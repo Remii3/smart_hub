@@ -1,8 +1,13 @@
+import { Routes, Route } from 'react-router-dom';
+import MainPage from './pages/MainPage';
+
 const App = () => {
   return (
-    <div className='text-3xl font-rubik'>
-      <p>Hello world</p>
-    </div>
+    <>
+      <Routes>
+        <Route path='/' element={<MainPage />} />
+      </Routes>
+    </>
   );
 };
 
