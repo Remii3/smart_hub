@@ -1,10 +1,9 @@
-import Nav from './Nav';
+import Parallax from "../components/parallax/Parallax";
 
 const Header = () => {
   return (
-    <div>
-      Header
-      <Nav />
+    <div className="-z-10 sticky top-0 left-0">
+      <Parallax />
     </div>
   );
 };

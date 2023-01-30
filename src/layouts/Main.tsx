@@ -1,5 +1,5 @@
-import Footer from './Footer';
-import Header from './Header';
+import Footer from "./Footer";
+import Nav from "./Nav";
 
 type ChildrenProps = {
   children: React.ReactNode;
@@ -7,11 +7,11 @@ type ChildrenProps = {
 
 const Main = ({ children }: ChildrenProps) => {
   return (
-    <>
-      <Header />
+    <div className="relative z-10 bg-white">
+      <Nav />
       <main>{children}</main>
       <Footer />
-    </>
+    </div>
   );
 };
 
