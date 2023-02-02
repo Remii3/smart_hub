@@ -1,9 +1,7 @@
-type ChildrenProps = {
-  children: React.ReactNode;
-};
+import { childrenPropsType } from '../types';
 
-const Main = ({ children }: ChildrenProps) => {
-  return <main className='z-20'>{children}</main>;
+const Main = ({ children }: childrenPropsType) => {
+  return <main>{children}</main>;
 };
 
 export default Main;

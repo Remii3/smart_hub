@@ -3,7 +3,7 @@
 }
 
 .sky {
-  background: url('./assets/img/parallaxImg.jpg') no-repeat center;
+  background: url('../assets/img/parallaxImg.jpg') no-repeat center;
   background-size: cover;
   transform: translateZ(-600px) scale(3);
   z-index: 1;
