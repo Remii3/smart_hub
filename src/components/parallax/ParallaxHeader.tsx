@@ -1,5 +1,3 @@
-import imgPath from '../../assets/img/6LUhzia.jpg';
-
 const ParallaxHeader = () => {
   return (
     <div className='paralax-group h-screen'>
