@@ -1,6 +1,8 @@
-import { childrenPropsType } from '../types';
+type PropsType = {
+  children: React.ReactNode;
+};
 
-const Header = ({ children }: childrenPropsType) => {
+const Header = ({ children }: PropsType) => {
   return <header>{children}</header>;
 };
 
