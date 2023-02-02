@@ -9,32 +9,7 @@
   z-index: 1;
 }
 
-/* .bushes {
-  background-size: cover;
-  transform: translateZ(-525px) scale(2.75);
+.parallax_title {
+  transform: translateZ(-500px) scale(3);
   z-index: 2;
 }
-
-.water {
-  background-size: cover;
-  transform: translateZ(-400px) scale(2.33333333);
-  z-index: 3;
-}
-
-.people1 {
-  background-size: cover;
-  transform: translateZ(-250px) scale(1.833333333);
-  z-index: 4;
-}
-
-.people2 {
-  background-size: cover;
-  transform: translateZ(-125px) scale(1.4167);
-  z-index: 5;
-}
-
-.people3 {
-  background-size: cover;
-  transform: translateZ(0) scale(1);
-  z-index: 6;
-} */

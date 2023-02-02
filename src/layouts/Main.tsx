@@ -3,7 +3,7 @@ type ChildrenProps = {
 };
 
 const Main = ({ children }: ChildrenProps) => {
-  return <main>{children}</main>;
+  return <main className='z-20'>{children}</main>;
 };
 
 export default Main;
