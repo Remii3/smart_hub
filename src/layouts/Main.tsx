@@ -1,8 +1,6 @@
-type ChildrenProps = {
-  children: React.ReactNode;
-};
+import { childrenPropsType } from '../types';
 
-const Main = ({ children }: ChildrenProps) => {
+const Main = ({ children }: childrenPropsType) => {
   return <main>{children}</main>;
 };
 
