@@ -1,12 +1,7 @@
-import Nav from './Nav';
+import { childrenPropsType } from '../types';
 
-const Header = () => {
-  return (
-    <div>
-      Header
-      <Nav />
-    </div>
-  );
+const Header = ({ children }: childrenPropsType) => {
+  return <header>{children}</header>;
 };
 
 export default Header;

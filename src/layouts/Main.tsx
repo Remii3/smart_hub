@@ -1,18 +1,7 @@
-import Footer from './Footer';
-import Header from './Header';
+import { childrenPropsType } from '../types';
 
-type ChildrenProps = {
-  children: React.ReactNode;
-};
-
-const Main = ({ children }: ChildrenProps) => {
-  return (
-    <>
-      <Header />
-      <main>{children}</main>
-      <Footer />
-    </>
-  );
+const Main = ({ children }: childrenPropsType) => {
+  return <main>{children}</main>;
 };
 
 export default Main;
