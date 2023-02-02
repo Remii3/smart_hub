@@ -1,6 +1,8 @@
-import { childrenPropsType } from '../types';
+type PropsType = {
+  children: React.ReactNode;
+};
 
-const Main = ({ children }: childrenPropsType) => {
+const Main = ({ children }: PropsType) => {
   return <main>{children}</main>;
 };
 

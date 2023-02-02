@@ -1,14 +1,23 @@
+import { lazy } from 'react';
 import { Routes, Route } from 'react-router-dom';
-import MainPage from './pages/MainPage';
-import NoPage404 from './pages/NoPage404';
+
+
+import SuspenseComponent from './components/suspense/SuspenseComponent';
+import LoadingComponent from './components/UI/LoadingComponent';
+
+const MainPage = lazy(() => import('./pages/MainPage'));
+
 
 const App = () => {
   return (
     <>
-      <Routes>
-        <Route path='/' element={<MainPage />} />
-        <Route path='*' element={<NoPage404 />} />
-      </Routes>
+
+      <SuspenseComponent fallback={<LoadingComponent />}>
+        <Routes>
+          <Route path='/' element={<MainPage />} />
+        </Routes>
+      </SuspenseComponent>
+
     </>
   );
 };
