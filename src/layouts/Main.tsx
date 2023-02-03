@@ -2,7 +2,7 @@ type PropsType = {
   children: React.ReactNode;
 };
 
-function Main({ children }: PropsType): JSX.Element {
+function Main({ children }: PropsType) {
   return <main>{children}</main>;
 }
 
