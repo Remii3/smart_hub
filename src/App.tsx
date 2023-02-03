@@ -6,7 +6,7 @@ import LoadingComponent from './components/UI/LoadingComponent';
 
 const MainPage = lazy(() => import('./pages/MainPage'));
 
-const App = () => {
+function App() {
   return (
     <>
       <SuspenseComponent fallback={<LoadingComponent />}>
@@ -16,6 +16,6 @@ const App = () => {
       </SuspenseComponent>
     </>
   );
-};
+}
 
 export default App;

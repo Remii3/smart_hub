@@ -1,4 +1,4 @@
-const Nav = () => {
+function Nav() {
   return (
     <nav className='sticky top-0 right-0 w-full py-3 z-30'>
       <div className='absolute top-0 left-0 w-full h-full bg-red-200 opacity-20' />
@@ -9,6 +9,6 @@ const Nav = () => {
       </ul>
     </nav>
   );
-};
+}
 
 export default Nav;

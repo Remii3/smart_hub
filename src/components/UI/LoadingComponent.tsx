@@ -1,5 +1,5 @@
-const LoadingComponent = () => {
+function LoadingComponent() {
   return <div>Loading...</div>;
-};
+}
 
 export default LoadingComponent;

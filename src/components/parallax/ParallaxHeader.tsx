@@ -1,4 +1,4 @@
-const ParallaxHeader = () => {
+function ParallaxHeader() {
   return (
     <>
       <section className='parallax__group relative w-screen min-h-screen'>
@@ -9,6 +9,6 @@ const ParallaxHeader = () => {
       </div>
     </>
   );
-};
+}
 
 export default ParallaxHeader;

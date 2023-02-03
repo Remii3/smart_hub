@@ -2,8 +2,8 @@ type PropsType = {
   children: React.ReactNode;
 };
 
-const Main = ({ children }: PropsType) => {
+function Main({ children }: PropsType): JSX.Element {
   return <main>{children}</main>;
-};
+}
 
 export default Main;

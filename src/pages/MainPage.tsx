@@ -3,7 +3,7 @@ import Footer from '../layouts/Footer';
 import Main from '../layouts/Main';
 import Nav from '../layouts/Nav';
 
-const MainPage = () => {
+function MainPage() {
   return (
     <div className='perspective-3 relative h-screen overflow-y-auto overflow-x-hidden bg-[#14222f]'>
       <ParallaxHeader />
@@ -35,6 +35,6 @@ const MainPage = () => {
       <Footer />
     </div>
   );
-};
+}
 
 export default MainPage;
