@@ -7,6 +7,14 @@
 
     theme: {
       extend: {
+        colors: {
+          primary: '#42a8ef',
+          secondary: '#254463',
+          pageBackground: '#0d1c25',
+          primaryGradient: 'linear-graident()',
+          primaryText: '#ffffff',
+          secondaryText: '#416c97',
+        },
         backgroundSize: {
           '400%': '400%',
         },
@@ -25,6 +33,7 @@
         },
         fontFamily: {
           rubik: ['Rubik', 'sans-serif'],
+          poppins: ['Poppins', 'sans-serif'],
         },
       },
     },
