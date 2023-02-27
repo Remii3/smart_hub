@@ -8,15 +8,17 @@
     theme: {
       extend: {
         colors: {
-          primary: '#42a8ef',
+          primary: '#6C63FF',
+          primaryText: '#4943AC',
           secondary: '#254463',
-          pageBackground: '#0d1c25',
-          primaryGradient: 'linear-graident()',
-          primaryText: '#ffffff',
-          secondaryText: '#416c97',
-        },
-        backgroundSize: {
-          '400%': '400%',
+          pageBackground: '#14222F',
+          dark: '#161618',
+          darkTint: '#1E1E20',
+          gray500: '#90A4AE',
+          gray600: '#727070',
+          gray800: '#E3E3E3',
+          gray900: '#F7F7FB',
+          danger: '#CA3333',
         },
         keyframes: {
           animateTextBackground: {
