@@ -26,7 +26,7 @@ const NoPage404 = () => {
            after:bg-gradient-to-r from-[#71b7e6] via-[#b98acc] to-[#ee8176]
            after:bg-clip-text
            after:fill-[transparent]
-           after:bg-400% 
+           after:bg-[size:400%] 
            after:drop-shadow-xl
            after:animate-animateTextBackground
            '
