@@ -1,0 +1,14 @@
+.parallax__group {
+  transform-style: preserve-3d;
+}
+
+.sky {
+  background: url('../img/parallaxImg.jpg') no-repeat center;
+  background-size: cover;
+  transform: translateZ(-600px) scale(3);
+  z-index: 1;
+}
+
+.parallax_title {
+  transform: translateZ(-500px) scale(3);
+}
