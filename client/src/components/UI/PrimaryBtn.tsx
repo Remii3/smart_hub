@@ -6,11 +6,11 @@ function PrimaryBtn({ usecase, text }: BtnUsecases) {
       case 'big':
         return 'sm:px-12 sm:py-5 px-14 py-3 font-semibold text-2xl';
       case 'normal':
-        return 'px-5 py-3 font-semibold text-lg';
+        return 'px-6 py-4 font-semibold text-lg';
     }
   };
   return (
-    <button className={`${btnClass()} bg-primary text-white rounded-lg`}>
+    <button className={`${btnClass()} bg-primary rounded-lg text-white`}>
       {text}
     </button>
   );

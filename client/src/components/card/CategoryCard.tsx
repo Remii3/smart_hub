@@ -5,8 +5,8 @@ type CategoryCardTypes = {
 
 function CategoryCard({ title, description }: CategoryCardTypes) {
   return (
-    <div className='relative rounded-lg py-12 px-10 flex flex-col gap-4 bg-gray900 drop-shadow'>
-      <h5>{title}</h5>
+    <div className='bg-gray900 relative flex flex-col gap-4 rounded-lg py-12 px-10 drop-shadow'>
+      <h3>{title}</h3>
       <p>{description}</p>
       <i className='absolute'>{/* arrow icon */}</i>
     </div>

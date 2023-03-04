@@ -4,6 +4,17 @@ import CategoryCard from '../components/card/CategoryCard';
 import PrimaryBtn from '../components/UI/PrimaryBtn';
 import Footer from '../layout/Footer';
 import Main from '../layout/Main';
+import BestAuctionCard from '../components/card/BestAuctionCard';
+import AuctionCard from '..//components/card/AuctionCard';
+import MainPageHeading from '../components/UI/MainPageHeading';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Autoplay, Navigation, Scrollbar } from 'swiper';
+
+import 'swiper/css';
+import 'swiper/css/scrollbar';
+import 'swiper/css/navigation';
+
+import '../lib/swiper/swiper.css';
 
 function MainPage() {
   const testArray = [
@@ -20,7 +31,57 @@ function MainPage() {
     { title: 'asd', description: 'zxczxzxc' },
     { title: 'asd', description: 'zxczxzxc' },
   ];
-
+  const testAuctionArray = [
+    {
+      title: 'asd',
+      author: 'asd',
+      deadline: new Date(),
+      description: 'zxczxzxc',
+      price: 12,
+    },
+    {
+      title: 'asd',
+      author: 'asd',
+      deadline: new Date(),
+      description: 'zxczxzxc',
+      price: 12,
+    },
+    {
+      title: 'asd',
+      author: 'asd',
+      deadline: new Date(),
+      description: 'zxczxzxc',
+      price: 12,
+    },
+    {
+      title: 'asd',
+      author: 'asd',
+      deadline: new Date(),
+      description: 'zxczxzxc',
+      price: 12,
+    },
+    {
+      title: 'asd',
+      author: 'asd',
+      deadline: new Date(),
+      description: 'zxczxzxc',
+      price: 12,
+    },
+    {
+      title: 'asd',
+      author: 'asd',
+      deadline: new Date(),
+      description: 'zxczxzxc',
+      price: 12,
+    },
+    {
+      title: 'asd',
+      author: 'asd',
+      deadline: new Date(),
+      description: 'zxczxzxc',
+      price: 12,
+    },
+  ];
   return (
     <>
       <Header />
@@ -52,58 +113,156 @@ function MainPage() {
         <Main>
           {/* Shop */}
           <div className='parallax__group translate-z-0 relative flex min-h-screen w-screen scale-100 flex-col items-center justify-center bg-white'>
-            <section className='bg-pageBackground relative -top-1 left-0 flex w-full flex-col items-center'>
-              <div className='py-7 text-center md:py-32'>
-                <h2 className='mb-5 uppercase text-white'>
-                  Reading with us is easy
-                </h2>
-                <p className='text-gray900 text-sm uppercase lg:text-lg'>
-                  Offering a diverse array of book genres to choose from, for
-                  every occasion
-                </p>
+            <section className='relative flex w-full flex-col items-center gap-12 pb-16'>
+              <div className='bg-pageBackground relative -top-1  left-0 w-full'>
+                <MainPageHeading
+                  color='white'
+                  usecase='main'
+                  mainTitle='Reading with us is easy'
+                  subTitle='Offering a diverse array of book genres to choose from, for
+                every occasion'
+                />
               </div>
-              <div className='w-full bg-white py-12'>
-                <div className='pb-16'>
-                  <div className='mx-auto grid max-w-7xl grid-cols-1 gap-6 px-3 md:grid-cols-2 lg:grid-cols-3'>
-                    {testArray.map((cardItem, id) => (
-                      <CategoryCard
-                        key={id}
-                        title={cardItem.title}
-                        description={cardItem.description}
-                      />
-                    ))}
-                  </div>
+              <div className='w-full'>
+                <div className='mx-auto grid max-w-7xl grid-cols-1 gap-6 px-3 md:grid-cols-2 lg:grid-cols-3'>
+                  {testArray.map((cardItem, id) => (
+                    <CategoryCard
+                      key={id}
+                      title={cardItem.title}
+                      description={cardItem.description}
+                    />
+                  ))}
                 </div>
-                <div className='text-center'>
-                  <PrimaryBtn usecase='normal' text='See all genres' />
-                </div>
+              </div>
+              <div className='w-full text-center'>
+                <PrimaryBtn usecase='normal' text='See all genres' />
               </div>
             </section>
             {/* Special */}
-            <section className='relative flex w-full flex-col items-center'>
-              <div className='w-full bg-white py-7 text-center md:py-32'>
-                <h2 className='text-dark mb-5 uppercase'>
-                  Discover your next great read
-                </h2>
-                <p className='text-dark text-sm uppercase lg:text-lg'>
-                  Unleash the power of imagination, explore new worlds and find
-                  your next favorite book with us
-                </p>
-              </div>
-              {testCollectionArray.map((collection, id) => (
-                <CollectionCard
-                  key={id}
-                  backcolor={(id + 1) % 2 ? 'pageBackground' : 'white'}
-                  collectionData={collection}
+            <section className='relative flex w-full flex-col items-center gap-12 pb-16'>
+              <div className='w-full bg-white'>
+                <MainPageHeading
+                  color='dark'
+                  usecase='main'
+                  mainTitle='Discover your next great read'
+                  subTitle='Unleash the power of imagination, explore new worlds and find
+                your next favorite book with us'
                 />
-              ))}
+              </div>
+              <div className='w-full'>
+                {testCollectionArray.map((collection, id) => (
+                  <CollectionCard
+                    key={id}
+                    backcolor={(id + 1) % 2 ? 'pageBackground' : 'white'}
+                    collectionData={collection}
+                    lastItem={testCollectionArray.length === id + 1}
+                  />
+                ))}
+              </div>
             </section>
-            <section className='bg-pageBackground relative flex w-full flex-col items-center'>
-              <div className=''>Section 3</div>
+            <section className='bg-pageBackground relative flex w-full flex-col items-center pb-16'>
+              <div className='relative -top-1 left-0 w-full bg-white'>
+                <MainPageHeading
+                  color='dark'
+                  usecase='main'
+                  mainTitle='Bid on books, find treasures within'
+                  subTitle='Books are the portal to endless possibilities'
+                />
+              </div>
+              <div className='flex flex-col gap-12'>
+                <div className='w-full'>
+                  <MainPageHeading
+                    color='white'
+                    usecase='sub'
+                    mainTitle='This makes our hearts beat faster every day'
+                    subTitle='Readers loved them'
+                  />
+                </div>
+                <div>
+                  <div>
+                    <BestAuctionCard
+                      title='asd'
+                      description='asdasdasd'
+                      expDate={new Date()}
+                    />
+                  </div>
+                  <div className='w-full text-center'>
+                    <span>1</span>
+                    <span>2</span>
+                    <span>3</span>
+                  </div>
+                </div>
+              </div>
             </section>
-            <section className='bg-pageBackground relative flex w-full flex-col items-center'>
-              <div className='absolute top-0 left-0 h-full w-full bg-[#72FFF4] opacity-[2%]'></div>
-              <div className='text-3xl text-white'>Section 4</div>
+            <section className='relative flex w-full flex-col items-center gap-12 bg-white px-0 pb-24 sm:px-24'>
+              <div className='w-full'>
+                <MainPageHeading
+                  color='dark'
+                  usecase='sub'
+                  mainTitle='Similar auctions'
+                  subTitle='You may like this too'
+                />
+              </div>
+              <div className='px-auto w-full max-w-[1648px]'>
+                <Swiper
+                  scrollbar={{
+                    hide: false,
+                  }}
+                  autoHeight={true}
+                  navigation
+                  autoplay={{
+                    delay: 5000,
+                    disableOnInteraction: false,
+                    pauseOnMouseEnter: true,
+                  }}
+                  modules={[Scrollbar, Navigation, Autoplay]}
+                  spaceBetween={52}
+                  slidesPerView={1}
+                  breakpoints={{
+                    324: {
+                      slidesPerView: 1,
+                      spaceBetween: 52,
+                      scrollbar: { hide: false },
+                    },
+                    663: {
+                      slidesPerView: 2,
+                      spaceBetween: 52,
+                      scrollbar: { hide: false },
+                    },
+                    1002: {
+                      slidesPerView: 3,
+                      spaceBetween: 52,
+                      scrollbar: { hide: true },
+                    },
+                    1341: {
+                      slidesPerView: 4,
+                      spaceBetween: 52,
+                    },
+                    1680: {
+                      slidesPerView: 5,
+                      spaceBetween: 52,
+                    },
+                  }}
+                  style={{
+                    paddingBottom: '26px',
+                    paddingTop: '26px',
+                  }}
+                >
+                  {testAuctionArray.map((auctionData, id) => (
+                    <SwiperSlide key={id}>
+                      <AuctionCard
+                        title={auctionData.title}
+                        author={auctionData.author}
+                        deadline={auctionData.deadline}
+                        price={auctionData.price}
+                      />
+                    </SwiperSlide>
+                  ))}
+                </Swiper>
+              </div>
+              <div className='w-full text-center'>
+                <PrimaryBtn text='See all auctions' usecase='normal' />
+              </div>
             </section>
           </div>
         </Main>
