@@ -8,11 +8,12 @@ import BestAuctionCard from '../components/card/BestAuctionCard';
 import AuctionCard from '..//components/card/AuctionCard';
 import MainPageHeading from '../components/UI/MainPageHeading';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Autoplay, Navigation, Scrollbar } from 'swiper';
+import { Autoplay, Navigation, Pagination, Scrollbar } from 'swiper';
 
 import 'swiper/css';
 import 'swiper/css/scrollbar';
 import 'swiper/css/navigation';
+import 'swiper/css/pagination';
 
 import '../lib/swiper/swiper.css';
 
@@ -32,6 +33,57 @@ function MainPage() {
     { title: 'asd', description: 'zxczxzxc' },
   ];
   const testAuctionArray = [
+    {
+      title: 'asd',
+      author: 'asd',
+      deadline: new Date(),
+      description: 'zxczxzxc',
+      price: 12,
+    },
+    {
+      title: 'asd',
+      author: 'asd',
+      deadline: new Date(),
+      description: 'zxczxzxc',
+      price: 12,
+    },
+    {
+      title: 'asd',
+      author: 'asd',
+      deadline: new Date(),
+      description: 'zxczxzxc',
+      price: 12,
+    },
+    {
+      title: 'asd',
+      author: 'asd',
+      deadline: new Date(),
+      description: 'zxczxzxc',
+      price: 12,
+    },
+    {
+      title: 'asd',
+      author: 'asd',
+      deadline: new Date(),
+      description: 'zxczxzxc',
+      price: 12,
+    },
+    {
+      title: 'asd',
+      author: 'asd',
+      deadline: new Date(),
+      description: 'zxczxzxc',
+      price: 12,
+    },
+    {
+      title: 'asd',
+      author: 'asd',
+      deadline: new Date(),
+      description: 'zxczxzxc',
+      price: 12,
+    },
+  ];
+  const testBestAuctionArray = [
     {
       title: 'asd',
       author: 'asd',
@@ -161,7 +213,7 @@ function MainPage() {
               </div>
             </section>
             <section className='bg-pageBackground relative flex w-full flex-col items-center pb-16'>
-              <div className='relative -top-1 left-0 w-full bg-white'>
+              <div className='relative -top-1 left-0 w-full  bg-white'>
                 <MainPageHeading
                   color='dark'
                   usecase='main'
@@ -169,28 +221,41 @@ function MainPage() {
                   subTitle='Books are the portal to endless possibilities'
                 />
               </div>
-              <div className='flex flex-col gap-12'>
-                <div className='w-full'>
-                  <MainPageHeading
-                    color='white'
-                    usecase='sub'
-                    mainTitle='This makes our hearts beat faster every day'
-                    subTitle='Readers loved them'
-                  />
+              <div className='flex w-full flex-col gap-12 lg:flex-row lg:gap-0'>
+                <div className='w-full flex-grow'>
+                  <div className='flex flex-col items-center py-6 text-center md:py-32 lg:items-start lg:pl-12'>
+                    <h3 className={`mb-5 text-center text-white lg:text-left`}>
+                      This makes our hearts beat faster every day
+                    </h3>
+                    <p className={`text-gray900 text-sm lg:text-lg `}>
+                      Readers loved them
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <div>
-                    <BestAuctionCard
-                      title='asd'
-                      description='asdasdasd'
-                      expDate={new Date()}
-                    />
-                  </div>
-                  <div className='w-full text-center'>
-                    <span>1</span>
-                    <span>2</span>
-                    <span>3</span>
-                  </div>
+                <div className='flex w-full max-w-[100%] items-center lg:max-w-[70%] lg:py-32'>
+                  <Swiper
+                    pagination={true}
+                    autoHeight={true}
+                    autoplay={{
+                      delay: 10000,
+                      disableOnInteraction: false,
+                      pauseOnMouseEnter: true,
+                    }}
+                    modules={[Autoplay, Pagination]}
+                    spaceBetween={52}
+                    slidesPerView={1}
+                    style={{ paddingBottom: '52px' }}
+                  >
+                    {testBestAuctionArray.map((auctionItem, id) => (
+                      <SwiperSlide key={id}>
+                        <BestAuctionCard
+                          title='asd'
+                          description='asdasdasd'
+                          expDate={new Date()}
+                        />
+                      </SwiperSlide>
+                    ))}
+                  </Swiper>
                 </div>
               </div>
             </section>
