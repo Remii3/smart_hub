@@ -10,7 +10,9 @@ function PrimaryBtn({ usecase, text }: BtnUsecases) {
     }
   };
   return (
-    <button className={`${btnClass()} bg-primary rounded-lg text-white`}>
+    <button
+      className={`${btnClass()} bg-primary transition-[filter, scale] rounded-lg text-white shadow duration-200 ease-out hover:shadow-md hover:brightness-90 active:scale-95 active:brightness-75`}
+    >
       {text}
     </button>
   );

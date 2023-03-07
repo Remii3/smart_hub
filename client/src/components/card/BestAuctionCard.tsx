@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import PrimaryBtn from '../UI/PrimaryBtn';
+import SecondaryBtn from '../UI/SecondaryBtn';
 
 type PropsTypes = {
   title: string;
@@ -46,12 +47,11 @@ function BestAuctionCard({ title, expDate, description, highBid }: PropsTypes) {
               </div>
               <div className='flex flex-col gap-1 sm:flex-row lg:items-start'>
                 <PrimaryBtn text='Enter live auction' usecase='normal' />
-                <button
-                  className='text-darkTint h-[60px] px-3'
+                <SecondaryBtn
+                  text={descHidden ? 'View details' : 'Hide details'}
                   onClick={showDesc}
-                >
-                  View details
-                </button>
+                  customCSS={descHidden ? 'brightness-100' : 'brightness-90'}
+                />
               </div>
             </div>
           </div>
