@@ -1,10 +1,20 @@
-type PropsType = {
+type PropsTypes = {
+  usecase: 'switch';
   text: string;
   onClick?: () => void;
   customCSS?: string;
 };
 
-function SecondaryBtn({ text, onClick, customCSS }: PropsType) {
+function SecondaryBtn({ usecase, text, onClick, customCSS }: PropsTypes) {
+  const usecaseClass = () => {
+    switch (usecase) {
+      case 'switch':
+        return 'px-3 h-[60px]';
+      default:
+        return '';
+    }
+  };
+
   const clickHandler = () => {
     if (onClick) {
       onClick();
@@ -14,7 +24,7 @@ function SecondaryBtn({ text, onClick, customCSS }: PropsType) {
 
   return (
     <button
-      className={`${customCSS} text-darkTint h-[60px] rounded-lg bg-white px-3 transition-[filter,transform] duration-200 ease-out hover:brightness-95 active:scale-95 active:brightness-90`}
+      className={`${customCSS} ${usecaseClass()} text-darkTint rounded-lg bg-white transition-[filter,transform] duration-200 ease-out hover:brightness-95 active:scale-95 active:brightness-90`}
       onClick={clickHandler}
     >
       {text}

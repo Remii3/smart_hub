@@ -11,9 +11,11 @@ type PropsTypes = {
 
 function BestAuctionCard({ title, expDate, description, highBid }: PropsTypes) {
   const [descHidden, setDescHidden] = useState(true);
+
   const showDesc = () => {
     setDescHidden(prevState => !prevState);
   };
+
   return (
     <div className=' rounded-lg p-2'>
       <div className='rounded-2xl bg-white px-3 pb-3 pt-6'>
@@ -48,6 +50,7 @@ function BestAuctionCard({ title, expDate, description, highBid }: PropsTypes) {
               <div className='flex flex-col gap-1 sm:flex-row lg:items-start'>
                 <PrimaryBtn text='Enter live auction' usecase='normal' />
                 <SecondaryBtn
+                  usecase='switch'
                   text={descHidden ? 'View details' : 'Hide details'}
                   onClick={showDesc}
                   customCSS={descHidden ? 'brightness-100' : 'brightness-90'}
