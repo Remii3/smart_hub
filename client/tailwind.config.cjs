@@ -8,8 +8,8 @@
     theme: {
       extend: {
         colors: {
-          primary: '#6C63FF',
-          primaryText: '#4943AC',
+          primary: '#3E74FF',
+          primaryText: '#3F63BF',
           secondary: '#254463',
           pageBackground: '#14222F',
           dark: '#161618',

@@ -12,28 +12,34 @@
     @apply font-semibold;
   }
   h1 {
-    @apply text-7xl;
+    @apply text-5xl lg:text-7xl;
   }
   h2 {
-    @apply text-6xl;
+    @apply text-2xl sm:text-5xl lg:text-6xl;
   }
   h3 {
-    @apply text-5xl;
+    @apply text-xl sm:text-4xl lg:text-5xl;
   }
   h4 {
-    @apply text-4xl;
+    @apply text-lg sm:text-3xl lg:text-4xl;
   }
   h5 {
-    @apply text-2xl;
+    @apply text-lg sm:text-2xl lg:text-3xl;
   }
   h6 {
-    @apply text-lg;
+    @apply text-base sm:text-xl lg:text-2xl;
   }
   body {
     @apply font-rubik;
   }
   p {
-    @apply text-lg;
+    @apply text-sm sm:text-lg;
+  }
+  button {
+    @apply text-base sm:text-lg;
+  }
+  li {
+    @apply pb-2 text-sm sm:text-base;
   }
 }
 
