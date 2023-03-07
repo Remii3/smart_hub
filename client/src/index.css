@@ -24,10 +24,10 @@
     @apply text-lg sm:text-3xl lg:text-4xl;
   }
   h5 {
-    @apply text-base sm:text-2xl lg:text-3xl;
+    @apply text-lg sm:text-2xl lg:text-3xl;
   }
   h6 {
-    @apply text-sm sm:text-xl lg:text-2xl;
+    @apply text-base sm:text-xl lg:text-2xl;
   }
   body {
     @apply font-rubik;
@@ -37,6 +37,9 @@
   }
   button {
     @apply text-base sm:text-lg;
+  }
+  li {
+    @apply pb-2 text-sm sm:text-base;
   }
 }
 

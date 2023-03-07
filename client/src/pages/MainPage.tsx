@@ -144,9 +144,9 @@ function MainPage() {
         <div className='parallax_title absolute top-[65%] flex h-screen w-full justify-start md:top-[100%]  '>
           <div className='text-primaryText flex w-full  flex-col sm:items-start'>
             <div className='mb-14 ml-[15%] max-w-xs sm:max-w-none'>
-              <h5 className='uppercase lg:text-4xl'>
+              <h6 className='uppercase lg:text-4xl'>
                 Award winning literature
-              </h5>
+              </h6>
               <h1 className='uppercase text-white sm:text-5xl lg:text-7xl'>
                 <span className='inline-block w-full max-w-[80%]'>
                   Buy best selling
