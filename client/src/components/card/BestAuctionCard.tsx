@@ -11,13 +11,17 @@ type PropsTypes = {
 
 function BestAuctionCard({ title, expDate, description, highBid }: PropsTypes) {
   const [descHidden, setDescHidden] = useState(true);
-
   const showDesc = () => {
+    const swiperEl = document.querySelector('.swiper');
+    console.log(swiperEl);
+    swiperEl?.setAttribute('autoHeight', 'true');
+    console.log(swiperEl);
+
     setDescHidden(prevState => !prevState);
   };
 
   return (
-    <div className=' rounded-lg p-2'>
+    <div className='h-auto rounded-lg p-2 transition-all duration-200 ease-out'>
       <div className='rounded-2xl bg-white px-3 pb-3 pt-6'>
         <div className='flex flex-col lg:flex-row'>
           <div className='hidden lg:block'>
@@ -26,7 +30,7 @@ function BestAuctionCard({ title, expDate, description, highBid }: PropsTypes) {
           <div className='flex-grow'>
             <h3 className='text-dark pb-6'>{title}</h3>
             <div className='flex flex-col justify-between lg:flex-row'>
-              <div className='flex flex-row justify-between pb-10'>
+              <div className='flex basis-1/2 flex-row justify-between pb-10'>
                 <div className='flex flex-col gap-3'>
                   <p>
                     <span className='text-gray600'> Highest bid:</span>
@@ -40,7 +44,9 @@ function BestAuctionCard({ title, expDate, description, highBid }: PropsTypes) {
                   </p>
                   <p className={`${descHidden ? 'hidden' : 'block'}`}>
                     <span className='text-gray600'>Description: </span>
-                    <span className='text-darkTint'> {description} </span>
+                    <span className='text-darkTint break-all'>
+                      {description}
+                    </span>
                   </p>
                 </div>
                 <div className='pr-3'>

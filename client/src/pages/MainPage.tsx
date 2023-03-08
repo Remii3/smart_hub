@@ -232,25 +232,37 @@ function MainPage() {
                     </p>
                   </div>
                 </div>
-                <div className='flex w-full max-w-[100%] items-center lg:max-w-[70%] lg:py-32'>
+                <div className='flex h-auto w-full max-w-[100%] items-center transition-all duration-200 ease-out lg:max-w-[70%] lg:py-32'>
                   <Swiper
+                    className='bestAuction-swiper'
                     pagination={true}
-                    autoHeight={true}
                     autoplay={{
                       delay: 10000,
                       disableOnInteraction: false,
                       pauseOnMouseEnter: true,
                     }}
-                    modules={[Autoplay, Pagination]}
+                    modules={[Pagination]}
                     spaceBetween={52}
                     slidesPerView={1}
-                    style={{ paddingBottom: '52px' }}
+                    observer={true}
+                    observeParents={true}
+                    observeSlideChildren={true}
+                    updateOnWindowResize={true}
+                    style={{
+                      paddingBottom: '52px',
+                      transition: 'all 0.3s ease-out',
+                    }}
                   >
                     {testBestAuctionArray.map((auctionItem, id) => (
-                      <SwiperSlide key={id}>
+                      <SwiperSlide
+                        key={id}
+                        style={{ transition: 'all 0.3s ease-out' }}
+                      >
                         <BestAuctionCard
                           title='asd'
-                          description='asdasdasd'
+                          description={
+                            'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa sssssssssssssssssssssssssssssssssssssssssss dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd cccccccccccccccccccccccccccccccccccccccccc'
+                          }
                           expDate={new Date()}
                         />
                       </SwiperSlide>
