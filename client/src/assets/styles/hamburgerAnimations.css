@@ -1,0 +1,71 @@
+@media screen and (max-width: 768px) {
+  .mobile-overlay.inactive {
+    animation: testOut 0.2s ease both;
+  }
+
+  .mobile-overlay.active {
+    animation: testIn 0.2s ease both;
+  }
+
+  @keyframes testIn {
+    0% {
+      height: 0;
+      display: block;
+      left: 100vw;
+      top: 0;
+    }
+    100% {
+      top: 63px;
+      height: calc(100vh - 56px);
+      display: block;
+      left: 0vw;
+    }
+  }
+  @keyframes testOut {
+    0% {
+      top: 63px;
+
+      height: calc(100vh - 56px);
+      display: none;
+      left: 0vw;
+    }
+    100% {
+      top: 0;
+      height: 0;
+      left: 100vw;
+      display: none;
+    }
+  }
+}
+
+#nav-icon3 {
+  width: 40px;
+  height: 40px;
+  position: relative;
+  transform: rotate(0deg);
+  transition: 0.5s ease-in-out;
+}
+
+#nav-icon3 span {
+  display: block;
+  position: absolute;
+  height: 4px;
+  width: 100%;
+  background: white;
+  border-radius: 9px;
+  opacity: 1;
+  left: 0;
+  transition: 0.25s ease-in-out;
+}
+
+#nav-icon3.open span:nth-child(1) {
+  top: 18px;
+  width: 0%;
+  left: 50%;
+}
+
+#nav-icon3.open span:nth-child(4) {
+  top: 18px;
+  width: 0%;
+  left: 50%;
+}
