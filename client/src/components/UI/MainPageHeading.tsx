@@ -24,7 +24,7 @@ function MainPageHeading({ mainTitle, subTitle, usecase, color }: PropsTypes) {
     <div
       className={`${
         usecase === 'main' ? 'py-7' : 'py-6'
-      }  text-center md:py-32`}
+      } px-4 text-center md:py-32`}
     >
       {mainTitleSize()}
       <p className={`text-sm uppercase lg:text-lg ${subTitleColor()}`}>

@@ -15,8 +15,10 @@ import 'swiper/css/scrollbar';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import '../assets/styles/swiper.css';
+import { useNavigate } from 'react-router-dom';
 
 function MainPage() {
+  const navigate = useNavigate();
   const testArray = [
     { title: 'asd', description: 'zxczxzxc' },
     { title: 'asd', description: 'zxczxzxc' },
@@ -160,7 +162,13 @@ function MainPage() {
               </h1>
             </div>
             <div className='ml-[15%]'>
-              <PrimaryBtn usecase='big' text='See now' />
+              <PrimaryBtn
+                usecase='big'
+                text='See now'
+                onClick={() => {
+                  navigate('/shop');
+                }}
+              />
             </div>
           </div>
         </div>
@@ -168,7 +176,7 @@ function MainPage() {
           {/* Shop */}
           <div className='parallax__group translate-z-0 relative flex min-h-screen w-screen scale-100 flex-col items-center justify-center bg-white'>
             <section className='relative flex w-full flex-col items-center gap-12 pb-16'>
-              <div className='bg-pageBackground relative -top-1  left-0 w-full'>
+              <div className='bg-pageBackground relative -top-1 left-0 w-full'>
                 <MainPageHeading
                   color='white'
                   usecase='main'
@@ -189,7 +197,13 @@ function MainPage() {
                 </div>
               </div>
               <div className='w-full text-center'>
-                <PrimaryBtn usecase='normal' text='See all genres' />
+                <PrimaryBtn
+                  usecase='normal'
+                  text='See all genres'
+                  onClick={() => {
+                    navigate('/shop');
+                  }}
+                />
               </div>
             </section>
             {/* Special */}
@@ -225,7 +239,7 @@ function MainPage() {
               </div>
               <div className='flex w-full flex-col gap-12 lg:flex-row lg:gap-0'>
                 <div className='w-full flex-grow'>
-                  <div className='flex flex-col items-center py-6 text-center md:py-32 lg:items-start lg:pl-12'>
+                  <div className='flex flex-col items-center px-4 py-6 text-center md:py-32 lg:items-start lg:pl-12'>
                     <h3 className={`mb-5 text-center text-white lg:text-left`}>
                       This makes our hearts beat faster every day
                     </h3>
@@ -328,7 +342,13 @@ function MainPage() {
                 </Swiper>
               </div>
               <div className='w-full text-center'>
-                <PrimaryBtn text='See all auctions' usecase='normal' />
+                <PrimaryBtn
+                  text='See all auctions'
+                  usecase='normal'
+                  onClick={() => {
+                    navigate('/auctions');
+                  }}
+                />
               </div>
             </section>
           </div>

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import PrimaryBtn from '../UI/PrimaryBtn';
 import SecondaryBtn from '../UI/SecondaryBtn';
 
@@ -11,6 +12,7 @@ type PropsTypes = {
 
 function BestAuctionCard({ title, expDate, description, highBid }: PropsTypes) {
   const [descHidden, setDescHidden] = useState(true);
+  const navigate = useNavigate();
 
   const showDesc = () => {
     setDescHidden(prevState => !prevState);
@@ -48,7 +50,13 @@ function BestAuctionCard({ title, expDate, description, highBid }: PropsTypes) {
                 </div>
               </div>
               <div className='flex flex-col gap-1 sm:flex-row lg:items-start'>
-                <PrimaryBtn text='Enter live auction' usecase='normal' />
+                <PrimaryBtn
+                  text='Enter live auction'
+                  usecase='normal'
+                  onClick={() => {
+                    navigate('/auctions');
+                  }}
+                />
                 <SecondaryBtn
                   usecase='switch'
                   text={descHidden ? 'View details' : 'Hide details'}

@@ -25,7 +25,9 @@ function Nav() {
 
   return (
     <nav className='relative top-0 left-0 z-30 mx-auto flex h-[64px] max-w-[1480px] flex-row items-center justify-between py-3 px-10 transition-all duration-300 ease-out'>
-      <div className='text-white'>SmartHub</div>
+      <div className='text-white'>
+        <Link to={'/'}>SmartHub</Link>
+      </div>
       <div className='hidden md:flex'>
         <ul className='flex flex-row items-center px-8 text-white'>
           <li className='hover:text-primary text-base transition-[color,transform] duration-200 ease-out hover:scale-105'>

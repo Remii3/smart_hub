@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import MainPageHeading from '../UI/MainPageHeading';
 import PrimaryBtn from '../UI/PrimaryBtn';
 
@@ -11,6 +12,8 @@ function CollectionCard({
   collectionData,
   lastItem,
 }: CollectionCardTypes) {
+  const navigate = useNavigate();
+
   const colorStyle = () => {
     switch (backcolor) {
       case 'white':
@@ -32,7 +35,13 @@ function CollectionCard({
       />
       <div className='pb-16'>{collectionData.title}</div>
       <div>
-        <PrimaryBtn usecase='normal' text='Check out' />
+        <PrimaryBtn
+          usecase='normal'
+          text='Check out'
+          onClick={() => {
+            navigate(`/collections`);
+          }}
+        />
       </div>
     </div>
   );
