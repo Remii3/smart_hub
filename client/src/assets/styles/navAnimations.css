@@ -1,0 +1,37 @@
+/* overlay animation */
+
+@media screen and (max-width: 768px) {
+  .mobile-overlay.inactive {
+    animation: exitAnim 0.2s ease both;
+  }
+
+  .mobile-overlay.active {
+    animation: entryAnim 0.2s ease both;
+  }
+
+  @keyframes entryAnim {
+    0% {
+      top: -60px;
+      left: 100vw;
+    }
+    100% {
+      top: 0;
+      padding-top: 63px;
+      height: 100vh;
+      left: 0vw;
+    }
+  }
+  @keyframes exitAnim {
+    0% {
+      top: 0;
+      padding-top: 63px;
+      left: 0vw;
+      height: 100vh;
+    }
+    100% {
+      top: -60px;
+      height: 0;
+      left: 100vw;
+    }
+  }
+}

@@ -14,9 +14,7 @@ import 'swiper/css';
 import 'swiper/css/scrollbar';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
-import '../assets/styles/hamburgerAnimations.css';
 import '../assets/styles/swiper.css';
-import { Link } from 'react-router-dom';
 
 function MainPage() {
   const testArray = [
@@ -135,29 +133,15 @@ function MainPage() {
       price: 12,
     },
   ];
-
   return (
     <>
-      <Header />
-      <div className='mobile-overlay bg-pageBackground fixed top-0 left-[100vw] z-20 w-full'>
-        <ul className='flex flex-col items-center text-white'>
-          <li className='px-2'>
-            <Link to={'/'}>News</Link>
-          </li>
-          <li className='px-2'>
-            <Link to={'/'}>Shop</Link>
-          </li>
-          <li className='px-2'>
-            <Link to={'/'}>Specials</Link>
-          </li>
-          <li className='px-2'>
-            <Link to={'/'}>Auctions</Link>
-          </li>
-        </ul>
-      </div>
-      <div className='perspective-3 bg-pageBackground relative h-screen overflow-y-auto overflow-x-hidden scroll-smooth'>
+      <div
+        id='testScroll'
+        className=' perspective-3 bg-pageBackground relative h-screen overflow-x-hidden scroll-smooth'
+      >
+        <Header />
         <section className='parallax__group relative min-h-screen w-screen'>
-          <div className='sky absolute top-0 left-0 right-0 bottom-0 flex items-center justify-center brightness-50'></div>
+          <div className='sky absolute -top-20 left-0 right-0 bottom-0 flex items-center justify-center brightness-50'></div>
         </section>
         <div className='parallax_title absolute top-[65%] flex h-screen w-full justify-start md:top-[100%]  '>
           <div className='text-primaryText flex w-full  flex-col sm:items-start'>
