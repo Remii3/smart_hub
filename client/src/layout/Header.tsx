@@ -17,7 +17,7 @@ function Header() {
         <ul className='flex flex-col text-white'>
           <li className='w-full'>
             <Link
-              to={'/'}
+              to={'/news'}
               className='hover:text-primaryText block w-full py-3 text-center text-lg transition-colors duration-200 ease-out'
             >
               News
@@ -25,7 +25,7 @@ function Header() {
           </li>
           <li className='w-full'>
             <Link
-              to={'/'}
+              to={'/shop'}
               className='hover:text-primaryText block w-full py-3 text-center text-lg transition-colors duration-200 ease-out'
             >
               Shop
@@ -33,15 +33,15 @@ function Header() {
           </li>
           <li>
             <Link
-              to={'/'}
+              to={'/collections'}
               className='hover:text-primaryText block w-full py-3 text-center text-lg transition-colors duration-200 ease-out'
             >
-              Specials
+              Collections
             </Link>
           </li>
           <li>
             <Link
-              to={'/'}
+              to={'/auctions'}
               className='hover:text-primaryText block w-full py-3 text-center text-lg transition-colors duration-200 ease-out'
             >
               Auctions

@@ -29,22 +29,22 @@ function Nav() {
       <div className='hidden md:flex'>
         <ul className='flex flex-row items-center px-8 text-white'>
           <li className='hover:text-primary text-base transition-[color,transform] duration-200 ease-out hover:scale-105'>
-            <Link className='px-4 py-2' to={'/'}>
+            <Link className='px-4 py-2' to={'/news'}>
               News
             </Link>
           </li>
           <li className='hover:text-primary text-base transition-[color,transform] duration-200 ease-out hover:scale-105'>
-            <Link className='px-4 py-2' to={'/'}>
+            <Link className='px-4 py-2' to={'/shop'}>
               Shop
             </Link>
           </li>
           <li className='hover:text-primary text-base transition-[color,transform] duration-200 ease-out hover:scale-105'>
-            <Link className='px-4 py-2' to={'/'}>
+            <Link className='px-4 py-2' to={'/specials'}>
               Specials
             </Link>
           </li>
           <li className='hover:text-primary text-base transition-[color,transform] duration-200 ease-out hover:scale-105'>
-            <Link className='px-4 py-2' to={'/'}>
+            <Link className='px-4 py-2' to={'/auctions'}>
               Auctions
             </Link>
           </li>

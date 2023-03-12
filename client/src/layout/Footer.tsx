@@ -9,10 +9,10 @@ function Footer() {
           <ul>
             <li>&copy;2023 Best design team</li>
             <li>
-              <Link to={'/'}> Terms and conditions</Link>
+              <Link to={'/termsconditions'}> Terms and conditions</Link>
             </li>
             <li>
-              <Link to={'/'}>Privacy Policy </Link>
+              <Link to={'/privpolicy'}>Privacy Policy </Link>
             </li>
           </ul>
         </div>
@@ -20,16 +20,16 @@ function Footer() {
           <h6 className='pb-4 text-xl'>Company</h6>
           <ul>
             <li>
-              <Link to='/'>Shop</Link>
+              <Link to='/shop'>Shop</Link>
             </li>
             <li>
-              <Link to='/'>Collections</Link>
+              <Link to='/collections'>Collections</Link>
             </li>
             <li>
-              <Link to='/'>Auctions</Link>
+              <Link to='/auctions'>Auctions</Link>
             </li>
             <li>
-              <Link to='/'>Contact</Link>
+              <Link to='/contact'>Contact</Link>
             </li>
           </ul>
         </div>
@@ -39,7 +39,8 @@ function Footer() {
         <h6 className='pb-4 text-xl'>Community</h6>
         <ul>
           <li>
-            <Link to={'/'}>Blog</Link>
+            <Link to='/news'>News</Link>
+            <Link to='/blog'>Blog</Link>
           </li>
         </ul>
       </div>
