@@ -15,10 +15,12 @@ import 'swiper/css/scrollbar';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import '../assets/styles/swiper.css';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 function MainPage() {
   const navigate = useNavigate();
+  const [bestAuctionCardFlag, setBestAuctionCardFlag] = useState(true);
   const testArray = [
     { title: 'asd', description: 'zxczxzxc' },
     { title: 'asd', description: 'zxczxzxc' },
@@ -135,6 +137,7 @@ function MainPage() {
       price: 12,
     },
   ];
+
   return (
     <>
       <div
@@ -248,26 +251,35 @@ function MainPage() {
                     </p>
                   </div>
                 </div>
-                <div className='flex w-full max-w-[100%] items-center lg:max-w-[70%] lg:py-32'>
+                <div className='flex h-auto w-full max-w-[100%] items-center transition-all duration-200 ease-out lg:max-w-[70%] lg:py-32'>
                   <Swiper
+                    className='bestAuction-swiper'
                     pagination={true}
-                    autoHeight={true}
                     autoplay={{
-                      delay: 10000,
+                      delay: 8000,
                       disableOnInteraction: false,
                       pauseOnMouseEnter: true,
+                      waitForTransition: true,
                     }}
+                    grabCursor
                     modules={[Autoplay, Pagination]}
                     spaceBetween={52}
                     slidesPerView={1}
-                    style={{ paddingBottom: '52px' }}
+                    onSlideChange={() => setBestAuctionCardFlag(prev => !prev)}
+                    style={{
+                      paddingBottom: '52px',
+                    }}
                   >
                     {testBestAuctionArray.map((auctionItem, id) => (
                       <SwiperSlide key={id}>
                         <BestAuctionCard
+                          id={id}
                           title='asd'
-                          description='asdasdasd'
+                          description={
+                            'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa sssssssssssssssssssssssssssssssssssssssssss dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd cccccccccccccccccccccccccccccccccccccccccc'
+                          }
                           expDate={new Date()}
+                          swipedFlag={bestAuctionCardFlag}
                         />
                       </SwiperSlide>
                     ))}
