@@ -1,24 +1,33 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import PrimaryBtn from '../UI/PrimaryBtn';
 import SecondaryBtn from '../UI/SecondaryBtn';
 
 type PropsTypes = {
+  id: number;
   title: string;
   description: string;
   expDate: Date;
   highBid?: number;
+  swipedFlag: boolean;
 };
 
-function BestAuctionCard({ title, expDate, description, highBid }: PropsTypes) {
+function BestAuctionCard({
+  id,
+  title,
+  expDate,
+  description,
+  highBid,
+  swipedFlag,
+}: PropsTypes) {
   const [descHidden, setDescHidden] = useState(true);
-  const showDesc = () => {
-    const swiperEl = document.querySelector('.swiper');
-    console.log(swiperEl);
-    swiperEl?.setAttribute('autoHeight', 'true');
-    console.log(swiperEl);
 
+  const showDesc = () => {
     setDescHidden(prevState => !prevState);
   };
+
+  useEffect(() => {
+    setDescHidden(true);
+  }, [swipedFlag]);
 
   return (
     <div className='h-auto rounded-lg p-2 transition-all duration-200 ease-out'>
@@ -42,7 +51,11 @@ function BestAuctionCard({ title, expDate, description, highBid }: PropsTypes) {
                       {expDate.toISOString().slice(0, 10)}
                     </span>
                   </p>
-                  <p className={`${descHidden ? 'hidden' : 'block'}`}>
+                  <p
+                    className={`${
+                      descHidden ? 'max-h-0' : 'max-h-72'
+                    } h-auto overflow-hidden transition-all duration-300 ease-in-out`}
+                  >
                     <span className='text-gray600'>Description: </span>
                     <span className='text-darkTint break-all'>
                       {description}

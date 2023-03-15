@@ -16,8 +16,10 @@ import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 
 import '../lib/swiper/swiper.css';
+import { useState } from 'react';
 
 function MainPage() {
+  const [bestAuctionCardFlag, setBestAuctionCardFlag] = useState(true);
   const testArray = [
     { title: 'asd', description: 'zxczxzxc' },
     { title: 'asd', description: 'zxczxzxc' },
@@ -134,6 +136,7 @@ function MainPage() {
       price: 12,
     },
   ];
+
   return (
     <>
       <Header />
@@ -237,33 +240,30 @@ function MainPage() {
                     className='bestAuction-swiper'
                     pagination={true}
                     autoplay={{
-                      delay: 10000,
+                      delay: 8000,
                       disableOnInteraction: false,
                       pauseOnMouseEnter: true,
+                      waitForTransition: true,
                     }}
-                    modules={[Pagination]}
+                    grabCursor
+                    modules={[Autoplay, Pagination]}
                     spaceBetween={52}
                     slidesPerView={1}
-                    observer={true}
-                    observeParents={true}
-                    observeSlideChildren={true}
-                    updateOnWindowResize={true}
+                    onSlideChange={() => setBestAuctionCardFlag(prev => !prev)}
                     style={{
                       paddingBottom: '52px',
-                      transition: 'all 0.3s ease-out',
                     }}
                   >
                     {testBestAuctionArray.map((auctionItem, id) => (
-                      <SwiperSlide
-                        key={id}
-                        style={{ transition: 'all 0.3s ease-out' }}
-                      >
+                      <SwiperSlide key={id}>
                         <BestAuctionCard
+                          id={id}
                           title='asd'
                           description={
                             'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa sssssssssssssssssssssssssssssssssssssssssss dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd cccccccccccccccccccccccccccccccccccccccccc'
                           }
                           expDate={new Date()}
+                          swipedFlag={bestAuctionCardFlag}
                         />
                       </SwiperSlide>
                     ))}
