@@ -12,12 +12,12 @@ function AccountForm({ verificationType }: AccountFormType) {
     <div>
       <form>
         <div>
-          <input type='email' />
-          {verificationType === 'register' && <input type='text' />}
-          <input type='password' />
+          <input type="email" />
+          {verificationType === 'register' && <input type="text" />}
+          <input type="password" />
         </div>
         <div>
-          <button>
+          <button type="button">
             {verificationType === 'register' ? 'Sign up' : 'Log in'}
           </button>
         </div>
@@ -28,17 +28,21 @@ function AccountForm({ verificationType }: AccountFormType) {
         <div />
       </div>
       <div>
-        <button>Google</button>
+        <button type="button">Google</button>
       </div>
       {verificationType === 'register' ? (
         <div>
           Already have an account?
-          <button onClick={() => renavigateHandler('login')}>Log in</button>
+          <button type="button" onClick={() => renavigateHandler('login')}>
+            Log in
+          </button>
         </div>
       ) : (
         <div>
           Don&apos;t have an account?
-          <button onClick={() => renavigateHandler('register')}>Sign up</button>
+          <button type="button" onClick={() => renavigateHandler('register')}>
+            Sign up
+          </button>
         </div>
       )}
     </div>
