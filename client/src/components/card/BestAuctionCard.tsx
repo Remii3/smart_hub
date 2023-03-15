@@ -54,7 +54,7 @@ function BestAuctionCard({
                   <p
                     className={`${
                       descHidden ? 'max-h-0' : 'max-h-72'
-                    } h-auto overflow-hidden transition-all duration-300 ease-in-out`}
+                    } overflow-hidden transition-[max-height] duration-300 ease-in-out`}
                   >
                     <span className='text-gray600'>Description: </span>
                     <span className='text-darkTint break-all'>
