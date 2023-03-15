@@ -56,7 +56,7 @@ function Nav() {
       <div
         className={`${
           openedBurger ? 'open' : ''
-        } relative block h-10 w-10  cursor-pointer py-2 pl-2 md:hidden`}
+        } relative block h-10 w-10  cursor-pointer  pl-2 md:hidden`}
         onClick={showMobileOverlay}
       >
         <span
@@ -67,18 +67,18 @@ function Nav() {
         <span
           className={`${
             openedBurger ? 'rotate-45' : 'rotate-0'
-          } absolute top-5 left-0 block h-1 w-full rounded-lg bg-white opacity-100 transition-transform`}
+          } absolute top-[18px] left-0 block h-1 w-full rounded-lg bg-white opacity-100 transition-transform`}
         ></span>
         <span
           className={`${
             openedBurger ? '-rotate-45' : 'rotate-0'
-          } absolute top-5 left-0 block h-1 w-full rounded-lg bg-white opacity-100 transition-transform`}
+          } absolute top-[18px] left-0 block h-1 w-full rounded-lg bg-white opacity-100 transition-transform`}
         ></span>
         <span
           className={`${
             openedBurger
               ? 'top-[18px] left-1/2 w-0'
-              : 'top-[35px] left-0 w-full'
+              : 'top-[31px] left-0 w-full'
           } absolute block h-1 rotate-0 rounded-lg bg-white opacity-100 transition-[top,left,width] duration-200 ease-in-out`}
         ></span>
       </div>
