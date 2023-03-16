@@ -5,7 +5,7 @@ function LoginPage() {
     <div>
       <section>{/* img */}</section>
       <section>
-        <AccountForm verificationType='login' />
+        <AccountForm verificationType="login" />
       </section>
     </div>
   );

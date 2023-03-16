@@ -5,6 +5,11 @@ type PropsTypes = {
   customCSS?: string;
 };
 
+const defaultProps = {
+  onClick: () => {},
+  customCSS: '',
+};
+
 function PrimaryBtn({ usecase, text, onClick, customCSS }: PropsTypes) {
   const usecaseClass = () => {
     switch (usecase) {
@@ -21,17 +26,19 @@ function PrimaryBtn({ usecase, text, onClick, customCSS }: PropsTypes) {
     if (onClick) {
       onClick();
     }
-    return;
   };
 
   return (
     <button
-      className={`${customCSS} ${usecaseClass()} bg-primary transition-[filter, scale] rounded-lg font-semibold text-white shadow duration-200 ease-out hover:shadow-md hover:brightness-90 active:scale-95 active:brightness-75`}
+      type="button"
+      className={`${customCSS} ${usecaseClass()} transition-[filter, scale] rounded-lg bg-primary font-semibold text-white shadow duration-200 ease-out hover:shadow-md hover:brightness-90 active:scale-95 active:brightness-75`}
       onClick={clickHandler}
     >
       {text}
     </button>
   );
 }
+
+PrimaryBtn.defaultProps = defaultProps;
 
 export default PrimaryBtn;

@@ -20,6 +20,8 @@ function CollectionCard({
         return 'text-dark bg-white';
       case 'pageBackground':
         return 'text-white bg-pageBackground';
+      default:
+        return '';
     }
   };
 
@@ -29,15 +31,15 @@ function CollectionCard({
     >
       <MainPageHeading
         color={backcolor === 'white' ? 'dark' : 'white'}
-        usecase='sub'
-        mainTitle='Award winning books'
-        subTitle='Our most awarded books, interested? Check out our gallery.'
+        usecase="sub"
+        mainTitle="Award winning books"
+        subTitle="Our most awarded books, interested? Check out our gallery."
       />
-      <div className='pb-16'>{collectionData.title}</div>
+      <div className="pb-16">{collectionData.title}</div>
       <div>
         <PrimaryBtn
-          usecase='normal'
-          text='Check out'
+          usecase="normal"
+          text="Check out"
           onClick={() => {
             navigate(`/collections`);
           }}

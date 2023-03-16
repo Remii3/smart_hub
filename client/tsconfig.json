@@ -24,7 +24,7 @@
     "typeRoots": ["src/ts", "node_modules/@types"],
 
   },
-  "include": ["src"],
+  "include": ["src", ".eslintrc.json", ".prettierrc.json"],
   "references": [{ "path": "./tsconfig.node.json" }],
   "exclude": ["node_modules"]
 }
