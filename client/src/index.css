@@ -39,9 +39,8 @@
     @apply text-base sm:text-lg;
   }
   li {
-    @apply pb-2 text-sm sm:text-base;
+    @apply text-sm sm:text-base;
   }
 }
-
 @tailwind components;
 @tailwind utilities;

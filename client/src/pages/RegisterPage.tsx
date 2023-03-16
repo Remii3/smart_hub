@@ -5,7 +5,7 @@ function RegisterPage() {
     <div>
       <section>{/* img */}</section>
       <section>
-        <AccountForm verificationType='register' />
+        <AccountForm verificationType="register" />
       </section>
     </div>
   );

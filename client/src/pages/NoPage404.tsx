@@ -2,6 +2,7 @@ import { useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import Particles from 'react-tsparticles';
 import { loadFull } from 'tsparticles';
+
 import type { Engine } from 'tsparticles-engine';
 
 const NoPage404 = () => {
@@ -10,50 +11,50 @@ const NoPage404 = () => {
   }, []);
 
   return (
-    <div className='font-rubik h-screen overflow-hidden bg-[#14222F]'>
-      <div className='error-page flex items-center justify-center text-center h-full'>
+    <div className="h-screen overflow-hidden bg-[#14222F] font-rubik">
+      <div className="error-page flex h-full items-center justify-center text-center">
         <div>
           <h1
-            data-h1='404'
-            className='text-8xl font-bold relative -mt-4 -ml-1 p-0 
-            md:text-9xl
-           after:content-[attr(data-h1)]
+            data-h1="404"
+            className="relative -mt-4 -ml-1 from-[#71b7e6] via-[#b98acc] to-[#ee8176] 
+            p-0
+           text-8xl
+           font-bold
            after:absolute
-           after:top-0
+           after:top-0 
            after:left-0 
            after:right-0 
-           after:text-transparent 
-           after:bg-gradient-to-r from-[#71b7e6] via-[#b98acc] to-[#ee8176]
-           after:bg-clip-text
+           after:animate-animateTextBackground after:bg-gradient-to-r after:bg-[size:400%] after:bg-clip-text
            after:fill-[transparent]
-           after:bg-[size:400%] 
-           after:drop-shadow-xl
-           after:animate-animateTextBackground
-           '
+           after:text-transparent
+           after:drop-shadow-xl 
+           after:content-[attr(data-h1)]
+           md:text-9xl
+           "
           >
             404
           </h1>
           <p
-            data-p='NOT FOUND'
-            className='uppercase text-[#d6d6d6] text-3xl font-bold max-w-screen-sm relative
-            md:text-4xl
-            md:max-w-xl
-            after:content-[attr(data-p)]
+            data-p="NOT FOUND"
+            className="relative max-w-screen-sm text-3xl font-bold uppercase text-[#d6d6d6]
             after:absolute
             after:top-0
             after:left-0
             after:right-0
-            after:text-transparent 
+            after:bg-clip-text
+            after:text-transparent
             after:drop-shadow-xl
-            after:bg-clip-text'
+            after:content-[attr(data-p)] 
+            md:max-w-xl
+            md:text-4xl"
           >
             Not found
           </p>
         </div>
       </div>
-      <div className='particles-js fixed top-0 right-0 bottom-0 left-0'></div>
+      <div className="particles-js fixed top-0 right-0 bottom-0 left-0"></div>
       <Particles
-        id='tsparticles'
+        id="tsparticles"
         init={particlesInit}
         options={{
           particles: {
@@ -117,7 +118,7 @@ const NoPage404 = () => {
 
       <Link
         to={'/'}
-        className='uppercase fixed right-10 bottom-10 rounded drop-shadow-md text-white text-base font-bold py-4 px-7 bg-gradient-to-r from-[#71b7e6] via-[#b98acc] to-[#ee8176] hover:drop-shadow-2xl hover:scale-105 transition-all ease-out duration-300 active:opacity-80'
+        className="fixed right-10 bottom-10 rounded bg-gradient-to-r from-[#71b7e6] via-[#b98acc] to-[#ee8176] py-4 px-7 text-base font-bold uppercase text-white drop-shadow-md transition-all duration-300 ease-out hover:scale-105 hover:drop-shadow-2xl active:opacity-80"
       >
         Go back
       </Link>
