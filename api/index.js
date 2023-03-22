@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
 
-const account_routes = require('./routes/account');
+const user_routes = require('./Routes/user.routes');
 
 const app = express();
 
@@ -23,6 +23,6 @@ app.get('/test', (req, res) => {
   res.json('test ok');
 });
 
-app.use('/account', account_routes);
+app.use('/account', user_routes);
 
 app.listen(4000);
