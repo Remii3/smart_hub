@@ -26,21 +26,21 @@ function MainPage() {
 
   const testArray = [
     { id: 0, title: 'asd', description: 'zxczxzxc' },
-    { id: 0, title: 'asd', description: 'zxczxzxc' },
-    { id: 0, title: 'asd', description: 'zxczxzxc' },
-    { id: 0, title: 'asd', description: 'zxczxzxc' },
-    { id: 0, title: 'asd', description: 'zxczxzxc' },
-    { id: 0, title: 'asd', description: 'zxczxzxc' },
+    { id: 1, title: 'asd', description: 'zxczxzxc' },
+    { id: 2, title: 'asd', description: 'zxczxzxc' },
+    { id: 3, title: 'asd', description: 'zxczxzxc' },
+    { id: 4, title: 'asd', description: 'zxczxzxc' },
+    { id: 5, title: 'asd', description: 'zxczxzxc' },
   ];
   const testCollectionArray = [
-    { id: 0, title: 'asd', description: 'zxczxzxc' },
-    { id: 0, title: 'asd', description: 'zxczxzxc' },
-    { id: 0, title: 'asd', description: 'zxczxzxc' },
-    { id: 0, title: 'asd', description: 'zxczxzxc' },
+    { id: 6, title: 'asd', description: 'zxczxzxc' },
+    { id: 7, title: 'asd', description: 'zxczxzxc' },
+    { id: 8, title: 'asd', description: 'zxczxzxc' },
+    { id: 9, title: 'asd', description: 'zxczxzxc' },
   ];
   const testAuctionArray = [
     {
-      id: 0,
+      id: 11,
       title: 'asd',
       author: 'asd',
       deadline: new Date(),
@@ -48,7 +48,7 @@ function MainPage() {
       price: 12,
     },
     {
-      id: 0,
+      id: 12,
       title: 'asd',
       author: 'asd',
       deadline: new Date(),
@@ -56,7 +56,7 @@ function MainPage() {
       price: 12,
     },
     {
-      id: 0,
+      id: 13,
       title: 'asd',
       author: 'asd',
       deadline: new Date(),
@@ -64,7 +64,7 @@ function MainPage() {
       price: 12,
     },
     {
-      id: 0,
+      id: 14,
       title: 'asd',
       author: 'asd',
       deadline: new Date(),
@@ -72,7 +72,7 @@ function MainPage() {
       price: 12,
     },
     {
-      id: 0,
+      id: 15,
       title: 'asd',
       author: 'asd',
       deadline: new Date(),
@@ -80,7 +80,7 @@ function MainPage() {
       price: 12,
     },
     {
-      id: 0,
+      id: 16,
       title: 'asd',
       author: 'asd',
       deadline: new Date(),
@@ -88,7 +88,7 @@ function MainPage() {
       price: 12,
     },
     {
-      id: 0,
+      id: 17,
       title: 'asd',
       author: 'asd',
       deadline: new Date(),
@@ -98,7 +98,7 @@ function MainPage() {
   ];
   const testBestAuctionArray = [
     {
-      id: 0,
+      id: 18,
       title: 'asd',
       author: 'asd',
       deadline: new Date(),
@@ -106,7 +106,7 @@ function MainPage() {
       price: 12,
     },
     {
-      id: 0,
+      id: 19,
       title: 'asd',
       author: 'asd',
       deadline: new Date(),
@@ -114,7 +114,7 @@ function MainPage() {
       price: 12,
     },
     {
-      id: 0,
+      id: 21,
       title: 'asd',
       author: 'asd',
       deadline: new Date(),
@@ -122,7 +122,7 @@ function MainPage() {
       price: 12,
     },
     {
-      id: 0,
+      id: 22,
       title: 'asd',
       author: 'asd',
       deadline: new Date(),
@@ -130,7 +130,7 @@ function MainPage() {
       price: 12,
     },
     {
-      id: 0,
+      id: 23,
       title: 'asd',
       author: 'asd',
       deadline: new Date(),
@@ -138,7 +138,7 @@ function MainPage() {
       price: 12,
     },
     {
-      id: 0,
+      id: 24,
       title: 'asd',
       author: 'asd',
       deadline: new Date(),
@@ -146,7 +146,7 @@ function MainPage() {
       price: 12,
     },
     {
-      id: 0,
+      id: 25,
       title: 'asd',
       author: 'asd',
       deadline: new Date(),
@@ -161,6 +161,7 @@ function MainPage() {
       className=" relative h-screen overflow-x-hidden scroll-smooth bg-pageBackground perspective-3"
     >
       <Header />
+
       <section className="parallax__group relative min-h-screen w-screen">
         <div className="sky absolute -top-20 left-0 right-0 bottom-0 flex items-center justify-center brightness-50" />
       </section>

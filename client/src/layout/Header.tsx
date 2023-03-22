@@ -60,6 +60,7 @@ function Header() {
           </li>
         </ul>
       </div>
+      <div className="sticky top-0 left-0 z-20 hidden h-screen w-screen bg-blue-300" />
     </header>
   );
 }
