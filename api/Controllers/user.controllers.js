@@ -71,7 +71,6 @@ const signUp = async (req, res) => {
   const salt = bcrypt.genSaltSync(12);
 
   const { email, username, password } = req.body;
-  console.log('first');
   // prettier-ignore
   const emailRegex = new RegExp('[a-z0-9]+@[a-z]+\.[a-z]{2,3}');
 

@@ -1,12 +1,15 @@
 import { useContext, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { OverlayContext } from '../context/OverlayProvider';
+import { UserContext } from '../context/UserProvider';
 
 import '../assets/styles/navAnimations.css';
 
 function Nav() {
   const [openedBurger, setOpenedBurger] = useState(false);
   const [openedProfile, setOpenedProfile] = useState(false);
+
+  const { loggedIn, setLoggedIn } = useContext(UserContext);
 
   const { shownOverlay, setShownOverlay } = useContext(OverlayContext);
 
@@ -75,13 +78,20 @@ function Nav() {
               />
             </svg>
           </button>
-          {shownOverlay && (
+          {shownOverlay && !loggedIn && (
             <div className="absolute -bottom-16 flex w-20 flex-col gap-2 bg-pageBackground p-2">
               <Link to="/account/login" className="text-sm text-white">
                 Sign in
               </Link>
               <Link to="/account/register" className="text-sm text-white">
                 Sign up
+              </Link>
+            </div>
+          )}
+          {shownOverlay && loggedIn && (
+            <div className="absolute -bottom-16 flex w-20 flex-col gap-2 bg-pageBackground p-2">
+              <Link to="/account/my" className="text-sm text-white">
+                My account
               </Link>
             </div>
           )}

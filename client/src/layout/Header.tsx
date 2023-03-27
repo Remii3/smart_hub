@@ -3,7 +3,7 @@ import useScrollPosition from '../hooks/useScrollPosition';
 import Nav from './Nav';
 
 function Header() {
-  const scrollPosition = useScrollPosition();
+  const scrollPosition = useScrollPosition('mainPageScroll');
   const windowWidth = window.innerWidth;
   let navColorBreakpoint = 0;
 
@@ -14,6 +14,7 @@ function Header() {
   } else {
     navColorBreakpoint = 980;
   }
+
   return (
     <header className="sticky top-0 left-0 z-30 w-full">
       <div

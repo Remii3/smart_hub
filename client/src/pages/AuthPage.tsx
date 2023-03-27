@@ -1,10 +1,11 @@
-import axios, { AxiosError } from 'axios';
+import axios from 'axios';
 import { ChangeEvent, FormEvent, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import PrimaryBtn from '../components/UI/PrimaryBtn';
-
 function AuthPage() {
   const [overlaySwitch, setOverlaySwitch] = useState(false);
+  const navigate = useNavigate();
+
   const [logUserData, setLogUserData] = useState({
     data: {
       email: '',
@@ -37,8 +38,6 @@ function AuthPage() {
     },
   });
 
-  const navigate = useNavigate();
-
   const loginOnBlur = (e: ChangeEvent<HTMLInputElement>) => {
     setLogUserData((prevState) => {
       return {
@@ -61,6 +60,12 @@ function AuthPage() {
     const inputValue = e.target.value;
     let error = '';
 
+    if (e.target.name === 'email') {
+      if (inputValue.length < 3 && inputValue.length > 0) {
+        error = 'Email min length is 3 characters.';
+      }
+    }
+
     if (e.target.name === 'password') {
       if (inputValue.length > 16) {
         error = 'Password max length is 16 characters.';
@@ -82,6 +87,12 @@ function AuthPage() {
   const registerHandler = (e: ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
     let error = '';
+
+    if (e.target.name === 'email') {
+      if (inputValue.length < 3 && inputValue.length > 0) {
+        error = 'Email min length is 3 characters.';
+      }
+    }
 
     if (e.target.name === 'username') {
       if (inputValue.length < 3 && inputValue.length > 0) {
@@ -108,7 +119,10 @@ function AuthPage() {
   };
 
   const overlaySwitchHandler = () => {
+    navigate(`/account/${overlaySwitch ? 'login' : 'register'}`);
+
     setOverlaySwitch((prevState) => !prevState);
+
     setTimeout(() => {
       setLogUserData({
         touched: { email: false, password: false },
@@ -125,12 +139,15 @@ function AuthPage() {
 
   const signInHandler = async (e: FormEvent) => {
     e.preventDefault();
+
     const { email, password } = logUserData.data;
+
     try {
       await axios.post('/account/login', {
         email,
         password,
       });
+
       navigate('/');
     } catch (err: any) {
       if (axios.isAxiosError(err)) {
@@ -150,8 +167,10 @@ function AuthPage() {
       }
     }
   };
+
   const signUpHandler = async (e: FormEvent) => {
     e.preventDefault();
+
     const { email, password, username } = regUserData.data;
 
     try {
@@ -183,7 +202,7 @@ function AuthPage() {
 
   return (
     <div className="flex h-screen w-screen items-center justify-center bg-pageBackground">
-      <div className="relative flex w-full max-w-3xl rounded-lg bg-white py-16 shadow-lg">
+      <div className="relative flex h-[648px] w-full max-w-3xl rounded-lg bg-white py-16 shadow-lg">
         <section
           className={`${
             overlaySwitch ? 'opacity-0' : 'opacity-100'
@@ -216,11 +235,15 @@ function AuthPage() {
                     onBlur={(e) => loginOnBlur(e)}
                     required
                   />
-                  {logUserData.touched.email && logUserData.errors.email && (
-                    <p className="pl-1 pt-1 text-sm text-red-500">
-                      {logUserData.errors.email}
-                    </p>
-                  )}
+                  <p
+                    className={`${
+                      logUserData.touched.email && logUserData.errors.email
+                        ? 'max-h-5 opacity-100'
+                        : 'max-h-0 opacity-0'
+                    } h-auto pl-1 pt-1 text-sm  text-red-500 transition-[max-height,opacity] duration-300 ease-out`}
+                  >
+                    {logUserData.errors.email}
+                  </p>
                 </div>
                 <div>
                   <input
@@ -233,12 +256,16 @@ function AuthPage() {
                     onBlur={(e) => loginOnBlur(e)}
                     required
                   />
-                  {logUserData.touched.password &&
-                    logUserData.errors.password && (
-                      <p className="pl-1 pt-1 text-sm text-red-500">
-                        {logUserData.errors.password}
-                      </p>
-                    )}
+                  <p
+                    className={`${
+                      logUserData.touched.password &&
+                      logUserData.errors.password
+                        ? 'max-h-5'
+                        : 'max-h-0'
+                    } h-auto pl-1 pt-1 text-sm text-red-500 transition-[max-height,opacity] duration-300 ease-out`}
+                  >
+                    {logUserData.errors.password}
+                  </p>
                 </div>
               </div>
               <Link to="/account/forgot-password">Forgot password?</Link>
@@ -272,8 +299,8 @@ function AuthPage() {
               </button>
             </div>
             <p>or</p>
-            <div className="flex w-full flex-col items-center gap-3">
-              <div className="flex w-full flex-col gap-4">
+            <div className="flex w-full flex-col items-center gap-4">
+              <div className="flex  w-full flex-col justify-center gap-3">
                 <div>
                   <input
                     name="email"
@@ -285,11 +312,15 @@ function AuthPage() {
                     onBlur={(e) => registerOnBlur(e)}
                     required
                   />
-                  {regUserData.touched.email && regUserData.errors.email && (
-                    <p className="pl-1 pt-1 text-sm text-red-500">
-                      {regUserData.errors.email}
-                    </p>
-                  )}
+                  <p
+                    className={`${
+                      regUserData.touched.email && regUserData.errors.email
+                        ? 'max-h-5'
+                        : 'max-h-0'
+                    } h-auto pl-1 pt-1 text-sm text-red-500 transition-[max-height] duration-300 ease-out`}
+                  >
+                    {regUserData.errors.email}
+                  </p>
                 </div>
                 <div>
                   <input
@@ -302,12 +333,16 @@ function AuthPage() {
                     onBlur={(e) => registerOnBlur(e)}
                     required
                   />
-                  {regUserData.touched.username &&
-                    regUserData.errors.username && (
-                      <p className="pl-1 pt-1 text-sm text-red-500">
-                        {regUserData.errors.username}
-                      </p>
-                    )}
+                  <p
+                    className={`${
+                      regUserData.touched.username &&
+                      regUserData.errors.username
+                        ? 'max-h-5 opacity-100'
+                        : 'max-h-0 opacity-0'
+                    } h-auto pl-1 pt-1 text-sm text-red-500 transition-[max-height] duration-300 ease-out`}
+                  >
+                    {regUserData.errors.username}
+                  </p>
                 </div>
                 <div>
                   <input
@@ -320,12 +355,16 @@ function AuthPage() {
                     onBlur={(e) => registerOnBlur(e)}
                     required
                   />
-                  {regUserData.touched.password &&
-                    regUserData.errors.password && (
-                      <p className="pl-1 pt-1 text-sm text-red-500">
-                        {regUserData.errors.password}
-                      </p>
-                    )}
+                  <p
+                    className={`${
+                      regUserData.touched.password &&
+                      regUserData.errors.password
+                        ? 'max-h-5 opacity-100'
+                        : 'max-h-0 opacity-0'
+                    } h-auto pl-1 pt-1 text-sm text-red-500 transition-[max-height] duration-300 ease-out`}
+                  >
+                    {regUserData.errors.password}
+                  </p>
                 </div>
               </div>
               <Link to="/account/forgot-password">Forgot password?</Link>

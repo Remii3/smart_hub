@@ -1,18 +1,21 @@
 import { useEffect, useState } from 'react';
 
-function useScrollPosition() {
+function useScrollPosition(elementId: string) {
   const [scrollPosition, setScrollPosition] = useState<number | undefined>(0);
 
   useEffect(() => {
-    const testScroll = document.getElementById('testScroll');
+    const scrollPosition = document.getElementById(elementId);
 
     const updatePosition = () => {
-      setScrollPosition(testScroll?.scrollTop);
+      setScrollPosition(scrollPosition?.scrollTop);
     };
-    testScroll?.addEventListener('scroll', updatePosition);
+
+    scrollPosition?.addEventListener('scroll', updatePosition);
+
     updatePosition();
+
     return () => {
-      testScroll?.removeEventListener('scroll', updatePosition);
+      scrollPosition?.removeEventListener('scroll', updatePosition);
     };
   }, []);
   return scrollPosition;

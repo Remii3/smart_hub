@@ -1,6 +1,6 @@
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, Navigation, Pagination, Scrollbar } from 'swiper';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import CollectionCard from '../components/card/CollectionCard';
 import Header from '../layout/Header';
@@ -18,6 +18,7 @@ import 'swiper/css';
 import 'swiper/css/pagination';
 
 import '../assets/styles/swiper.css';
+import { OverlayContext } from '../context/OverlayProvider';
 
 function MainPage() {
   const navigate = useNavigate();
@@ -154,18 +155,26 @@ function MainPage() {
       price: 12,
     },
   ];
-
+  const { shownOverlay, setShownOverlay } = useContext(OverlayContext);
+  const showProfileDropdown = () => {
+    setShownOverlay((prevState) => !prevState);
+  };
   return (
     <div
-      id="testScroll"
-      className=" relative h-screen overflow-x-hidden scroll-smooth bg-pageBackground perspective-3"
+      id="mainPageScroll"
+      className="relative min-h-screen overflow-auto bg-pageBackground perspective-3"
     >
       <Header />
-
+      {shownOverlay && (
+        <div
+          className="parallax__group absolute inset-0 z-20 w-screen bg-black opacity-50 translate-z-0"
+          onClick={showProfileDropdown}
+        />
+      )}
       <section className="parallax__group relative min-h-screen w-screen">
-        <div className="sky absolute -top-20 left-0 right-0 bottom-0 flex items-center justify-center brightness-50" />
+        <div className="sky absolute -top-20 left-0 right-0 bottom-0 flex h-screen w-full items-center justify-center brightness-50" />
       </section>
-      <div className="parallax_title absolute top-[65%] flex h-screen w-full justify-start md:top-[100%]  ">
+      {/* <div className="parallax_title absolute top-[65%] flex h-screen w-full justify-start md:top-[100%]  ">
         <div className="flex w-full flex-col  text-primaryText sm:items-start">
           <div className="mb-14 ml-[15%] max-w-xs sm:max-w-none">
             <h6 className="uppercase lg:text-4xl">Award winning literature</h6>
@@ -189,10 +198,10 @@ function MainPage() {
             />
           </div>
         </div>
-      </div>
+      </div> */}
       <Main>
         {/* Shop */}
-        <div className="parallax__group relative flex min-h-screen w-screen scale-100 flex-col items-center justify-center bg-white translate-z-0">
+        <div className="parallax__group relative flex min-h-screen w-screen scale-100 flex-col items-center justify-center overflow-y-hidden bg-white translate-z-0">
           <section className="relative flex w-full flex-col items-center gap-12 pb-16">
             <div className="relative -top-1 left-0 w-full bg-pageBackground">
               <MainPageHeading
