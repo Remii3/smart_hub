@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "axios": "^1.3.4",
+    "gsap": "^3.11.5",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router": "^6.9.0",
@@ -20,6 +21,7 @@
   },
   "devDependencies": {
     "@kamona/tailwindcss-perspective": "^0.1.1",
+    "@types/gsap": "^3.0.0",
     "@types/node": "^18.15.3",
     "@types/react": "^18.0.27",
     "@types/react-dom": "^18.0.10",

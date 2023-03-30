@@ -16,7 +16,7 @@ function Header() {
   }
 
   return (
-    <header className="sticky top-0 left-0 z-30 w-full">
+    <header className="fixed top-0 left-0 z-30 w-full">
       <div
         className={`${
           Number(scrollPosition) <= navColorBreakpoint

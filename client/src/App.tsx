@@ -20,8 +20,7 @@ function App() {
         <UserProvider>
           <Routes>
             <Route path="/" element={<MainPage />} />
-            <Route path="/account/register" element={<AuthPage />} />
-            <Route path="/account/login" element={<AuthPage />} />
+            <Route path="/account" element={<AuthPage />} />
           </Routes>
         </UserProvider>
       </OverlayProvider>

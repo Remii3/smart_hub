@@ -139,4 +139,10 @@ const signUp = async (req, res) => {
   }
 };
 
-module.exports = { signIn, signUp };
+const profile = async (req, res) => {
+  const { email, username } = await User.findOne({ _id: req.user.userId });
+
+  res.json({ email, username });
+};
+
+module.exports = { signIn, signUp, profile };

@@ -1,28 +1,41 @@
+import axios from 'axios';
 import {
   createContext,
   Dispatch,
   ReactNode,
   SetStateAction,
+  useEffect,
+  useMemo,
   useState,
 } from 'react';
 
 type ContextTypes = {
-  loggedIn: boolean;
-  setLoggedIn: Dispatch<SetStateAction<boolean>>;
+  userData: null | object;
+  setUserData:
+    | Dispatch<SetStateAction<object>>
+    | Dispatch<SetStateAction<null>>;
 };
 
 export const UserContext = createContext<ContextTypes>({
-  loggedIn: false,
-  setLoggedIn: () => {},
+  userData: null,
+  setUserData: () => {},
 });
 
 function UserProvider({ children }: { children: ReactNode }) {
-  const [loggedIn, setLoggedIn] = useState(false);
+  const [userData, setUserData] = useState(null);
+
+  useEffect(() => {
+    const token = document.cookie.match('token');
+
+    if (!userData && token) {
+      axios.get('/account/profile').then((res) => {
+        setUserData(res.data);
+      });
+    }
+  });
+  const userValues = useMemo(() => ({ userData, setUserData }), [userData]);
   return (
-    // eslint-disable-next-line react/jsx-no-constructed-context-values
-    <UserContext.Provider value={{ loggedIn, setLoggedIn }}>
-      {children}
-    </UserContext.Provider>
+    <UserContext.Provider value={userValues}>{children}</UserContext.Provider>
   );
 }
 

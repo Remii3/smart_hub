@@ -1,17 +1,19 @@
-import { useContext, useState } from 'react';
+import { useContext, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
+import gsap from 'gsap';
 import { OverlayContext } from '../context/OverlayProvider';
 import { UserContext } from '../context/UserProvider';
-
 import '../assets/styles/navAnimations.css';
 
 function Nav() {
   const [openedBurger, setOpenedBurger] = useState(false);
-  const [openedProfile, setOpenedProfile] = useState(false);
+  const userIcon = useRef<HTMLDivElement>(null);
 
-  const { loggedIn, setLoggedIn } = useContext(UserContext);
+  const { userData, setUserData } = useContext(UserContext);
 
   const { shownOverlay, setShownOverlay } = useContext(OverlayContext);
+
+  gsap.registerPlugin();
 
   const showMobileOverlay = () => {
     const mobileOverlay = document.querySelector('.mobile-overlay');
@@ -30,41 +32,63 @@ function Nav() {
     }
   };
 
-  const showProfileDropdown = () => {
-    console.log('first');
+  const profileDropdownHandler = () => {
     setShownOverlay((prevState) => !prevState);
+  };
+
+  const disableDropdownHandler = () => {
+    setShownOverlay(false);
+  };
+
+  const logoutHandler = () => {
+    document.cookie = 'token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+    setUserData(() => null);
+    disableDropdownHandler();
   };
 
   return (
     <nav className="relative top-0 left-0 z-30 mx-auto flex h-[64px] max-w-[1480px] flex-row items-center justify-between py-3 px-10 transition-all duration-300 ease-out">
       <div className="text-white">
-        <Link to="/">SmartHub</Link>
+        <button type="button" onClick={() => setShownOverlay(false)}>
+          <Link to="/">SmartHub</Link>
+        </button>
       </div>
       <div className="hidden md:flex">
         <ul className="flex flex-row items-center px-8 text-white">
           <li className="text-base transition-[color,transform] duration-200 ease-out hover:scale-105 hover:text-primary">
-            <Link className="px-4 py-2" to="/news">
-              News
-            </Link>
+            <button type="button" onClick={disableDropdownHandler}>
+              <Link className="px-4 py-2" to="/news">
+                News
+              </Link>
+            </button>
           </li>
+
           <li className="text-base transition-[color,transform] duration-200 ease-out hover:scale-105 hover:text-primary">
-            <Link className="px-4 py-2" to="/shop">
-              Shop
-            </Link>
+            <button type="button" onClick={disableDropdownHandler}>
+              <Link className="px-4 py-2" to="/shop">
+                Shop
+              </Link>
+            </button>
           </li>
+
           <li className="text-base transition-[color,transform] duration-200 ease-out hover:scale-105 hover:text-primary">
-            <Link className="px-4 py-2" to="/specials">
-              Specials
-            </Link>
+            <button type="button" onClick={disableDropdownHandler}>
+              <Link className="px-4 py-2" to="/specials">
+                Specials
+              </Link>
+            </button>
           </li>
+
           <li className="text-base transition-[color,transform] duration-200 ease-out hover:scale-105 hover:text-primary">
-            <Link className="px-4 py-2" to="/auctions">
-              Auctions
-            </Link>
+            <button type="button" onClick={disableDropdownHandler}>
+              <Link className="px-4 py-2" to="/auctions">
+                Auctions
+              </Link>
+            </button>
           </li>
         </ul>
         <div className="relative flex items-center justify-center px-2">
-          <button type="button" onClick={showProfileDropdown}>
+          <button type="button" onClick={profileDropdownHandler}>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
@@ -78,21 +102,52 @@ function Nav() {
               />
             </svg>
           </button>
-          {shownOverlay && !loggedIn && (
-            <div className="absolute -bottom-16 flex w-20 flex-col gap-2 bg-pageBackground p-2">
-              <Link to="/account/login" className="text-sm text-white">
-                Sign in
-              </Link>
-              <Link to="/account/register" className="text-sm text-white">
-                Sign up
-              </Link>
+          {!userData && (
+            <div
+              ref={userIcon}
+              className={`${
+                shownOverlay ? 'flex' : 'hidden'
+              } absolute top-7 w-20 flex-col bg-pageBackground`}
+            >
+              <button type="button" onClick={disableDropdownHandler}>
+                <Link
+                  to={{ pathname: '/account', search: 'auth=login' }}
+                  className="px-2 pt-2 pb-1 text-sm text-white transition-[color,transform] duration-200 ease-out hover:text-primary"
+                >
+                  Sign in
+                </Link>
+              </button>
+              <button type="button" onClick={disableDropdownHandler}>
+                <Link
+                  to={{ pathname: '/account', search: 'auth=register' }}
+                  className="px-2 pb-2 pt-1 text-sm text-white transition-[color,transform] duration-200 ease-out hover:text-primary"
+                >
+                  Sign up
+                </Link>
+              </button>
             </div>
           )}
-          {shownOverlay && loggedIn && (
-            <div className="absolute -bottom-16 flex w-20 flex-col gap-2 bg-pageBackground p-2">
-              <Link to="/account/my" className="text-sm text-white">
-                My account
-              </Link>
+          {userData && (
+            <div
+              className={`${
+                shownOverlay ? 'flex' : 'hidden'
+              }  absolute top-7 w-20 flex-col bg-pageBackground`}
+            >
+              <button type="button" onClick={disableDropdownHandler}>
+                <Link
+                  to="/account/my"
+                  className="px-2 pb-2 pt-1 text-sm text-white transition-[color,transform] duration-200 ease-out hover:text-primary"
+                >
+                  Account
+                </Link>
+              </button>
+              <button
+                type="button"
+                onClick={logoutHandler}
+                className="px-2 pb-2 pt-1 text-sm text-white transition-[color,transform] duration-200 ease-out hover:text-primary"
+              >
+                Logout
+              </button>
             </div>
           )}
         </div>

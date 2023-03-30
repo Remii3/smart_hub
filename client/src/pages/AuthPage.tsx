@@ -1,10 +1,17 @@
 import axios from 'axios';
-import { ChangeEvent, FormEvent, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { ChangeEvent, FormEvent, useContext, useState } from 'react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import PrimaryBtn from '../components/UI/PrimaryBtn';
+import { UserContext } from '../context/UserProvider';
+
 function AuthPage() {
-  const [overlaySwitch, setOverlaySwitch] = useState(false);
+  const [searchParams] = useSearchParams();
+  const overlayPosition = searchParams.get('auth');
+  const [overlaySwitch, setOverlaySwitch] = useState(
+    overlayPosition !== 'login'
+  );
   const navigate = useNavigate();
+  const { setUserData } = useContext(UserContext);
 
   const [logUserData, setLogUserData] = useState({
     data: {
@@ -119,10 +126,14 @@ function AuthPage() {
   };
 
   const overlaySwitchHandler = () => {
-    navigate(`/account/${overlaySwitch ? 'login' : 'register'}`);
-
     setOverlaySwitch((prevState) => !prevState);
-
+    navigate(
+      {
+        pathname: '/account',
+        search: `auth=${overlaySwitch ? 'login' : 'register'}`,
+      },
+      { replace: true }
+    );
     setTimeout(() => {
       setLogUserData({
         touched: { email: false, password: false },
@@ -147,6 +158,8 @@ function AuthPage() {
         email,
         password,
       });
+
+      axios.get('/account/profile').then((res) => setUserData(res.data));
 
       navigate('/');
     } catch (err: any) {
@@ -179,6 +192,8 @@ function AuthPage() {
         username,
         password,
       });
+
+      axios.get('/account/profile').then((res) => setUserData(res.data));
 
       navigate('/');
     } catch (err: any) {
