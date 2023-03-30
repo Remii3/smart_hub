@@ -1,6 +1,6 @@
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, Navigation, Pagination, Scrollbar } from 'swiper';
-import { useContext, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -20,7 +20,6 @@ import 'swiper/css';
 import 'swiper/css/pagination';
 
 import '../assets/styles/swiper.css';
-import { OverlayContext } from '../context/OverlayProvider';
 
 function MainPage() {
   const [bestAuctionCardFlag, setBestAuctionCardFlag] = useState(true);
@@ -160,11 +159,6 @@ function MainPage() {
     },
   ];
 
-  const { shownOverlay, setShownOverlay } = useContext(OverlayContext);
-  const showProfileDropdown = () => {
-    setShownOverlay((prevState) => !prevState);
-  };
-
   const imgBg = useRef(null);
 
   useEffect(() => {
@@ -185,26 +179,20 @@ function MainPage() {
       className="relative min-h-screen overflow-y-auto overflow-x-hidden  bg-pageBackground"
     >
       <Header />
-      {shownOverlay && (
-        <div
-          className="absolute inset-0 z-20 bg-black opacity-30"
-          onClick={showProfileDropdown}
-          aria-hidden="true"
-        />
-      )}
+
       <div className="relative">
         <section className="relative h-screen w-full overflow-hidden">
           <div
             ref={imgBg}
             className="absolute top-0 left-0 h-full w-full scale-125 bg-mainBanner bg-cover bg-center bg-no-repeat brightness-50"
           />
-          <div className="absolute top-[65%] flex h-screen w-full justify-start md:top-[25%]  ">
-            <div className="flex w-full flex-col  text-primaryText sm:items-start">
+          <div className="absolute top-1/4 flex h-screen w-full justify-start   ">
+            <div className="flex w-full flex-col text-primaryText sm:items-start">
               <div className="mb-14 ml-[15%] max-w-xs sm:max-w-none">
-                <h6 className="uppercase lg:text-4xl">
+                <h6 className="uppercase md:text-4xl">
                   Award winning literature
                 </h6>
-                <h1 className="uppercase text-white sm:text-5xl lg:text-7xl">
+                <h1 className="uppercase text-white sm:text-6xl md:text-7xl">
                   <span className="inline-block w-full max-w-[80%]">
                     Buy best selling
                   </span>
