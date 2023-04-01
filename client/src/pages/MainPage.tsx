@@ -178,7 +178,7 @@ function MainPage() {
         <section className="relative h-screen w-full overflow-hidden">
           <div
             ref={imgBg}
-            className="absolute top-0 left-0 h-full w-full scale-125 bg-[url('./src/assets/img/parallaxImg.jpg')] bg-cover bg-center bg-no-repeat brightness-50"
+            className="absolute top-0 left-0 h-full w-full scale-125 bg-mainBanner bg-cover bg-center bg-no-repeat brightness-50"
           />
           <div className="absolute top-1/4 flex h-screen w-full justify-start   ">
             <div className="flex w-full flex-col text-primaryText sm:items-start">
