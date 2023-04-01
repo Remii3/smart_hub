@@ -33,7 +33,9 @@ function UserProvider({ children }: { children: ReactNode }) {
       });
     }
   });
+
   const userValues = useMemo(() => ({ userData, setUserData }), [userData]);
+
   return (
     <UserContext.Provider value={userValues}>{children}</UserContext.Provider>
   );

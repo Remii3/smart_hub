@@ -1,4 +1,10 @@
-import { Dispatch, createContext, SetStateAction, useState } from 'react';
+import {
+  Dispatch,
+  createContext,
+  SetStateAction,
+  useState,
+  useMemo,
+} from 'react';
 
 interface ContextTypes {
   shownOverlay: boolean;
@@ -13,9 +19,15 @@ export const OverlayContext = createContext<ContextTypes>({
 export function OverlayProvider({ children }: { children: React.ReactNode }) {
   const [shownOverlay, setShownOverlay] = useState(false);
 
+  const overlayValues = useMemo(
+    () => ({
+      shownOverlay,
+      setShownOverlay,
+    }),
+    [shownOverlay]
+  );
   return (
-    // eslint-disable-next-line react/jsx-no-constructed-context-values
-    <OverlayContext.Provider value={{ shownOverlay, setShownOverlay }}>
+    <OverlayContext.Provider value={overlayValues}>
       {children}
     </OverlayContext.Provider>
   );

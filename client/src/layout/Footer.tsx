@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 
 function Footer() {
   return (
-    <footer className="mx-auto flex max-w-[1200px] flex-col justify-center gap-5 pt-6 pb-10 pl-4 text-white md:flex-row">
+    <footer className="mx-auto flex max-w-[1200px] flex-col justify-center gap-5 pt-8 pb-10 pl-4 text-white md:flex-row">
       <div className="flex basis-2/3 flex-col gap-5 sm:flex-row">
         <div className="basis-1/2">
           <h6 className="inline-block pb-4 text-xl">Best design team</h6>

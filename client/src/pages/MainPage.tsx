@@ -13,7 +13,6 @@ import Main from '../layout/Main';
 import BestAuctionCard from '../components/card/BestAuctionCard';
 import AuctionCard from '../components/card/AuctionCard';
 import MainPageHeading from '../components/UI/MainPageHeading';
-
 import 'swiper/css/scrollbar';
 import 'swiper/css/navigation';
 import 'swiper/css';
@@ -23,10 +22,23 @@ import '../assets/styles/swiper.css';
 
 function MainPage() {
   const [bestAuctionCardFlag, setBestAuctionCardFlag] = useState(true);
+  const imgBg = useRef(null);
 
   const navigate = useNavigate();
 
   gsap.registerPlugin(ScrollTrigger);
+
+  useEffect(() => {
+    gsap.to(imgBg.current, {
+      scrollTrigger: {
+        scrub: 1,
+      },
+      duration: 0.5,
+      y: '-50%',
+      scale: 1.5,
+      ease: 'sine.out',
+    });
+  }, []);
 
   const testArray = [
     { id: 0, title: 'asd', description: 'zxczxzxc' },
@@ -159,20 +171,6 @@ function MainPage() {
     },
   ];
 
-  const imgBg = useRef(null);
-
-  useEffect(() => {
-    gsap.to(imgBg.current, {
-      scrollTrigger: {
-        scrub: 1,
-      },
-      duration: 0.5,
-      y: '-50%',
-      scale: 1.5,
-      ease: 'sine.out',
-    });
-  }, []);
-
   return (
     <div className="relative min-h-screen overflow-y-auto overflow-x-hidden  bg-pageBackground">
       <Header />
@@ -180,7 +178,7 @@ function MainPage() {
         <section className="relative h-screen w-full overflow-hidden">
           <div
             ref={imgBg}
-            className="absolute top-0 left-0 h-full w-full scale-125 bg-mainBanner bg-cover bg-center bg-no-repeat brightness-50"
+            className="absolute top-0 left-0 h-full w-full scale-125 bg-[url('./src/assets/img/parallaxImg.jpg')] bg-cover bg-center bg-no-repeat brightness-50"
           />
           <div className="absolute top-1/4 flex h-screen w-full justify-start   ">
             <div className="flex w-full flex-col text-primaryText sm:items-start">
