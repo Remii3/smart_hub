@@ -3,7 +3,7 @@ type PropsType = {
 };
 
 function Main({ children }: PropsType) {
-  return <main>{children}</main>;
+  return <main id="mainContainer">{children}</main>;
 }
 
 export default Main;

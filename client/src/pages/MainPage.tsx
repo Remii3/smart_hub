@@ -174,12 +174,8 @@ function MainPage() {
   }, []);
 
   return (
-    <div
-      id="mainPageScroll"
-      className="relative min-h-screen overflow-y-auto overflow-x-hidden  bg-pageBackground"
-    >
+    <div className="relative min-h-screen overflow-y-auto overflow-x-hidden  bg-pageBackground">
       <Header />
-
       <div className="relative">
         <section className="relative h-screen w-full overflow-hidden">
           <div

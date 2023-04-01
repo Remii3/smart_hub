@@ -24,7 +24,7 @@
     "typeRoots": ["src/ts", "node_modules/@types"],
 
   },
-  "include": ["src", ".eslintrc.json", ".prettierrc.json"],
+  "include": ["src", ".eslintrc.json", ".prettierrc.json", "tailwind.config.cjs", "postcss.config.cjs"],
   "references": [{ "path": "./tsconfig.node.json" }],
   "exclude": ["node_modules"]
 }

@@ -1,27 +1,38 @@
-import { useContext } from 'react';
+import { gsap } from 'gsap';
+import { useContext, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { UserContext } from '../context/UserProvider';
 import { OverlayContext } from '../context/OverlayProvider';
-import useScrollPosition from '../hooks/useScrollPosition';
 import Nav from './Nav';
 
 function Header() {
-  const scrollPosition = useScrollPosition('mainPageScroll');
-  const windowWidth = window.innerWidth;
-  let navColorBreakpoint = 0;
   const { shownOverlay, setShownOverlay } = useContext(OverlayContext);
-  const { userData, setUserData } = useContext(UserContext);
+  const { userData } = useContext(UserContext);
 
-  if (windowWidth < 480) {
-    navColorBreakpoint = 590;
-  } else if (windowWidth < 900) {
-    navColorBreakpoint = 950;
-  } else {
-    navColorBreakpoint = 980;
-  }
+  gsap.registerPlugin(ScrollTrigger);
+
+  useEffect(() => {
+    const mainContainer = document.getElementById('mainContainer');
+
+    ScrollTrigger.create({
+      trigger: mainContainer,
+      start: 'top 70px',
+      end: 'bottom 70px',
+      markers: false,
+      animation: gsap.to('#mainHeader', {
+        backgroundColor: '#14222F',
+        ease: 'sine.out',
+      }),
+      toggleActions: 'restart none none reverse',
+    });
+  }, []);
 
   return (
-    <header className="fixed top-0 left-0 z-20 w-full">
+    <header
+      id="mainHeader"
+      className="fixed top-0 left-0 z-20 w-full bg-transparent"
+    >
       {shownOverlay && (
         <div
           className="absolute inset-0 z-30 h-screen w-screen bg-black opacity-30"

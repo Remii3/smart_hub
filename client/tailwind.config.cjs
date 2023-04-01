@@ -42,6 +42,5 @@
         },
       },
     },
-    plugins: [require('@kamona/tailwindcss-perspective')],
   }
 );
