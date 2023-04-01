@@ -1,5 +1,5 @@
 type PropsTypes = {
-  usecase: 'switch';
+  usecase: 'switch' | 'outline';
   text: string;
   onClick?: () => void;
   customCSS?: string;
@@ -15,6 +15,8 @@ function SecondaryBtn({ usecase, text, onClick, customCSS }: PropsTypes) {
     switch (usecase) {
       case 'switch':
         return 'px-3 h-[60px]';
+      case 'outline':
+        return 'border border-primary text-primary';
       default:
         return '';
     }

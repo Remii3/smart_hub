@@ -1,12 +1,12 @@
 type PropsTypes = {
   usecase: 'big' | 'normal';
   text: string;
-  onClick?: () => void;
+  onClick?: (e: any) => void;
   customCSS?: string;
 };
 
 const defaultProps = {
-  onClick: () => {},
+  onClick: (e: any) => {},
   customCSS: '',
 };
 
@@ -22,9 +22,9 @@ function PrimaryBtn({ usecase, text, onClick, customCSS }: PropsTypes) {
     }
   };
 
-  const clickHandler = () => {
+  const clickHandler = (e: any) => {
     if (onClick) {
-      onClick();
+      onClick(e);
     }
   };
 
@@ -32,7 +32,7 @@ function PrimaryBtn({ usecase, text, onClick, customCSS }: PropsTypes) {
     <button
       type="button"
       className={`${customCSS} ${usecaseClass()} transition-[filter, scale] rounded-lg bg-primary font-semibold text-white shadow duration-200 ease-out hover:shadow-md hover:brightness-90 active:scale-95 active:brightness-75`}
-      onClick={clickHandler}
+      onClick={(e) => clickHandler(e)}
     >
       {text}
     </button>

@@ -5,7 +5,7 @@ import { loadFull } from 'tsparticles';
 
 import type { Engine } from 'tsparticles-engine';
 
-const NoPage404 = () => {
+function NoPage404() {
   const particlesInit = useCallback(async (engine: Engine) => {
     await loadFull(engine);
   }, []);
@@ -52,7 +52,7 @@ const NoPage404 = () => {
           </p>
         </div>
       </div>
-      <div className="particles-js fixed top-0 right-0 bottom-0 left-0"></div>
+      <div className="particles-js fixed top-0 right-0 bottom-0 left-0" />
       <Particles
         id="tsparticles"
         init={particlesInit}
@@ -117,13 +117,13 @@ const NoPage404 = () => {
       />
 
       <Link
-        to={'/'}
+        to="/"
         className="fixed right-10 bottom-10 rounded bg-gradient-to-r from-[#71b7e6] via-[#b98acc] to-[#ee8176] py-4 px-7 text-base font-bold uppercase text-white drop-shadow-md transition-all duration-300 ease-out hover:scale-105 hover:drop-shadow-2xl active:opacity-80"
       >
         Go back
       </Link>
     </div>
   );
-};
+}
 
 export default NoPage404;

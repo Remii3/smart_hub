@@ -1,65 +1,62 @@
-import { Link } from 'react-router-dom';
-import useScrollPosition from '../hooks/useScrollPosition';
+import { gsap } from 'gsap';
+import { useContext, useEffect, useRef } from 'react';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { OverlayContext } from '../context/OverlayProvider';
 import Nav from './Nav';
 
 function Header() {
-  const scrollPosition = useScrollPosition();
-  const windowWidth = window.innerWidth;
-  let navColorBreakpoint = 0;
+  const { shownOverlay, setShownOverlay } = useContext(OverlayContext);
+  const navOverlay = useRef(null);
+  const headerBgBreakPoint = useRef(null);
+  gsap.registerPlugin(ScrollTrigger);
 
-  if (windowWidth < 480) {
-    navColorBreakpoint = 590;
-  } else if (windowWidth < 900) {
-    navColorBreakpoint = 950;
-  } else {
-    navColorBreakpoint = 980;
-  }
+  useEffect(() => {
+    const mainContainer = document.getElementById('mainContainer');
+
+    ScrollTrigger.create({
+      trigger: mainContainer,
+      start: 'top 70px',
+      end: 'bottom 70px',
+      markers: false,
+      animation: gsap.to(headerBgBreakPoint.current, {
+        backgroundColor: '#14222F',
+        ease: 'sine.out',
+      }),
+      toggleActions: 'restart none none reverse',
+    });
+  }, []);
+
+  const profileOverlayHandler = () => {
+    const tm = gsap.timeline();
+
+    if (shownOverlay) {
+      tm.to(navOverlay.current, {
+        opacity: 0,
+        duration: 0.1,
+      }).to(navOverlay.current, { maxHeight: 0, duration: 0.01 });
+    } else {
+      tm.to(navOverlay.current, { maxHeight: '100vh', duration: 0.01 }).to(
+        navOverlay.current,
+        {
+          opacity: 0.3,
+          duration: 0.1,
+        }
+      );
+    }
+    setShownOverlay((prevState) => !prevState);
+  };
   return (
-    <header className="sticky top-0 left-0 z-30 w-full">
+    <header
+      ref={headerBgBreakPoint}
+      className="fixed top-0 left-0 z-20 w-full bg-transparent"
+    >
       <div
-        className={`${
-          Number(scrollPosition) <= navColorBreakpoint
-            ? 'bg-transparent'
-            : 'bg-pageBackground'
-        } absolute top-0 left-0 z-20 h-full w-full transition-colors duration-300 ease-out`}
+        ref={navOverlay}
+        className="absolute inset-0 h-screen max-h-0 w-screen bg-black opacity-0"
+        onClick={profileOverlayHandler}
+        aria-hidden="true"
       />
-      <Nav />
-      <div className="mobile-overlay absolute top-0 left-[100vw] z-10 w-full bg-pageBackground">
-        <ul className="flex flex-col text-white">
-          <li className="w-full">
-            <Link
-              to="/news"
-              className="block w-full py-3 text-center text-lg transition-colors duration-200 ease-out hover:text-primaryText"
-            >
-              News
-            </Link>
-          </li>
-          <li className="w-full">
-            <Link
-              to="/shop"
-              className="block w-full py-3 text-center text-lg transition-colors duration-200 ease-out hover:text-primaryText"
-            >
-              Shop
-            </Link>
-          </li>
-          <li>
-            <Link
-              to="/collections"
-              className="block w-full py-3 text-center text-lg transition-colors duration-200 ease-out hover:text-primaryText"
-            >
-              Collections
-            </Link>
-          </li>
-          <li>
-            <Link
-              to="/auctions"
-              className="block w-full py-3 text-center text-lg transition-colors duration-200 ease-out hover:text-primaryText"
-            >
-              Auctions
-            </Link>
-          </li>
-        </ul>
-      </div>
+      <Nav profileOverlayHandler={profileOverlayHandler} />
     </header>
   );
 }
