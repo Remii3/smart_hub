@@ -320,7 +320,7 @@ function MainPage() {
               </div>
             </section>
             {/* All auctions */}
-            <section className="relative flex w-full flex-col items-center gap-12 bg-white px-0 pb-24 sm:px-24">
+            <section className="relative flex w-full flex-col items-center gap-12 bg-white px-0 pb-24 lg:px-12">
               <div className="w-full">
                 <MainPageHeading
                   color="dark"
@@ -329,13 +329,13 @@ function MainPage() {
                   subTitle="You may like this too"
                 />
               </div>
-              <div className="px-auto w-full max-w-[1648px]">
+              <div className="px-auto w-full ">
                 <Swiper
                   scrollbar={{
                     hide: false,
                   }}
-                  autoHeight
                   navigation
+                  grabCursor
                   autoplay={{
                     delay: 5000,
                     disableOnInteraction: false,
@@ -344,29 +344,25 @@ function MainPage() {
                   modules={[Scrollbar, Navigation, Autoplay]}
                   spaceBetween={52}
                   slidesPerView={1}
+                  setWrapperSize
                   breakpoints={{
                     324: {
                       slidesPerView: 1,
-                      spaceBetween: 52,
                       scrollbar: { hide: false },
                     },
                     663: {
                       slidesPerView: 2,
-                      spaceBetween: 52,
                       scrollbar: { hide: false },
                     },
                     1002: {
                       slidesPerView: 3,
-                      spaceBetween: 52,
                       scrollbar: { hide: true },
                     },
                     1341: {
                       slidesPerView: 4,
-                      spaceBetween: 52,
                     },
                     1680: {
                       slidesPerView: 5,
-                      spaceBetween: 52,
                     },
                   }}
                   style={{
