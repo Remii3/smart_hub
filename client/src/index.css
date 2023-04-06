@@ -11,36 +11,36 @@
     @apply font-poppins;
     @apply font-semibold;
   }
+
   h1 {
-    @apply text-5xl lg:text-7xl;
+    @apply text-[calc(3rem+0.390625vw)] leading-none sm:text-[calc(3.75rem+0.390625vw)]  lg:text-[calc(4.5rem+0.390625vw)];
   }
+
   h2 {
-    @apply text-2xl sm:text-5xl lg:text-6xl;
+    @apply text-[calc(1.875rem+0.390625vw)] leading-9 sm:text-[calc(3rem+0.390625vw)] sm:leading-none lg:text-[calc(3.75rem+0.390625vw)];
   }
+
   h3 {
-    @apply text-xl sm:text-4xl lg:text-5xl;
+    @apply text-[calc(1.5rem+0.390625vw)] leading-8 sm:text-[calc(1.875rem+0.390625vw)] sm:leading-9 lg:text-[calc(3rem+0.390625vw)] lg:leading-none;
   }
+
   h4 {
-    @apply text-lg sm:text-3xl lg:text-4xl;
+    @apply text-[calc(1.25rem+0.390625vw)] leading-7 sm:text-[calc(1.5rem+0.390625vw)] sm:leading-8 lg:text-[calc(1.875rem+0.390625vw)];
   }
+
   h5 {
-    @apply text-lg sm:text-2xl lg:text-3xl;
+    @apply text-[calc(1.125rem+0.390625vw)] leading-7 sm:text-[calc(1.25rem+0.390625vw)] lg:text-[calc(1.5rem+0.390625vw)] lg:leading-8;
   }
+
   h6 {
-    @apply text-base sm:text-xl lg:text-2xl;
+    @apply text-[calc(1rem+0.390625vw)] leading-6 sm:text-[calc(1.125rem+0.390625vw)] sm:leading-7 lg:text-[calc(1.25rem+0.390625vw)];
   }
+
   body {
     @apply font-rubik;
-  }
-  p {
-    @apply text-sm sm:text-lg;
-  }
-  button {
-    @apply text-base sm:text-lg;
-  }
-  li {
-    @apply text-sm sm:text-base;
+    @apply text-[calc(1rem+0.390625vw)] leading-6 sm:text-[calc(1.125rem+0.390625vw)] sm:leading-7 lg:text-xl;
   }
 }
+
 @tailwind components;
 @tailwind utilities;

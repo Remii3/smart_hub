@@ -41,44 +41,50 @@ function Nav({ profileOverlayHandler }: { profileOverlayHandler: () => void }) {
 
   return (
     <nav>
-      <div className="mx-auto flex h-[64px] max-w-[1480px] flex-row items-center justify-between  py-3 px-10 transition-all duration-300 ease-out">
+      <div className="mx-auto flex h-[64px] max-w-[1480px] flex-row items-center justify-between px-10 py-3">
         <div className="text-white">
           <Link to="/">SmartHub</Link>
         </div>
         <div className="hidden md:flex">
           <ul className="flex flex-row items-center px-8 text-white">
-            <li className="text-base transition-[color,transform] duration-200 ease-out hover:scale-105 hover:text-primary">
+            <li className="text-base transition-[color] duration-200 ease-out hover:text-primary">
               <Link className="px-4 py-2" to="/news">
                 News
               </Link>
             </li>
 
-            <li className="text-base transition-[color,transform] duration-200 ease-out hover:scale-105 hover:text-primary">
+            <li className="text-base transition-[color] duration-200 ease-out hover:text-primary">
               <Link className="px-4 py-2" to="/shop">
                 Shop
               </Link>
             </li>
 
-            <li className="text-base transition-[color,transform] duration-200 ease-out hover:scale-105 hover:text-primary">
+            <li className="text-base transition-[color] duration-200 ease-out hover:text-primary">
               <Link className="px-4 py-2" to="/specials">
                 Specials
               </Link>
             </li>
 
-            <li className="text-base transition-[color,transform] duration-200 ease-out hover:scale-105 hover:text-primary">
+            <li className="text-base transition-[color] duration-200 ease-out hover:text-primary">
               <Link className="px-4 py-2" to="/auctions">
                 Auctions
               </Link>
             </li>
           </ul>
-          <div className="relative z-40 flex items-center justify-center px-2">
-            <button type="button" onClick={dropdownHandler}>
+          <div className="relative z-40 mt-[2px] flex items-center justify-center ">
+            <button
+              type="button"
+              className={`${
+                shownOverlay ? 'bg-transparentGray shadow-lg' : ''
+              } rounded-lg p-1 transition-[background-color,box-shadow] duration-200 ease-out hover:bg-transparentGray hover:shadow-lg `}
+              onClick={dropdownHandler}
+            >
               {userData ? (
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 24 24"
                   fill="currentColor"
-                  className="mt-[2px] h-7 w-7 text-white"
+                  className="h-7 w-7 text-white"
                 >
                   <path
                     fillRule="evenodd"
@@ -93,7 +99,7 @@ function Nav({ profileOverlayHandler }: { profileOverlayHandler: () => void }) {
                   viewBox="0 0 24 24"
                   strokeWidth={1.5}
                   stroke="currentColor"
-                  className="mt-[2px] h-7 w-7 text-white"
+                  className="h-7 w-7 text-white"
                 >
                   <path
                     strokeLinecap="round"
@@ -111,7 +117,7 @@ function Nav({ profileOverlayHandler }: { profileOverlayHandler: () => void }) {
               >
                 <Link
                   to={{ pathname: '/account', search: 'auth=login' }}
-                  className="px-3 pt-4 pb-2 text-white transition-[color,transform] duration-200 ease-out hover:text-primary"
+                  className="px-3 pb-2 pt-4 text-white transition-[color] duration-200 ease-out hover:text-primary"
                 >
                   <button
                     type="button"
@@ -123,7 +129,7 @@ function Nav({ profileOverlayHandler }: { profileOverlayHandler: () => void }) {
                 </Link>
                 <Link
                   to={{ pathname: '/account', search: 'auth=register' }}
-                  className="px-3 pb-4 pt-2 text-white transition-[color,transform] duration-200 ease-out hover:text-primary"
+                  className="px-3 pb-4 pt-2 text-white transition-[color] duration-200 ease-out hover:text-primary"
                 >
                   <button
                     type="button"
@@ -143,7 +149,7 @@ function Nav({ profileOverlayHandler }: { profileOverlayHandler: () => void }) {
               >
                 <Link
                   to="/account/my"
-                  className="px-3 pb-2 pt-4 text-white transition-[color,transform] duration-200 ease-out hover:text-primary"
+                  className="px-3 pb-2 pt-4 text-white transition-[color] duration-200 ease-out hover:text-primary"
                 >
                   <button
                     type="button"
@@ -156,7 +162,7 @@ function Nav({ profileOverlayHandler }: { profileOverlayHandler: () => void }) {
                 <button
                   type="button"
                   onClick={logoutHandler}
-                  className="px-3 pb-4 pt-2 text-base text-white transition-[color,transform] duration-200 ease-out hover:text-primary"
+                  className="px-3 pb-4 pt-2 text-base text-white transition-[color] duration-200 ease-out hover:text-primary"
                 >
                   Logout
                 </button>
@@ -174,38 +180,38 @@ function Nav({ profileOverlayHandler }: { profileOverlayHandler: () => void }) {
           <span
             className={`${
               openedBurger
-                ? 'top-[18px] left-1/2 w-0'
-                : 'top-[5px] left-0 w-full'
+                ? 'left-1/2 top-[18px] w-0'
+                : 'left-0 top-[5px] w-full'
             } absolute block h-1 rotate-0 rounded-lg bg-white opacity-100 transition-[top,left,width] duration-200 ease-in-out`}
           />
           <span
             className={`${
               openedBurger ? 'rotate-45' : 'rotate-0'
-            } absolute top-[18px] left-0 block h-1 w-full rounded-lg bg-white opacity-100 transition-transform`}
+            } absolute left-0 top-[18px] block h-1 w-full rounded-lg bg-white opacity-100 transition-transform`}
           />
           <span
             className={`${
               openedBurger ? '-rotate-45' : 'rotate-0'
-            } absolute top-[18px] left-0 block h-1 w-full rounded-lg bg-white opacity-100 transition-transform`}
+            } absolute left-0 top-[18px] block h-1 w-full rounded-lg bg-white opacity-100 transition-transform`}
           />
           <span
             className={`${
               openedBurger
-                ? 'top-[18px] left-1/2 w-0'
-                : 'top-[31px] left-0 w-full'
+                ? 'left-1/2 top-[18px] w-0'
+                : 'left-0 top-[31px] w-full'
             } absolute block h-1 rotate-0 rounded-lg bg-white opacity-100 transition-[top,left,width] duration-200 ease-in-out`}
           />
         </button>
       </div>
       <div
         ref={navMobile}
-        className="mobile-overlay absolute top-[0] left-[100vw] z-10 h-screen w-full bg-pageBackground pt-16"
+        className="mobile-overlay absolute left-[100vw] top-[0] z-10 h-screen w-full bg-pageBackground pt-16"
       >
         <ul className="flex flex-col text-white">
           <li className="w-full">
             <Link
               to="/news"
-              className="block w-full py-3 text-center text-lg transition-colors duration-200 ease-out hover:text-primaryText"
+              className="block w-full py-3 text-center text-lg transition-[color] duration-200 ease-out hover:text-primaryText"
             >
               News
             </Link>
@@ -213,7 +219,7 @@ function Nav({ profileOverlayHandler }: { profileOverlayHandler: () => void }) {
           <li className="w-full">
             <Link
               to="/shop"
-              className="block w-full py-3 text-center text-lg transition-colors duration-200 ease-out hover:text-primaryText"
+              className="block w-full py-3 text-center text-lg transition-[color] duration-200 ease-out hover:text-primaryText"
             >
               Shop
             </Link>
@@ -221,7 +227,7 @@ function Nav({ profileOverlayHandler }: { profileOverlayHandler: () => void }) {
           <li>
             <Link
               to="/collections"
-              className="block w-full py-3 text-center text-lg transition-colors duration-200 ease-out hover:text-primaryText"
+              className="block w-full py-3 text-center text-lg transition-[color] duration-200 ease-out hover:text-primaryText"
             >
               Collections
             </Link>
@@ -229,7 +235,7 @@ function Nav({ profileOverlayHandler }: { profileOverlayHandler: () => void }) {
           <li>
             <Link
               to="/auctions"
-              className="block w-full py-3 text-center text-lg transition-colors duration-200 ease-out hover:text-primaryText"
+              className="block w-full py-3 text-center text-lg transition-[color] duration-200 ease-out hover:text-primaryText"
             >
               Auctions
             </Link>
@@ -241,7 +247,7 @@ function Nav({ profileOverlayHandler }: { profileOverlayHandler: () => void }) {
               <button type="button" className="w-full">
                 <Link
                   to={{ pathname: '/account', search: 'auth=login' }}
-                  className="block w-full py-3 text-center text-lg transition-colors duration-200 ease-out hover:text-primaryText"
+                  className="block w-full py-3 text-center text-lg transition-[color] duration-200 ease-out hover:text-primaryText"
                 >
                   Sign in
                 </Link>
@@ -249,7 +255,7 @@ function Nav({ profileOverlayHandler }: { profileOverlayHandler: () => void }) {
               <button type="button" className="w-full">
                 <Link
                   to={{ pathname: '/account', search: 'auth=register' }}
-                  className="block w-full py-3 text-center text-lg transition-colors duration-200 ease-out hover:text-primaryText"
+                  className="block w-full py-3 text-center text-lg transition-[color] duration-200 ease-out hover:text-primaryText"
                 >
                   Sign up
                 </Link>
@@ -260,13 +266,13 @@ function Nav({ profileOverlayHandler }: { profileOverlayHandler: () => void }) {
             <div className="w-full flex-col bg-pageBackground">
               <Link
                 to="/account/my"
-                className="block w-full py-3 text-center text-lg transition-colors duration-200 ease-out hover:text-primaryText"
+                className="block w-full py-3 text-center text-lg transition-[color] duration-200 ease-out hover:text-primaryText"
               >
                 Account
               </Link>
               <button
                 type="button"
-                className="block w-full py-3 text-center text-lg transition-colors duration-200 ease-out hover:text-primaryText"
+                className="block w-full py-3 text-center text-lg transition-[color] duration-200 ease-out hover:text-primaryText"
               >
                 Logout
               </button>

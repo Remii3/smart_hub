@@ -21,7 +21,16 @@
   "plugins": ["react", "@typescript-eslint", "prettier"],
   "rules": {
     "react/react-in-jsx-scope": 0,
-    "no-alert":0,
-    "@typescript-eslint/no-explicit-any": 0
+    "no-alert": 0,
+    "@typescript-eslint/no-explicit-any": 0,
+    "jsx-a11y/label-has-associated-control": [
+      2,
+      {
+        "labelComponents": ["FormLabel"],
+        "labelAttributes": ["label"],
+        "controlComponents": ["input"],
+        "depth": 1
+      }
+    ]
   }
 }

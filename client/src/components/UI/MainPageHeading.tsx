@@ -6,26 +6,22 @@ type PropsTypes = {
 };
 
 function MainPageHeading({ mainTitle, subTitle, usecase, color }: PropsTypes) {
-  const mainTitleSize = () => {
-    if (usecase === 'main') {
-      return <h2 className={`mb-5 uppercase text-${color}`}>{mainTitle}</h2>;
-    }
-    return <h3 className={`mb-5 text-${color}`}>{mainTitle}</h3>;
-  };
-  const subTitleColor = () => {
-    if (color === 'dark') {
-      return 'text-darkTint';
-    }
-    return 'text-gray900';
-  };
   return (
     <div
       className={`${
-        usecase === 'main' ? 'py-7' : 'py-6'
+        usecase === 'main' ? 'py-11' : 'py-10'
       } px-4 text-center md:py-32`}
     >
-      {mainTitleSize()}
-      <p className={`text-sm uppercase lg:text-lg ${subTitleColor()}`}>
+      {usecase === 'main' ? (
+        <h2 className={`mb-5 uppercase text-${color}`}>{mainTitle}</h2>
+      ) : (
+        <h3 className={`mb-5 text-${color}`}>{mainTitle}</h3>
+      )}
+      <p
+        className={`${
+          color === 'dark' ? 'text-darkTint' : 'text-gray900'
+        } text-sm uppercase sm:text-base lg:text-lg`}
+      >
         {subTitle}
       </p>
     </div>

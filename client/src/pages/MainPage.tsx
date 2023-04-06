@@ -6,7 +6,7 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import CollectionCard from '../components/card/CollectionCard';
 import Header from '../layout/Header';
-import CategoryCard from '../components/card/CategoryCard';
+import CategoryCard from '../components/card/ShopCategoryCard';
 import PrimaryBtn from '../components/UI/PrimaryBtn';
 import Footer from '../layout/Footer';
 import Main from '../layout/Main';
@@ -178,7 +178,7 @@ function MainPage() {
         <section className="relative h-screen w-full overflow-hidden">
           <div
             ref={imgBg}
-            className="absolute top-0 left-0 h-full w-full scale-125 bg-mainBanner bg-cover bg-center bg-no-repeat brightness-50"
+            className="absolute left-0 top-0 h-full w-full scale-125 bg-mainBanner bg-cover bg-center bg-no-repeat brightness-50"
           />
           <div className="absolute top-1/4 flex h-screen w-full justify-start   ">
             <div className="flex w-full flex-col text-primaryText sm:items-start">
@@ -186,7 +186,7 @@ function MainPage() {
                 <h6 className="uppercase md:text-4xl">
                   Award winning literature
                 </h6>
-                <h1 className="uppercase text-white sm:text-6xl md:text-7xl">
+                <h1 className="uppercase text-white ">
                   <span className="inline-block w-full max-w-[80%]">
                     Buy best selling
                   </span>
@@ -209,8 +209,8 @@ function MainPage() {
           </div>
         </section>
         <Main>
-          {/* Shop */}
           <div className="parallax__group relative flex min-h-screen w-full flex-col items-center justify-center overflow-y-hidden bg-white ">
+            {/* Shop */}
             <section className="relative flex w-full flex-col items-center gap-12 pb-16">
               <div className="relative -top-1 left-0 w-full bg-pageBackground">
                 <MainPageHeading
@@ -242,7 +242,7 @@ function MainPage() {
                 />
               </div>
             </section>
-            {/* Special */}
+            {/* Gallery */}
             <section className="relative flex w-full flex-col items-center gap-12 pb-16">
               <div className="w-full bg-white">
                 <MainPageHeading
@@ -264,8 +264,9 @@ function MainPage() {
                 ))}
               </div>
             </section>
+            {/* Special auctions */}
             <section className="relative flex w-full flex-col items-center bg-pageBackground pb-16">
-              <div className="relative -top-1 left-0 w-full  bg-white">
+              <div className="relative -top-1 left-0 w-full bg-white">
                 <MainPageHeading
                   color="dark"
                   usecase="main"
@@ -273,18 +274,16 @@ function MainPage() {
                   subTitle="Books are the portal to endless possibilities"
                 />
               </div>
-              <div className="flex w-full flex-col gap-12 lg:flex-row lg:gap-0">
+              <div className="flex w-full flex-col gap-0 lg:flex-row">
                 <div className="w-full flex-grow">
-                  <div className="flex flex-col items-center px-4 py-6 text-center md:py-32 lg:items-start lg:pl-12">
-                    <h3 className="mb-5 text-center text-white lg:text-left">
-                      This makes our hearts beat faster every day
-                    </h3>
-                    <p className={`text-sm text-gray900 lg:text-lg `}>
-                      Readers loved them
-                    </p>
-                  </div>
+                  <MainPageHeading
+                    color="white"
+                    usecase="sub"
+                    mainTitle="Selected by community"
+                    subTitle="Readers loved them and voted them the best"
+                  />
                 </div>
-                <div className="flex h-auto w-full max-w-[100%] items-center transition-all duration-200 ease-out lg:max-w-[70%] lg:py-32">
+                <div className="flex h-auto w-full max-w-[100%] items-center lg:max-w-[70%] lg:py-32">
                   <Swiper
                     className="bestAuction-swiper"
                     pagination
@@ -320,7 +319,8 @@ function MainPage() {
                 </div>
               </div>
             </section>
-            <section className="relative flex w-full flex-col items-center gap-12 bg-white px-0 pb-24 sm:px-24">
+            {/* All auctions */}
+            <section className="relative flex w-full flex-col items-center gap-12 bg-white px-0 pb-24 lg:px-12">
               <div className="w-full">
                 <MainPageHeading
                   color="dark"
@@ -329,13 +329,13 @@ function MainPage() {
                   subTitle="You may like this too"
                 />
               </div>
-              <div className="px-auto w-full max-w-[1648px]">
+              <div className="px-auto w-full ">
                 <Swiper
                   scrollbar={{
                     hide: false,
                   }}
-                  autoHeight
                   navigation
+                  grabCursor
                   autoplay={{
                     delay: 5000,
                     disableOnInteraction: false,
@@ -344,29 +344,25 @@ function MainPage() {
                   modules={[Scrollbar, Navigation, Autoplay]}
                   spaceBetween={52}
                   slidesPerView={1}
+                  setWrapperSize
                   breakpoints={{
                     324: {
                       slidesPerView: 1,
-                      spaceBetween: 52,
                       scrollbar: { hide: false },
                     },
                     663: {
                       slidesPerView: 2,
-                      spaceBetween: 52,
                       scrollbar: { hide: false },
                     },
                     1002: {
                       slidesPerView: 3,
-                      spaceBetween: 52,
                       scrollbar: { hide: true },
                     },
                     1341: {
                       slidesPerView: 4,
-                      spaceBetween: 52,
                     },
                     1680: {
                       slidesPerView: 5,
-                      spaceBetween: 52,
                     },
                   }}
                   style={{

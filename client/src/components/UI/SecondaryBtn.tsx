@@ -1,7 +1,7 @@
 type PropsTypes = {
   usecase: 'switch' | 'outline';
   text: string;
-  onClick?: () => void;
+  onClick?: (e: any) => void;
   customCSS?: string;
 };
 
@@ -22,17 +22,17 @@ function SecondaryBtn({ usecase, text, onClick, customCSS }: PropsTypes) {
     }
   };
 
-  const clickHandler = () => {
+  const clickHandler = (e: any) => {
     if (onClick) {
-      onClick();
+      onClick(e);
     }
   };
 
   return (
     <button
       type="button"
-      className={`${customCSS} ${usecaseClass()} rounded-lg bg-white text-darkTint transition-[filter,transform] duration-200 ease-out hover:brightness-95 active:scale-95 active:brightness-90`}
-      onClick={clickHandler}
+      className={`${customCSS} ${usecaseClass()} rounded-lg bg-white text-darkTint transition-[filter,transform] duration-200 ease-out hover:brightness-95 active:scale-95 active:brightness-90 sm:text-lg `}
+      onClick={(e) => clickHandler(e)}
     >
       {text}
     </button>
