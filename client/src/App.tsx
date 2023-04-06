@@ -6,6 +6,7 @@ import SuspenseComponent from './components/suspense/SuspenseComponent';
 import LoadingComponent from './components/UI/LoadingComponent';
 import { OverlayProvider } from './context/OverlayProvider';
 import UserProvider from './context/UserProvider';
+import NoPage404 from './pages/NoPage404';
 
 const MainPage = lazy(() => import('./pages/MainPage'));
 const AuthPage = lazy(() => import('./pages/AuthPage'));
@@ -21,6 +22,7 @@ function App() {
           <Routes>
             <Route path="/" element={<MainPage />} />
             <Route path="/account" element={<AuthPage />} />
+            <Route path="/*" element={<NoPage404 />} />
           </Routes>
         </UserProvider>
       </OverlayProvider>

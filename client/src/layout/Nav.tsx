@@ -41,31 +41,31 @@ function Nav({ profileOverlayHandler }: { profileOverlayHandler: () => void }) {
 
   return (
     <nav>
-      <div className="mx-auto flex h-[64px] max-w-[1480px] flex-row items-center justify-between px-10 py-3 transition-all duration-300 ease-out">
+      <div className="mx-auto flex h-[64px] max-w-[1480px] flex-row items-center justify-between px-10 py-3">
         <div className="text-white">
           <Link to="/">SmartHub</Link>
         </div>
         <div className="hidden md:flex">
           <ul className="flex flex-row items-center px-8 text-white">
-            <li className="text-base transition-[color,transform] duration-200 ease-out hover:text-primary">
+            <li className="text-base transition-[color] duration-200 ease-out hover:text-primary">
               <Link className="px-4 py-2" to="/news">
                 News
               </Link>
             </li>
 
-            <li className="text-base transition-[color,transform] duration-200 ease-out hover:text-primary">
+            <li className="text-base transition-[color] duration-200 ease-out hover:text-primary">
               <Link className="px-4 py-2" to="/shop">
                 Shop
               </Link>
             </li>
 
-            <li className="text-base transition-[color,transform] duration-200 ease-out hover:text-primary">
+            <li className="text-base transition-[color] duration-200 ease-out hover:text-primary">
               <Link className="px-4 py-2" to="/specials">
                 Specials
               </Link>
             </li>
 
-            <li className="text-base transition-[color,transform] duration-200 ease-out hover:text-primary">
+            <li className="text-base transition-[color] duration-200 ease-out hover:text-primary">
               <Link className="px-4 py-2" to="/auctions">
                 Auctions
               </Link>
@@ -76,7 +76,7 @@ function Nav({ profileOverlayHandler }: { profileOverlayHandler: () => void }) {
               type="button"
               className={`${
                 shownOverlay ? 'bg-transparentGray shadow-lg' : ''
-              } rounded-lg p-1 transition-[background-color] duration-200 ease-out hover:bg-transparentGray hover:shadow-lg `}
+              } rounded-lg p-1 transition-[background-color,box-shadow] duration-200 ease-out hover:bg-transparentGray hover:shadow-lg `}
               onClick={dropdownHandler}
             >
               {userData ? (
@@ -117,7 +117,7 @@ function Nav({ profileOverlayHandler }: { profileOverlayHandler: () => void }) {
               >
                 <Link
                   to={{ pathname: '/account', search: 'auth=login' }}
-                  className="px-3 pb-2 pt-4 text-white transition-[color,transform] duration-200 ease-out hover:text-primary"
+                  className="px-3 pb-2 pt-4 text-white transition-[color] duration-200 ease-out hover:text-primary"
                 >
                   <button
                     type="button"
@@ -129,7 +129,7 @@ function Nav({ profileOverlayHandler }: { profileOverlayHandler: () => void }) {
                 </Link>
                 <Link
                   to={{ pathname: '/account', search: 'auth=register' }}
-                  className="px-3 pb-4 pt-2 text-white transition-[color,transform] duration-200 ease-out hover:text-primary"
+                  className="px-3 pb-4 pt-2 text-white transition-[color] duration-200 ease-out hover:text-primary"
                 >
                   <button
                     type="button"
@@ -149,7 +149,7 @@ function Nav({ profileOverlayHandler }: { profileOverlayHandler: () => void }) {
               >
                 <Link
                   to="/account/my"
-                  className="px-3 pb-2 pt-4 text-white transition-[color,transform] duration-200 ease-out hover:text-primary"
+                  className="px-3 pb-2 pt-4 text-white transition-[color] duration-200 ease-out hover:text-primary"
                 >
                   <button
                     type="button"
@@ -162,7 +162,7 @@ function Nav({ profileOverlayHandler }: { profileOverlayHandler: () => void }) {
                 <button
                   type="button"
                   onClick={logoutHandler}
-                  className="px-3 pb-4 pt-2 text-base text-white transition-[color,transform] duration-200 ease-out hover:text-primary"
+                  className="px-3 pb-4 pt-2 text-base text-white transition-[color] duration-200 ease-out hover:text-primary"
                 >
                   Logout
                 </button>
@@ -211,7 +211,7 @@ function Nav({ profileOverlayHandler }: { profileOverlayHandler: () => void }) {
           <li className="w-full">
             <Link
               to="/news"
-              className="block w-full py-3 text-center text-lg transition-colors duration-200 ease-out hover:text-primaryText"
+              className="block w-full py-3 text-center text-lg transition-[color] duration-200 ease-out hover:text-primaryText"
             >
               News
             </Link>
@@ -219,7 +219,7 @@ function Nav({ profileOverlayHandler }: { profileOverlayHandler: () => void }) {
           <li className="w-full">
             <Link
               to="/shop"
-              className="block w-full py-3 text-center text-lg transition-colors duration-200 ease-out hover:text-primaryText"
+              className="block w-full py-3 text-center text-lg transition-[color] duration-200 ease-out hover:text-primaryText"
             >
               Shop
             </Link>
@@ -227,7 +227,7 @@ function Nav({ profileOverlayHandler }: { profileOverlayHandler: () => void }) {
           <li>
             <Link
               to="/collections"
-              className="block w-full py-3 text-center text-lg transition-colors duration-200 ease-out hover:text-primaryText"
+              className="block w-full py-3 text-center text-lg transition-[color] duration-200 ease-out hover:text-primaryText"
             >
               Collections
             </Link>
@@ -235,7 +235,7 @@ function Nav({ profileOverlayHandler }: { profileOverlayHandler: () => void }) {
           <li>
             <Link
               to="/auctions"
-              className="block w-full py-3 text-center text-lg transition-colors duration-200 ease-out hover:text-primaryText"
+              className="block w-full py-3 text-center text-lg transition-[color] duration-200 ease-out hover:text-primaryText"
             >
               Auctions
             </Link>
@@ -247,7 +247,7 @@ function Nav({ profileOverlayHandler }: { profileOverlayHandler: () => void }) {
               <button type="button" className="w-full">
                 <Link
                   to={{ pathname: '/account', search: 'auth=login' }}
-                  className="block w-full py-3 text-center text-lg transition-colors duration-200 ease-out hover:text-primaryText"
+                  className="block w-full py-3 text-center text-lg transition-[color] duration-200 ease-out hover:text-primaryText"
                 >
                   Sign in
                 </Link>
@@ -255,7 +255,7 @@ function Nav({ profileOverlayHandler }: { profileOverlayHandler: () => void }) {
               <button type="button" className="w-full">
                 <Link
                   to={{ pathname: '/account', search: 'auth=register' }}
-                  className="block w-full py-3 text-center text-lg transition-colors duration-200 ease-out hover:text-primaryText"
+                  className="block w-full py-3 text-center text-lg transition-[color] duration-200 ease-out hover:text-primaryText"
                 >
                   Sign up
                 </Link>
@@ -266,13 +266,13 @@ function Nav({ profileOverlayHandler }: { profileOverlayHandler: () => void }) {
             <div className="w-full flex-col bg-pageBackground">
               <Link
                 to="/account/my"
-                className="block w-full py-3 text-center text-lg transition-colors duration-200 ease-out hover:text-primaryText"
+                className="block w-full py-3 text-center text-lg transition-[color] duration-200 ease-out hover:text-primaryText"
               >
                 Account
               </Link>
               <button
                 type="button"
-                className="block w-full py-3 text-center text-lg transition-colors duration-200 ease-out hover:text-primaryText"
+                className="block w-full py-3 text-center text-lg transition-[color] duration-200 ease-out hover:text-primaryText"
               >
                 Logout
               </button>

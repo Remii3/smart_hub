@@ -5,7 +5,7 @@ type CategoryCardTypes = {
 
 function CategoryCard({ title, description }: CategoryCardTypes) {
   return (
-    <div className="relative flex cursor-pointer flex-col gap-4 rounded-lg bg-gray900 px-10 py-12 shadow transition-[transform,box-shadow] duration-200 ease-out hover:scale-105 hover:shadow-lg active:scale-100">
+    <div className="relative flex cursor-pointer flex-col gap-4 rounded-lg bg-gray900 px-10 py-12 shadow transition-[transform,box-shadow] duration-300 ease-out hover:scale-105 hover:shadow-lg active:scale-100">
       <h4 className="text-dark">{title}</h4>
       <p className="text-darkTint sm:text-lg lg:text-xl">{description}</p>
       <svg

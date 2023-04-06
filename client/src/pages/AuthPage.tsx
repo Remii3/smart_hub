@@ -1,17 +1,30 @@
 import axios from 'axios';
-import { ChangeEvent, FormEvent, useContext, useState } from 'react';
+import {
+  ChangeEvent,
+  FormEvent,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
+import type { Engine } from 'tsparticles-engine';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { loadFull } from 'tsparticles';
+import Particles from 'react-tsparticles';
 import PrimaryBtn from '../components/UI/PrimaryBtn';
 import { UserContext } from '../context/UserProvider';
 
 function AuthPage() {
   const [searchParams] = useSearchParams();
-  const overlayPosition = searchParams.get('auth');
-  const [overlaySwitch, setOverlaySwitch] = useState(
-    overlayPosition !== 'login'
-  );
+  const paramsAuth = searchParams.get('auth');
+  const [overlaySwitch, setOverlaySwitch] = useState(paramsAuth !== 'login');
+
   const navigate = useNavigate();
   const { setUserData } = useContext(UserContext);
+
+  const particlesInit = useCallback(async (engine: Engine) => {
+    await loadFull(engine);
+  }, []);
 
   const [logUserData, setLogUserData] = useState({
     data: {
@@ -44,6 +57,18 @@ function AuthPage() {
       password: false,
     },
   });
+
+  useEffect(() => {
+    if (paramsAuth !== 'login' && 'register') {
+      navigate(
+        {
+          pathname: '/account',
+          search: 'auth=register',
+        },
+        { replace: true }
+      );
+    }
+  }, [navigate, paramsAuth]);
 
   const loginOnBlur = (e: ChangeEvent<HTMLInputElement>) => {
     setLogUserData((prevState) => {
@@ -217,7 +242,69 @@ function AuthPage() {
 
   return (
     <div className="flex h-screen w-screen items-center justify-center bg-pageBackground">
-      <div className="relative flex h-[648px] w-full max-w-3xl rounded-lg bg-white py-16 shadow-lg">
+      <Particles
+        id="tsparticles"
+        init={particlesInit}
+        options={{
+          particles: {
+            number: { value: 3, density: { enable: true, value_area: 800 } },
+            color: {
+              value: '#ebebeb',
+            },
+            shape: {
+              type: 'circle',
+            },
+            opacity: {
+              value: 0.5,
+              random: true,
+              anim: {
+                enable: false,
+                speed: 1,
+                opacity_min: 0.2,
+                sync: false,
+              },
+            },
+            size: {
+              value: 140,
+              random: false,
+              anim: {
+                enable: true,
+                speed: 10,
+                size_min: 40,
+                sync: false,
+              },
+            },
+            move: {
+              enable: true,
+              speed: 3,
+              direction: 'none',
+              random: false,
+              straight: false,
+              out_mode: 'out',
+              bounce: false,
+              attract: {
+                enable: false,
+                rotateX: 600,
+                rotateY: 1200,
+              },
+            },
+          },
+          interactivity: {
+            detect_on: 'canvas',
+            events: {
+              onhover: {
+                enable: false,
+              },
+              onclick: {
+                enable: false,
+              },
+              resize: true,
+            },
+          },
+          retina_detect: true,
+        }}
+      />
+      <div className="relative flex w-full max-w-3xl rounded-lg bg-white py-12 shadow-lg">
         <section
           className={`${
             overlaySwitch ? 'opacity-0' : 'opacity-100'
@@ -240,44 +327,52 @@ function AuthPage() {
             <div className="flex w-full flex-col items-center gap-3">
               <div className="flex w-full flex-col gap-4">
                 <div>
-                  <input
-                    name="email"
-                    type="email"
-                    className="w-full rounded-lg bg-gray900 px-4 py-3 shadow"
-                    placeholder="Email"
-                    value={logUserData.data.email}
-                    onChange={(e) => loginHandler(e)}
-                    onBlur={(e) => loginOnBlur(e)}
-                    required
-                  />
+                  <label className="text-base">
+                    Email
+                    <input
+                      name="email"
+                      type="email"
+                      className="mt-1 w-full rounded-lg bg-gray900 px-4 py-3 shadow"
+                      placeholder="Email"
+                      value={logUserData.data.email}
+                      onChange={(e) => loginHandler(e)}
+                      onBlur={(e) => loginOnBlur(e)}
+                      required
+                      autoComplete="email"
+                    />
+                  </label>
                   <p
                     className={`${
                       logUserData.touched.email && logUserData.errors.email
                         ? 'max-h-5 opacity-100'
                         : 'max-h-0 opacity-0'
-                    } h-auto pl-1 pt-1 text-sm  text-red-500 transition-[max-height,opacity] duration-300 ease-out`}
+                    } h-4 pl-1 pt-1 text-sm  text-red-500 transition-[max-height,opacity] duration-300 ease-out`}
                   >
                     {logUserData.errors.email}
                   </p>
                 </div>
                 <div>
-                  <input
-                    name="password"
-                    type="password"
-                    className="w-full rounded-lg bg-gray900 px-4 py-3 shadow"
-                    placeholder="Password"
-                    value={logUserData.data.password}
-                    onChange={(e) => loginHandler(e)}
-                    onBlur={(e) => loginOnBlur(e)}
-                    required
-                  />
+                  <label className="text-base">
+                    Password
+                    <input
+                      name="password"
+                      type="password"
+                      className="mt-1 w-full rounded-lg bg-gray900 px-4 py-3 shadow"
+                      placeholder="Password"
+                      value={logUserData.data.password}
+                      onChange={(e) => loginHandler(e)}
+                      onBlur={(e) => loginOnBlur(e)}
+                      required
+                      autoComplete="current-password"
+                    />
+                  </label>
                   <p
                     className={`${
                       logUserData.touched.password &&
                       logUserData.errors.password
-                        ? 'max-h-5'
-                        : 'max-h-0'
-                    } h-auto pl-1 pt-1 text-sm text-red-500 transition-[max-height,opacity] duration-300 ease-out`}
+                        ? 'max-h-5 opacity-100'
+                        : 'max-h-0 opacity-0'
+                    } h-4 pl-1 pt-1 text-sm text-red-500 transition-[max-height,opacity] duration-300 ease-out`}
                   >
                     {logUserData.errors.password}
                   </p>
@@ -298,7 +393,7 @@ function AuthPage() {
         <section
           className={`${
             overlaySwitch ? 'opacity-100' : 'opacity-0'
-          } basis-1/2 px-8 transition-[opacity] duration-300 ease-in-out`}
+          } basis-1/2 px-8 transition-[opacity] duration-300 ease-out`}
         >
           <form
             onSubmit={signUpHandler}
@@ -313,76 +408,90 @@ function AuthPage() {
                 Google Account
               </button>
             </div>
-            <p>or</p>
-            <div className="flex w-full flex-col items-center gap-4">
-              <div className="flex  w-full flex-col justify-center gap-3">
-                <div>
-                  <input
-                    name="email"
-                    type="email"
-                    className="w-full rounded-lg bg-gray900 px-4 py-3 shadow-md"
-                    placeholder="Email"
-                    value={regUserData.data.email}
-                    onChange={(e) => registerHandler(e)}
-                    onBlur={(e) => registerOnBlur(e)}
-                    required
-                  />
-                  <p
-                    className={`${
-                      regUserData.touched.email && regUserData.errors.email
-                        ? 'max-h-5'
-                        : 'max-h-0'
-                    } h-auto pl-1 pt-1 text-sm text-red-500 transition-[max-height] duration-300 ease-out`}
-                  >
-                    {regUserData.errors.email}
-                  </p>
+            <div className="text-center">
+              <p>or</p>
+              <div className="flex w-full flex-col items-center gap-4 text-start">
+                <div className="flex  w-full flex-col justify-center gap-3">
+                  <div>
+                    <label className="text-base">
+                      Email
+                      <input
+                        name="email"
+                        type="email"
+                        className="mt-1 w-full rounded-lg bg-gray900 px-4 py-3 shadow-md"
+                        placeholder="Email"
+                        value={regUserData.data.email}
+                        onChange={(e) => registerHandler(e)}
+                        onBlur={(e) => registerOnBlur(e)}
+                        required
+                        autoComplete="email"
+                      />
+                    </label>
+                    <p
+                      className={`${
+                        regUserData.touched.email && regUserData.errors.email
+                          ? 'max-h-5 opacity-100'
+                          : 'max-h-0 opacity-0'
+                      } h-4 pl-1 pt-1 text-sm text-red-500 transition-[max-height,opacity] duration-300 ease-out`}
+                    >
+                      {regUserData.errors.email}
+                    </p>
+                  </div>
+                  <div>
+                    <label className="text-base">
+                      Username
+                      <input
+                        name="username"
+                        type="text"
+                        className="mt-1 w-full rounded-lg bg-gray900 px-4 py-3 shadow-md"
+                        placeholder="Username"
+                        value={regUserData.data.username}
+                        onChange={(e) => registerHandler(e)}
+                        onBlur={(e) => registerOnBlur(e)}
+                        required
+                        autoComplete="username"
+                      />
+                    </label>
+                    <p
+                      className={`${
+                        regUserData.touched.username &&
+                        regUserData.errors.username
+                          ? 'max-h-5 opacity-100'
+                          : 'max-h-0 opacity-0'
+                      } h-4 pl-1 pt-1 text-sm text-red-500 transition-[max-height,opacity] duration-300 ease-out`}
+                    >
+                      {regUserData.errors.username}
+                    </p>
+                  </div>
+                  <div>
+                    <label className="text-base">
+                      Password
+                      <input
+                        name="password"
+                        type="password"
+                        className="mt-1 w-full rounded-lg bg-gray900 px-4 py-3 shadow-md"
+                        placeholder="Password"
+                        value={regUserData.data.password}
+                        onChange={(e) => registerHandler(e)}
+                        onBlur={(e) => registerOnBlur(e)}
+                        required
+                        autoComplete="new-password"
+                      />
+                    </label>
+                    <p
+                      className={`${
+                        regUserData.touched.password &&
+                        regUserData.errors.password
+                          ? 'max-h-5 opacity-100'
+                          : 'max-h-0 opacity-0'
+                      } h-4 pl-1 pt-1 text-sm text-red-500 transition-[max-height,opacity] duration-300 ease-out`}
+                    >
+                      {regUserData.errors.password}
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <input
-                    name="username"
-                    type="text"
-                    className="w-full rounded-lg bg-gray900 px-4 py-3 shadow-md"
-                    placeholder="Username"
-                    value={regUserData.data.username}
-                    onChange={(e) => registerHandler(e)}
-                    onBlur={(e) => registerOnBlur(e)}
-                    required
-                  />
-                  <p
-                    className={`${
-                      regUserData.touched.username &&
-                      regUserData.errors.username
-                        ? 'max-h-5 opacity-100'
-                        : 'max-h-0 opacity-0'
-                    } h-auto pl-1 pt-1 text-sm text-red-500 transition-[max-height] duration-300 ease-out`}
-                  >
-                    {regUserData.errors.username}
-                  </p>
-                </div>
-                <div>
-                  <input
-                    name="password"
-                    type="password"
-                    className="w-full rounded-lg bg-gray900 px-4 py-3 shadow-md"
-                    placeholder="Password"
-                    value={regUserData.data.password}
-                    onChange={(e) => registerHandler(e)}
-                    onBlur={(e) => registerOnBlur(e)}
-                    required
-                  />
-                  <p
-                    className={`${
-                      regUserData.touched.password &&
-                      regUserData.errors.password
-                        ? 'max-h-5 opacity-100'
-                        : 'max-h-0 opacity-0'
-                    } h-auto pl-1 pt-1 text-sm text-red-500 transition-[max-height] duration-300 ease-out`}
-                  >
-                    {regUserData.errors.password}
-                  </p>
-                </div>
+                <Link to="/account/forgot-password">Forgot password?</Link>
               </div>
-              <Link to="/account/forgot-password">Forgot password?</Link>
             </div>
             <div>
               <PrimaryBtn
@@ -398,12 +507,12 @@ function AuthPage() {
         <section
           className={`${
             overlaySwitch ? 'left-0 rounded-l-lg' : 'left-1/2 rounded-r-lg'
-          } absolute top-0 h-full w-1/2 overflow-hidden bg-primary text-white transition-[left] duration-300 ease-in-out`}
+          } absolute top-0 h-full w-1/2 overflow-hidden bg-primary text-white transition-[left,border-radius] duration-500 ease-out`}
         >
           <div
             className={`${
               overlaySwitch ? '-right-full opacity-0' : 'right-0 opacity-100'
-            } absolute top-0 h-full w-full pb-24 transition-[right,opacity] duration-500 ease-in-out`}
+            } absolute top-0 h-full w-full pb-24 transition-[right,opacity] duration-700 ease-out`}
           >
             <div className="flex h-full w-full flex-col items-center justify-center px-8 ">
               <h4 className="pb-2">No account yet?</h4>
@@ -419,7 +528,7 @@ function AuthPage() {
           <div
             className={`${
               overlaySwitch ? 'left-0 opacity-100' : '-left-full opacity-0'
-            } absolute top-0 h-full w-full pb-24  transition-[left,opacity] duration-500 ease-in-out`}
+            } absolute top-0 h-full w-full pb-24  transition-[left,opacity] duration-700 ease-out`}
           >
             <div className="flex h-full w-full flex-col items-center justify-center px-8">
               <h4 className="pb-2">Already a user?</h4>

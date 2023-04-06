@@ -31,7 +31,7 @@ function PrimaryBtn({ usecase, text, onClick, customCSS }: PropsTypes) {
   return (
     <button
       type="button"
-      className={`${customCSS} ${usecaseClass()} transition-[filter, scale] rounded-lg bg-primary font-semibold text-white shadow duration-200 ease-out hover:shadow-md hover:brightness-90 active:scale-95 active:brightness-75`}
+      className={`${customCSS} ${usecaseClass()} rounded-lg bg-primary font-semibold text-white shadow transition-[filter,box-shadow,transform] duration-200 ease-out hover:shadow-lg hover:brightness-90 active:scale-95 active:brightness-75`}
       onClick={(e) => clickHandler(e)}
     >
       {text}

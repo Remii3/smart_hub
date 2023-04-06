@@ -283,7 +283,7 @@ function MainPage() {
                     subTitle="Readers loved them and voted them the best"
                   />
                 </div>
-                <div className="flex h-auto w-full max-w-[100%] items-center transition-all duration-200 ease-out lg:max-w-[70%] lg:py-32">
+                <div className="flex h-auto w-full max-w-[100%] items-center lg:max-w-[70%] lg:py-32">
                   <Swiper
                     className="bestAuction-swiper"
                     pagination

@@ -36,10 +36,7 @@ function BestAuctionCard({
   }, [swipedFlag]);
 
   return (
-    <div
-      id={`${id}`}
-      className="h-auto rounded-lg p-2 transition-all duration-200 ease-out"
-    >
+    <div id={`${id}`} className="h-auto rounded-lg p-2">
       <div className="rounded-2xl bg-white px-3 pb-3 pt-6">
         <div className="flex flex-col lg:flex-row">
           <div className="hidden lg:block">
@@ -75,7 +72,7 @@ function BestAuctionCard({
                   <p className="text-lg text-darkTint">$12</p>
                 </div>
               </div>
-              <div className="flex min-w-fit flex-col gap-1 sm:flex-row lg:items-start">
+              <div className="flex min-w-[332px] flex-col gap-1 sm:flex-row lg:items-start">
                 <PrimaryBtn
                   text="Enter live auction"
                   usecase="normal"
