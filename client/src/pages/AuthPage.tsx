@@ -406,7 +406,7 @@ function AuthPage() {
             } absolute top-0 h-full w-full pb-24 transition-[right,opacity] duration-500 ease-in-out`}
           >
             <div className="flex h-full w-full flex-col items-center justify-center px-8 ">
-              <h4 className="pb-1">No account yet?</h4>
+              <h4 className="pb-2">No account yet?</h4>
               <p className="w-full pb-4 text-center">Press the button below</p>
               <PrimaryBtn
                 usecase="normal"
@@ -422,7 +422,7 @@ function AuthPage() {
             } absolute top-0 h-full w-full pb-24  transition-[left,opacity] duration-500 ease-in-out`}
           >
             <div className="flex h-full w-full flex-col items-center justify-center px-8">
-              <h4 className="pb-1">Already a user?</h4>
+              <h4 className="pb-2">Already a user?</h4>
               <p className="w-full pb-4 text-center">
                 Waste no more time, sign in now!
               </p>

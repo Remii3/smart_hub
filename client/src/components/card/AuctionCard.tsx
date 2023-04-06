@@ -13,11 +13,13 @@ function AuctionCard({ title, author, deadline, price }: PropsTypes) {
         <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between rounded-2xl bg-white py-2 pl-4 pr-8 ">
           <div>
             <h5 className="text-dark">{title}</h5>
-            <p className="text-gray600">{author}</p>
-            <p className="text-gray600">{deadline.toISOString().slice(0, 4)}</p>
+            <p className="text-gray600 sm:text-lg">{author}</p>
+            <p className="text-gray600 sm:text-lg">
+              {deadline.toISOString().slice(0, 4)}
+            </p>
           </div>
           <div>
-            <p className="text-lg text-darkTint">${price}</p>
+            <p className="text-darkTint sm:text-lg">${price}</p>
           </div>
         </div>
       </div>

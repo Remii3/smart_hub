@@ -16,14 +16,14 @@ function NoPage404() {
         <div>
           <h1
             data-h1="404"
-            className="relative -mt-4 -ml-1 from-[#71b7e6] via-[#b98acc] to-[#ee8176] 
+            className="relative -ml-1 -mt-4 from-[#71b7e6] via-[#b98acc] to-[#ee8176] 
             p-0
            text-8xl
            font-bold
            after:absolute
-           after:top-0 
            after:left-0 
            after:right-0 
+           after:top-0 
            after:animate-animateTextBackground after:bg-gradient-to-r after:bg-[size:400%] after:bg-clip-text
            after:fill-[transparent]
            after:text-transparent
@@ -38,9 +38,9 @@ function NoPage404() {
             data-p="NOT FOUND"
             className="relative max-w-screen-sm text-3xl font-bold uppercase text-[#d6d6d6]
             after:absolute
-            after:top-0
             after:left-0
             after:right-0
+            after:top-0
             after:bg-clip-text
             after:text-transparent
             after:drop-shadow-xl
@@ -52,7 +52,7 @@ function NoPage404() {
           </p>
         </div>
       </div>
-      <div className="particles-js fixed top-0 right-0 bottom-0 left-0" />
+      <div className="particles-js fixed bottom-0 left-0 right-0 top-0" />
       <Particles
         id="tsparticles"
         init={particlesInit}
@@ -118,7 +118,7 @@ function NoPage404() {
 
       <Link
         to="/"
-        className="fixed right-10 bottom-10 rounded bg-gradient-to-r from-[#71b7e6] via-[#b98acc] to-[#ee8176] py-4 px-7 text-base font-bold uppercase text-white drop-shadow-md transition-all duration-300 ease-out hover:scale-105 hover:drop-shadow-2xl active:opacity-80"
+        className="fixed bottom-10 right-10 rounded bg-gradient-to-r from-[#71b7e6] via-[#b98acc] to-[#ee8176] px-7 py-4 text-base font-bold uppercase text-white drop-shadow-md transition-all duration-300 ease-out hover:scale-105 hover:drop-shadow-2xl active:opacity-80"
       >
         Go back
       </Link>

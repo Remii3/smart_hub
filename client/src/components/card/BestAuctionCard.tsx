@@ -36,22 +36,25 @@ function BestAuctionCard({
   }, [swipedFlag]);
 
   return (
-    <div className="h-auto rounded-lg p-2 transition-all duration-200 ease-out">
+    <div
+      id={`${id}`}
+      className="h-auto rounded-lg p-2 transition-all duration-200 ease-out"
+    >
       <div className="rounded-2xl bg-white px-3 pb-3 pt-6">
         <div className="flex flex-col lg:flex-row">
           <div className="hidden lg:block">
             <img src="#" alt="#" />
           </div>
           <div className="flex-grow">
-            <h3 className="pb-6 text-dark">{title}</h3>
+            <h4 className="pb-6 text-dark">{title}</h4>
             <div className="flex flex-col justify-between lg:flex-row">
-              <div className="flex basis-1/2 flex-row justify-between pb-10">
+              <div className="flex flex-row justify-between pb-10 lg:max-w-lg">
                 <div className="flex flex-col gap-3">
-                  <p>
+                  <p className="sm:text-lg">
                     <span className="text-gray600"> Highest bid:</span>
                     <span className="text-darkTint">{highBid}</span>
                   </p>
-                  <p>
+                  <p className="sm:text-lg">
                     <span className="text-gray600"> Deadline:</span>
                     <span className="text-darkTint">
                       {expDate.toISOString().slice(0, 10)}
@@ -60,7 +63,7 @@ function BestAuctionCard({
                   <p
                     className={`${
                       descHidden ? 'max-h-0' : 'max-h-72'
-                    } overflow-hidden transition-[max-height] duration-300 ease-in-out`}
+                    } overflow-hidden transition-[max-height] duration-300 ease-in-out sm:text-lg`}
                   >
                     <span className="text-gray600">Description: </span>
                     <span className="break-all text-darkTint">
@@ -72,7 +75,7 @@ function BestAuctionCard({
                   <p className="text-lg text-darkTint">$12</p>
                 </div>
               </div>
-              <div className="flex flex-col gap-1 sm:flex-row lg:items-start">
+              <div className="flex min-w-fit flex-col gap-1 sm:flex-row lg:items-start">
                 <PrimaryBtn
                   text="Enter live auction"
                   usecase="normal"

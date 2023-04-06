@@ -48,7 +48,7 @@ function Header() {
   return (
     <header
       ref={headerBgBreakPoint}
-      className="fixed top-0 left-0 z-20 w-full bg-transparent"
+      className="fixed left-0 top-0 z-20 w-full bg-transparent"
     >
       <div
         ref={navOverlay}

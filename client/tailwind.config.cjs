@@ -22,6 +22,7 @@
           gray800: '#E3E3E3',
           gray900: '#F7F7FB',
           danger: '#CA3333',
+          transparentGray: 'rgba(0,0,0,0.21)',
         },
         keyframes: {
           animateTextBackground: {

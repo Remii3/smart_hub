@@ -6,10 +6,10 @@ import {
   useMemo,
 } from 'react';
 
-interface ContextTypes {
+type ContextTypes = {
   shownOverlay: boolean;
   setShownOverlay: Dispatch<SetStateAction<boolean>>;
-}
+};
 
 export const OverlayContext = createContext<ContextTypes>({
   shownOverlay: false,

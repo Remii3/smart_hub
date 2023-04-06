@@ -6,7 +6,7 @@ type PropsTypes = {
 };
 
 const defaultProps = {
-  onClick: (e: any) => {},
+  onClick: () => {},
   customCSS: '',
 };
 
