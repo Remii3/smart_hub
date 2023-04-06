@@ -52,13 +52,19 @@ function NoPage404() {
           </p>
         </div>
       </div>
-      <div className="particles-js fixed bottom-0 left-0 right-0 top-0" />
       <Particles
         id="tsparticles"
         init={particlesInit}
         options={{
+          fullScreen: true,
+          autoPlay: true,
+          smooth: true,
+          fps_limit: 120,
           particles: {
-            number: { value: 5, density: { enable: true, value_area: 800 } },
+            number: {
+              value: 5,
+              density: { enable: false, height: 800, width: 800 },
+            },
             color: {
               value: '#ebebeb',
             },
@@ -87,7 +93,7 @@ function NoPage404() {
             },
             move: {
               enable: true,
-              speed: 3,
+              speed: 2,
               direction: 'none',
               random: false,
               straight: false,

@@ -246,8 +246,19 @@ function AuthPage() {
         id="tsparticles"
         init={particlesInit}
         options={{
+          autoPlay: true,
+          fullScreen: true,
+          smooth: true,
+          fps_limit: 120,
           particles: {
-            number: { value: 3, density: { enable: true, value_area: 800 } },
+            number: {
+              value: 5,
+              density: {
+                enable: false,
+                height: 800,
+                width: 800,
+              },
+            },
             color: {
               value: '#ebebeb',
             },
@@ -269,7 +280,7 @@ function AuthPage() {
               random: false,
               anim: {
                 enable: true,
-                speed: 10,
+                speed: 2,
                 size_min: 40,
                 sync: false,
               },
@@ -289,6 +300,7 @@ function AuthPage() {
               },
             },
           },
+
           interactivity: {
             detect_on: 'canvas',
             events: {
