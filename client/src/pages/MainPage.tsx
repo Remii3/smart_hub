@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import axios from 'axios';
 import CollectionCard from '../components/card/CollectionCard';
 import Header from '../layout/Header';
 import CategoryCard from '../components/card/ShopCategoryCard';
@@ -170,6 +171,10 @@ function MainPage() {
       price: 12,
     },
   ];
+
+  useEffect(() => {
+    axios.get(`/product/books`).then((res) => console.log(res));
+  }, []);
 
   return (
     <div className="relative min-h-screen overflow-y-auto overflow-x-hidden  bg-pageBackground">

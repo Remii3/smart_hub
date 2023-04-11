@@ -3,6 +3,7 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
 const user_routes = require('./Routes/user.routes');
+const product_routes = require('./Routes/product.routes');
 
 const app = express();
 
@@ -25,5 +26,6 @@ app.get('/test', (req, res) => {
 });
 
 app.use('/account', user_routes);
+app.use('/product', product_routes);
 
 app.listen(4000);
