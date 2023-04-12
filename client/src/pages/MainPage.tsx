@@ -81,7 +81,7 @@ function MainPage() {
             ref={imgBg}
             className="absolute left-0 top-0 h-full w-full scale-125 bg-mainBanner bg-cover bg-center bg-no-repeat brightness-50"
           />
-          <div className="absolute top-1/4 flex h-screen w-full justify-start   ">
+          <div className="absolute top-[15%] flex h-screen w-full justify-start sm:top-1/4">
             <div className="flex w-full flex-col text-primaryText sm:items-start">
               <div className="mb-14 ml-[15%] max-w-xs sm:max-w-none">
                 <h6 className="uppercase md:text-4xl">
