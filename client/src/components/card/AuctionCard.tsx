@@ -33,7 +33,7 @@ function AuctionCard({
       id={`${id}`}
       className="relative m-auto h-full w-auto max-w-[280px] cursor-pointer rounded-lg shadow transition-[transform,box-shadow] duration-300 ease-out hover:scale-105 hover:shadow-lg active:scale-100"
     >
-      <Link to={`auctions/${title}`}>
+      <Link to={`auctions/${id}`}>
         <img
           src={coverUrl}
           className="m-auto h-full max-h-[390px] min-h-[390px] w-full rounded-md object-fill"

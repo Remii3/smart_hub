@@ -55,7 +55,7 @@ function SpecialAuctionCard({
       <div className="rounded-2xl bg-white px-3 py-3">
         <div className="flex flex-col lg:flex-row">
           <div className="w-full min-w-[160px] overflow-hidden rounded-md lg:block lg:max-w-xs lg:pr-4">
-            <Link to={`auctions/${title}`}>
+            <Link to={`auctions/${id}`}>
               <img
                 src={coverUrl}
                 className="m-auto h-full max-h-[400px] rounded-md object-contain object-top "
@@ -99,7 +99,7 @@ function SpecialAuctionCard({
                   text="Enter live auction"
                   usecase="normal"
                   onClick={() => {
-                    navigate('/auctions');
+                    navigate(`/auctions/${id}`);
                   }}
                 />
                 <SecondaryBtn
