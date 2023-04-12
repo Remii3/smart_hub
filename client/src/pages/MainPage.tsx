@@ -1,17 +1,14 @@
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { Autoplay, Navigation, Pagination, Scrollbar } from 'swiper';
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import axios from 'axios';
 import CollectionCard from '../components/card/CollectionCard';
 import Header from '../layout/Header';
 import CategoryCard from '../components/card/ShopCategoryCard';
 import PrimaryBtn from '../components/UI/PrimaryBtn';
 import Footer from '../layout/Footer';
 import Main from '../layout/Main';
-import BestAuctionCard from '../components/card/BestAuctionCard';
-import AuctionCard from '../components/card/AuctionCard';
 import MainPageHeading from '../components/UI/MainPageHeading';
 import 'swiper/css/scrollbar';
 import 'swiper/css/navigation';
@@ -19,9 +16,16 @@ import 'swiper/css';
 import 'swiper/css/pagination';
 
 import '../assets/styles/swiper.css';
+import SpecialAuctionsSwiper from '../components/swiper/SpecialAuctionsSwiper';
+import { CategoryCardTypes } from '../types/types';
+import { BookTypes } from '../types/interfaces';
+import AuctionsSwiper from '../components/swiper/AuctionsSwiper';
 
 function MainPage() {
-  const [bestAuctionCardFlag, setBestAuctionCardFlag] = useState(true);
+  const [shopList, setShopList] = useState<CategoryCardTypes[]>([]);
+  const [collection, setCollection] = useState<BookTypes[]>([]);
+  const [specialAuctions, setSpecialAuctions] = useState<BookTypes[]>([]);
+  const [auctions, setAuctions] = useState<BookTypes[]>([]);
   const imgBg = useRef(null);
 
   const navigate = useNavigate();
@@ -38,138 +42,35 @@ function MainPage() {
       scale: 1.5,
       ease: 'sine.out',
     });
+    try {
+      axios.get('/product/categories').then((res) => {
+        setShopList(res.data);
+      });
+    } catch (err) {
+      console.error(err);
+    }
+    try {
+      axios.get('/product/books').then((res) => {
+        setCollection(res.data);
+      });
+    } catch (err) {
+      console.error(err);
+    }
+    try {
+      axios.get('/product/books').then((res) => {
+        setSpecialAuctions(res.data);
+      });
+    } catch (err) {
+      console.error(err);
+    }
+    try {
+      axios.get('/product/books').then((res) => {
+        setAuctions(res.data);
+      });
+    } catch (err) {
+      console.error(err);
+    }
   }, []);
-
-  const testArray = [
-    { id: 0, title: 'asd', description: 'zxczxzxc' },
-    { id: 1, title: 'asd', description: 'zxczxzxc' },
-    { id: 2, title: 'asd', description: 'zxczxzxc' },
-    { id: 3, title: 'asd', description: 'zxczxzxc' },
-    { id: 4, title: 'asd', description: 'zxczxzxc' },
-    { id: 5, title: 'asd', description: 'zxczxzxc' },
-  ];
-  const testCollectionArray = [
-    { id: 6, title: 'asd', description: 'zxczxzxc' },
-    { id: 7, title: 'asd', description: 'zxczxzxc' },
-    { id: 8, title: 'asd', description: 'zxczxzxc' },
-    { id: 9, title: 'asd', description: 'zxczxzxc' },
-  ];
-  const testAuctionArray = [
-    {
-      id: 11,
-      title: 'asd',
-      author: 'asd',
-      deadline: new Date(),
-      description: 'zxczxzxc',
-      price: 12,
-    },
-    {
-      id: 12,
-      title: 'asd',
-      author: 'asd',
-      deadline: new Date(),
-      description: 'zxczxzxc',
-      price: 12,
-    },
-    {
-      id: 13,
-      title: 'asd',
-      author: 'asd',
-      deadline: new Date(),
-      description: 'zxczxzxc',
-      price: 12,
-    },
-    {
-      id: 14,
-      title: 'asd',
-      author: 'asd',
-      deadline: new Date(),
-      description: 'zxczxzxc',
-      price: 12,
-    },
-    {
-      id: 15,
-      title: 'asd',
-      author: 'asd',
-      deadline: new Date(),
-      description: 'zxczxzxc',
-      price: 12,
-    },
-    {
-      id: 16,
-      title: 'asd',
-      author: 'asd',
-      deadline: new Date(),
-      description: 'zxczxzxc',
-      price: 12,
-    },
-    {
-      id: 17,
-      title: 'asd',
-      author: 'asd',
-      deadline: new Date(),
-      description: 'zxczxzxc',
-      price: 12,
-    },
-  ];
-  const testBestAuctionArray = [
-    {
-      id: 18,
-      title: 'asd',
-      author: 'asd',
-      deadline: new Date(),
-      description: 'zxczxzxc',
-      price: 12,
-    },
-    {
-      id: 19,
-      title: 'asd',
-      author: 'asd',
-      deadline: new Date(),
-      description: 'zxczxzxc',
-      price: 12,
-    },
-    {
-      id: 21,
-      title: 'asd',
-      author: 'asd',
-      deadline: new Date(),
-      description: 'zxczxzxc',
-      price: 12,
-    },
-    {
-      id: 22,
-      title: 'asd',
-      author: 'asd',
-      deadline: new Date(),
-      description: 'zxczxzxc',
-      price: 12,
-    },
-    {
-      id: 23,
-      title: 'asd',
-      author: 'asd',
-      deadline: new Date(),
-      description: 'zxczxzxc',
-      price: 12,
-    },
-    {
-      id: 24,
-      title: 'asd',
-      author: 'asd',
-      deadline: new Date(),
-      description: 'zxczxzxc',
-      price: 12,
-    },
-    {
-      id: 25,
-      title: 'asd',
-      author: 'asd',
-      deadline: new Date(),
-      description: 'zxczxzxc',
-      price: 12,
-    },
-  ];
 
   return (
     <div className="relative min-h-screen overflow-y-auto overflow-x-hidden  bg-pageBackground">
@@ -223,11 +124,11 @@ function MainPage() {
               </div>
               <div className="w-full">
                 <div className="mx-auto grid max-w-7xl grid-cols-1 gap-6 px-3 md:grid-cols-2 lg:grid-cols-3">
-                  {testArray.map((cardItem) => (
+                  {shopList.slice(0, 6).map((cardItem) => (
                     <CategoryCard
-                      key={cardItem.id}
-                      title={cardItem.title}
-                      description={cardItem.description}
+                      key={cardItem._id}
+                      cat_name={cardItem.name}
+                      cat_description={cardItem.description}
                     />
                   ))}
                 </div>
@@ -254,18 +155,18 @@ function MainPage() {
                 />
               </div>
               <div className="w-full">
-                {testCollectionArray.map((collection, id) => (
+                {collection.slice(0, 4).map((collection_data, id) => (
                   <CollectionCard
-                    key={collection.id}
+                    key={collection_data._id}
                     backcolor={(id + 1) % 2 ? 'pageBackground' : 'white'}
-                    collectionData={collection}
-                    lastItem={testCollectionArray.length === id + 1}
+                    collectionData={collection_data}
+                    lastItem={collection.length === id + 1}
                   />
                 ))}
               </div>
             </section>
             {/* Special auctions */}
-            <section className="relative flex w-full flex-col items-center bg-pageBackground pb-16">
+            <section className="relative flex w-full flex-col items-center bg-pageBackground">
               <div className="relative -top-1 left-0 w-full bg-white">
                 <MainPageHeading
                   color="dark"
@@ -284,38 +185,9 @@ function MainPage() {
                   />
                 </div>
                 <div className="flex h-auto w-full max-w-[100%] items-center lg:max-w-[70%] lg:py-32">
-                  <Swiper
-                    className="bestAuction-swiper"
-                    pagination
-                    autoplay={{
-                      delay: 8000,
-                      disableOnInteraction: false,
-                      pauseOnMouseEnter: true,
-                      waitForTransition: true,
-                    }}
-                    grabCursor
-                    modules={[Autoplay, Pagination]}
-                    spaceBetween={52}
-                    slidesPerView={1}
-                    onSlideChange={() =>
-                      setBestAuctionCardFlag((prev) => !prev)
-                    }
-                    style={{
-                      paddingBottom: '52px',
-                    }}
-                  >
-                    {testBestAuctionArray.map((auctionItem) => (
-                      <SwiperSlide key={auctionItem.id}>
-                        <BestAuctionCard
-                          id={auctionItem.id}
-                          title="asd"
-                          description="aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa sssssssssssssssssssssssssssssssssssssssssss dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd cccccccccccccccccccccccccccccccccccccccccc"
-                          expDate={new Date()}
-                          swipedFlag={bestAuctionCardFlag}
-                        />
-                      </SwiperSlide>
-                    ))}
-                  </Swiper>
+                  <SpecialAuctionsSwiper
+                    swiperItems={specialAuctions.slice(0, 6)}
+                  />
                 </div>
               </div>
             </section>
@@ -330,57 +202,7 @@ function MainPage() {
                 />
               </div>
               <div className="px-auto w-full ">
-                <Swiper
-                  scrollbar={{
-                    hide: false,
-                  }}
-                  navigation
-                  grabCursor
-                  autoplay={{
-                    delay: 5000,
-                    disableOnInteraction: false,
-                    pauseOnMouseEnter: true,
-                  }}
-                  modules={[Scrollbar, Navigation, Autoplay]}
-                  spaceBetween={52}
-                  slidesPerView={1}
-                  setWrapperSize
-                  breakpoints={{
-                    324: {
-                      slidesPerView: 1,
-                      scrollbar: { hide: false },
-                    },
-                    663: {
-                      slidesPerView: 2,
-                      scrollbar: { hide: false },
-                    },
-                    1002: {
-                      slidesPerView: 3,
-                      scrollbar: { hide: true },
-                    },
-                    1341: {
-                      slidesPerView: 4,
-                    },
-                    1680: {
-                      slidesPerView: 5,
-                    },
-                  }}
-                  style={{
-                    paddingBottom: '26px',
-                    paddingTop: '26px',
-                  }}
-                >
-                  {testAuctionArray.map((auctionData) => (
-                    <SwiperSlide key={auctionData.id}>
-                      <AuctionCard
-                        title={auctionData.title}
-                        author={auctionData.author}
-                        deadline={auctionData.deadline}
-                        price={auctionData.price}
-                      />
-                    </SwiperSlide>
-                  ))}
-                </Swiper>
+                <AuctionsSwiper swiperItems={auctions} />
               </div>
               <div className="w-full text-center">
                 <PrimaryBtn
