@@ -13,6 +13,7 @@ import { loadFull } from 'tsparticles';
 import Particles from 'react-tsparticles';
 import PrimaryBtn from '../components/UI/PrimaryBtn';
 import { UserContext } from '../context/UserProvider';
+import Header from '../layout/Header';
 
 function AuthPage() {
   const [searchParams] = useSearchParams();
@@ -242,6 +243,7 @@ function AuthPage() {
 
   return (
     <div className="flex h-screen w-screen items-center justify-center bg-pageBackground">
+      <Header />
       <Particles
         id="tsparticles"
         init={particlesInit}

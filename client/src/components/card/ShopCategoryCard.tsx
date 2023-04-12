@@ -1,13 +1,30 @@
+import { Link } from 'react-router-dom';
+
 type CategoryCardTypes = {
-  title: string;
-  description: string;
+  cat_name: string;
+  cat_description: string;
 };
 
-function CategoryCard({ title, description }: CategoryCardTypes) {
+function CategoryCard({ cat_name, cat_description }: CategoryCardTypes) {
+  const categoryName = cat_name.charAt(0).toUpperCase() + cat_name.slice(1);
+
+  const maxDescLength = 100;
+  let trimmedDesc = cat_description.slice(0, maxDescLength);
+  trimmedDesc = trimmedDesc.substring(
+    0,
+    Math.min(trimmedDesc.length, trimmedDesc.lastIndexOf(' '))
+  );
+
+  const categoryDescription = `${trimmedDesc}...`;
   return (
-    <div className="relative flex cursor-pointer flex-col gap-4 rounded-lg bg-gray900 px-10 py-12 shadow transition-[transform,box-shadow] duration-300 ease-out hover:scale-105 hover:shadow-lg active:scale-100">
-      <h4 className="text-dark">{title}</h4>
-      <p className="text-darkTint sm:text-lg lg:text-xl">{description}</p>
+    <Link
+      to={{ pathname: `/shop`, search: `category=${cat_name}` }}
+      className="relative flex cursor-pointer flex-col gap-4 rounded-lg bg-gray900 px-10 py-12 shadow transition-[transform,box-shadow] duration-300 ease-out hover:scale-105 hover:shadow-lg active:scale-100"
+    >
+      <h4 className="text-dark">{categoryName}</h4>
+      <p className="text-darkTint sm:text-lg lg:text-xl">
+        {categoryDescription}
+      </p>
       <svg
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 24 24"
@@ -20,7 +37,7 @@ function CategoryCard({ title, description }: CategoryCardTypes) {
           clipRule="evenodd"
         />
       </svg>
-    </div>
+    </Link>
   );
 }
 
