@@ -39,7 +39,7 @@ mongoose
 app.get('/', (req, res) => {
   var fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
   console.log(fullUrl);
-  res.status(201).json({ message: 'Connected to backend' });
+  res.status(201).json({ message: 'Connected to backend', url: fullUrl });
 });
 
 app.use('/account', account_routes);
