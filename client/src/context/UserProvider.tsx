@@ -10,7 +10,7 @@ import {
 } from 'react';
 
 type ContextTypes = {
-  userData: null | object;
+  userData: null | { email: string; username: string };
   setUserData:
     | Dispatch<SetStateAction<object>>
     | Dispatch<SetStateAction<null>>;

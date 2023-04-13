@@ -16,16 +16,14 @@ import 'swiper/css';
 import 'swiper/css/pagination';
 
 import '../assets/styles/swiper.css';
-import SpecialAuctionsSwiper from '../components/swiper/SpecialAuctionsSwiper';
 import { CategoryCardTypes } from '../types/types';
 import { BookTypes } from '../types/interfaces';
+import SpecialAuctionsSwiper from '../components/swiper/SpecialAuctionsSwiper';
 import AuctionsSwiper from '../components/swiper/AuctionsSwiper';
 
 function MainPage() {
   const [shopList, setShopList] = useState<CategoryCardTypes[]>([]);
   const [collection, setCollection] = useState<BookTypes[]>([]);
-  const [specialAuctions, setSpecialAuctions] = useState<BookTypes[]>([]);
-  const [auctions, setAuctions] = useState<BookTypes[]>([]);
   const imgBg = useRef(null);
 
   const navigate = useNavigate();
@@ -52,20 +50,6 @@ function MainPage() {
     try {
       axios.get('/product/books').then((res) => {
         setCollection(res.data);
-      });
-    } catch (err) {
-      console.error(err);
-    }
-    try {
-      axios.get('/product/books').then((res) => {
-        setSpecialAuctions(res.data);
-      });
-    } catch (err) {
-      console.error(err);
-    }
-    try {
-      axios.get('/product/books').then((res) => {
-        setAuctions(res.data);
       });
     } catch (err) {
       console.error(err);
@@ -185,9 +169,7 @@ function MainPage() {
                   />
                 </div>
                 <div className="flex h-auto w-full max-w-[100%] items-center lg:max-w-[70%] lg:py-32">
-                  <SpecialAuctionsSwiper
-                    swiperItems={specialAuctions.slice(0, 6)}
-                  />
+                  <SpecialAuctionsSwiper />
                 </div>
               </div>
             </section>
@@ -202,7 +184,7 @@ function MainPage() {
                 />
               </div>
               <div className="px-auto w-full ">
-                <AuctionsSwiper swiperItems={auctions} />
+                <AuctionsSwiper />
               </div>
               <div className="w-full text-center">
                 <PrimaryBtn

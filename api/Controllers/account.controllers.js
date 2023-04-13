@@ -145,4 +145,23 @@ const profile = async (req, res) => {
   res.json({ email, username });
 };
 
-module.exports = { signIn, signUp, profile };
+const newData = async (req, res) => {
+  const salt = bcrypt.genSaltSync(12);
+  let { email, newData, newDataSwitch } = req.body;
+
+  const keys = Object.entries(newDataSwitch);
+  const selectedNewData = keys.filter(([key, value]) => value === true);
+  const newDataField = Object.keys(Object.fromEntries(selectedNewData));
+
+  if (newDataField[0] === 'password') {
+    newData = bcrypt.hashSync(newData, salt);
+  }
+
+  const resStatus = await User.updateOne(
+    { email: email },
+    { $set: { [newDataField[0]]: newData } },
+  );
+  res.json(resStatus);
+};
+
+module.exports = { signIn, signUp, profile, newData };

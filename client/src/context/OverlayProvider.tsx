@@ -16,7 +16,7 @@ export const OverlayContext = createContext<ContextTypes>({
   setShownOverlay: () => {},
 });
 
-export function OverlayProvider({ children }: { children: React.ReactNode }) {
+function OverlayProvider({ children }: { children: React.ReactNode }) {
   const [shownOverlay, setShownOverlay] = useState(false);
 
   const overlayValues = useMemo(

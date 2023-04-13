@@ -8,7 +8,7 @@
     theme: {
       extend: {
         backgroundImage: {
-          mainBanner: 'url("./src/assets/img/parallaxImg.jpg")',
+          mainBanner: 'url("/src/assets/img/parallaxImg.jpg")',
         },
         colors: {
           primary: '#3E74FF',

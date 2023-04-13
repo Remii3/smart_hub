@@ -3,3 +3,5 @@ export type CategoryCardTypes = {
   name: string;
   description: string;
 };
+
+export type AccountTabsTypes = 'personalInfo' | 'history' | 'myShop';
