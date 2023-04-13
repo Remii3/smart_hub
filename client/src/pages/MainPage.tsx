@@ -41,7 +41,6 @@ function MainPage() {
       ease: 'sine.out',
     });
     try {
-      axios.get('/');
       axios.get('/product/categories').then((res) => {
         setShopList(res.data);
       });
