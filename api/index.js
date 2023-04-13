@@ -14,10 +14,13 @@ app.use(cookieParser());
 app.use(
   cors({
     credentials: true,
-    origin: 'https://smarthub-jb8g.onrender.com',
+    origin: [
+      'http://localhost:5173',
+      'https://smarthub-jb8g.onrender.com',
+      'https://smart-3vvso6opn-remii3.vercel.app',
+    ],
   }),
 );
-
 mongoose
   .connect(process.env.MONGODB_CONNECTIONURL, {
     useNewUrlParser: true,
@@ -34,6 +37,8 @@ mongoose
   });
 
 app.get('/', (req, res) => {
+  var fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
+  console.log(fullUrl);
   res.status(201).json({ message: 'Connected to backend' });
 });
 
