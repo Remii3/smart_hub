@@ -10,7 +10,7 @@ const AuthPage = lazy(() => import('./pages/AuthPage'));
 const NoPage404 = lazy(() => import('./pages/NoPage404'));
 const MyAccount = lazy(() => import('./pages/MyAccount'));
 
-axios.defaults.baseURL = 'http://localhost:4000';
+axios.defaults.baseURL = 'https://smarthub-backend.onrender.com/';
 axios.defaults.withCredentials = true;
 
 function App() {
