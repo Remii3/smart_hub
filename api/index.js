@@ -14,7 +14,7 @@ app.use(cookieParser());
 app.use(
   cors({
     credentials: true,
-    origin: 'https://smarthub-jb8g.onrender.com/',
+    origin: ['https://smarthub-jb8g.onrender.com/', 'http://localhost:5173'],
   }),
 );
 
