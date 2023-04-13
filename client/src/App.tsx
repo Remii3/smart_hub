@@ -9,8 +9,7 @@ const MainPage = lazy(() => import('./pages/MainPage'));
 const AuthPage = lazy(() => import('./pages/AuthPage'));
 const NoPage404 = lazy(() => import('./pages/NoPage404'));
 const MyAccount = lazy(() => import('./pages/MyAccount'));
-
-axios.defaults.baseURL = 'https://smarthub-backend.onrender.com/';
+axios.defaults.baseURL = 'https://smarthub-backend.onrender.com';
 axios.defaults.withCredentials = true;
 
 function App() {
