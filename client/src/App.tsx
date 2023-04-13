@@ -1,31 +1,28 @@
 import axios from 'axios';
-import { lazy } from 'react';
+import { lazy, useContext } from 'react';
 import { Routes, Route } from 'react-router-dom';
-
 import SuspenseComponent from './components/suspense/SuspenseComponent';
 import LoadingComponent from './components/UI/LoadingComponent';
-import { OverlayProvider } from './context/OverlayProvider';
-import UserProvider from './context/UserProvider';
-import NoPage404 from './pages/NoPage404';
+import { UserContext } from './context/UserProvider';
 
 const MainPage = lazy(() => import('./pages/MainPage'));
 const AuthPage = lazy(() => import('./pages/AuthPage'));
+const NoPage404 = lazy(() => import('./pages/NoPage404'));
+const MyAccount = lazy(() => import('./pages/MyAccount'));
 
 axios.defaults.baseURL = 'http://localhost:4000';
 axios.defaults.withCredentials = true;
 
 function App() {
+  const { userData } = useContext(UserContext);
   return (
     <SuspenseComponent fallback={<LoadingComponent />}>
-      <OverlayProvider>
-        <UserProvider>
-          <Routes>
-            <Route path="/" element={<MainPage />} />
-            <Route path="/account" element={<AuthPage />} />
-            <Route path="/*" element={<NoPage404 />} />
-          </Routes>
-        </UserProvider>
-      </OverlayProvider>
+      <Routes>
+        <Route path="/" element={<MainPage />} />
+        <Route path="/account" element={<AuthPage />} />
+        {userData && <Route path="/account/my" element={<MyAccount />} />}
+        <Route path="/*" element={<NoPage404 />} />
+      </Routes>
     </SuspenseComponent>
   );
 }
