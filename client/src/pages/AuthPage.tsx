@@ -184,7 +184,6 @@ function AuthPage() {
         email,
         password,
       });
-
       axios.get('/account/profile').then((res) => setUserData(res.data));
 
       navigate('/');

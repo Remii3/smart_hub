@@ -14,11 +14,7 @@ app.use(cookieParser());
 app.use(
   cors({
     credentials: true,
-    origin: [
-      'http://localhost:5173',
-      'https://smarthub-jb8g.onrender.com',
-      'https://smart-3vvso6opn-remii3.vercel.app',
-    ],
+    origin: ['http://localhost:5173', 'https://smarthub-jb8g.onrender.com'],
   }),
 );
 mongoose

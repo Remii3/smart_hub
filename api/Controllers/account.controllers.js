@@ -133,8 +133,6 @@ const signUp = async (req, res) => {
         message: Object.values(responseObject)[0] + ` already exists`,
       });
     }
-    console.log(e.code);
-    console.log(e);
     res.status(422).json(e);
   }
 };
