@@ -36,7 +36,5 @@ app.get('/', (req, res) => {
   res.status(201).json({ message: 'Connected to backend' });
 });
 
-
 app.use('/account', account_routes);
 app.use('/product', product_routes);
-

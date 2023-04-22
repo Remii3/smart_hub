@@ -145,21 +145,77 @@ const profile = async (req, res) => {
 
 const newData = async (req, res) => {
   const salt = bcrypt.genSaltSync(12);
-  let { email, newData, newDataSwitch } = req.body;
+  let { currentEmail, data, dataName } = req.body;
 
-  const keys = Object.entries(newDataSwitch);
-  const selectedNewData = keys.filter(([key, value]) => value === true);
-  const newDataField = Object.keys(Object.fromEntries(selectedNewData));
+  if (dataName === 'email') {
+    const emailRegex = new RegExp('[a-z0-9]+@[a-z]+.[a-z]{2,3}');
 
-  if (newDataField[0] === 'password') {
-    newData = bcrypt.hashSync(newData, salt);
+    if (data[dataName].trim() === '') {
+      return res.status(422).json({
+        name: 'email',
+        message: 'Email is required',
+      });
+    }
+
+    if (!data[dataName].match(emailRegex)) {
+      return res.status(422).json({
+        name: 'email',
+        message: 'Incorrect email address',
+      });
+    }
+  } else if (dataName === 'username') {
+    if (data[dataName].trim() === '') {
+      return res.status(422).json({
+        name: 'username',
+        message: 'Username is required',
+      });
+    }
+  } else {
+    if (data[dataName].trim() === '') {
+      return res.status(422).json({
+        name: 'password',
+        message: 'Password is required',
+      });
+    }
+
+    if (data[dataName].trim().length < 3) {
+      return res.status(422).json({
+        name: 'password',
+        message: 'Password min length is 3 characters',
+      });
+    }
+
+    if (data[dataName].trim().length > 16) {
+      return res.status(422).json({
+        name: 'password',
+        message: 'Password max length is 16 characters',
+      });
+    }
   }
 
-  const resStatus = await User.updateOne(
-    { email: email },
-    { $set: { [newDataField[0]]: newData } },
-  );
-  res.json(resStatus);
+  // const keys = Object.entries(newDataSwitch);
+  // const selectedNewData = keys.filter(([key, value]) => value === true);
+  // const newDataField = Object.keys(Object.fromEntries(selectedNewData));
+
+  if (data[dataName] === 'password') {
+    password = bcrypt.hashSync(password, salt);
+  }
+  try {
+    await User.updateOne(
+      { email: currentEmail },
+      { $set: { [dataName]: data[dataName] } },
+    );
+  } catch (e) {
+    if (e.code === 11000) {
+      const responseObject = e.keyValue;
+      return res.status(422).json({
+        name: Object.keys(responseObject)[0],
+        message: Object.values(responseObject)[0] + ` already exists`,
+      });
+    }
+    res.status(422).json(e);
+  }
+  res.status(200).json({ message: 'Successfully created account' });
 };
 
 module.exports = { signIn, signUp, profile, newData };

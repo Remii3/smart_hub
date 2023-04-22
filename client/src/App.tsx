@@ -23,7 +23,7 @@ switch (document.URL) {
     properUrl = 'https://smarthub-backend.onrender.com';
     break;
 }
-axios.defaults.baseURL = properUrl;
+axios.defaults.baseURL = 'http://localhost:4000';
 axios.defaults.withCredentials = true;
 
 function App() {
