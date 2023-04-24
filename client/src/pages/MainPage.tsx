@@ -36,8 +36,8 @@ function MainPage() {
         scrub: 1,
       },
       duration: 0.5,
-      y: '-50%',
-      scale: 1.5,
+      y: '-25%',
+      scale: '1.3',
       ease: 'sine.out',
     });
     try {
@@ -57,13 +57,13 @@ function MainPage() {
   }, []);
 
   return (
-    <div className="relative min-h-screen overflow-y-auto overflow-x-hidden  bg-pageBackground">
+    <div className="min-h-screen bg-pageBackground">
       <Header />
-      <div className="relative">
-        <section className="relative h-screen w-full overflow-hidden">
+      <div>
+        <section className="relative -top-16 h-screen w-full overflow-hidden">
           <div
             ref={imgBg}
-            className="absolute left-0 top-0 h-full w-full scale-125 bg-mainBanner bg-cover bg-center bg-no-repeat brightness-50"
+            className="absolute left-0 top-0 h-full w-full scale-125 bg-mainBanner bg-cover bg-top bg-no-repeat brightness-50"
           />
           <div className="absolute top-[15%] flex h-screen w-full justify-start sm:top-1/4">
             <div className="flex w-full flex-col text-primaryText sm:items-start">
@@ -94,7 +94,7 @@ function MainPage() {
           </div>
         </section>
         <Main>
-          <div className="parallax__group relative flex min-h-screen w-full flex-col items-center justify-center overflow-y-hidden bg-white ">
+          <div className="parallax__group relative -top-16 flex min-h-screen w-full flex-col items-center justify-center overflow-y-hidden bg-white ">
             {/* Shop */}
             <section className="relative flex w-full flex-col items-center gap-12 pb-16">
               <div className="relative -top-1 left-0 w-full bg-pageBackground">
