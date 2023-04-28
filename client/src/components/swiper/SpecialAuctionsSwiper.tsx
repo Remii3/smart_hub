@@ -4,7 +4,7 @@ import { lazy, useEffect, useState } from 'react';
 import axios from 'axios';
 import { BookTypes } from '../../types/interfaces';
 import SuspenseComponent from '../suspense/SuspenseComponent';
-import LoadingComponent from '../UI/LoadingComponent';
+import LoadingComponent from '../UI/Loaders/LoadingComponent';
 
 const SpecialAuctionCard = lazy(() => import('../card/SpecialAuctionCard'));
 

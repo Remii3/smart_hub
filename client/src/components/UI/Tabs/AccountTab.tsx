@@ -1,11 +1,10 @@
 import { Dispatch } from 'react';
-import { AccountTabsTypes } from '../../types/types';
 
 type PropsTypes = {
-  tabName: AccountTabsTypes;
+  tabName: string;
   tabText: string;
   currentTab: string;
-  setCurrentTab: Dispatch<React.SetStateAction<AccountTabsTypes>>;
+  setCurrentTab: Dispatch<React.SetStateAction<string>>;
 };
 
 function AccountTab({
@@ -22,9 +21,9 @@ function AccountTab({
     <button
       className={`${
         currentTab === tabName
-          ? 'bg-primary text-white'
-          : 'bg-white text-primary'
-      }  whitespace-nowrap rounded-md p-3 text-lg shadow transition-[filter] duration-200 ease-out hover:brightness-90 active:brightness-75`}
+          ? 'border-blue-600  text-blue-600   dark:border-blue-500 dark:text-blue-500'
+          : 'border-transparent hover:border-gray-300 hover:text-gray-600 dark:hover:text-gray-300'
+      } group inline-flex rounded-t-lg border-b-2 p-4 transition duration-200 ease-out`}
       type="button"
       onClick={changeTabHandler}
     >

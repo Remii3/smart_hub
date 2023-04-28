@@ -1,17 +1,16 @@
 import axios from 'axios';
-import { lazy, useContext } from 'react';
-import { Routes, Route } from 'react-router-dom';
-import SuspenseComponent from './components/suspense/SuspenseComponent';
-import LoadingComponent from './components/UI/LoadingComponent';
+import { lazy, useContext, useEffect } from 'react';
+import { Routes, Route, useLocation } from 'react-router-dom';
 import { UserContext } from './context/UserProvider';
 import ShopPage from './pages/ShopPage';
 import ProductPage from './pages/ProductPage';
+import LoadingComponent from './components/UI/Loaders/LoadingComponent';
+import SuspenseComponent from './components/suspense/SuspenseComponent';
 
 const MainPage = lazy(() => import('./pages/MainPage'));
 const AuthPage = lazy(() => import('./pages/AuthPage'));
 const NoPage404 = lazy(() => import('./pages/NoPage404'));
 const MyAccount = lazy(() => import('./pages/MyAccount'));
-
 let properUrl = 'http://localhost:4000';
 
 switch (document.URL) {
@@ -30,6 +29,12 @@ axios.defaults.withCredentials = true;
 
 function App() {
   const { userData } = useContext(UserContext);
+
+  const { pathname } = useLocation();
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
   return (
     // <div className="overflow-hidden">
     <SuspenseComponent fallback={<LoadingComponent />}>

@@ -1,32 +1,42 @@
-import { gsap } from 'gsap';
 import { useContext, useEffect, useRef } from 'react';
+import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { OverlayContext } from '../context/OverlayProvider';
+
 import Nav from './Nav';
+import { OverlayContext } from '../context/OverlayProvider';
 
 function Header() {
   const { shownOverlay, setShownOverlay } = useContext(OverlayContext);
   const navOverlay = useRef(null);
-  const headerBgBreakPoint = useRef(null);
+  const headerElement = useRef(null);
+
   gsap.registerPlugin(ScrollTrigger);
 
-  useEffect(() => {
-    const mainContainer = document.getElementById('mainContainer');
+  const headerBgHandler = () => {
+    const mainPageUrl = window.location.pathname === '/';
+    const mainPageSectionOne = document.getElementById('mainPageSectionOne');
 
-    ScrollTrigger.create({
-      trigger: mainContainer,
-      start: 'top 70px',
-      end: 'bottom 70px',
-      markers: false,
-      animation: gsap.to(headerBgBreakPoint.current, {
+    if (mainPageSectionOne && mainPageUrl) {
+      gsap.to(headerElement.current, {
+        scrollTrigger: {
+          trigger: mainPageSectionOne,
+          toggleActions: 'restart none none reverse',
+          start: 'top',
+          end: 'top',
+        },
         backgroundColor: '#14222F',
         ease: 'sine.out',
-      }),
-      toggleActions: 'restart none none reverse',
-    });
-  }, []);
+      });
+    } else {
+      gsap.to(headerElement.current, {
+        backgroundColor: '#14222F',
+        ease: 'none',
+        duration: 0,
+      });
+    }
+  };
 
-  const profileOverlayHandler = () => {
+  const accountDropdownOverlayHandler = () => {
     const tm = gsap.timeline();
 
     if (shownOverlay) {
@@ -45,18 +55,26 @@ function Header() {
     }
     setShownOverlay((prevState) => !prevState);
   };
+
+  useEffect(() => {
+    headerBgHandler();
+  }, []);
+
   return (
     <header
-      ref={headerBgBreakPoint}
-      className="sticky left-0 top-0 z-20 w-full overflow-hidden bg-transparent"
+      ref={headerElement}
+      className="fixed left-0 top-0 z-20 w-full bg-transparent"
     >
       <div
         ref={navOverlay}
         className="absolute inset-0 h-screen max-h-0 w-screen bg-black opacity-0"
-        onClick={profileOverlayHandler}
+        onClick={accountDropdownOverlayHandler}
         aria-hidden="true"
       />
-      <Nav profileOverlayHandler={profileOverlayHandler} />
+      <Nav
+        accountDropdownOverlayHandler={accountDropdownOverlayHandler}
+        headerBgHandler={() => headerBgHandler()}
+      />
     </header>
   );
 }

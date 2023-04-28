@@ -31,7 +31,7 @@ function SecondaryBtn({ usecase, text, onClick, customCSS }: PropsTypes) {
   return (
     <button
       type="button"
-      className={`${customCSS} ${usecaseClass()} rounded-lg bg-white text-darkTint transition-[filter,transform] duration-200 ease-out hover:brightness-95 active:scale-95 active:brightness-90 sm:text-lg `}
+      className={`${customCSS} ${usecaseClass()} rounded-lg bg-white text-darkTint transition-[filter,transform] duration-200 ease-out hover:brightness-95 active:scale-95 active:brightness-90`}
       onClick={(e) => clickHandler(e)}
     >
       {text}

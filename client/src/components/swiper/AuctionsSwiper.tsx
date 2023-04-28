@@ -4,7 +4,7 @@ import { Autoplay, Navigation, Scrollbar } from 'swiper';
 import axios from 'axios';
 import { BookTypes } from '../../types/interfaces';
 import SuspenseComponent from '../suspense/SuspenseComponent';
-import LoadingComponent from '../UI/LoadingComponent';
+import LoadingComponent from '../UI/Loaders/LoadingComponent';
 
 const AuctionCard = lazy(() => import('../card/AuctionCard'));
 

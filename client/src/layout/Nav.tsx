@@ -1,13 +1,28 @@
-import { useContext, useRef, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import gsap from 'gsap';
+
 import { OverlayContext } from '../context/OverlayProvider';
 import { UserContext } from '../context/UserProvider';
+import {
+  OutlineAccountImg,
+  SolidAccountImg,
+} from '../assets/icons/AccountIcon';
 
-function Nav({ profileOverlayHandler }: { profileOverlayHandler: () => void }) {
+type PropsTypes = {
+  accountDropdownOverlayHandler: () => void;
+  headerBgHandler: () => void;
+};
+
+function Nav({ accountDropdownOverlayHandler, headerBgHandler }: PropsTypes) {
   const [openedBurger, setOpenedBurger] = useState(false);
   const navMobile = useRef(null);
-
+  const navLinkList = [
+    { to: '/news', text: 'news' },
+    { to: '/shop', text: 'shop' },
+    { to: '/collections', text: 'collections' },
+    { to: '/auctions', text: 'auctions' },
+  ];
   const { userData, setUserData } = useContext(UserContext);
   const { shownOverlay } = useContext(OverlayContext);
 
@@ -29,47 +44,47 @@ function Nav({ profileOverlayHandler }: { profileOverlayHandler: () => void }) {
     }
   };
 
-  const dropdownHandler = () => {
-    profileOverlayHandler();
+  const accountDropdownHandler = () => {
+    headerBgHandler();
+    accountDropdownOverlayHandler();
   };
 
   const logoutHandler = () => {
     document.cookie = 'token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
     setUserData(() => null);
-    dropdownHandler();
+    accountDropdownHandler();
   };
+
+  useEffect(() => {
+    gsap.to(navMobile.current, {
+      left: '100vw',
+      ease: 'sine.inOut',
+    });
+    setOpenedBurger(false);
+  }, []);
 
   return (
     <nav>
       <div className="mx-auto flex h-[64px] max-w-[1480px] flex-row items-center justify-between px-10 py-3">
-        <div className="text-white">
-          <Link to="/">SmartHub</Link>
+        <div>
+          <Link to="/" className="text-white">
+            SmartHub
+          </Link>
         </div>
         <div className="hidden md:flex">
           <ul className="flex flex-row items-center px-8 text-white">
-            <li className="text-base transition-[color] duration-200 ease-out hover:text-primary">
-              <Link className="px-4 py-2" to="/news">
-                News
-              </Link>
-            </li>
-
-            <li className="text-base transition-[color] duration-200 ease-out hover:text-primary">
-              <Link className="px-4 py-2" to="/shop">
-                Shop
-              </Link>
-            </li>
-
-            <li className="text-base transition-[color] duration-200 ease-out hover:text-primary">
-              <Link className="px-4 py-2" to="/specials">
-                Specials
-              </Link>
-            </li>
-
-            <li className="text-base transition-[color] duration-200 ease-out hover:text-primary">
-              <Link className="px-4 py-2" to="/auctions">
-                Auctions
-              </Link>
-            </li>
+            {navLinkList.map((navLink, id) => (
+              // eslint-disable-next-line react/no-array-index-key
+              <li key={id}>
+                <Link
+                  to={navLink.to}
+                  className="px-4 py-2 text-base transition-[color] duration-200 ease-out hover:text-primary"
+                >
+                  {navLink.text[0].toLocaleUpperCase()}
+                  {navLink.text.slice(1)}
+                </Link>
+              </li>
+            ))}
           </ul>
           <div className="relative z-40 mt-[2px] flex items-center justify-center ">
             <button
@@ -77,97 +92,53 @@ function Nav({ profileOverlayHandler }: { profileOverlayHandler: () => void }) {
               className={`${
                 shownOverlay ? 'bg-transparentGray shadow-lg' : ''
               } rounded-lg p-1 transition-[background-color,box-shadow] duration-200 ease-out hover:bg-transparentGray hover:shadow-lg `}
-              onClick={dropdownHandler}
+              onClick={() => accountDropdownHandler()}
             >
-              {userData ? (
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                  className="h-7 w-7 text-white"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M18.685 19.097A9.723 9.723 0 0021.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 003.065 7.097A9.716 9.716 0 0012 21.75a9.716 9.716 0 006.685-2.653zm-12.54-1.285A7.486 7.486 0 0112 15a7.486 7.486 0 015.855 2.812A8.224 8.224 0 0112 20.25a8.224 8.224 0 01-5.855-2.438zM15.75 9a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              ) : (
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={1.5}
-                  stroke="currentColor"
-                  className="h-7 w-7 text-white"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z"
-                  />
-                </svg>
-              )}
+              {userData ? <SolidAccountImg /> : <OutlineAccountImg />}
             </button>
-            {!userData && (
-              <div
-                className={`${
-                  shownOverlay ? 'flex' : 'hidden'
-                } absolute top-7 w-24 flex-col rounded-lg bg-pageBackground`}
-              >
-                <Link
-                  to={{ pathname: '/account', search: 'auth=login' }}
-                  className="px-3 pb-2 pt-4 text-white transition-[color] duration-200 ease-out hover:text-primary"
-                >
-                  <button
-                    type="button"
-                    className="w-full text-center text-base"
-                    onClick={dropdownHandler}
+
+            <div className="absolute top-7 w-24 rounded-lg bg-pageBackground">
+              {!userData ? (
+                <div className={`${shownOverlay ? 'flex' : 'hidden'} flex-col`}>
+                  <Link
+                    to={{ pathname: '/account', search: 'auth=login' }}
+                    className="w-full px-3 pb-2 pt-4 text-center text-base text-white transition-[color] duration-200 ease-out hover:text-primary"
+                    onClick={() => accountDropdownHandler()}
                   >
                     Sign in
-                  </button>
-                </Link>
-                <Link
-                  to={{ pathname: '/account', search: 'auth=register' }}
-                  className="px-3 pb-4 pt-2 text-white transition-[color] duration-200 ease-out hover:text-primary"
-                >
-                  <button
-                    type="button"
-                    className="w-full text-center text-base"
-                    onClick={dropdownHandler}
+                  </Link>
+                  <Link
+                    to={{ pathname: '/account', search: 'auth=register' }}
+                    className="w-full px-3 pb-4 pt-2 text-center text-base text-white transition-[color] duration-200 ease-out hover:text-primary"
+                    onClick={() => accountDropdownHandler()}
                   >
                     Sign up
-                  </button>
-                </Link>
-              </div>
-            )}
-            {userData && (
-              <div
-                className={`${
-                  shownOverlay ? 'flex' : 'hidden'
-                }  absolute top-7 w-24 flex-col rounded-lg bg-pageBackground`}
-              >
-                <Link
-                  to="/account/my"
-                  className="px-3 pb-2 pt-4 text-white transition-[color] duration-200 ease-out hover:text-primary"
-                >
+                  </Link>
+                </div>
+              ) : (
+                <div className={`${shownOverlay ? 'flex' : 'hidden'} flex-col`}>
+                  <Link
+                    to="/account/my"
+                    className="px-3 pb-2 pt-4 text-white transition-[color] duration-200 ease-out hover:text-primary"
+                  >
+                    <button
+                      type="button"
+                      className="w-full text-center text-base"
+                      onClick={() => accountDropdownHandler()}
+                    >
+                      Account
+                    </button>
+                  </Link>
                   <button
                     type="button"
-                    className="w-full text-center text-base"
-                    onClick={dropdownHandler}
+                    onClick={logoutHandler}
+                    className="px-3 pb-4 pt-2 text-base text-white transition-[color] duration-200 ease-out hover:text-primary"
                   >
-                    Account
+                    Logout
                   </button>
-                </Link>
-                <button
-                  type="button"
-                  onClick={logoutHandler}
-                  className="px-3 pb-4 pt-2 text-base text-white transition-[color] duration-200 ease-out hover:text-primary"
-                >
-                  Logout
-                </button>
-              </div>
-            )}
+                </div>
+              )}
+            </div>
           </div>
         </div>
         <button
@@ -208,76 +179,55 @@ function Nav({ profileOverlayHandler }: { profileOverlayHandler: () => void }) {
         className="mobile-overlay absolute left-[100vw] top-[0] z-10 h-screen w-full bg-pageBackground pt-16"
       >
         <ul className="flex flex-col text-white">
-          <li className="w-full">
-            <Link
-              to="/news"
-              className="block w-full py-3 text-center text-lg transition-[color] duration-200 ease-out hover:text-primaryText"
-            >
-              News
-            </Link>
-          </li>
-          <li className="w-full">
-            <Link
-              to="/shop"
-              className="block w-full py-3 text-center text-lg transition-[color] duration-200 ease-out hover:text-primaryText"
-            >
-              Shop
-            </Link>
-          </li>
-          <li>
-            <Link
-              to="/collections"
-              className="block w-full py-3 text-center text-lg transition-[color] duration-200 ease-out hover:text-primaryText"
-            >
-              Collections
-            </Link>
-          </li>
-          <li>
-            <Link
-              to="/auctions"
-              className="block w-full py-3 text-center text-lg transition-[color] duration-200 ease-out hover:text-primaryText"
-            >
-              Auctions
-            </Link>
-          </li>
-          <div className="mx-auto my-4 h-[1px] w-3/4 rounded-lg bg-white" />
-
-          {!userData && (
-            <div className="w-full flex-col bg-pageBackground">
-              <button type="button" className="w-full">
+          {navLinkList.map((navLink, id) => (
+            // eslint-disable-next-line react/no-array-index-key
+            <li key={id}>
+              <Link
+                to={navLink.to}
+                className="block w-full py-3 text-center text-lg transition-[color] duration-200 ease-out hover:text-primaryText"
+              >
+                {navLink.text[0].toLocaleUpperCase()}
+                {navLink.text.slice(1)}
+              </Link>
+            </li>
+          ))}
+          <div
+            className="mx-auto my-4 h-[1px] w-3/4 rounded-lg bg-white"
+            aria-hidden="true"
+          />
+          <li className="w-full bg-pageBackground">
+            {!userData ? (
+              <div className="flex-col">
                 <Link
                   to={{ pathname: '/account', search: 'auth=login' }}
                   className="block w-full py-3 text-center text-lg transition-[color] duration-200 ease-out hover:text-primaryText"
                 >
                   Sign in
                 </Link>
-              </button>
-              <button type="button" className="w-full">
                 <Link
                   to={{ pathname: '/account', search: 'auth=register' }}
                   className="block w-full py-3 text-center text-lg transition-[color] duration-200 ease-out hover:text-primaryText"
                 >
                   Sign up
                 </Link>
-              </button>
-            </div>
-          )}
-          {userData && (
-            <div className="w-full flex-col bg-pageBackground">
-              <Link
-                to="/account/my"
-                className="block w-full py-3 text-center text-lg transition-[color] duration-200 ease-out hover:text-primaryText"
-              >
-                Account
-              </Link>
-              <button
-                type="button"
-                className="block w-full py-3 text-center text-lg transition-[color] duration-200 ease-out hover:text-primaryText"
-              >
-                Logout
-              </button>
-            </div>
-          )}
+              </div>
+            ) : (
+              <div className="flex-col">
+                <Link
+                  to="/account/my"
+                  className="block w-full py-3 text-center text-lg transition-[color] duration-200 ease-out hover:text-primaryText"
+                >
+                  Account
+                </Link>
+                <button
+                  type="button"
+                  className="block w-full py-3 text-center text-lg transition-[color] duration-200 ease-out hover:text-primaryText"
+                >
+                  Logout
+                </button>
+              </div>
+            )}
+          </li>
         </ul>
       </div>
     </nav>

@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import MainPageHeading from '../UI/MainPageHeading';
-import PrimaryBtn from '../UI/PrimaryBtn';
+import PrimaryBtn from '../UI/Btns/PrimaryBtn';
 
 type CollectionCardTypes = {
   backcolor: 'white' | 'pageBackground';

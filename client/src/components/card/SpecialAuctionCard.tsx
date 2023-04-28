@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import PrimaryBtn from '../UI/PrimaryBtn';
-import SecondaryBtn from '../UI/SecondaryBtn';
+import PrimaryBtn from '../UI/Btns/PrimaryBtn';
+import SecondaryBtn from '../UI/Btns/SecondaryBtn';
 
 type PropsTypes = {
   id: number;
@@ -85,10 +85,12 @@ function SpecialAuctionCard({
                   <p
                     className={`${
                       descHidden ? 'max-h-0 opacity-0' : 'max-h-72 opacity-100'
-                    } overflow-hidden pb-3 transition-[max-height,opacity] duration-300 ease-in-out sm:text-lg lg:hidden`}
+                    } overflow-hidden pb-3 transition-[max-height,opacity] duration-300 ease-in-out lg:hidden`}
                   >
-                    <span className="text-gray600">Description: </span>
-                    <span className="break-words text-darkTint">
+                    <span className="text-base text-gray600">
+                      Description:{' '}
+                    </span>
+                    <span className="break-words text-md text-darkTint">
                       {description}
                     </span>
                   </p>
