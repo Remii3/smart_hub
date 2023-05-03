@@ -36,7 +36,6 @@ function App() {
   }, [pathname]);
 
   return (
-    // <div className="overflow-hidden">
     <SuspenseComponent fallback={<LoadingComponent />}>
       <Routes>
         <Route path="/" element={<MainPage />} />
@@ -48,7 +47,6 @@ function App() {
         <Route path="/*" element={<NoPage404 />} />
       </Routes>
     </SuspenseComponent>
-    // </div>
   );
 }
 export default App;
