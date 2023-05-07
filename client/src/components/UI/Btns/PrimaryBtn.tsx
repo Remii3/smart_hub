@@ -1,5 +1,6 @@
 type PropsTypes = {
-  usecase: 'big' | 'normal';
+  usecase: 'default' | 'proceed' | '';
+  type: 'button' | 'submit';
   text: string;
   onClick?: (e: any) => void;
   customCSS?: string;
@@ -10,13 +11,9 @@ const defaultProps = {
   customCSS: '',
 };
 
-function PrimaryBtn({ usecase, text, onClick, customCSS }: PropsTypes) {
+function PrimaryBtn({ usecase, text, onClick, customCSS, type }: PropsTypes) {
   const usecaseClass = () => {
     switch (usecase) {
-      case 'big':
-        return 'px-12 py-6 text-md';
-      case 'normal':
-        return 'px-6 py-3 text-base';
       default:
         return '';
     }
@@ -30,8 +27,11 @@ function PrimaryBtn({ usecase, text, onClick, customCSS }: PropsTypes) {
 
   return (
     <button
-      type="button"
-      className={`${customCSS} ${usecaseClass()} font-semiBold rounded-lg border-0 bg-primary text-white transition duration-200 ease-out hover:bg-blue-700 focus:outline-none focus:ring focus:ring-blue-300 active:bg-blue-800`}
+      type={type === 'button' ? 'button' : 'submit'}
+      className={`${
+        customCSS ||
+        'border-primary bg-primary px-4 py-2 text-white hover:bg-blue-700 focus:ring-blue-300'
+      } ${usecaseClass()} rounded-md border shadow-sm transition ease-out focus:ring`}
       onClick={(e) => clickHandler(e)}
     >
       {text}

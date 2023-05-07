@@ -7,9 +7,9 @@ type PropsType = {
 
 function MainLayout({ children }: PropsType) {
   return (
-    <div id="mainContainer" className=" overflow-hidden bg-gray-100">
+    <div id="mainContainer" className="overflow-hidden bg-white">
       <Header />
-      <main className="relative top-16">{children}</main>
+      <main className="relative top-16 w-full pr-[17px]">{children}</main>
       <Footer />
     </div>
   );

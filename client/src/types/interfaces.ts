@@ -1,14 +1,19 @@
-export interface BookTypes {
-  _id: number;
+export interface ProductTypes {
+  _id: string;
   title: string;
-  authors: string[];
-  categories: string[];
-  volume: string;
-  edition: string;
-  language: string;
-  pages: number;
-  url: string;
-  description: string;
-  cover_url: string;
+  author?: string | undefined;
+  categories?: string[] | undefined;
+  description?: string | undefined;
+  imgs?: string[] | undefined;
+  quantity?: number | undefined;
+  language?: string | undefined;
   price: number;
+  marketPlace: string;
+  shippingData?: { height: number; width: number; depth: number } | undefined;
+}
+
+export interface ProductCategories {
+  _id: string;
+  name: string;
+  description: string;
 }

@@ -63,7 +63,7 @@ function Header() {
   return (
     <header
       ref={headerElement}
-      className="fixed left-0 top-0 z-20 w-full bg-transparent"
+      className="fixed top-0 z-20 w-screen bg-transparent pr-[17px]"
     >
       <div
         ref={navOverlay}

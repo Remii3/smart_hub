@@ -13,15 +13,14 @@ import 'swiper/css';
 import 'swiper/css/pagination';
 
 import '../assets/styles/swiper.css';
-import { CategoryCardTypes } from '../types/types';
-import { BookTypes } from '../types/interfaces';
+import { ProductTypes, ProductCategories } from '../types/interfaces';
 import SpecialAuctionsSwiper from '../components/swiper/SpecialAuctionsSwiper';
 import AuctionsSwiper from '../components/swiper/AuctionsSwiper';
 import MainLayout from '../layout/MainLayout';
 
 function MainPage() {
-  const [shopList, setShopList] = useState<CategoryCardTypes[]>([]);
-  const [collection, setCollection] = useState<BookTypes[]>([]);
+  const [shopList, setShopList] = useState<ProductCategories[]>([]);
+  const [collection, setCollection] = useState<ProductTypes[]>([]);
   const imgBg = useRef(null);
 
   const navigate = useNavigate();
@@ -46,7 +45,7 @@ function MainPage() {
       console.error(err);
     }
     try {
-      axios.get('/product/books').then((res) => {
+      axios.get('/product/all-books').then((res) => {
         setCollection(res.data);
       });
     } catch (err) {
@@ -108,8 +107,9 @@ function MainPage() {
                 {shopList.slice(0, 6).map((cardItem) => (
                   <CategoryCard
                     key={cardItem._id}
-                    cat_name={cardItem.name}
-                    cat_description={cardItem.description}
+                    _id={cardItem._id}
+                    name={cardItem.name}
+                    description={cardItem.description}
                   />
                 ))}
               </div>
@@ -136,14 +136,14 @@ function MainPage() {
               />
             </div>
             <div className="w-full">
-              {collection.slice(0, 4).map((collection_data, id) => (
+              {/* {collection.slice(0, 4).map((collection_data, id) => (
                 <CollectionCard
                   key={collection_data._id}
                   backcolor={(id + 1) % 2 ? 'pageBackground' : 'white'}
                   collectionData={collection_data}
                   lastItem={collection.length === id + 1}
                 />
-              ))}
+              ))} */}
             </div>
           </section>
           {/* Special auctions */}
