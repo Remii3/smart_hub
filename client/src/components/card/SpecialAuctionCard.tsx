@@ -1,31 +1,27 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import PrimaryBtn from '../UI/PrimaryBtn';
-import SecondaryBtn from '../UI/SecondaryBtn';
+import PrimaryBtn from '../UI/Btns/PrimaryBtn';
+import SecondaryBtn from '../UI/Btns/SecondaryBtn';
+import { ProductTypes } from '../../types/interfaces';
 
-type PropsTypes = {
-  id: number;
-  title: string;
-  description: string;
-  deadline: Date | null;
+interface PropsTypes extends ProductTypes {
   highBid?: number;
-  minBid: number;
-  coverUrl: string;
   swipedFlag: boolean;
-};
+  deadline: Date | null;
+}
 
 const defalutProps = {
   highBid: 0,
 };
 
 function SpecialAuctionCard({
-  id,
+  _id,
   title,
   deadline,
   description,
   highBid,
-  minBid,
-  coverUrl,
+  price,
+  imgs,
   swipedFlag,
 }: PropsTypes) {
   const [descHidden, setDescHidden] = useState(true);
@@ -51,16 +47,18 @@ function SpecialAuctionCard({
   }
 
   return (
-    <div id={`${id}`} className="h-auto rounded-lg p-2">
+    <div id={`${_id}`} className="h-auto rounded-lg p-2">
       <div className="rounded-2xl bg-white px-3 py-3">
         <div className="flex flex-col lg:flex-row">
           <div className="w-full min-w-[160px] overflow-hidden rounded-md lg:block lg:max-w-xs lg:pr-4">
-            <Link to={`auctions/${id}`}>
-              <img
-                src={coverUrl}
-                className="m-auto h-full max-h-[400px] rounded-md object-contain object-top "
-                alt="cover_img"
-              />
+            <Link to={`auctions/${_id}`}>
+              {imgs && (
+                <img
+                  src={imgs[0]}
+                  className="m-auto h-full max-h-[400px] rounded-md object-contain object-top "
+                  alt="cover_img"
+                />
+              )}
             </Link>
           </div>
           <div className="flex-grow pt-3">
@@ -74,7 +72,7 @@ function SpecialAuctionCard({
                   </p>
                   <p className="flex justify-between  sm:text-lg">
                     <span className="text-gray600"> Min bid:</span>
-                    <span className="text-darkTint">${minBid}</span>
+                    <span className="text-darkTint">${price}</span>
                   </p>
                   <p className="flex justify-between sm:text-lg">
                     <span className="text-gray600"> Deadline:</span>
@@ -85,10 +83,12 @@ function SpecialAuctionCard({
                   <p
                     className={`${
                       descHidden ? 'max-h-0 opacity-0' : 'max-h-72 opacity-100'
-                    } overflow-hidden pb-3 transition-[max-height,opacity] duration-300 ease-in-out sm:text-lg lg:hidden`}
+                    } overflow-hidden pb-3 transition-[max-height,opacity] duration-300 ease-in-out lg:hidden`}
                   >
-                    <span className="text-gray600">Description: </span>
-                    <span className="break-words text-darkTint">
+                    <span className="text-base text-gray600">
+                      Description:{' '}
+                    </span>
+                    <span className="break-words text-md text-darkTint">
                       {description}
                     </span>
                   </p>
@@ -96,17 +96,21 @@ function SpecialAuctionCard({
               </div>
               <div className="flex flex-col justify-start gap-2 sm:flex-row md:flex-col lg:items-start xl:flex-row xl:pt-3">
                 <PrimaryBtn
+                  type="button"
                   text="Enter live auction"
-                  usecase="normal"
+                  usecase="default"
                   onClick={() => {
-                    navigate(`/auctions/${id}`);
+                    navigate(`/auctions/${_id}`);
                   }}
                 />
                 <SecondaryBtn
+                  type="button"
                   usecase="switch"
                   text={descHidden ? 'View details' : 'Hide details'}
                   onClick={showDesc}
-                  customCSS={descHidden ? 'brightness-100' : 'brightness-90'}
+                  customCSS={
+                    descHidden ? 'text-gray-600 ' : 'text-white bg-gray-600'
+                  }
                 />
               </div>
             </div>
