@@ -40,9 +40,17 @@ module.exports = {
         gray800: '#E3E3E3',
         gray900: '#F7F7FB',
         danger: '#CA3333',
-        transparentGray: 'rgba(0,0,0,0.21)',
+        transparentGray: 'rgba(0,0,0,0.43)',
       },
       keyframes: {
+        overlayShow: {
+          from: { opacity: 0 },
+          to: { opacity: 1 },
+        },
+        contentShow: {
+          from: { opacity: 0, transform: 'translate(-50%, -48%) scale(0.96)' },
+          to: { opacity: 1, transform: 'translate(-50%, -50%) scale(1)' },
+        },
         animateTextBackground: {
           '0%': { backgroundPosition: '0 0' },
           '25%': { backgroundPosition: '100% 0' },
@@ -52,8 +60,11 @@ module.exports = {
         },
       },
       animation: {
+        overlayShow: 'overlayShow 150ms cubic-bezier(0.16, 1, 0.3, 1)',
+        contentShow: 'contentShow 150ms cubic-bezier(0.16, 1, 0.3, 1)',
         animateTextBackground: 'animateTextBackground 10s ease-in-out infinite',
       },
+
       fontFamily: {
         rubik: ['Rubik', 'sans-serif'],
         poppins: ['Poppins', 'sans-serif'],

@@ -24,18 +24,21 @@ export const UserContext = createContext<ContextTypes>({
 function UserProvider({ children }: { children: ReactNode }) {
   const [userData, setUserData] = useState(null);
 
+  const fetchData = async () => {
+    const defaultUrl = `/account/profile`;
+    const res = await axios.get(defaultUrl);
+    setUserData(res.data);
+  };
+
   useEffect(() => {
     const token = document.cookie.match('token');
 
     if (!userData && token) {
-      axios.get('/account/profile').then((res) => {
-        setUserData(res.data);
-      });
+      fetchData();
     }
-  });
+  }, [userData]);
 
   const userValues = useMemo(() => ({ userData, setUserData }), [userData]);
-
   return (
     <UserContext.Provider value={userValues}>{children}</UserContext.Provider>
   );

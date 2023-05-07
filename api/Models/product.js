@@ -1,15 +1,16 @@
 const mongoose = require('mongoose');
 
 const ProductSchema = mongoose.Schema({
-  _id: { type: mongoose.Schema.Types.ObjectId },
-  categories: [mongoose.Types.ObjectId],
-  title: { type: String },
-  description: String,
-  price: Number,
-  prodImg: String,
+  title: { type: String, required: true },
+  author: { type: String },
+  category: { type: String },
+  description: { type: String },
+  imgs: { type: [String] },
   quantity: { type: Number },
+  price: { type: Number, required: true },
+  marketPlace: { type: String, required: true },
   shipingDetails: {
-    type: { weight: Number, height: Number, width: Number, depth: Number },
+    type: { height: Number, width: Number, depth: Number },
   },
 });
 

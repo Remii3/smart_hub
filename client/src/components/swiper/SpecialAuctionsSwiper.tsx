@@ -2,13 +2,13 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, Pagination } from 'swiper';
 import { lazy, useEffect, useState } from 'react';
 import axios from 'axios';
-import { BookTypes } from '../../types/interfaces';
+import { ProductTypes } from '../../types/interfaces';
 import SuspenseComponent from '../suspense/SuspenseComponent';
 import LoadingComponent from '../UI/Loaders/LoadingComponent';
 
 const SpecialAuctionCard = lazy(() => import('../card/SpecialAuctionCard'));
 
-interface SpecialAuctionsTypes extends BookTypes {
+interface SpecialAuctionsTypes extends ProductTypes {
   deadline?: Date;
 }
 
@@ -19,7 +19,7 @@ function SpecialAuctionsSwiper() {
   const [bestAuctionCardFlag, setBestAuctionCardFlag] = useState(true);
   useEffect(() => {
     try {
-      axios.get('/product/books').then((res) => {
+      axios.get('/product/auction-books').then((res) => {
         setSpecialAuctions(res.data.slice(0, 6));
       });
     } catch (err) {
@@ -49,13 +49,14 @@ function SpecialAuctionsSwiper() {
         <SwiperSlide key={auctionItem._id}>
           <SuspenseComponent fallback={<LoadingComponent />}>
             <SpecialAuctionCard
-              id={auctionItem._id}
-              coverUrl={auctionItem.cover_url}
+              _id={auctionItem._id}
               title={auctionItem.title}
               description={auctionItem.description}
+              imgs={auctionItem.imgs}
               deadline={auctionItem.deadline || null}
-              minBid={auctionItem.price}
+              price={auctionItem.price}
               swipedFlag={bestAuctionCardFlag}
+              marketPlace={auctionItem.marketPlace}
             />
           </SuspenseComponent>
         </SwiperSlide>
