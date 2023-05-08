@@ -1,13 +1,10 @@
-import { useContext, useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 import Nav from './Nav';
-import { OverlayContext } from '../context/OverlayProvider';
 
 function Header() {
-  const { shownOverlay, setShownOverlay } = useContext(OverlayContext);
-  const navOverlay = useRef(null);
   const headerElement = useRef(null);
 
   gsap.registerPlugin(ScrollTrigger);
@@ -36,26 +33,6 @@ function Header() {
     }
   };
 
-  const accountDropdownOverlayHandler = () => {
-    const tm = gsap.timeline();
-
-    if (shownOverlay) {
-      tm.to(navOverlay.current, {
-        opacity: 0,
-        duration: 0.1,
-      }).to(navOverlay.current, { maxHeight: 0, duration: 0.01 });
-    } else {
-      tm.to(navOverlay.current, { maxHeight: '100vh', duration: 0.01 }).to(
-        navOverlay.current,
-        {
-          opacity: 0.3,
-          duration: 0.1,
-        }
-      );
-    }
-    setShownOverlay((prevState) => !prevState);
-  };
-
   useEffect(() => {
     headerBgHandler();
   }, []);
@@ -65,16 +42,7 @@ function Header() {
       ref={headerElement}
       className="fixed top-0 z-20 w-screen bg-transparent pr-[17px]"
     >
-      <div
-        ref={navOverlay}
-        className="absolute inset-0 h-screen max-h-0 w-screen bg-black opacity-0"
-        onClick={accountDropdownOverlayHandler}
-        aria-hidden="true"
-      />
-      <Nav
-        accountDropdownOverlayHandler={accountDropdownOverlayHandler}
-        headerBgHandler={() => headerBgHandler()}
-      />
+      <Nav />
     </header>
   );
 }

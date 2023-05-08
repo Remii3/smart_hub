@@ -1,7 +1,7 @@
 import { ChangeEvent, useContext, useState } from 'react';
 import axios from 'axios';
 import { UserContext } from '../../context/UserProvider';
-import InputField from '../form/InputField';
+import InputField from '../UI/form/InputField';
 
 type NewDataNameTypes = 'email' | 'username' | 'password';
 
@@ -91,19 +91,20 @@ function EditUserData() {
   };
   return (
     <div className="grid grid-cols-1 gap-5">
-      <div>
+      <fieldset>
         <InputField
           name="email"
           type="email"
-          text="Email"
+          optional={false}
+          labelValue="Email"
           placeholder="JohnDoe@gmail.com..."
-          initiallyDisabled={!newDataFieldShow.email}
-          error={newUserData.errors.email}
-          errorMessage={newUserData.errors.email}
-          value={
+          disabled={!newDataFieldShow.email}
+          hasError={newUserData.errors.email}
+          errorValue={newUserData.errors.email}
+          inputValue={
             newDataFieldShow.email ? newUserData.data.email : userData.email
           }
-          valueChange={(e) => newUserDataChangeHandler(e)}
+          onChange={(e) => newUserDataChangeHandler(e)}
         />
         <div className="flex justify-between">
           <button
@@ -123,22 +124,23 @@ function EditUserData() {
             Accept
           </button>
         </div>
-      </div>
-      <div>
+      </fieldset>
+      <fieldset>
         <InputField
           name="username"
           type="text"
-          text="Username"
+          optional={false}
+          labelValue="Username"
           placeholder="JohnDoe..."
-          initiallyDisabled={!newDataFieldShow.username}
-          error={newUserData.errors.username}
-          errorMessage={newUserData.errors.username}
-          value={
+          disabled={!newDataFieldShow.username}
+          hasError={newUserData.errors.username}
+          errorValue={newUserData.errors.username}
+          inputValue={
             newDataFieldShow.username
               ? newUserData.data.username
               : userData.username
           }
-          valueChange={(e) => newUserDataChangeHandler(e)}
+          onChange={(e) => newUserDataChangeHandler(e)}
         />
         <div className="flex justify-between">
           <button
@@ -158,19 +160,25 @@ function EditUserData() {
             Accept
           </button>
         </div>
-      </div>
-      <div>
-        <InputField
-          name="password"
-          type="text"
-          text="New Password"
-          placeholder="Password..."
-          initiallyHidden={!newDataFieldShow.password}
-          error={newUserData.errors.password}
-          errorMessage={newUserData.errors.password}
-          value={newUserData.data.password}
-          valueChange={(e) => newUserDataChangeHandler(e)}
-        />
+      </fieldset>
+      <fieldset>
+        <div
+          className={`${
+            newDataFieldShow.password ? 'max-h-max' : 'max-h-0'
+          } overflow-hidden py-1`}
+        >
+          <InputField
+            name="password"
+            type="text"
+            optional={false}
+            labelValue="New Password"
+            placeholder="Password..."
+            hasError={newUserData.errors.password}
+            errorValue={newUserData.errors.password}
+            inputValue={newUserData.data.password}
+            onChange={(e) => newUserDataChangeHandler(e)}
+          />
+        </div>
         <div className="flex justify-between">
           <button
             className="text-base text-primaryText"
@@ -189,7 +197,7 @@ function EditUserData() {
             Accept
           </button>
         </div>
-      </div>
+      </fieldset>
     </div>
   );
 }

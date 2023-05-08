@@ -443,7 +443,7 @@ function MyShop() {
             </RadioGroup>
           </fieldset>
 
-          <div className="flex flex-col space-x-1 sm:flex-row">
+          <div className="flex flex-col sm:flex-row sm:space-x-1">
             <fieldset className="mb-2 space-y-1">
               <label
                 htmlFor="height"

@@ -77,7 +77,8 @@ function MainPage() {
               </div>
               <div className="ml-[15%]">
                 <PrimaryBtn
-                  usecase="big"
+                  usecase="default"
+                  type="button"
                   text="See now"
                   onClick={() => {
                     navigate('/shop');
@@ -116,7 +117,8 @@ function MainPage() {
             </div>
             <div className="w-full text-center">
               <PrimaryBtn
-                usecase="normal"
+                usecase="default"
+                type="button"
                 text="See all genres"
                 onClick={() => {
                   navigate('/shop');
@@ -185,8 +187,9 @@ function MainPage() {
             </div>
             <div className="w-full text-center">
               <PrimaryBtn
+                type="button"
                 text="See all auctions"
-                usecase="normal"
+                usecase="default"
                 onClick={() => {
                   navigate('/auctions');
                 }}
