@@ -9,8 +9,14 @@ import {
   useState,
 } from 'react';
 
+import { ProductTypes } from '../types/interfaces';
+
 type ContextTypes = {
-  userData: null | { email: string; username: string };
+  userData: null | {
+    email: string;
+    username: string;
+    my_products: ProductTypes[];
+  };
   setUserData:
     | Dispatch<SetStateAction<object>>
     | Dispatch<SetStateAction<null>>;

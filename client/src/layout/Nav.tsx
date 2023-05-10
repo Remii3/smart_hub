@@ -1,20 +1,15 @@
-import { useContext, useEffect, useRef, useState } from 'react';
+import { Fragment, useContext, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import gsap from 'gsap';
 
-import { OverlayContext } from '../context/OverlayProvider';
+import { Menu, Transition } from '@headlessui/react';
 import { UserContext } from '../context/UserProvider';
 import {
   OutlineAccountImg,
   SolidAccountImg,
 } from '../assets/icons/AccountIcon';
 
-type PropsTypes = {
-  accountDropdownOverlayHandler: () => void;
-  headerBgHandler: () => void;
-};
-
-function Nav({ accountDropdownOverlayHandler, headerBgHandler }: PropsTypes) {
+function Nav() {
   const [openedBurger, setOpenedBurger] = useState(false);
   const navMobile = useRef(null);
   const navLinkList = [
@@ -24,7 +19,6 @@ function Nav({ accountDropdownOverlayHandler, headerBgHandler }: PropsTypes) {
     { to: '/auctions', text: 'auctions' },
   ];
   const { userData, setUserData } = useContext(UserContext);
-  const { shownOverlay } = useContext(OverlayContext);
 
   gsap.registerPlugin();
 
@@ -44,15 +38,9 @@ function Nav({ accountDropdownOverlayHandler, headerBgHandler }: PropsTypes) {
     }
   };
 
-  const accountDropdownHandler = () => {
-    headerBgHandler();
-    accountDropdownOverlayHandler();
-  };
-
   const logoutHandler = () => {
     document.cookie = 'token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
     setUserData(() => null);
-    accountDropdownHandler();
   };
 
   useEffect(() => {
@@ -86,60 +74,95 @@ function Nav({ accountDropdownOverlayHandler, headerBgHandler }: PropsTypes) {
               </li>
             ))}
           </ul>
-          <div className="relative z-40 mt-[2px] flex items-center justify-center ">
-            <button
-              type="button"
-              className={`${
-                shownOverlay ? 'bg-transparentGray shadow-lg' : ''
-              } rounded-lg p-1 transition-[background-color,box-shadow] duration-200 ease-out hover:bg-transparentGray hover:shadow-lg `}
-              onClick={() => accountDropdownHandler()}
-            >
-              {userData ? <SolidAccountImg /> : <OutlineAccountImg />}
-            </button>
-
-            <div className="absolute top-7 w-24 rounded-lg bg-pageBackground">
-              {!userData ? (
-                <div className={`${shownOverlay ? 'flex' : 'hidden'} flex-col`}>
-                  <Link
-                    to={{ pathname: '/account', search: 'auth=login' }}
-                    className="w-full px-3 pb-2 pt-4 text-center text-base text-white transition-[color] duration-200 ease-out hover:text-primary"
-                    onClick={() => accountDropdownHandler()}
-                  >
-                    Sign in
-                  </Link>
-                  <Link
-                    to={{ pathname: '/account', search: 'auth=register' }}
-                    className="w-full px-3 pb-4 pt-2 text-center text-base text-white transition-[color] duration-200 ease-out hover:text-primary"
-                    onClick={() => accountDropdownHandler()}
-                  >
-                    Sign up
-                  </Link>
-                </div>
-              ) : (
-                <div className={`${shownOverlay ? 'flex' : 'hidden'} flex-col`}>
-                  <Link
-                    to="/account/my"
-                    className="px-3 pb-2 pt-4 text-white transition-[color] duration-200 ease-out hover:text-primary"
-                  >
-                    <button
-                      type="button"
-                      className="w-full text-center text-base"
-                      onClick={() => accountDropdownHandler()}
-                    >
-                      Account
-                    </button>
-                  </Link>
-                  <button
-                    type="button"
-                    onClick={logoutHandler}
-                    className="px-3 pb-4 pt-2 text-base text-white transition-[color] duration-200 ease-out hover:text-primary"
-                  >
-                    Logout
-                  </button>
-                </div>
-              )}
+          <Menu as="div" className="relative inline-block text-left">
+            <div>
+              <Menu.Button className="inline-flex w-full justify-center rounded-md bg-black bg-opacity-20 px-4 py-2 text-sm font-medium text-white hover:bg-opacity-30 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75">
+                {userData ? <SolidAccountImg /> : <OutlineAccountImg />}
+              </Menu.Button>
             </div>
-          </div>
+            <Transition
+              as={Fragment}
+              enter="transition ease-out duration-100"
+              enterFrom="transform opacity-0 scale-95"
+              enterTo="transform opacity-100 scale-100"
+              leave="transition ease-in duration-75"
+              leaveFrom="transform opacity-100 scale-100"
+              leaveTo="transform opacity-0 scale-95"
+            >
+              <Menu.Items className="absolute right-0 mt-2 w-28 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                <div className="p-1">
+                  {!userData && (
+                    <>
+                      <Menu.Item>
+                        {({ active }) => (
+                          <Link
+                            to={{ pathname: '/account', search: 'auth=login' }}
+                            className={`${
+                              active
+                                ? 'bg-primary text-white'
+                                : 'bg-white text-gray-900'
+                            } group flex w-full items-center rounded-md px-2 py-2 text-sm transition ease-out`}
+                          >
+                            Sign in
+                          </Link>
+                        )}
+                      </Menu.Item>
+                      <Menu.Item>
+                        {({ active }) => (
+                          <Link
+                            to={{
+                              pathname: '/account',
+                              search: 'auth=register',
+                            }}
+                            className={`${
+                              active
+                                ? 'bg-primary text-white'
+                                : 'bg-white text-gray-900'
+                            } group flex w-full items-center rounded-md px-2 py-2 text-sm transition ease-out`}
+                          >
+                            Sign up
+                          </Link>
+                        )}
+                      </Menu.Item>
+                    </>
+                  )}
+                  {userData && (
+                    <>
+                      <Menu.Item>
+                        {({ active }) => (
+                          <Link
+                            to="/account/my"
+                            className={`${
+                              active
+                                ? 'bg-primary text-white'
+                                : 'bg-white text-gray-900'
+                            } group flex w-full items-center rounded-md px-2 py-2 text-sm transition ease-out`}
+                          >
+                            Account
+                          </Link>
+                        )}
+                      </Menu.Item>
+                      <Menu.Item>
+                        {({ active }) => (
+                          <button
+                            type="button"
+                            onClick={logoutHandler}
+                            className={`${
+                              active
+                                ? 'bg-primary text-white'
+                                : 'bg-white text-gray-900'
+                            } group flex w-full items-center rounded-md px-2 py-2 text-sm transition ease-out`}
+                          >
+                            Logout
+                          </button>
+                        )}
+                      </Menu.Item>
+                    </>
+                  )}
+                </div>
+              </Menu.Items>
+            </Transition>
+          </Menu>
         </div>
         <button
           type="button"

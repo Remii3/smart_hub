@@ -395,8 +395,9 @@ function AuthPage() {
               </div>
               <div>
                 <PrimaryBtn
+                  type="submit"
                   text="Sign in"
-                  usecase="normal"
+                  usecase="default"
                   customCSS="px-12"
                   onClick={(e) => signInHandler(e)}
                 />
@@ -508,8 +509,9 @@ function AuthPage() {
               </div>
               <div>
                 <PrimaryBtn
+                  type="submit"
                   text="Sign up"
-                  usecase="normal"
+                  usecase="default"
                   customCSS="px-12"
                   onClick={(e) => signUpHandler(e)}
                 />
@@ -533,7 +535,8 @@ function AuthPage() {
                   Press the button below
                 </p>
                 <PrimaryBtn
-                  usecase="normal"
+                  type="button"
+                  usecase="default"
                   text="Sign up"
                   customCSS="border border-white px-12"
                   onClick={overlaySwitchHandler}
@@ -551,8 +554,9 @@ function AuthPage() {
                   Waste no more time, sign in now!
                 </p>
                 <PrimaryBtn
+                  type="button"
                   text="Sign in"
-                  usecase="normal"
+                  usecase="default"
                   customCSS="border border-white px-12"
                   onClick={overlaySwitchHandler}
                 />

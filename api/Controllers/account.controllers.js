@@ -1,6 +1,7 @@
 const User = require('../Models/user');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const Product = require('../Models/product');
 
 const signIn = async (req, res) => {
   const { email, password } = req.body;
@@ -139,9 +140,17 @@ const signUp = async (req, res) => {
 };
 
 const profile = async (req, res) => {
-  const { email, username } = await User.findOne({ _id: req.user.userId });
+  const { email, username, cart, my_products } = await User.findOne({
+    _id: req.user.userId,
+  });
 
-  res.json({ email, username });
+  let userProductsData;
+
+  await Product.find({ _id: my_products }).then(res => {
+    userProductsData = res;
+  });
+
+  res.json({ email, username, cart, my_products: userProductsData });
 };
 
 const newData = async (req, res) => {
@@ -193,10 +202,6 @@ const newData = async (req, res) => {
       });
     }
   }
-
-  // const keys = Object.entries(newDataSwitch);
-  // const selectedNewData = keys.filter(([key, value]) => value === true);
-  // const newDataField = Object.keys(Object.fromEntries(selectedNewData));
 
   if (data[dataName] === 'password') {
     password = bcrypt.hashSync(password, salt);

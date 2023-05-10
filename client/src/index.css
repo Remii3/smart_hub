@@ -48,8 +48,6 @@
 
   body {
     @apply font-rubik;
-    line-height: 1.75;
-    font-size: clamp(1rem, 0.19vw + 0.96rem, 1.19rem);
   }
 }
 

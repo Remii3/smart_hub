@@ -65,7 +65,7 @@ function MainPage() {
             <div className="flex w-full flex-col text-primaryText sm:items-start">
               <div className="mb-14 ml-[15%] max-w-xs sm:max-w-none">
                 <h3 className="uppercase">Award winning literature</h3>
-                <h1 className="text-3xl uppercase text-white lg:text-4xl">
+                <h1 className="uppercase text-white">
                   <span className="inline-block w-full max-w-[80%]">
                     Buy best selling
                   </span>
@@ -77,7 +77,8 @@ function MainPage() {
               </div>
               <div className="ml-[15%]">
                 <PrimaryBtn
-                  usecase="big"
+                  usecase="default"
+                  type="button"
                   text="See now"
                   onClick={() => {
                     navigate('/shop');
@@ -116,7 +117,8 @@ function MainPage() {
             </div>
             <div className="w-full text-center">
               <PrimaryBtn
-                usecase="normal"
+                usecase="default"
+                type="button"
                 text="See all genres"
                 onClick={() => {
                   navigate('/shop');
@@ -185,8 +187,9 @@ function MainPage() {
             </div>
             <div className="w-full text-center">
               <PrimaryBtn
+                type="button"
                 text="See all auctions"
-                usecase="normal"
+                usecase="default"
                 onClick={() => {
                   navigate('/auctions');
                 }}

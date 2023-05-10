@@ -1,24 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { RadioGroup } from '@headlessui/react';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
 import PrimaryBtn from '../UI/Btns/PrimaryBtn';
 import CustomDialog from '../dialog/CustomDialog';
-import { ProductCategories } from '../../types/interfaces';
-
-const initialProductData = {
-  title: { value: '', hasError: false },
-  author: { value: '', hasError: false },
-  category: { value: '', hasError: false },
-  otherCategory: { value: '', hasError: false },
-  description: { value: '', hasError: false },
-  imgs: { value: [], hasError: false },
-  quantity: { value: 1, hasError: false },
-  price: { value: 1, hasError: false },
-  marketPlace: { value: '', hasError: false },
-  height: { value: 1, hasError: false },
-  width: { value: 1, hasError: false },
-  depth: { value: 1, hasError: false },
-};
+import { ProductCategories, ProductTypes } from '../../types/interfaces';
+import DefaultCard from '../card/DefaultCard';
+import SecondaryBtn from '../UI/Btns/SecondaryBtn';
+import { UserContext } from '../../context/UserProvider';
+import CheckIcon from '../../assets/icons/CheckIcon';
 
 type ProductDataTypes = {
   title: { value: string; hasError: boolean };
@@ -35,19 +25,64 @@ type ProductDataTypes = {
   depth: { value: number; hasError: boolean };
 };
 
-function CheckIcon(props: any) {
+const initialProductData = {
+  title: { value: '', hasError: false },
+  author: { value: '', hasError: false },
+  category: { value: '', hasError: false },
+  otherCategory: { value: '', hasError: false },
+  description: { value: '', hasError: false },
+  imgs: { value: [], hasError: false },
+  quantity: { value: 1, hasError: false },
+  price: { value: 1, hasError: false },
+  marketPlace: { value: '', hasError: false },
+  height: { value: 1, hasError: false },
+  width: { value: 1, hasError: false },
+  depth: { value: 1, hasError: false },
+};
+
+function MyProducts({
+  shownAllProducts,
+  myProducts,
+  onClick,
+}: {
+  shownAllProducts: boolean;
+  myProducts: ProductTypes[];
+  onClick: () => void;
+}) {
   return (
-    // eslint-disable-next-line react/jsx-props-no-spreading
-    <svg viewBox="0 0 24 24" fill="none" {...props}>
-      <circle cx={12} cy={12} r={12} fill="#fff" opacity="0.2" />
-      <path
-        d="M7 13l3 3 7-7"
-        stroke="#fff"
-        strokeWidth={1.5}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
+    <div>
+      <div
+        className={`${
+          shownAllProducts ? 'max-h-[556px]' : 'max-h-[278px]'
+        } grid grid-cols-1 gap-4 overflow-hidden p-4 transition-[max-height] duration-300 ease-in-out sm:grid-cols-2 xl:grid-cols-3`}
+      >
+        {myProducts.map((product, id) => (
+          <DefaultCard
+            key={id}
+            _id={product._id}
+            title={product.title}
+            marketPlace={product.marketPlace}
+            price={product.price}
+          />
+        ))}
+      </div>
+
+      {myProducts.length > 3 && (
+        <div className="flex w-full justify-center">
+          <SecondaryBtn
+            text={shownAllProducts ? 'Hide more' : 'Show more'}
+            type="button"
+            usecase="switch"
+            onClick={onClick}
+            customCSS={`${
+              shownAllProducts
+                ? 'bg-gray-400 text-white'
+                : 'text-gray-600 bg-white'
+            } px-3 py-2`}
+          />
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -59,6 +94,9 @@ function MyShop() {
   const [hasFailed, setHasFailed] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [categories, setCategories] = useState<ProductCategories[]>();
+  const [shownAllProducts, setShownAllProducts] = useState(false);
+
+  const { userData } = useContext(UserContext);
 
   const resetProductData = () => {
     setTimeout(() => {
@@ -123,6 +161,7 @@ function MyShop() {
     }
 
     const newProductData = {
+      userEmail: userData?.email,
       title: productData.title.value,
       author: productData.author.value,
       category: currentCategory,
@@ -162,14 +201,44 @@ function MyShop() {
     }
   }, [productData.category.value]);
 
+  const showAllHandler = () => {
+    setShownAllProducts((prevState) => !prevState);
+  };
   return (
     <div>
-      <PrimaryBtn
-        text="Add Product"
-        type="button"
-        usecase="default"
-        onClick={() => setIsOpen((prevState) => !prevState)}
-      />
+      <div>
+        <div className="mb-8">
+          <div className="flex justify-between align-bottom">
+            <h2 className="mb-0">My products</h2>
+            {userData?.my_products && (
+              <div className="flex items-end">
+                <Link to="/" className="text-sm">
+                  Show all
+                </Link>
+              </div>
+            )}
+          </div>
+          {userData &&
+          userData.my_products &&
+          userData.my_products.length > 0 ? (
+            <MyProducts
+              myProducts={userData.my_products}
+              onClick={showAllHandler}
+              shownAllProducts={shownAllProducts}
+            />
+          ) : (
+            'No products added.'
+          )}
+        </div>
+        <div>
+          <PrimaryBtn
+            text="Add Product"
+            type="button"
+            usecase="default"
+            onClick={() => setIsOpen((prevState) => !prevState)}
+          />
+        </div>
+      </div>
       <CustomDialog
         isOpen={isOpen}
         changeIsOpen={changeIsOpen}
@@ -391,7 +460,7 @@ function MyShop() {
                       </div>
                       {checked && (
                         <div className="shrink-0 text-white">
-                          <CheckIcon className="h-6 w-6" />
+                          <CheckIcon height={6} width={6} />
                         </div>
                       )}
                     </div>
@@ -433,7 +502,7 @@ function MyShop() {
                       </div>
                       {checked && (
                         <div className="shrink-0 text-white">
-                          <CheckIcon className="h-6 w-6" />
+                          <CheckIcon height={6} width={6} />
                         </div>
                       )}
                     </div>
@@ -443,7 +512,7 @@ function MyShop() {
             </RadioGroup>
           </fieldset>
 
-          <div className="flex flex-col space-x-1 sm:flex-row">
+          <div className="flex flex-col sm:flex-row sm:space-x-1">
             <fieldset className="mb-2 space-y-1">
               <label
                 htmlFor="height"

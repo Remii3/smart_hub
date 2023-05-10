@@ -8,9 +8,9 @@ function MyAccount() {
       <div className="relative min-h-screen">
         <div>
           <section>
-            <div className="mt-2">
-              <EditUserData />
+            <div className="mx-auto flex flex-col justify-center gap-8 px-4 lg:flex-row">
               <MyShop />
+              <EditUserData />
             </div>
           </section>
         </div>

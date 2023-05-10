@@ -1,5 +1,7 @@
+const { default: mongoose } = require('mongoose');
 const Category = require('../Models/category');
 const Product = require('../Models/product');
+const User = require('../Models/user');
 
 const getAllBooks = async (req, res) => {
   const books = await Product.find({});
@@ -23,6 +25,7 @@ const getCategories = async (req, res) => {
 
 const addProduct = async (req, res) => {
   let {
+    userEmail,
     title,
     author,
     category,
@@ -35,9 +38,10 @@ const addProduct = async (req, res) => {
     width,
     depth,
   } = req.body;
-
+  const newProductsId = new mongoose.Types.ObjectId();
   try {
     const newProduct = await Product.create({
+      _id: newProductsId,
       title,
       author,
       category: category,
@@ -49,8 +53,13 @@ const addProduct = async (req, res) => {
       shipingDetails: { height, width, depth },
     });
     await newProduct.save();
+    await User.updateOne(
+      { email: userEmail },
+      { $push: { my_products: [newProductsId] } },
+    );
     res.status(200).json({ message: 'Successfully added new product' });
   } catch (err) {
+    console.log(err);
     res.status(422).json(err);
   }
 };
