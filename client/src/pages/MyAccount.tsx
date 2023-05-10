@@ -8,7 +8,7 @@ function MyAccount() {
       <div className="relative min-h-screen">
         <div>
           <section>
-            <div className="mx-auto flex max-w-7xl flex-col justify-between px-4 lg:flex-row">
+            <div className="mx-auto flex flex-col justify-center gap-8 px-4 lg:flex-row">
               <MyShop />
               <EditUserData />
             </div>

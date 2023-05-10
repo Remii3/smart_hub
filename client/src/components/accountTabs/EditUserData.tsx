@@ -109,7 +109,7 @@ function EditUserData() {
               }
               onChange={(e) => newUserDataChangeHandler(e)}
             />
-            <div className="flex justify-between">
+            <div className="flex justify-between gap-4">
               <button
                 className="text-base text-primaryText"
                 onClick={() => newDataSwitchHandler('email')}
@@ -119,8 +119,8 @@ function EditUserData() {
               </button>
               <button
                 className={`${
-                  newDataFieldShow.email ? 'block' : 'hidden'
-                } text-base text-green-600`}
+                  newDataFieldShow.email ? 'opacity-100' : 'opacity-0'
+                } text-base text-green-600 transition-[opacity] ease-out`}
                 type="button"
                 onClick={() => uploadNewUserDataHandler('email')}
               >
@@ -145,9 +145,9 @@ function EditUserData() {
               }
               onChange={(e) => newUserDataChangeHandler(e)}
             />
-            <div className="flex justify-between">
+            <div className="flex justify-between gap-4">
               <button
-                className="text-base text-primaryText"
+                className="whitespace-nowrap text-base text-primaryText"
                 onClick={() => newDataSwitchHandler('username')}
                 type="button"
               >
@@ -155,8 +155,8 @@ function EditUserData() {
               </button>
               <button
                 className={`${
-                  newDataFieldShow.username ? 'block' : 'hidden'
-                } text-base text-green-600`}
+                  newDataFieldShow.username ? 'opacity-100' : 'opacity-0'
+                } text-base text-green-600 transition-[opacity] ease-out`}
                 type="button"
                 onClick={() => uploadNewUserDataHandler('username')}
               >
@@ -171,7 +171,7 @@ function EditUserData() {
               newDataFieldShow.password
                 ? 'max-h-20 opacity-100'
                 : 'max-h-0 opacity-0'
-            } overflow-hidden py-1 transition-[max-height,opacity] duration-300 ease-in-out`}
+            } overflow-hidden p-1 transition-[max-height,opacity] duration-300 ease-in-out`}
           >
             <CustomInput
               name="password"
@@ -195,8 +195,8 @@ function EditUserData() {
             </button>
             <button
               className={`${
-                newDataFieldShow.password ? 'block' : 'hidden'
-              } text-base text-green-600`}
+                newDataFieldShow.password ? 'opacity-100' : 'opacity-0'
+              } text-base  text-green-600 transition-[opacity] ease-out`}
               type="button"
               onClick={() => uploadNewUserDataHandler('password')}
             >

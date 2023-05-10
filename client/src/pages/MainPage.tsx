@@ -65,7 +65,7 @@ function MainPage() {
             <div className="flex w-full flex-col text-primaryText sm:items-start">
               <div className="mb-14 ml-[15%] max-w-xs sm:max-w-none">
                 <h3 className="uppercase">Award winning literature</h3>
-                <h1 className="text-3xl uppercase text-white lg:text-4xl">
+                <h1 className="uppercase text-white">
                   <span className="inline-block w-full max-w-[80%]">
                     Buy best selling
                   </span>

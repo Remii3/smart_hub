@@ -8,21 +8,7 @@ import { ProductCategories, ProductTypes } from '../../types/interfaces';
 import DefaultCard from '../card/DefaultCard';
 import SecondaryBtn from '../UI/Btns/SecondaryBtn';
 import { UserContext } from '../../context/UserProvider';
-
-const initialProductData = {
-  title: { value: '', hasError: false },
-  author: { value: '', hasError: false },
-  category: { value: '', hasError: false },
-  otherCategory: { value: '', hasError: false },
-  description: { value: '', hasError: false },
-  imgs: { value: [], hasError: false },
-  quantity: { value: 1, hasError: false },
-  price: { value: 1, hasError: false },
-  marketPlace: { value: '', hasError: false },
-  height: { value: 1, hasError: false },
-  width: { value: 1, hasError: false },
-  depth: { value: 1, hasError: false },
-};
+import CheckIcon from '../../assets/icons/CheckIcon';
 
 type ProductDataTypes = {
   title: { value: string; hasError: boolean };
@@ -39,21 +25,20 @@ type ProductDataTypes = {
   depth: { value: number; hasError: boolean };
 };
 
-function CheckIcon(props: any) {
-  return (
-    // eslint-disable-next-line react/jsx-props-no-spreading
-    <svg viewBox="0 0 24 24" fill="none" {...props}>
-      <circle cx={12} cy={12} r={12} fill="#fff" opacity="0.2" />
-      <path
-        d="M7 13l3 3 7-7"
-        stroke="#fff"
-        strokeWidth={1.5}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
+const initialProductData = {
+  title: { value: '', hasError: false },
+  author: { value: '', hasError: false },
+  category: { value: '', hasError: false },
+  otherCategory: { value: '', hasError: false },
+  description: { value: '', hasError: false },
+  imgs: { value: [], hasError: false },
+  quantity: { value: 1, hasError: false },
+  price: { value: 1, hasError: false },
+  marketPlace: { value: '', hasError: false },
+  height: { value: 1, hasError: false },
+  width: { value: 1, hasError: false },
+  depth: { value: 1, hasError: false },
+};
 
 function MyProducts({
   shownAllProducts,
@@ -112,6 +97,7 @@ function MyShop() {
   const [shownAllProducts, setShownAllProducts] = useState(false);
 
   const { userData } = useContext(UserContext);
+
   const resetProductData = () => {
     setTimeout(() => {
       setProductData(initialProductData);
@@ -474,7 +460,7 @@ function MyShop() {
                       </div>
                       {checked && (
                         <div className="shrink-0 text-white">
-                          <CheckIcon className="h-6 w-6" />
+                          <CheckIcon height={6} width={6} />
                         </div>
                       )}
                     </div>
@@ -516,7 +502,7 @@ function MyShop() {
                       </div>
                       {checked && (
                         <div className="shrink-0 text-white">
-                          <CheckIcon className="h-6 w-6" />
+                          <CheckIcon height={6} width={6} />
                         </div>
                       )}
                     </div>
