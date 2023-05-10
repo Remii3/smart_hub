@@ -1,9 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { RadioGroup } from '@headlessui/react';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
 import PrimaryBtn from '../UI/Btns/PrimaryBtn';
 import CustomDialog from '../dialog/CustomDialog';
-import { ProductCategories } from '../../types/interfaces';
+import { ProductCategories, ProductTypes } from '../../types/interfaces';
+import DefaultCard from '../card/DefaultCard';
+import SecondaryBtn from '../UI/Btns/SecondaryBtn';
+import { UserContext } from '../../context/UserProvider';
 
 const initialProductData = {
   title: { value: '', hasError: false },
@@ -51,6 +55,52 @@ function CheckIcon(props: any) {
   );
 }
 
+function MyProducts({
+  shownAllProducts,
+  myProducts,
+  onClick,
+}: {
+  shownAllProducts: boolean;
+  myProducts: ProductTypes[];
+  onClick: () => void;
+}) {
+  return (
+    <div>
+      <div
+        className={`${
+          shownAllProducts ? 'max-h-[556px]' : 'max-h-[278px]'
+        } grid grid-cols-1 gap-4 overflow-hidden p-4 transition-[max-height] duration-300 ease-in-out sm:grid-cols-2 xl:grid-cols-3`}
+      >
+        {myProducts.map((product, id) => (
+          <DefaultCard
+            key={id}
+            _id={product._id}
+            title={product.title}
+            marketPlace={product.marketPlace}
+            price={product.price}
+          />
+        ))}
+      </div>
+
+      {myProducts.length > 3 && (
+        <div className="flex w-full justify-center">
+          <SecondaryBtn
+            text={shownAllProducts ? 'Hide more' : 'Show more'}
+            type="button"
+            usecase="switch"
+            onClick={onClick}
+            customCSS={`${
+              shownAllProducts
+                ? 'bg-gray-400 text-white'
+                : 'text-gray-600 bg-white'
+            } px-3 py-2`}
+          />
+        </div>
+      )}
+    </div>
+  );
+}
+
 function MyShop() {
   const [isOpen, setIsOpen] = useState(false);
   const [productData, setProductData] =
@@ -59,7 +109,9 @@ function MyShop() {
   const [hasFailed, setHasFailed] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [categories, setCategories] = useState<ProductCategories[]>();
+  const [shownAllProducts, setShownAllProducts] = useState(false);
 
+  const { userData } = useContext(UserContext);
   const resetProductData = () => {
     setTimeout(() => {
       setProductData(initialProductData);
@@ -123,6 +175,7 @@ function MyShop() {
     }
 
     const newProductData = {
+      userEmail: userData?.email,
       title: productData.title.value,
       author: productData.author.value,
       category: currentCategory,
@@ -162,14 +215,44 @@ function MyShop() {
     }
   }, [productData.category.value]);
 
+  const showAllHandler = () => {
+    setShownAllProducts((prevState) => !prevState);
+  };
   return (
     <div>
-      <PrimaryBtn
-        text="Add Product"
-        type="button"
-        usecase="default"
-        onClick={() => setIsOpen((prevState) => !prevState)}
-      />
+      <div>
+        <div className="mb-8">
+          <div className="flex justify-between align-bottom">
+            <h2 className="mb-0">My products</h2>
+            {userData?.my_products && (
+              <div className="flex items-end">
+                <Link to="/" className="text-sm">
+                  Show all
+                </Link>
+              </div>
+            )}
+          </div>
+          {userData &&
+          userData.my_products &&
+          userData.my_products.length > 0 ? (
+            <MyProducts
+              myProducts={userData.my_products}
+              onClick={showAllHandler}
+              shownAllProducts={shownAllProducts}
+            />
+          ) : (
+            'No products added.'
+          )}
+        </div>
+        <div>
+          <PrimaryBtn
+            text="Add Product"
+            type="button"
+            usecase="default"
+            onClick={() => setIsOpen((prevState) => !prevState)}
+          />
+        </div>
+      </div>
       <CustomDialog
         isOpen={isOpen}
         changeIsOpen={changeIsOpen}

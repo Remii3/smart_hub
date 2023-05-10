@@ -6,7 +6,7 @@ import { ProductTypes } from '../../types/interfaces';
 import SuspenseComponent from '../suspense/SuspenseComponent';
 import LoadingComponent from '../UI/Loaders/LoadingComponent';
 
-const AuctionCard = lazy(() => import('../card/AuctionCard'));
+const DefaultCard = lazy(() => import('../card/DefaultCard'));
 
 interface AuctionsTypes extends ProductTypes {
   deadline?: Date;
@@ -72,7 +72,7 @@ function AuctionsSwiper() {
       {auctions.map((auctionItem) => (
         <SwiperSlide key={auctionItem._id}>
           <SuspenseComponent fallback={<LoadingComponent />}>
-            <AuctionCard
+            <DefaultCard
               _id={auctionItem._id}
               title={auctionItem.title}
               author={auctionItem.author ?? 'No author'}

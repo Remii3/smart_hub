@@ -1,7 +1,7 @@
 import { ChangeEvent, useContext, useState } from 'react';
 import axios from 'axios';
 import { UserContext } from '../../context/UserProvider';
-import InputField from '../UI/form/InputField';
+import CustomInput from '../UI/form/CustomInput';
 
 type NewDataNameTypes = 'email' | 'username' | 'password';
 
@@ -90,114 +90,121 @@ function EditUserData() {
     }
   };
   return (
-    <div className="grid grid-cols-1 gap-5">
-      <fieldset>
-        <InputField
-          name="email"
-          type="email"
-          optional={false}
-          labelValue="Email"
-          placeholder="JohnDoe@gmail.com..."
-          disabled={!newDataFieldShow.email}
-          hasError={newUserData.errors.email}
-          errorValue={newUserData.errors.email}
-          inputValue={
-            newDataFieldShow.email ? newUserData.data.email : userData.email
-          }
-          onChange={(e) => newUserDataChangeHandler(e)}
-        />
-        <div className="flex justify-between">
-          <button
-            className="text-base text-primaryText"
-            onClick={() => newDataSwitchHandler('email')}
-            type="button"
-          >
-            Change email
-          </button>
-          <button
+    <div>
+      <h4>My data</h4>
+      <div>
+        <div className="flex flex-col gap-4 md:flex-row">
+          <fieldset>
+            <CustomInput
+              name="email"
+              type="email"
+              optional={false}
+              labelValue="Email"
+              placeholder="JohnDoe@gmail.com..."
+              disabled={!newDataFieldShow.email}
+              hasError={newUserData.errors.email}
+              errorValue={newUserData.errors.email}
+              inputValue={
+                newDataFieldShow.email ? newUserData.data.email : userData.email
+              }
+              onChange={(e) => newUserDataChangeHandler(e)}
+            />
+            <div className="flex justify-between">
+              <button
+                className="text-base text-primaryText"
+                onClick={() => newDataSwitchHandler('email')}
+                type="button"
+              >
+                Change email
+              </button>
+              <button
+                className={`${
+                  newDataFieldShow.email ? 'block' : 'hidden'
+                } text-base text-green-600`}
+                type="button"
+                onClick={() => uploadNewUserDataHandler('email')}
+              >
+                Accept
+              </button>
+            </div>
+          </fieldset>
+          <fieldset>
+            <CustomInput
+              name="username"
+              type="text"
+              optional={false}
+              labelValue="Username"
+              placeholder="JohnDoe..."
+              disabled={!newDataFieldShow.username}
+              hasError={newUserData.errors.username}
+              errorValue={newUserData.errors.username}
+              inputValue={
+                newDataFieldShow.username
+                  ? newUserData.data.username
+                  : userData.username
+              }
+              onChange={(e) => newUserDataChangeHandler(e)}
+            />
+            <div className="flex justify-between">
+              <button
+                className="text-base text-primaryText"
+                onClick={() => newDataSwitchHandler('username')}
+                type="button"
+              >
+                Change username
+              </button>
+              <button
+                className={`${
+                  newDataFieldShow.username ? 'block' : 'hidden'
+                } text-base text-green-600`}
+                type="button"
+                onClick={() => uploadNewUserDataHandler('username')}
+              >
+                Accept
+              </button>
+            </div>
+          </fieldset>
+        </div>
+        <fieldset>
+          <div
             className={`${
-              newDataFieldShow.email ? 'block' : 'hidden'
-            } text-base text-green-600`}
-            type="button"
-            onClick={() => uploadNewUserDataHandler('email')}
+              newDataFieldShow.password
+                ? 'max-h-20 opacity-100'
+                : 'max-h-0 opacity-0'
+            } overflow-hidden py-1 transition-[max-height,opacity] duration-300 ease-in-out`}
           >
-            Accept
-          </button>
-        </div>
-      </fieldset>
-      <fieldset>
-        <InputField
-          name="username"
-          type="text"
-          optional={false}
-          labelValue="Username"
-          placeholder="JohnDoe..."
-          disabled={!newDataFieldShow.username}
-          hasError={newUserData.errors.username}
-          errorValue={newUserData.errors.username}
-          inputValue={
-            newDataFieldShow.username
-              ? newUserData.data.username
-              : userData.username
-          }
-          onChange={(e) => newUserDataChangeHandler(e)}
-        />
-        <div className="flex justify-between">
-          <button
-            className="text-base text-primaryText"
-            onClick={() => newDataSwitchHandler('username')}
-            type="button"
-          >
-            Change username
-          </button>
-          <button
-            className={`${
-              newDataFieldShow.username ? 'block' : 'hidden'
-            } text-base text-green-600`}
-            type="button"
-            onClick={() => uploadNewUserDataHandler('username')}
-          >
-            Accept
-          </button>
-        </div>
-      </fieldset>
-      <fieldset>
-        <div
-          className={`${
-            newDataFieldShow.password ? 'max-h-max' : 'max-h-0'
-          } overflow-hidden py-1`}
-        >
-          <InputField
-            name="password"
-            type="text"
-            optional={false}
-            labelValue="New Password"
-            placeholder="Password..."
-            hasError={newUserData.errors.password}
-            errorValue={newUserData.errors.password}
-            inputValue={newUserData.data.password}
-            onChange={(e) => newUserDataChangeHandler(e)}
-          />
-        </div>
-        <div className="flex justify-between">
-          <button
-            className="text-base text-primaryText"
-            onClick={() => newDataSwitchHandler('password')}
-            type="button"
-          >
-            Change password
-          </button>
-          <button
-            className={`${
-              newDataFieldShow.password ? 'block' : 'hidden'
-            } text-base text-green-600`}
-            type="button"
-            onClick={() => uploadNewUserDataHandler('password')}
-          >
-            Accept
-          </button>
-        </div>
-      </fieldset>
+            <CustomInput
+              name="password"
+              type="text"
+              optional={false}
+              labelValue="New Password"
+              placeholder="Password..."
+              hasError={newUserData.errors.password}
+              errorValue={newUserData.errors.password}
+              inputValue={newUserData.data.password}
+              onChange={(e) => newUserDataChangeHandler(e)}
+            />
+          </div>
+          <div className="flex justify-between">
+            <button
+              className="text-base text-primaryText"
+              onClick={() => newDataSwitchHandler('password')}
+              type="button"
+            >
+              Change password
+            </button>
+            <button
+              className={`${
+                newDataFieldShow.password ? 'block' : 'hidden'
+              } text-base text-green-600`}
+              type="button"
+              onClick={() => uploadNewUserDataHandler('password')}
+            >
+              Accept
+            </button>
+          </div>
+        </fieldset>
+      </div>
     </div>
   );
 }

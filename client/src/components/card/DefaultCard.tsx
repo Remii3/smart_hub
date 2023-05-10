@@ -2,10 +2,12 @@ import { Link } from 'react-router-dom';
 import { ProductTypes } from '../../types/interfaces';
 
 interface PropsTypes extends ProductTypes {
-  deadline: Date | null;
+  deadline?: Date | null;
 }
-
-function AuctionCard({
+const defaultProps = {
+  deadline: null,
+};
+function DefaultCard({
   _id,
   title,
   author,
@@ -27,7 +29,7 @@ function AuctionCard({
   return (
     <div
       id={`${_id}`}
-      className="relative m-auto h-full w-auto max-w-[280px] cursor-pointer rounded-lg shadow transition-[transform,box-shadow] duration-300 ease-out hover:scale-105 hover:shadow-lg active:scale-100"
+      className="f-ull relative m-auto min-h-[250px] w-full min-w-[250px] cursor-pointer rounded-lg shadow transition-[transform,box-shadow] duration-300 ease-out hover:scale-105 hover:shadow-lg active:scale-100"
     >
       <Link to={`auctions/${_id}`}>
         {imgs && (
@@ -57,5 +59,5 @@ function AuctionCard({
     </div>
   );
 }
-
-export default AuctionCard;
+DefaultCard.defaultProps = defaultProps;
+export default DefaultCard;
