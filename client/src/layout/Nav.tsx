@@ -53,7 +53,7 @@ function Nav() {
 
   return (
     <nav>
-      <div className="mx-auto flex h-[64px] max-w-[1480px] flex-row items-center justify-between px-10 py-3">
+      <div className="relative mx-auto flex h-[64px] max-w-[1480px] flex-row items-center justify-between px-10 py-3">
         <div>
           <Link to="/" className="text-white">
             SmartHub
