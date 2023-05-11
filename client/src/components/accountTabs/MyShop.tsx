@@ -212,7 +212,7 @@ function MyShop() {
             <h2 className="mb-0">My products</h2>
             {userData?.my_products && (
               <div className="flex items-end">
-                <Link to="/" className="text-sm">
+                <Link to="/account/my/my-products" className="text-sm">
                   Show all
                 </Link>
               </div>

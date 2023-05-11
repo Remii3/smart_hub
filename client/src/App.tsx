@@ -51,19 +51,21 @@ function App() {
           <Route path="/news" element={<NewsPage />} />
           <Route path="/shop" element={<ShopPage />} />
           <Route path="/shop/:category" element={<ShopPage />} />
-          <Route path="/shop/:category/:id" element={<ProductPage />} />
+          <Route path="/product/:id" element={<ProductPage />} />
           <Route path="/collections" element={<CollectionsPage />} />
           <Route path="/auctions" element={<AuctionsPage />} />
+          <Route path="/auctions/:category" element={<AuctionsPage />} />
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/blog" element={<BlogPage />} />
           <Route path="/account" element={<AuthPage />} />
-          {userData && <Route path="/account/my" element={<MyAccount />} />}
-          {userData && (
-            <Route
-              path="/account/my/my-products"
-              element={<MyProductsPage />}
-            />
-          )}
+          <Route
+            path="/account/my"
+            element={userData ? <MyAccount /> : <AuthPage />}
+          />
+          <Route
+            path="/account/my/my-products"
+            element={userData ? <MyProductsPage /> : <AuthPage />}
+          />
           <Route path="/*" element={<NoPage404 />} />
         </Routes>
       </MainLayout>

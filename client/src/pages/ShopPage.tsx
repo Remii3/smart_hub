@@ -34,7 +34,7 @@ function ShopPage() {
             {products.map((product, id) => (
               <Link
                 key={id}
-                to={`/shop/${product.category}/${product.isbn}`}
+                to={`/product/${product.isbn}`}
                 className="flex min-h-[200px] w-full items-center justify-center rounded p-1 shadow transition-[transform,box-shadow] duration-300 ease-out hover:scale-105 sm:w-auto"
               >
                 {product.title}
