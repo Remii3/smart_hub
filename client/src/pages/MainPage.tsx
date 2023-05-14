@@ -32,10 +32,10 @@ function MainPage() {
         scrub: 1,
       },
       duration: 0.5,
-      y: '-25%',
-      scale: '1.3',
+      scale: '1.25',
       ease: 'sine.out',
     });
+
     try {
       axios.get('/product/categories').then((res) => {
         setShopList(res.data);
@@ -54,45 +54,52 @@ function MainPage() {
 
   return (
     <div className="min-h-screen bg-pageBackground">
-      <section className="relative h-screen w-full">
+      <section className="h-screen w-full">
         <div
           ref={imgBg}
-          className="absolute left-0 top-0 h-full w-full scale-125 bg-mainBanner bg-cover bg-top bg-no-repeat brightness-50"
+          className="absolute left-0 top-0 h-[110vh] w-full scale-100 bg-mainBanner bg-cover bg-center bg-no-repeat brightness-50"
         />
-        <div className="absolute top-[15%] flex h-screen w-full justify-start sm:top-1/4">
-          <div className="flex w-full flex-col text-primaryText sm:items-start">
-            <div className="mb-14 ml-[15%] max-w-xs sm:max-w-none">
-              <h3 className="uppercase">Award winning literature</h3>
-              <h1 className="uppercase text-white">
-                <span className="inline-block w-full max-w-[80%]">
-                  Buy best selling
-                </span>
-                <span className="inline-block w-full max-w-[80%]">
-                  books in the
-                </span>
-                <span className="inline-block w-full max-w-[80%]">world</span>
+        <section className="relative top-20 lg:-top-16">
+          <div className="mx-auto max-w-screen-xl px-4 py-32 lg:flex lg:h-screen lg:items-center">
+            <div
+              id="mainPageTitle"
+              className="mx-auto max-w-xl text-center lg:max-w-3xl"
+            >
+              <h1 className="text-3xl font-extrabold text-white sm:text-5xl lg:text-6xl">
+                Understand User Flow.
+                <strong className="font-extrabold text-primary sm:block">
+                  Increase Conversion.
+                </strong>
               </h1>
-            </div>
-            <div className="ml-[15%]">
-              <PrimaryBtn
-                usecase="default"
-                type="button"
-                text="See now"
-                onClick={() => {
-                  navigate('/shop');
-                }}
-              />
+
+              <p className="mt-4 text-white sm:text-xl/relaxed">
+                Lorem ipsum dolor sit amet consectetur, adipisicing elit.
+                Nesciunt illo tenetur fuga ducimus numquam ea!
+              </p>
+
+              <div className="mt-8 flex flex-wrap justify-center gap-4">
+                <a
+                  className="block w-full rounded bg-primary px-12 py-3 text-sm font-medium text-white shadow hover:bg-blue-700 focus:outline-none focus:ring active:bg-red-500 sm:w-auto"
+                  href="/get-started"
+                >
+                  Get Started
+                </a>
+
+                <a
+                  className="block w-full rounded px-12 py-3 text-sm font-medium text-white shadow hover:text-primary focus:outline-none focus:ring active:text-red-500 sm:w-auto"
+                  href="/about"
+                >
+                  Learn More
+                </a>
+              </div>
             </div>
           </div>
-        </div>
+        </section>
       </section>
-      <div className="parallax__group relative -top-16 flex min-h-screen w-full flex-col items-center justify-center overflow-hidden overflow-y-hidden bg-white ">
+      <div className="flex min-h-screen w-full flex-col items-center justify-center bg-white ">
         {/* Shop */}
-        <section
-          id="mainPageSectionOne"
-          className="relative flex w-full flex-col items-center gap-12 pb-16"
-        >
-          <div className="relative -top-1 left-0 w-full bg-pageBackground">
+        <section className="relative flex w-full flex-col items-center gap-12 pb-16">
+          <div className="relative -top-4 left-0 w-full bg-pageBackground">
             <MainPageHeading
               color="white"
               usecase="main"
@@ -119,7 +126,7 @@ function MainPage() {
               type="button"
               text="See all genres"
               onClick={() => {
-                navigate('/shop');
+                navigate('/shop/categories');
               }}
             />
           </div>

@@ -5,6 +5,9 @@ import { UserContext } from './context/UserProvider';
 import LoadingComponent from './components/UI/Loaders/LoadingComponent';
 import SuspenseComponent from './components/suspense/SuspenseComponent';
 import MainLayout from './layout/MainLayout';
+import SearchPage from './pages/SearchPage';
+import CategoriesPage from './pages/CategoriesPage';
+import RegisterPage from './pages/RegisterPage';
 
 const MainPage = lazy(() => import('./pages/MainPage'));
 const AuthPage = lazy(() => import('./pages/AuthPage'));
@@ -50,14 +53,16 @@ function App() {
           <Route path="/" element={<MainPage />} />
           <Route path="/news" element={<NewsPage />} />
           <Route path="/shop" element={<ShopPage />} />
-          <Route path="/shop/:category" element={<ShopPage />} />
+          <Route path="/shop/:searchParam" element={<SearchPage />} />
+          <Route path="/shop/categories" element={<CategoriesPage />} />
           <Route path="/product/:id" element={<ProductPage />} />
           <Route path="/collections" element={<CollectionsPage />} />
           <Route path="/auctions" element={<AuctionsPage />} />
-          <Route path="/auctions/:category" element={<AuctionsPage />} />
+          <Route path="/auctions/categories" element={<CategoriesPage />} />
+          <Route path="/auctions/:searchParam" element={<SearchPage />} />
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/blog" element={<BlogPage />} />
-          <Route path="/account" element={<AuthPage />} />
+          <Route path="/account" element={<RegisterPage />} />
           <Route
             path="/account/my"
             element={userData ? <MyAccount /> : <AuthPage />}

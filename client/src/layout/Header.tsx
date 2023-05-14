@@ -7,20 +7,17 @@ type HeaderTypes = {
 
 function Header({ currentPathname }: HeaderTypes) {
   const headerElement = useRef(null);
-  const mainPageSectionOne = document.getElementById('mainPageSectionOne');
+  const mainPageTitle = document.getElementById('mainPageTitle');
   const [isTransparent, setIsTransparent] = useState(false);
   const isMainPage = currentPathname === '/';
 
   const changeHeaderBgHandler = useCallback(() => {
-    if (
-      mainPageSectionOne &&
-      window.pageYOffset > mainPageSectionOne?.offsetHeight
-    ) {
+    if (mainPageTitle && mainPageTitle?.getBoundingClientRect().top < 0) {
       setIsTransparent(false);
     } else {
       setIsTransparent(true);
     }
-  }, [mainPageSectionOne]);
+  }, [mainPageTitle]);
 
   useEffect(() => {
     if (isMainPage) {
@@ -33,12 +30,12 @@ function Header({ currentPathname }: HeaderTypes) {
   }, [changeHeaderBgHandler, isMainPage]);
 
   return (
-    <header className="fixed top-0 z-20 w-screen pr-[17px]">
+    <header className="fixed top-0 z-20 w-screen">
       <div
         ref={headerElement}
         className={`${
           isMainPage && isTransparent ? 'opacity-0' : 'opacity-100'
-        } absolute left-0 top-0 h-full w-full bg-pageBackground`}
+        } absolute left-0 top-0 h-full w-full bg-pageBackground transition-[opacity] duration-300 ease-in-out`}
       />
       <Nav />
     </header>
