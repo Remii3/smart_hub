@@ -13,6 +13,7 @@ type CustomInputTypes = {
   errorValue?: string | null;
   inputValue: string;
   onChange: (e: ChangeEvent<HTMLInputElement>) => void;
+  onBlur?: (e: ChangeEvent<HTMLInputElement>) => void;
 };
 
 const defaultProps = {
@@ -21,6 +22,7 @@ const defaultProps = {
   errorValue: null,
   min: null,
   max: null,
+  onBlur: undefined,
 };
 
 function CustomInput({
@@ -36,6 +38,7 @@ function CustomInput({
   errorValue,
   inputValue,
   onChange,
+  onBlur,
 }: CustomInputTypes) {
   const onChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
@@ -51,7 +54,7 @@ function CustomInput({
         >
           {labelValue}
         </label>
-        {optional && <span>Optional</span>}
+        {optional && <span className="text-sm text-gray-400">Optional</span>}
       </div>
       <div>
         <input
@@ -62,21 +65,16 @@ function CustomInput({
           disabled={disabled}
           min={min}
           max={max}
+          onBlur={onBlur ? (e) => onBlur(e) : undefined}
           className={`${
             hasError &&
             'bg-red-1 00 border-red-600 text-red-600 focus:border-red-600 focus:ring-red-600'
-          } w-full rounded-md border-gray-200 shadow-sm sm:text-sm`}
+          }  mt-1 w-full rounded-md border-gray-200 shadow-sm disabled:border-slate-200 disabled:bg-slate-50 disabled:text-slate-500 disabled:shadow-none sm:text-sm`}
           value={inputValue}
           onChange={(e) => onChangeHandler(e)}
         />
         {errorValue && (
-          <span
-            className={`${
-              hasError && 'max-h-4 opacity-100'
-            } max-h-0 text-xs text-red-600 opacity-0 transition-[max-height] duration-200 ease-out`}
-          >
-            {errorValue}
-          </span>
+          <span className="text-xs text-red-600">{errorValue}</span>
         )}
       </div>
     </>

@@ -5,12 +5,12 @@ import { UserContext } from './context/UserProvider';
 import LoadingComponent from './components/UI/Loaders/LoadingComponent';
 import SuspenseComponent from './components/suspense/SuspenseComponent';
 import MainLayout from './layout/MainLayout';
-import SearchPage from './pages/SearchPage';
-import CategoriesPage from './pages/CategoriesPage';
-import RegisterPage from './pages/RegisterPage';
 
+const SearchPage = lazy(() => import('./pages/SearchPage'));
+const CategoriesPage = lazy(() => import('./pages/CategoriesPage'));
+const RegisterPage = lazy(() => import('./pages/RegisterPage'));
+const LoginPage = lazy(() => import('./pages/LoginPage'));
 const MainPage = lazy(() => import('./pages/MainPage'));
-const AuthPage = lazy(() => import('./pages/AuthPage'));
 const NoPage404 = lazy(() => import('./pages/NoPage404'));
 const MyAccount = lazy(() => import('./pages/MyAccount'));
 const ProductPage = lazy(() => import('./pages/ProductPage'));
@@ -62,14 +62,15 @@ function App() {
           <Route path="/auctions/:searchParam" element={<SearchPage />} />
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/blog" element={<BlogPage />} />
-          <Route path="/account" element={<RegisterPage />} />
+          <Route path="/account/register" element={<RegisterPage />} />
+          <Route path="/account/login" element={<LoginPage />} />
           <Route
             path="/account/my"
-            element={userData ? <MyAccount /> : <AuthPage />}
+            element={userData ? <MyAccount /> : <RegisterPage />}
           />
           <Route
             path="/account/my/my-products"
-            element={userData ? <MyProductsPage /> : <AuthPage />}
+            element={userData ? <MyProductsPage /> : <RegisterPage />}
           />
           <Route path="/*" element={<NoPage404 />} />
         </Routes>

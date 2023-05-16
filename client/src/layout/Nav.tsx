@@ -62,7 +62,6 @@ function Nav() {
         <div className="hidden md:flex">
           <ul className="flex flex-row items-center px-8 text-white">
             {navLinkList.map((navLink, id) => (
-              // eslint-disable-next-line react/no-array-index-key
               <li key={id}>
                 <Link
                   to={navLink.to}
@@ -96,7 +95,7 @@ function Nav() {
                       <Menu.Item>
                         {({ active }) => (
                           <Link
-                            to={{ pathname: '/account', search: 'auth=login' }}
+                            to={{ pathname: '/account/login' }}
                             className={`${
                               active
                                 ? 'bg-primary text-white'
@@ -111,8 +110,7 @@ function Nav() {
                         {({ active }) => (
                           <Link
                             to={{
-                              pathname: '/account',
-                              search: 'auth=register',
+                              pathname: '/account/register',
                             }}
                             className={`${
                               active

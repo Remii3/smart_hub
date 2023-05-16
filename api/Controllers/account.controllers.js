@@ -2,39 +2,44 @@ const User = require('../Models/user');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const Product = require('../Models/product');
+const { default: mongoose } = require('mongoose');
+
+const salt = bcrypt.genSaltSync(12);
 
 const signIn = async (req, res) => {
   const { email, password } = req.body;
 
   // prettier-ignore
-  const emailRegex = new RegExp('[a-z0-9]+@[a-z]+\.[a-z]{2,3}');
+  const emailRegex = /^\S+@\S+\.\S+$/
+
+  let errors = [];
 
   if (email.trim() === '') {
-    return res.status(422).json({
+    errors.push({
       name: 'email',
       message: 'Email is required',
     });
-  }
-
-  if (!email.match(emailRegex)) {
-    return res.status(422).json({
+  } else if (!email.match(emailRegex)) {
+    errors.push({
       name: 'email',
       message: 'Incorrect email address',
     });
   }
 
   if (password.trim() === '') {
-    return res.status(422).json({
+    errors.push({
       name: 'password',
       message: 'Password is required',
     });
+  } else if (password.trim().length < 3) {
+    errors.push({
+      name: 'password',
+      message: 'Min length is 3 characters',
+    });
   }
 
-  if (password.trim().length < 3) {
-    return res.status(422).json({
-      name: 'password',
-      message: 'Password min length is 3 characters',
-    });
+  if (errors.length > 0) {
+    return res.status(422).json(errors);
   }
 
   const userDoc = await User.findOne({ email });
@@ -69,147 +74,114 @@ const signIn = async (req, res) => {
 };
 
 const signUp = async (req, res) => {
-  const salt = bcrypt.genSaltSync(12);
-
-  const { email, username, password } = req.body;
+  const { credentials, email, password, passwordConfirmation } = req.body;
   // prettier-ignore
-  const emailRegex = new RegExp('[a-z0-9]+@[a-z]+\.[a-z]{2,3}');
+  const emailAtRegex =  /^\S+@/
+  // prettier-ignore
+  const emailAfterAtRegex =  /^\S+@\S+\./
+  // prettier-ignore
+  const emailFullRegex = /^\S+@\S+\.\S+$/
+
+  const errors = [];
+
+  if (credentials.firstName.trim() === '') {
+    errors.push({
+      name: 'firstName',
+      message: 'First name is required',
+    });
+  } else if (credentials.firstName.length < 3) {
+    errors.push({
+      name: 'firstName',
+      message: 'Minimal length is 3',
+    });
+  }
+
+  if (credentials.lastName.trim() === '') {
+    errors.push({
+      name: 'lastName',
+      message: 'Last name is required',
+    });
+  } else if (credentials.lastName.length < 3) {
+    errors.push({
+      name: 'lastName',
+      message: 'Minimal length is 3',
+    });
+  }
 
   if (email.trim() === '') {
-    return res.status(422).json({
+    errors.push({
       name: 'email',
       message: 'Email is required',
     });
-  }
-
-  if (!email.match(emailRegex)) {
-    return res.status(422).json({
+  } else if (!email.match(emailAtRegex)) {
+    errors.push({
       name: 'email',
-      message: 'Incorrect email address',
+      message: 'Eamil requires @',
     });
-  }
-
-  if (username.trim() === '') {
-    return res.status(422).json({
-      name: 'username',
-      message: 'Username is required',
+  } else if (!email.match(emailAfterAtRegex)) {
+    errors.push({
+      name: 'email',
+      message: 'Eamil requires values after @ and .',
+    });
+  } else if (!email.match(emailFullRegex)) {
+    errors.push({
+      name: 'email',
+      message: 'Eamil requires values after .',
     });
   }
 
   if (password.trim() === '') {
-    return res.status(422).json({
+    errors.push({
       name: 'password',
       message: 'Password is required',
     });
-  }
-
-  if (password.trim().length < 3) {
-    return res.status(422).json({
+  } else if (password.trim().length < 3) {
+    errors.push({
       name: 'password',
       message: 'Password min length is 3 characters',
     });
-  }
-
-  if (password.trim().length > 16) {
-    return res.status(422).json({
+  } else if (password.trim().length > 16) {
+    errors.push({
       name: 'password',
       message: 'Password max length is 16 characters',
     });
+  } else if (password !== passwordConfirmation) {
+    errors.push({
+      name: 'password',
+      message: 'Passwords are not the same',
+    });
+    errors.push({
+      name: 'passwordConfirmation',
+      message: 'Passwords are not the same',
+    });
   }
 
+  if (errors.length > 0) {
+    return res.status(422).json(errors);
+  }
   try {
     const newUser = await User.create({
+      credentials,
       email,
-      username,
       password: bcrypt.hashSync(password, salt),
     });
     await newUser.save();
+    const userDoc = await User.findOne({ email });
 
-    res.status(200).json({ message: 'Succesfully created an account' });
-  } catch (e) {
-    if (e.code === 11000) {
-      const responseObject = e.keyValue;
-      return res.status(422).json({
-        name: Object.keys(responseObject)[0],
-        message: Object.values(responseObject)[0] + ` already exists`,
-      });
-    }
-    console.log(e);
-    res.status(422).json(e);
-  }
-};
-
-const profile = async (req, res) => {
-  const { email, username, cart, my_products } = await User.findOne({
-    _id: req.user.userId,
-  });
-
-  let userProductsData;
-
-  await Product.find({ _id: my_products }).then(res => {
-    userProductsData = res;
-  });
-
-  res.json({ email, username, cart, my_products: userProductsData });
-};
-
-const newData = async (req, res) => {
-  const salt = bcrypt.genSaltSync(12);
-  let { currentEmail, data, dataName } = req.body;
-
-  if (dataName === 'email') {
-    const emailRegex = new RegExp('[a-z0-9]+@[a-z]+.[a-z]{2,3}');
-
-    if (data[dataName].trim() === '') {
-      return res.status(422).json({
-        name: 'email',
-        message: 'Email is required',
-      });
-    }
-
-    if (!data[dataName].match(emailRegex)) {
-      return res.status(422).json({
-        name: 'email',
-        message: 'Incorrect email address',
-      });
-    }
-  } else if (dataName === 'username') {
-    if (data[dataName].trim() === '') {
-      return res.status(422).json({
-        name: 'username',
-        message: 'Username is required',
-      });
-    }
-  } else {
-    if (data[dataName].trim() === '') {
-      return res.status(422).json({
-        name: 'password',
-        message: 'Password is required',
-      });
-    }
-
-    if (data[dataName].trim().length < 3) {
-      return res.status(422).json({
-        name: 'password',
-        message: 'Password min length is 3 characters',
-      });
-    }
-
-    if (data[dataName].trim().length > 16) {
-      return res.status(422).json({
-        name: 'password',
-        message: 'Password max length is 16 characters',
-      });
-    }
-  }
-
-  if (data[dataName] === 'password') {
-    password = bcrypt.hashSync(password, salt);
-  }
-  try {
-    await User.updateOne(
-      { email: currentEmail },
-      { $set: { [dataName]: data[dataName] } },
+    jwt.sign(
+      {
+        email: email,
+        userId: userDoc._id,
+      },
+      process.env.JWT_SECRET,
+      {},
+      (err, token) => {
+        if (err) throw 'firts';
+        res
+          .status(200)
+          .cookie('token', token)
+          .json({ message: 'Succesfully created an account' });
+      },
     );
   } catch (e) {
     if (e.code === 11000) {
@@ -221,7 +193,110 @@ const newData = async (req, res) => {
     }
     res.status(422).json(e);
   }
-  res.status(200).json({ message: 'Successfully created account' });
+};
+
+const profile = async (req, res) => {
+  let userProductsData;
+
+  const { email, credentials, cart, my_products } = await User.findOne({
+    _id: req.user.userId,
+  });
+
+  const myProducts = await Product.find({ _id: my_products });
+  userProductsData = myProducts;
+
+  res.json({ email, credentials, cart, my_products: userProductsData });
+};
+
+const newData = async (req, res) => {
+  let { userEmail, name, newValue } = req.body;
+  let isCredentials = false;
+
+  if (name === 'email') {
+    // prettier-ignore
+    const emailRegex = /^\S+@\S+\.\S+$/
+
+    if (newValue.trim() === '') {
+      return res.status(422).json({
+        name: 'email',
+        message: 'Minumum 1 character is required',
+      });
+    } else if (!name.match(emailRegex)) {
+      return res.status(422).json({
+        name: 'email',
+        message: 'Incorrect email address',
+      });
+    }
+  }
+
+  if (name === 'firstName') {
+    if (newValue.trim() === '') {
+      return res.status(422).json({
+        name: 'firstName',
+        message: 'Minumum 1 character is required',
+      });
+    }
+    isCredentials = true;
+  }
+
+  if (name === 'lastName') {
+    if (newValue.trim() === '') {
+      return res.status(422).json({
+        name: 'lastName',
+        message: 'Minumum 1 character is required',
+      });
+    }
+    isCredentials = true;
+  }
+
+  if (name === 'password') {
+    if (newValue.trim() === '') {
+      return res.status(422).json({
+        name: 'password',
+        message: 'Minumum 1 character is required',
+      });
+    }
+
+    if (newValue.trim().length < 3) {
+      return res.status(422).json({
+        name: 'password',
+        message: 'Min length is 3 characters',
+      });
+    }
+
+    if (newValue.trim().length > 16) {
+      return res.status(422).json({
+        name: 'password',
+        message: 'Max length is 16 characters',
+      });
+    }
+    newValue = bcrypt.hashSync(newValue, salt);
+  }
+
+  try {
+    if (isCredentials) {
+      const credentialsPath = 'credentials.' + name;
+      await User.updateOne(
+        { email: userEmail },
+        { $set: { [credentialsPath]: newValue } },
+      );
+    } else {
+      await User.updateOne(
+        { email: userEmail },
+        { $set: { [name]: newValue } },
+      );
+    }
+    res.status(200).json({ message: 'Successfully updated data' });
+  } catch (e) {
+    if (e.code === 11000) {
+      const responseObject = e.keyValue;
+      return res.status(422).json({
+        name: Object.keys(responseObject)[0],
+        message: Object.values(responseObject)[0] + ` already exists`,
+      });
+    }
+    res.status(422).json(e);
+  }
 };
 
 module.exports = { signIn, signUp, profile, newData };
