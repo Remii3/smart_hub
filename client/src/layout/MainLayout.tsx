@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import Footer from './Footer';
 import Header from './Header';
 
@@ -6,10 +7,16 @@ type PropsType = {
 };
 
 function MainLayout({ children }: PropsType) {
+  const [currentPathname, setCurrentPathname] = useState('');
+
+  useEffect(() => {
+    setCurrentPathname(window.location.pathname);
+  }, [children]);
+
   return (
-    <div id="mainContainer" className="overflow-hidden bg-white">
-      <Header />
-      <main className="my-16 w-full pr-[17px]">{children}</main>
+    <div id="mainContainer" className="relative overflow-hidden bg-white">
+      <Header currentPathname={currentPathname} />
+      <main className="mt-16 h-full w-full">{children}</main>
       <Footer />
     </div>
   );

@@ -1,47 +1,42 @@
-import { useEffect, useRef } from 'react';
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-
+import { useCallback, useEffect, useRef, useState } from 'react';
 import Nav from './Nav';
 
-function Header() {
+type HeaderTypes = {
+  currentPathname: string;
+};
+
+function Header({ currentPathname }: HeaderTypes) {
   const headerElement = useRef(null);
+  const mainPageTitle = document.getElementById('mainPageTitle');
+  const [isTransparent, setIsTransparent] = useState(false);
+  const isMainPage = currentPathname === '/';
 
-  gsap.registerPlugin(ScrollTrigger);
-
-  const headerBgHandler = () => {
-    const mainPageUrl = window.location.pathname === '/';
-    const mainPageSectionOne = document.getElementById('mainPageSectionOne');
-
-    if (mainPageSectionOne && mainPageUrl) {
-      gsap.to(headerElement.current, {
-        scrollTrigger: {
-          trigger: mainPageSectionOne,
-          toggleActions: 'restart none none reverse',
-          start: 'top',
-          end: 'top',
-        },
-        backgroundColor: '#14222F',
-        ease: 'sine.out',
-      });
+  const changeHeaderBgHandler = useCallback(() => {
+    if (mainPageTitle && mainPageTitle?.getBoundingClientRect().top < 0) {
+      setIsTransparent(false);
     } else {
-      gsap.to(headerElement.current, {
-        backgroundColor: '#14222F',
-        ease: 'none',
-        duration: 0,
-      });
+      setIsTransparent(true);
     }
-  };
+  }, [mainPageTitle]);
 
   useEffect(() => {
-    headerBgHandler();
-  }, []);
+    if (isMainPage) {
+      setIsTransparent(true);
+      window.addEventListener('scroll', changeHeaderBgHandler);
+    }
+    return () => {
+      window.removeEventListener('scroll', changeHeaderBgHandler);
+    };
+  }, [changeHeaderBgHandler, isMainPage]);
 
   return (
-    <header
-      ref={headerElement}
-      className="fixed top-0 z-20 w-screen bg-transparent pr-[17px]"
-    >
+    <header className="fixed top-0 z-20 w-screen">
+      <div
+        ref={headerElement}
+        className={`${
+          isMainPage && isTransparent ? 'opacity-0' : 'opacity-100'
+        } absolute left-0 top-0 h-full w-full bg-pageBackground transition-[opacity] duration-300 ease-in-out`}
+      />
       <Nav />
     </header>
   );

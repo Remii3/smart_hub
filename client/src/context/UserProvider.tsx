@@ -14,7 +14,7 @@ import { ProductTypes } from '../types/interfaces';
 type ContextTypes = {
   userData: null | {
     email: string;
-    username: string;
+    credentials: { firstName: string; lastName: string };
     my_products: ProductTypes[];
   };
   setUserData:

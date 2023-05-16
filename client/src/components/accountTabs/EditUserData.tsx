@@ -3,24 +3,26 @@ import axios from 'axios';
 import { UserContext } from '../../context/UserProvider';
 import CustomInput from '../UI/form/CustomInput';
 
-type NewDataNameTypes = 'email' | 'username' | 'password';
+type NewDataNameTypes = 'email' | 'firstName' | 'lastName' | 'password';
 
 function EditUserData() {
   const { userData, setUserData } = useContext(UserContext);
+
   const [newDataFieldShow, setNewDataFieldShow] = useState({
+    credentials: { firstName: false, lastName: false },
     email: false,
-    username: false,
     password: false,
   });
+
   const [newUserData, setNewUserData] = useState({
     data: {
+      credentials: { firstName: '', lastName: '' },
       email: '',
-      username: '',
       password: '',
     },
     errors: {
+      credentials: { firstName: null, lastName: null },
       email: null,
-      username: null,
       password: null,
     },
   });
@@ -28,72 +30,205 @@ function EditUserData() {
   const newDataSwitchHandler = (newDataName: NewDataNameTypes) => {
     if (newDataName === 'email') {
       setNewDataFieldShow((prevState) => {
-        return { username: false, email: !prevState.email, password: false };
+        return {
+          credentials: { firstName: false, lastName: false },
+          email: !prevState.email,
+          password: false,
+        };
       });
-    } else if (newDataName === 'username') {
+    } else if (newDataName === 'firstName') {
       setNewDataFieldShow((prevState) => {
-        return { username: !prevState.username, email: false, password: false };
+        return {
+          credentials: {
+            firstName: !prevState.credentials.firstName,
+            lastName: false,
+          },
+          email: false,
+          password: false,
+        };
+      });
+    } else if (newDataName === 'lastName') {
+      setNewDataFieldShow((prevState) => {
+        return {
+          credentials: {
+            firstName: false,
+            lastName: !prevState.credentials.lastName,
+          },
+          email: false,
+          password: false,
+        };
       });
     } else if (newDataName === 'password') {
       setNewDataFieldShow((prevState) => {
-        return { username: false, email: false, password: !prevState.password };
+        return {
+          credentials: { firstName: false, lastName: false },
+          email: false,
+          password: !prevState.password,
+        };
       });
     }
     setNewUserData({
-      data: { email: '', password: '', username: '' },
-      errors: { email: null, password: null, username: null },
+      data: {
+        email: '',
+        password: '',
+        credentials: { firstName: '', lastName: '' },
+      },
+      errors: {
+        email: null,
+        password: null,
+        credentials: { firstName: null, lastName: null },
+      },
     });
   };
 
   const newUserDataChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {
-    setNewUserData((prevState) => {
-      return {
-        ...prevState,
-        data: { ...prevState.data, [e.target.name]: e.target.value },
-      };
-    });
+    // console.log('Name:', e.target.name);
+    // console.log('Value:', e.target.value);
+    if (e.target.name === 'firstName' || e.target.name === 'lastName') {
+      setNewUserData((prevState) => {
+        return {
+          ...prevState,
+          data: {
+            ...prevState.data,
+            credentials: {
+              ...prevState.data.credentials,
+              [e.target.name]: e.target.value,
+            },
+          },
+        };
+      });
+    } else {
+      setNewUserData((prevState) => {
+        return {
+          ...prevState,
+          data: { ...prevState.data, [e.target.name]: e.target.value },
+        };
+      });
+    }
   };
 
   if (!userData) return <div>No data</div>;
 
-  const uploadNewUserDataHandler = async (dataName: string) => {
-    const { data } = newUserData;
+  const uploadNewUserDataHandler = async (name: string) => {
+    let newValue = null;
+    switch (name) {
+      case 'firstName':
+        newValue = newUserData.data.credentials.firstName;
+        break;
+      case 'lastName':
+        newValue = newUserData.data.credentials.lastName;
+        break;
+      case 'email':
+        newValue = newUserData.data.email;
+        break;
+      case 'password':
+        newValue = newUserData.data.password;
+        break;
+      default:
+        newValue = null;
+    }
+
     try {
+      console.log('Data to send:', newValue);
       await axios.post('/account/newData', {
-        currentEmail: userData.email,
-        data,
-        dataName,
+        userEmail: userData.email,
+        name,
+        newValue,
       });
       axios.get('/account/profile').then((res) => {
-        setNewDataFieldShow({ email: false, password: false, username: false });
+        setNewDataFieldShow({
+          email: false,
+          password: false,
+          credentials: { firstName: false, lastName: false },
+        });
         setNewUserData({
-          data: { email: '', password: '', username: '' },
-          errors: { email: null, password: null, username: null },
+          data: {
+            email: '',
+            password: '',
+            credentials: { firstName: '', lastName: '' },
+          },
+          errors: {
+            email: null,
+            password: null,
+            credentials: { firstName: null, lastName: null },
+          },
         });
         setUserData(res.data);
       });
     } catch (err: any) {
       if (axios.isAxiosError(err)) {
         if (err.response)
-          setNewUserData((prevState) => {
-            return {
-              ...newUserData,
-              errors: {
-                ...prevState.errors,
-                [err.response.data.name]: err.response.data.message,
-              },
-            };
-          });
+          if (typeof Object.values(err.response.data)[0] !== 'string') {
+            err.response.data.forEach(
+              (error: { name: string; message: string }) => {
+                if (error.name === 'firstName' || error.name === 'lastName') {
+                  setNewUserData((prevState) => {
+                    return {
+                      ...prevState,
+
+                      errors: {
+                        ...prevState.errors,
+                        credentials: {
+                          ...prevState.errors.credentials,
+                          [error.name]: error.message,
+                        },
+                      },
+                    };
+                  });
+                } else {
+                  setNewUserData((prevState) => {
+                    return {
+                      ...prevState,
+
+                      errors: {
+                        ...prevState.errors,
+                        [error.name]: error.message,
+                      },
+                    };
+                  });
+                }
+              }
+            );
+          } else if (
+            err.response.data.name === 'firstName' ||
+            err.response.data.name === 'lastName'
+          ) {
+            setNewUserData((prevState) => {
+              return {
+                ...prevState,
+
+                errors: {
+                  ...prevState.errors,
+                  credentials: {
+                    ...prevState.errors.credentials,
+                    [err.response.data.name]: err.response.data.message,
+                  },
+                },
+              };
+            });
+          } else {
+            setNewUserData((prevState) => {
+              return {
+                ...prevState,
+
+                errors: {
+                  ...prevState.errors,
+                  [err.response.data.name]: err.response.data.message,
+                },
+              };
+            });
+          }
       } else {
         alert(err);
       }
     }
   };
+
   return (
     <div>
       <h4>My data</h4>
       <div>
-        <div className="flex flex-col gap-4 md:flex-row">
+        <div className="flex flex-col gap-4">
           <fieldset>
             <CustomInput
               name="email"
@@ -128,42 +263,84 @@ function EditUserData() {
               </button>
             </div>
           </fieldset>
-          <fieldset>
-            <CustomInput
-              name="username"
-              type="text"
-              optional={false}
-              labelValue="Username"
-              placeholder="JohnDoe..."
-              disabled={!newDataFieldShow.username}
-              hasError={newUserData.errors.username}
-              errorValue={newUserData.errors.username}
-              inputValue={
-                newDataFieldShow.username
-                  ? newUserData.data.username
-                  : userData.username
-              }
-              onChange={(e) => newUserDataChangeHandler(e)}
-            />
-            <div className="flex justify-between gap-4">
-              <button
-                className="whitespace-nowrap text-base text-primaryText"
-                onClick={() => newDataSwitchHandler('username')}
-                type="button"
-              >
-                Change username
-              </button>
-              <button
-                className={`${
-                  newDataFieldShow.username ? 'opacity-100' : 'opacity-0'
-                } text-base text-green-600 transition-[opacity] ease-out`}
-                type="button"
-                onClick={() => uploadNewUserDataHandler('username')}
-              >
-                Accept
-              </button>
-            </div>
-          </fieldset>
+          <div className="flex gap-4">
+            <fieldset>
+              <CustomInput
+                name="firstName"
+                type="text"
+                optional={false}
+                labelValue="First Name"
+                placeholder="John..."
+                disabled={!newDataFieldShow.credentials.firstName}
+                hasError={newUserData.errors.credentials.firstName}
+                errorValue={newUserData.errors.credentials.firstName}
+                inputValue={
+                  newDataFieldShow.credentials.firstName
+                    ? newUserData.data.credentials.firstName
+                    : userData.credentials.firstName
+                }
+                onChange={(e) => newUserDataChangeHandler(e)}
+              />
+              <div className="flex justify-between gap-4">
+                <button
+                  className="whitespace-nowrap text-base text-primaryText"
+                  onClick={() => newDataSwitchHandler('firstName')}
+                  type="button"
+                >
+                  Change first name
+                </button>
+                <button
+                  className={`${
+                    newDataFieldShow.credentials.firstName
+                      ? 'opacity-100'
+                      : 'opacity-0'
+                  } text-base text-green-600 transition-[opacity] ease-out`}
+                  type="button"
+                  onClick={() => uploadNewUserDataHandler('firstName')}
+                >
+                  Accept
+                </button>
+              </div>
+            </fieldset>
+            <fieldset>
+              <CustomInput
+                name="lastName"
+                type="text"
+                optional={false}
+                labelValue="Last Name"
+                placeholder="Doe..."
+                disabled={!newDataFieldShow.credentials.lastName}
+                hasError={newUserData.errors.credentials.lastName}
+                errorValue={newUserData.errors.credentials.lastName}
+                inputValue={
+                  newDataFieldShow.credentials.lastName
+                    ? newUserData.data.credentials.lastName
+                    : userData.credentials.lastName
+                }
+                onChange={(e) => newUserDataChangeHandler(e)}
+              />
+              <div className="flex justify-between gap-4">
+                <button
+                  className="whitespace-nowrap text-base text-primaryText"
+                  onClick={() => newDataSwitchHandler('lastName')}
+                  type="button"
+                >
+                  Change last name
+                </button>
+                <button
+                  className={`${
+                    newDataFieldShow.credentials.lastName
+                      ? 'opacity-100'
+                      : 'opacity-0'
+                  } text-base text-green-600 transition-[opacity] ease-out`}
+                  type="button"
+                  onClick={() => uploadNewUserDataHandler('lastName')}
+                >
+                  Accept
+                </button>
+              </div>
+            </fieldset>
+          </div>
         </div>
         <fieldset>
           <div

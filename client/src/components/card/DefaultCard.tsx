@@ -14,6 +14,7 @@ function DefaultCard({
   deadline,
   price,
   imgs,
+  marketPlace,
 }: PropsTypes) {
   let titleShortened = title;
 
@@ -29,9 +30,9 @@ function DefaultCard({
   return (
     <div
       id={`${_id}`}
-      className="f-ull relative m-auto min-h-[250px] w-full min-w-[250px] cursor-pointer rounded-lg shadow transition-[transform,box-shadow] duration-300 ease-out hover:scale-105 hover:shadow-lg active:scale-100"
+      className="relative m-auto h-full min-h-[250px] w-full min-w-[250px] cursor-pointer rounded-lg shadow transition-[transform,box-shadow] duration-300 ease-out hover:scale-105 hover:shadow-lg active:scale-100"
     >
-      <Link to={`auctions/${_id}`}>
+      <Link to={`/product/${_id}`}>
         {imgs && (
           <img
             src={imgs[0]}

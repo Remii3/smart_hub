@@ -2,15 +2,26 @@ import axios from 'axios';
 import { lazy, useContext, useEffect } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import { UserContext } from './context/UserProvider';
-import ShopPage from './pages/ShopPage';
-import ProductPage from './pages/ProductPage';
 import LoadingComponent from './components/UI/Loaders/LoadingComponent';
 import SuspenseComponent from './components/suspense/SuspenseComponent';
+import MainLayout from './layout/MainLayout';
 
+const SearchPage = lazy(() => import('./pages/SearchPage'));
+const CategoriesPage = lazy(() => import('./pages/CategoriesPage'));
+const RegisterPage = lazy(() => import('./pages/RegisterPage'));
+const LoginPage = lazy(() => import('./pages/LoginPage'));
 const MainPage = lazy(() => import('./pages/MainPage'));
-const AuthPage = lazy(() => import('./pages/AuthPage'));
 const NoPage404 = lazy(() => import('./pages/NoPage404'));
 const MyAccount = lazy(() => import('./pages/MyAccount'));
+const ProductPage = lazy(() => import('./pages/ProductPage'));
+const ShopPage = lazy(() => import('./pages/ShopPage'));
+const NewsPage = lazy(() => import('./pages/NewsPage'));
+const CollectionsPage = lazy(() => import('./pages/CollectionsPage'));
+const AuctionsPage = lazy(() => import('./pages/AuctionsPage'));
+const ContactPage = lazy(() => import('./pages/ContactPage'));
+const MyProductsPage = lazy(() => import('./pages/MyProductsPage'));
+const BlogPage = lazy(() => import('./pages/BlogPage'));
+
 let properUrl = 'http://localhost:4000';
 
 switch (window.location.origin) {
@@ -37,15 +48,33 @@ function App() {
 
   return (
     <SuspenseComponent fallback={<LoadingComponent />}>
-      <Routes>
-        <Route path="/" element={<MainPage />} />
-        <Route path="/shop" element={<ShopPage />} />
-        <Route path="/shop/:category" element={<ShopPage />} />
-        <Route path="/shop/:category/:id" element={<ProductPage />} />
-        <Route path="/account" element={<AuthPage />} />
-        {userData && <Route path="/account/my" element={<MyAccount />} />}
-        <Route path="/*" element={<NoPage404 />} />
-      </Routes>
+      <MainLayout>
+        <Routes>
+          <Route path="/" element={<MainPage />} />
+          <Route path="/news" element={<NewsPage />} />
+          <Route path="/shop" element={<ShopPage />} />
+          <Route path="/shop/:searchParam" element={<SearchPage />} />
+          <Route path="/shop/categories" element={<CategoriesPage />} />
+          <Route path="/product/:id" element={<ProductPage />} />
+          <Route path="/collections" element={<CollectionsPage />} />
+          <Route path="/auctions" element={<AuctionsPage />} />
+          <Route path="/auctions/categories" element={<CategoriesPage />} />
+          <Route path="/auctions/:searchParam" element={<SearchPage />} />
+          <Route path="/contact" element={<ContactPage />} />
+          <Route path="/blog" element={<BlogPage />} />
+          <Route path="/account/register" element={<RegisterPage />} />
+          <Route path="/account/login" element={<LoginPage />} />
+          <Route
+            path="/account/my"
+            element={userData ? <MyAccount /> : <RegisterPage />}
+          />
+          <Route
+            path="/account/my/my-products"
+            element={userData ? <MyProductsPage /> : <RegisterPage />}
+          />
+          <Route path="/*" element={<NoPage404 />} />
+        </Routes>
+      </MainLayout>
     </SuspenseComponent>
   );
 }
