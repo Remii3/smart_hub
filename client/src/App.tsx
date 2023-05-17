@@ -21,6 +21,7 @@ const AuctionsPage = lazy(() => import('./pages/AuctionsPage'));
 const ContactPage = lazy(() => import('./pages/ContactPage'));
 const MyProductsPage = lazy(() => import('./pages/MyProductsPage'));
 const BlogPage = lazy(() => import('./pages/BlogPage'));
+const CartPage = lazy(() => import('./pages/CartPage'));
 
 let properUrl = 'http://localhost:4000';
 
@@ -62,6 +63,7 @@ function App() {
           <Route path="/auctions/:searchParam" element={<SearchPage />} />
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/blog" element={<BlogPage />} />
+          <Route path="/cart" element={<CartPage />} />
           <Route path="/account/register" element={<RegisterPage />} />
           <Route path="/account/login" element={<LoginPage />} />
           <Route
