@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const Product = require('../Models/product');
 const { default: mongoose } = require('mongoose');
+const Cart = require('../Models/cart');
 
 const salt = bcrypt.genSaltSync(12);
 
@@ -166,6 +167,11 @@ const signUp = async (req, res) => {
       password: bcrypt.hashSync(password, salt),
     });
     await newUser.save();
+
+    const cartId = new mongoose.Types.ObjectId();
+
+    await Cart.create({ _id: cartId, products: [] });
+
     const userDoc = await User.findOne({ email });
 
     jwt.sign(
@@ -299,4 +305,24 @@ const newData = async (req, res) => {
   }
 };
 
-module.exports = { signIn, signUp, profile, newData };
+const addToCart = async (req, res) => {
+  res.status(200).json('hello test add');
+};
+
+const removeFromCart = async (req, res) => {
+  res.status(200).json('hello test remove');
+};
+
+const getCart = async (req, res) => {
+  res.status(200).json('hello test get');
+};
+
+module.exports = {
+  signIn,
+  signUp,
+  profile,
+  newData,
+  addToCart,
+  removeFromCart,
+  getCart,
+};

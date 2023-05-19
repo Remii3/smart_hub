@@ -23,6 +23,13 @@ const getCategories = async (req, res) => {
   res.json(categories);
 };
 
+const getBook = async (req, res) => {
+  const { id } = req.body;
+  console.log(id);
+  const product = await Product.findOne({ _id: id });
+  res.status(200).json(product);
+};
+
 const addProduct = async (req, res) => {
   let {
     userEmail,
@@ -69,5 +76,6 @@ module.exports = {
   getAuctionBooks,
   getShopBooks,
   getCategories,
+  getBook,
   addProduct,
 };

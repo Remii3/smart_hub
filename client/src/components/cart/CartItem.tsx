@@ -1,7 +1,11 @@
-import React from 'react';
+import axios from 'axios';
 import TrashIcon from '../../assets/icons/TrashIcon';
 
 function CartItem() {
+  const removeProductHandler = () => {
+    axios.post('/account/cart-remove', { test: 'asd' });
+  };
+
   return (
     <li className="flex items-center gap-4">
       <img
@@ -44,6 +48,7 @@ function CartItem() {
         <button
           type="button"
           className="text-gray-600 transition hover:text-red-600"
+          onClick={removeProductHandler}
         >
           <span className="sr-only">Remove item</span>
 
