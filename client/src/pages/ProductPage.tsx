@@ -29,16 +29,14 @@ function ProductPage() {
   const addToCartHandler = (e: FormEvent) => {
     e.preventDefault();
     if (userData) {
-      setCartProducts((prevState: any) => {
-        return {
-          productData: [...prevState.productData, productData],
-        };
-      });
+      // setCartProducts((prevState: any[]) => {
+      //   return [...prevState, productData];
+      // });
       axios.post('/account/cart-add', { product: productData });
     } else {
-      setCartProducts((prevState: any) => {
-        return { ...prevState, productData };
-      });
+      // setCartProducts((prevState: any) => {
+      //   return { ...prevState, productData };
+      // });
     }
     console.log(cartProducts);
   };

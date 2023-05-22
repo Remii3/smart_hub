@@ -306,6 +306,24 @@ const newData = async (req, res) => {
 };
 
 const addToCart = async (req, res) => {
+  const { product } = req.body;
+
+  const searchedItem = await Cart.findOne({ productId: product._id });
+  if (searchedItem) {
+    console.log('1');
+    console.log(searchedItem);
+    // Cart.updateOne(searchedItem, {
+    //   $set: { quantity: quantity + product.quantity },
+    // });
+  } else {
+    const cartId = new mongoose.Types.ObjectId();
+    console.log('2');
+    await Cart.create({
+      _id: cartId,
+      products: [{ productId: product._id, quantity: product.quantity }],
+    });
+  }
+
   res.status(200).json('hello test add');
 };
 

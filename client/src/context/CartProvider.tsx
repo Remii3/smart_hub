@@ -13,17 +13,17 @@ import { ProductTypes } from '../types/interfaces';
 type CartTypes = {
   cartProducts: null | ProductTypes[];
   setCartProducts:
-    | Dispatch<SetStateAction<object>>
-    | Dispatch<SetStateAction<null>>;
+    | Dispatch<SetStateAction<ProductTypes[]>>
+    | Dispatch<SetStateAction<never[]>>;
 };
 
 export const CartContext = createContext<CartTypes>({
-  cartProducts: null,
+  cartProducts: [],
   setCartProducts: () => {},
 });
 
 function CartProvider({ children }: { children: ReactNode }) {
-  const [cartProducts, setCartProducts] = useState(null);
+  const [cartProducts, setCartProducts] = useState([]);
 
   const fetchData = async () => {
     const defaultUrl = `/account/cart`;

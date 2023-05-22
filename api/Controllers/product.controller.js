@@ -25,7 +25,6 @@ const getCategories = async (req, res) => {
 
 const getBook = async (req, res) => {
   const { id } = req.body;
-  console.log(id);
   const product = await Product.findOne({ _id: id });
   res.status(200).json(product);
 };
