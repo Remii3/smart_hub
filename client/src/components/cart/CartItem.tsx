@@ -1,10 +1,49 @@
 import axios from 'axios';
-import TrashIcon from '../../assets/icons/TrashIcon';
+import { useContext, useState } from 'react';
+import { TrashIcon } from '../../assets/icons/Icons';
+import { UserContext } from '../../context/UserProvider';
+import { CartContext } from '../../context/CartProvider';
+import { ProductTypes } from '../../types/interfaces';
+import getCookie from '../../helpers/getCookie';
 
-function CartItem() {
-  const removeProductHandler = () => {
-    axios.post('/account/cart-remove', { test: 'asd' });
+type CartItemProps = {
+  productData: ProductTypes;
+  inCartQuantity: number;
+};
+
+function CartItem({ productData, inCartQuantity }: CartItemProps) {
+  const { userData } = useContext(UserContext);
+  const { fetchCartData } = useContext(CartContext);
+  const [currentQuantity, setCurrentQuantity] = useState(inCartQuantity);
+  const userCartId = userData?.cartData._id || getCookie('guestToken');
+
+  const removeProductHandler = async () => {
+    await axios.post('/cart/cart-remove', {
+      cartId: userCartId,
+      productId: productData._id,
+    });
+    fetchCartData();
   };
+
+  const incrementCartItemhandler = async () => {
+    await axios.post('cart/cartItem-increment', {
+      cartId: userCartId,
+      productId: productData._id,
+    });
+    fetchCartData();
+    setCurrentQuantity((prevState) => prevState + 1);
+  };
+
+  const decrementCartItemHandler = async () => {
+    await axios.post('cart/cartItem-decrement', {
+      cartId: userCartId,
+      productId: productData._id,
+    });
+    fetchCartData();
+    setCurrentQuantity((prevState) => prevState - 1);
+  };
+
+  if (!productData) return <div />;
 
   return (
     <li className="flex items-center gap-4">
@@ -13,36 +52,47 @@ function CartItem() {
         alt=""
         className="h-16 w-16 rounded object-cover"
       />
-
       <div>
-        <h3 className="text-sm text-gray-900">Basic Tee 6-Pack</h3>
+        <h3 className="m-0 text-sm text-gray-900">{productData.title}</h3>
 
         <dl className="mt-0.5 space-y-px text-[10px] text-gray-600">
           <div>
-            <dt className="inline">Size:</dt>
-            <dd className="inline">XXS</dd>
-          </div>
-
-          <div>
-            <dt className="inline">Color:</dt>
-            <dd className="inline">White</dd>
+            <dt className="inline">Price:</dt>
+            <dd className="inline"> ${productData.price}</dd>
           </div>
         </dl>
       </div>
 
       <div className="flex flex-1 items-center justify-end gap-3">
         <form>
-          <label htmlFor="Line1Qty" className="sr-only">
-            Quantity
-          </label>
-
-          <input
-            type="number"
-            min="1"
-            value="1"
-            id="Line1Qty"
-            className="h-8 w-12 rounded border-gray-200 bg-gray-50 p-0 text-center text-xs text-gray-600 [-moz-appearance:_textfield] focus:outline-none [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none"
-          />
+          <div className="flex items-center">
+            <button
+              type="button"
+              className={`${!(currentQuantity > 1) && 'text-gray-300'} px-2`}
+              disabled={!(currentQuantity > 1)}
+              onClick={() => decrementCartItemHandler()}
+            >
+              -
+            </button>
+            <label htmlFor="Line1Qty" className="sr-only">
+              Quantity
+            </label>
+            <input
+              type="number"
+              min="1"
+              value={currentQuantity}
+              readOnly
+              id="Line1Qty"
+              className="h-8 w-12 rounded border-gray-200 bg-gray-50 p-0 text-center text-xs text-gray-600 [-moz-appearance:_textfield] focus:outline-none [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none"
+            />
+            <button
+              type="button"
+              className="px-2"
+              onClick={() => incrementCartItemhandler()}
+            >
+              +
+            </button>
+          </div>
         </form>
 
         <button
@@ -52,7 +102,7 @@ function CartItem() {
         >
           <span className="sr-only">Remove item</span>
 
-          <TrashIcon />
+          <TrashIcon height={4} width={4} />
         </button>
       </div>
     </li>

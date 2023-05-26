@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const Product = require('../Models/product');
 const { default: mongoose } = require('mongoose');
 const Cart = require('../Models/cart');
+const getRandomString = require('../helpers/getRandomString');
 
 const salt = bcrypt.genSaltSync(12);
 
@@ -161,14 +162,14 @@ const signUp = async (req, res) => {
     return res.status(422).json(errors);
   }
   try {
+    const cartId = new mongoose.Types.ObjectId();
     const newUser = await User.create({
       credentials,
       email,
       password: bcrypt.hashSync(password, salt),
+      cartId,
     });
     await newUser.save();
-
-    const cartId = new mongoose.Types.ObjectId();
 
     await Cart.create({ _id: cartId, products: [] });
 
@@ -203,15 +204,27 @@ const signUp = async (req, res) => {
 
 const profile = async (req, res) => {
   let userProductsData;
+  try {
+    const { _id, email, credentials, cartId, my_products } = await User.findOne(
+      {
+        _id: req.user.userId,
+      },
+    );
 
-  const { email, credentials, cart, my_products } = await User.findOne({
-    _id: req.user.userId,
-  });
+    const myProducts = await Product.find({ _id: my_products });
+    userProductsData = myProducts;
+    const cartData = await Cart.findOne({ _id: cartId });
 
-  const myProducts = await Product.find({ _id: my_products });
-  userProductsData = myProducts;
-
-  res.json({ email, credentials, cart, my_products: userProductsData });
+    res.json({
+      _id,
+      email,
+      credentials,
+      cartData,
+      my_products: userProductsData,
+    });
+  } catch (err) {
+    res.status(401).json({ message: err });
+  }
 };
 
 const newData = async (req, res) => {
@@ -305,34 +318,20 @@ const newData = async (req, res) => {
   }
 };
 
-const addToCart = async (req, res) => {
-  const { product } = req.body;
-
-  const searchedItem = await Cart.findOne({ productId: product._id });
-  if (searchedItem) {
-    console.log('1');
-    console.log(searchedItem);
-    // Cart.updateOne(searchedItem, {
-    //   $set: { quantity: quantity + product.quantity },
-    // });
-  } else {
-    const cartId = new mongoose.Types.ObjectId();
-    console.log('2');
-    await Cart.create({
-      _id: cartId,
-      products: [{ productId: product._id, quantity: product.quantity }],
-    });
-  }
-
-  res.status(200).json('hello test add');
-};
-
-const removeFromCart = async (req, res) => {
-  res.status(200).json('hello test remove');
-};
-
-const getCart = async (req, res) => {
-  res.status(200).json('hello test get');
+const guestData = async (req, res) => {
+  jwt.sign(
+    {
+      email: getRandomString(10),
+      userId: getRandomString(15),
+    },
+    getRandomString(40),
+    {},
+    (err, token) => {
+      if (err) res.status(422).json({ message: 'Failed to fetch guest Data' });
+      token = token.slice(token.length - 12, token.length);
+      res.status(200).cookie('guestToken', token).json('Success');
+    },
+  );
 };
 
 module.exports = {
@@ -340,7 +339,5 @@ module.exports = {
   signUp,
   profile,
   newData,
-  addToCart,
-  removeFromCart,
-  getCart,
+  guestData,
 };

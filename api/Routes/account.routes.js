@@ -8,23 +8,14 @@ const {
   signUp,
   profile,
   newData,
-  addToCart,
-  removeFromCart,
-  getCart,
+  guestData,
 } = require('../Controllers/account.controllers');
 
-router.post('/register', signUp);
-
-router.post('/login', signIn);
-
 router.get('/profile', checkAuth, profile);
+router.get('/guest', guestData);
 
+router.post('/register', signUp);
+router.post('/login', signIn);
 router.post('/newData', newData);
-
-router.post('/cart-add', addToCart);
-
-router.post('/cart-remove', removeFromCart);
-
-router.get('/cart', getCart);
 
 module.exports = router;

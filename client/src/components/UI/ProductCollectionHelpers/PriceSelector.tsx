@@ -62,15 +62,11 @@ function PriceSelector({ highestPrice }: PropsTypes) {
 
             <div className="border-t border-gray-200 p-4">
               <div className="flex justify-between gap-4">
-                <label
-                  htmlFor="FilterPriceFrom"
-                  className="flex items-center gap-2"
-                >
+                <label className="flex items-center gap-2">
                   <span className="text-sm text-gray-600">$</span>
 
                   <input
                     type="number"
-                    id="FilterPriceFrom"
                     placeholder="From"
                     className="w-full rounded-md border-gray-200 shadow-sm sm:text-sm"
                     value={lowPrice}
@@ -78,15 +74,11 @@ function PriceSelector({ highestPrice }: PropsTypes) {
                   />
                 </label>
 
-                <label
-                  htmlFor="FilterPriceTo"
-                  className="flex items-center gap-2"
-                >
+                <label className="flex items-center gap-2">
                   <span className="text-sm text-gray-600">$</span>
 
                   <input
                     type="number"
-                    id="FilterPriceTo"
                     placeholder="To"
                     className="w-full rounded-md border-gray-200 shadow-sm sm:text-sm"
                     value={highPrice}

@@ -17,7 +17,7 @@ function AuctionsSwiper() {
 
   useEffect(() => {
     try {
-      axios.get('/product/auction-books').then((res) => {
+      axios.get('/product/auction-get').then((res) => {
         setAuctions(res.data);
       });
     } catch (err) {

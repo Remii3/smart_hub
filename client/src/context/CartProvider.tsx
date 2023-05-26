@@ -1,48 +1,61 @@
 import axios from 'axios';
 import {
-  Dispatch,
   ReactNode,
-  SetStateAction,
   createContext,
+  useCallback,
+  useContext,
   useEffect,
   useMemo,
   useState,
 } from 'react';
 import { ProductTypes } from '../types/interfaces';
+import { UserContext } from './UserProvider';
+import getCookie from '../helpers/getCookie';
 
 type CartTypes = {
-  cartProducts: null | ProductTypes[];
-  setCartProducts:
-    | Dispatch<SetStateAction<ProductTypes[]>>
-    | Dispatch<SetStateAction<never[]>>;
+  cartProducts:
+    | null
+    | {
+        inCartQuantity: number;
+        productData: ProductTypes;
+        totalPrice: number;
+      }[];
+  fetchCartData: () => void;
 };
 
 export const CartContext = createContext<CartTypes>({
-  cartProducts: [],
-  setCartProducts: () => {},
+  cartProducts: null,
+  fetchCartData() {},
 });
 
 function CartProvider({ children }: { children: ReactNode }) {
-  const [cartProducts, setCartProducts] = useState([]);
+  const [cartProducts, setCartProducts] = useState(null);
 
-  const fetchData = async () => {
-    const defaultUrl = `/account/cart`;
-    const res = await axios.get(defaultUrl);
-    // setCartProducts(res.data);
-  };
+  const { userData } = useContext(UserContext);
+
+  const fetchCartData = useCallback(async () => {
+    const userCartId = userData?.cartData._id || getCookie('guestToken');
+
+    if (userCartId) {
+      const res = await axios.get('/cart/cart-get', {
+        params: { cartId: userCartId },
+      });
+      setCartProducts(res.data.products);
+    }
+  }, [userData]);
 
   useEffect(() => {
-    fetchData();
-  }, [cartProducts]);
+    fetchCartData();
+  }, [fetchCartData]);
 
   const cartValues = useMemo(
     () => ({
       cartProducts,
-      setCartProducts,
+      fetchCartData,
     }),
-    [cartProducts]
+    [cartProducts, fetchCartData]
   );
-  console.log(cartProducts);
+
   return (
     <CartContext.Provider value={cartValues}>{children}</CartContext.Provider>
   );

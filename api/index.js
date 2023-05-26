@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
 const account_routes = require('./Routes/account.routes');
 const product_routes = require('./Routes/product.routes');
+const cart_routes = require('./Routes/cart.routes');
 
 const app = express();
 
@@ -32,9 +33,6 @@ mongoose
     console.log(err);
   });
 
-app.get('/', (req, res) => {
-  res.status(201).json({ message: 'Connected to backend' });
-});
-
 app.use('/account', account_routes);
 app.use('/product', product_routes);
+app.use('/cart', cart_routes);

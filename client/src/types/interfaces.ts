@@ -17,3 +17,11 @@ export interface ProductCategories {
   name: string;
   description: string;
 }
+
+export interface UserDataTypes {
+  _id: string;
+  email: string;
+  cartData: { products: ProductTypes[]; _id: string };
+  credentials: { firstName: string; lastName: string };
+  my_products: ProductTypes[];
+}

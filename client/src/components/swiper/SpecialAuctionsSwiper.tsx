@@ -19,7 +19,7 @@ function SpecialAuctionsSwiper() {
   const [bestAuctionCardFlag, setBestAuctionCardFlag] = useState(true);
   useEffect(() => {
     try {
-      axios.get('/product/auction-books').then((res) => {
+      axios.get('/product/auction-get').then((res) => {
         setSpecialAuctions(res.data.slice(0, 6));
       });
     } catch (err) {

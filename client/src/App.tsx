@@ -46,6 +46,12 @@ function App() {
 
   useEffect(() => {
     window.scrollTo(0, 0);
+    if (
+      !document.cookie.match('token') &&
+      !document.cookie.match('guestToken')
+    ) {
+      axios.get('/account/guest');
+    }
   }, [pathname]);
 
   return (

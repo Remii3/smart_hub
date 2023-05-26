@@ -5,12 +5,13 @@ import PrimaryBtn from '../components/UI/Btns/PrimaryBtn';
 import { ProductTypes } from '../types/interfaces';
 import { UserContext } from '../context/UserProvider';
 import { CartContext } from '../context/CartProvider';
+import getCookie from '../helpers/getCookie';
 
 function ProductPage() {
   const [selectedQuantity, setSelectedQuantity] = useState(1);
   const [productData, setProductData] = useState<ProductTypes>();
   const { userData } = useContext(UserContext);
-  const { cartProducts, setCartProducts } = useContext(CartContext);
+  const { fetchCartData } = useContext(CartContext);
   const quantityChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
     setSelectedQuantity(Number(e.target.value));
@@ -22,23 +23,23 @@ function ProductPage() {
 
   useEffect(() => {
     axios
-      .post('/product/get-book', { id: prodId })
+      .get('/product/product-get', { params: { productId: prodId } })
       .then((res) => setProductData(res.data));
   }, [prodId]);
 
-  const addToCartHandler = (e: FormEvent) => {
+  const addToCartHandler = async (e: FormEvent) => {
     e.preventDefault();
-    if (userData) {
-      // setCartProducts((prevState: any[]) => {
-      //   return [...prevState, productData];
-      // });
-      axios.post('/account/cart-add', { product: productData });
-    } else {
-      // setCartProducts((prevState: any) => {
-      //   return { ...prevState, productData };
-      // });
+
+    const currentUserId = userData?.cartData._id || getCookie('guestToken');
+
+    if (productData) {
+      await axios.post('/cart/cart-add', {
+        cartId: currentUserId,
+        productId: productData._id,
+        productQuantity: productData.quantity,
+      });
+      fetchCartData();
     }
-    console.log(cartProducts);
   };
 
   if (productData === undefined) return <p> No data</p>;
@@ -81,15 +82,6 @@ function ProductPage() {
                 />
               </div>
             </div>
-
-            <iframe
-              title="YouTube video player"
-              allowFullScreen
-              width="420"
-              height="315"
-              src="https://www.youtube.com/embed/pNar3Dh9zDk"
-              className="aspect-video w-full rounded-xl object-cover"
-            />
           </div>
 
           <div className="sticky top-0">

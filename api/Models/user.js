@@ -8,7 +8,7 @@ const UserSchema = new mongoose.Schema({
   },
   password: { type: String, required: true },
   addresses: { type: [String], required: false },
-  cart: mongoose.Types.ObjectId,
+  cartId: mongoose.Types.ObjectId,
   my_products: [{ type: mongoose.Types.ObjectId }],
 });
 
