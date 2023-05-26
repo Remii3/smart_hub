@@ -1,12 +1,48 @@
-import { ChangeEvent, useState } from 'react';
+import { ChangeEvent, FormEvent, useEffect, useState, useContext } from 'react';
+import { useLocation } from 'react-router-dom';
+import axios from 'axios';
+import PrimaryBtn from '../components/UI/Btns/PrimaryBtn';
+import { ProductTypes } from '../types/interfaces';
+import { UserContext } from '../context/UserProvider';
+import { CartContext } from '../context/CartProvider';
+import getCookie from '../helpers/getCookie';
 
 function ProductPage() {
   const [selectedQuantity, setSelectedQuantity] = useState(1);
-
+  const [productData, setProductData] = useState<ProductTypes>();
+  const { userData } = useContext(UserContext);
+  const { fetchCartData } = useContext(CartContext);
   const quantityChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
     setSelectedQuantity(Number(e.target.value));
   };
+  const path = useLocation();
+  let prodId: string | any[] | null = null;
+  prodId = path.pathname.split('/');
+  prodId = prodId[prodId.length - 1];
+
+  useEffect(() => {
+    axios
+      .get('/product/product-get', { params: { productId: prodId } })
+      .then((res) => setProductData(res.data));
+  }, [prodId]);
+
+  const addToCartHandler = async (e: FormEvent) => {
+    e.preventDefault();
+
+    const currentUserId = userData?.cartData._id || getCookie('guestToken');
+
+    if (productData) {
+      await axios.post('/cart/cart-add', {
+        cartId: currentUserId,
+        productId: productData._id,
+        productQuantity: productData.quantity,
+      });
+      fetchCartData();
+    }
+  };
+
+  if (productData === undefined) return <p> No data</p>;
 
   return (
     <section>
@@ -46,26 +82,24 @@ function ProductPage() {
                 />
               </div>
             </div>
-
-            <iframe
-              title="YouTube video player"
-              allowFullScreen
-              width="420"
-              height="315"
-              src="https://www.youtube.com/embed/pNar3Dh9zDk"
-              className="aspect-video w-full rounded-xl object-cover"
-            />
           </div>
 
           <div className="sticky top-0">
-            <strong className="rounded-full border border-blue-600 bg-gray-100 px-3 py-0.5 text-xs font-medium tracking-wide text-blue-600">
-              Pre Order
-            </strong>
+            {productData.marketPlace === 'Shop' && (
+              <strong className="rounded-full border border-blue-600 bg-gray-100 px-3 py-0.5 text-xs font-medium tracking-wide text-blue-600">
+                {productData.marketPlace}
+              </strong>
+            )}
+            {productData.marketPlace === 'Auction' && (
+              <strong className="rounded-full border border-pink-600 bg-gray-100 px-3 py-0.5 text-xs font-medium tracking-wide text-pink-600">
+                {productData.marketPlace}
+              </strong>
+            )}
 
             <div className="mt-8 flex justify-between">
               <div className="max-w-[35ch] space-y-2">
                 <h1 className="text-xl font-bold sm:text-2xl">
-                  Fun Product That Does Something Cool
+                  {productData.title}
                 </h1>
 
                 <p className="text-sm">Highest Rated Product</p>
@@ -118,30 +152,28 @@ function ProductPage() {
                 </div>
               </div>
 
-              <p className="text-lg font-bold">$119.99</p>
+              <p className="text-lg font-bold">${productData.price}</p>
             </div>
 
             <div className="mt-4">
               <div className="prose max-w-none">
-                <p>
-                  Lorem ipsum dolor sit amet consectetur adipisicing elit. Ipsa
-                  veniam dicta beatae eos ex error culpa delectus rem tenetur,
-                  architecto quam nesciunt, dolor veritatis nisi minus
-                  inventore, rerum at recusandae?
-                </p>
+                <p>{productData.description}</p>
               </div>
 
-              <button
-                type="button"
-                className="mt-2 text-sm font-medium underline"
-              >
-                Read More
-              </button>
+              {productData.description &&
+                productData.description.length > 600 && (
+                  <button
+                    type="button"
+                    className="mt-2 text-sm font-medium underline"
+                  >
+                    Read More
+                  </button>
+                )}
             </div>
 
             <form className="mt-8">
               <fieldset>
-                <legend className="mb-1 text-sm font-medium">Color</legend>
+                <legend className="mb-1 text-sm font-medium">Cover</legend>
 
                 <div className="flex flex-wrap gap-1">
                   <label htmlFor="color_tt" className="cursor-pointer">
@@ -153,7 +185,7 @@ function ProductPage() {
                     />
 
                     <span className="group inline-block rounded-full border px-3 py-1 text-xs font-medium peer-checked:bg-black peer-checked:text-white">
-                      Texas Tea
+                      Soft
                     </span>
                   </label>
 
@@ -166,7 +198,7 @@ function ProductPage() {
                     />
 
                     <span className="group inline-block rounded-full border px-3 py-1 text-xs font-medium peer-checked:bg-black peer-checked:text-white">
-                      Fiesta Red
+                      Medium
                     </span>
                   </label>
 
@@ -179,7 +211,7 @@ function ProductPage() {
                     />
 
                     <span className="group inline-block rounded-full border px-3 py-1 text-xs font-medium peer-checked:bg-black peer-checked:text-white">
-                      Cobalt Blue
+                      Hard
                     </span>
                   </label>
                 </div>
@@ -273,12 +305,13 @@ function ProductPage() {
                   />
                 </div>
 
-                <button
+                <PrimaryBtn
+                  text="Add to Cart"
+                  usecase="default"
+                  customCSS="block rounded bg-green-600 px-5 py-3 text-xs font-medium text-white hover:bg-green-500"
                   type="submit"
-                  className="block rounded bg-green-600 px-5 py-3 text-xs font-medium text-white hover:bg-green-500"
-                >
-                  Add to Cart
-                </button>
+                  onClick={(e) => addToCartHandler(e)}
+                />
               </div>
             </form>
           </div>

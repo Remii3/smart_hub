@@ -1,8 +1,19 @@
 import { Link } from 'react-router-dom';
+import { useContext } from 'react';
 import CartItem from '../components/cart/CartItem';
-import TicketIcon from '../assets/icons/Ticketicon';
+import { CartContext } from '../context/CartProvider';
+import { TicketIcon } from '../assets/icons/Icons';
 
 function CartPage() {
+  const { cartProducts } = useContext(CartContext);
+  let cartTotalPrice = 0;
+
+  if (cartProducts) {
+    for (const product of cartProducts) {
+      cartTotalPrice += product.totalPrice;
+    }
+  }
+
   return (
     <section>
       <div className="mx-auto max-w-screen-xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
@@ -15,7 +26,14 @@ function CartPage() {
 
           <div className="mt-8">
             <ul className="space-y-4">
-              <CartItem />
+              {cartProducts &&
+                cartProducts.map((cartProduct) => (
+                  <CartItem
+                    key={cartProduct.productData._id}
+                    productData={cartProduct.productData}
+                    inCartQuantity={cartProduct.inCartQuantity}
+                  />
+                ))}
             </ul>
 
             <div className="mt-8 flex justify-end border-t border-gray-100 pt-8">
@@ -38,13 +56,13 @@ function CartPage() {
 
                   <div className="flex justify-between !text-base font-medium">
                     <dt>Total</dt>
-                    <dd>£200</dd>
+                    <dd>£{cartTotalPrice}</dd>
                   </div>
                 </dl>
 
                 <div className="flex justify-end">
                   <span className="inline-flex items-center justify-center rounded-full bg-indigo-100 px-2.5 py-0.5 text-indigo-700">
-                    <TicketIcon />
+                    <TicketIcon height={4} width={4} />
 
                     <p className="whitespace-nowrap text-xs">
                       2 Discounts Applied

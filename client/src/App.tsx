@@ -6,6 +6,7 @@ import LoadingComponent from './components/UI/Loaders/LoadingComponent';
 import SuspenseComponent from './components/suspense/SuspenseComponent';
 import MainLayout from './layout/MainLayout';
 
+const CheckoutPage = lazy(() => import('./pages/CheckoutPage'));
 const SearchPage = lazy(() => import('./pages/SearchPage'));
 const CategoriesPage = lazy(() => import('./pages/CategoriesPage'));
 const RegisterPage = lazy(() => import('./pages/RegisterPage'));
@@ -45,6 +46,12 @@ function App() {
 
   useEffect(() => {
     window.scrollTo(0, 0);
+    if (
+      !document.cookie.match('token') &&
+      !document.cookie.match('guestToken')
+    ) {
+      axios.get('/account/guest');
+    }
   }, [pathname]);
 
   return (
@@ -64,6 +71,7 @@ function App() {
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/blog" element={<BlogPage />} />
           <Route path="/cart" element={<CartPage />} />
+          <Route path="/checkout" element={<CheckoutPage />} />
           <Route path="/account/register" element={<RegisterPage />} />
           <Route path="/account/login" element={<LoginPage />} />
           <Route

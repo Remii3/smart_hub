@@ -3,24 +3,51 @@ const Category = require('../Models/category');
 const Product = require('../Models/product');
 const User = require('../Models/user');
 
-const getAllBooks = async (req, res) => {
-  const books = await Product.find({});
-  res.json(books);
+const getAllProducts = async (req, res) => {
+  try {
+    const books = await Product.find({});
+    res.status(200).json(books);
+  } catch (err) {
+    res.status(422).json({ message: 'Fetching data went wrong' });
+  }
 };
 
-const getShopBooks = async (req, res) => {
-  const books = await Product.find({ marketPlace: 'Shop' });
-  res.json(books);
+const getShopProducts = async (req, res) => {
+  try {
+    const books = await Product.find({ marketPlace: 'Shop' });
+    res.status(200).json(books);
+  } catch (err) {
+    res.status(422).json({ message: 'Fetching data went wrong' });
+  }
 };
 
-const getAuctionBooks = async (req, res) => {
-  const books = await Product.find({ marketPlace: 'Auction' });
-  res.json(books);
+const getAuctionProducts = async (req, res) => {
+  try {
+    const books = await Product.find({ marketPlace: 'Auction' });
+    res.status(200).json(books);
+  } catch (err) {
+    res.status(422).json({ message: 'Fetching data went wrong' });
+  }
 };
 
 const getCategories = async (req, res) => {
-  const categories = await Category.find({});
-  res.json(categories);
+  try {
+    const categories = await Category.find({});
+    res.status(200).json(categories);
+  } catch (err) {
+    res.status(422).json({ message: 'Fetching data went wrong' });
+  }
+};
+
+const getProduct = async (req, res) => {
+  const { productId } = req.query;
+  if (!productId) res.status(422).json({ message: 'Product id is requried' });
+  try {
+    const product = await Product.findOne({ _id: productId });
+    res.status(200).json(product);
+  } catch (err) {
+    res.status(422).json({ message: 'Fetching data went wrong' });
+  }
 };
 
 const addProduct = async (req, res) => {
@@ -59,15 +86,15 @@ const addProduct = async (req, res) => {
     );
     res.status(200).json({ message: 'Successfully added new product' });
   } catch (err) {
-    console.log(err);
-    res.status(422).json(err);
+    res.status(422).json({ message: 'Adding product failed' });
   }
 };
 
 module.exports = {
-  getAllBooks,
-  getAuctionBooks,
-  getShopBooks,
+  getAllProducts,
+  getShopProducts,
+  getAuctionProducts,
   getCategories,
+  getProduct,
   addProduct,
 };

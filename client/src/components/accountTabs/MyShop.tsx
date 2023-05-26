@@ -8,7 +8,7 @@ import { ProductCategories, ProductTypes } from '../../types/interfaces';
 import DefaultCard from '../card/DefaultCard';
 import SecondaryBtn from '../UI/Btns/SecondaryBtn';
 import { UserContext } from '../../context/UserProvider';
-import CheckIcon from '../../assets/icons/CheckIcon';
+import { CheckIcon } from '../../assets/icons/Icons';
 
 type ProductDataTypes = {
   title: { value: string; hasError: boolean };
@@ -411,15 +411,11 @@ function MyShop() {
             />
           </fieldset>
           <fieldset className="mb-2 space-y-1">
-            <label
-              htmlFor="marketPlace"
-              className="block text-sm font-medium text-gray-700"
-            >
+            <span className="block text-sm font-medium text-gray-700">
               Marketplace
-            </label>
+            </span>
             <RadioGroup
               value={productData.marketPlace.value}
-              id="marketPlace"
               onChange={(value) => productDataChangeHandler(null, value)}
             >
               <div className="space-y-2">
