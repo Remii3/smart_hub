@@ -6,7 +6,7 @@ import CustomInput from '../UI/form/CustomInput';
 type NewDataNameTypes = 'email' | 'firstName' | 'lastName' | 'password';
 
 function EditUserData() {
-  const { userData, setUserData } = useContext(UserContext);
+  const { userData, changeUserData } = useContext(UserContext);
 
   const [newDataFieldShow, setNewDataFieldShow] = useState({
     credentials: { firstName: false, lastName: false },
@@ -82,8 +82,6 @@ function EditUserData() {
   };
 
   const newUserDataChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {
-    // console.log('Name:', e.target.name);
-    // console.log('Value:', e.target.value);
     if (e.target.name === 'firstName' || e.target.name === 'lastName') {
       setNewUserData((prevState) => {
         return {
@@ -129,7 +127,6 @@ function EditUserData() {
     }
 
     try {
-      console.log('Data to send:', newValue);
       await axios.post('/account/newData', {
         userEmail: userData.email,
         name,
@@ -153,7 +150,7 @@ function EditUserData() {
             credentials: { firstName: null, lastName: null },
           },
         });
-        setUserData(res.data);
+        changeUserData(res.data);
       });
     } catch (err: any) {
       if (axios.isAxiosError(err)) {

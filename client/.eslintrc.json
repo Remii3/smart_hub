@@ -33,6 +33,7 @@
       }
     ],
     "no-underscore-dangle": "off",
-    "react/no-array-index-key": "off"
+    "react/no-array-index-key": "off",
+    "no-restricted-syntax": "off"
   }
 }
