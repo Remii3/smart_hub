@@ -1,7 +1,10 @@
 const mongoose = require('mongoose');
 
 const CartSchema = mongoose.Schema({
-  products: [mongoose.SchemaTypes.ObjectId],
+  _id: mongoose.Types.ObjectId,
+  products: {
+    type: [{ _id: mongoose.SchemaTypes.ObjectId, inCartQuantity: Number }],
+  },
 });
 
 const CartModel = mongoose.model('Cart', CartSchema);

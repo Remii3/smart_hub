@@ -1,50 +1,44 @@
 import axios from 'axios';
-import {
-  createContext,
-  Dispatch,
-  ReactNode,
-  SetStateAction,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react';
+import { createContext, ReactNode, useEffect, useMemo, useState } from 'react';
 
-import { ProductTypes } from '../types/interfaces';
+import { UserDataTypes } from '../types/interfaces';
 
 type ContextTypes = {
-  userData: null | {
-    email: string;
-    credentials: { firstName: string; lastName: string };
-    my_products: ProductTypes[];
-  };
-  setUserData:
-    | Dispatch<SetStateAction<object>>
-    | Dispatch<SetStateAction<null>>;
+  userData: null | UserDataTypes;
+  changeUserData: (data: null | UserDataTypes) => void;
 };
 
 export const UserContext = createContext<ContextTypes>({
   userData: null,
-  setUserData: () => {},
+  changeUserData() {},
 });
 
 function UserProvider({ children }: { children: ReactNode }) {
-  const [userData, setUserData] = useState(null);
+  const [userData, setUserData] = useState<null | UserDataTypes>(null);
 
   const fetchData = async () => {
-    const defaultUrl = `/account/profile`;
-    const res = await axios.get(defaultUrl);
+    const res = await axios.get('/account/profile');
     setUserData(res.data);
+  };
+
+  const changeUserData = (data: UserDataTypes | null) => {
+    setUserData(data);
   };
 
   useEffect(() => {
     const token = document.cookie.match('token');
+
+    if (document.cookie.match('token') && document.cookie.match('guestToken')) {
+      document.cookie =
+        'guestToken=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+    }
 
     if (!userData && token) {
       fetchData();
     }
   }, [userData]);
 
-  const userValues = useMemo(() => ({ userData, setUserData }), [userData]);
+  const userValues = useMemo(() => ({ userData, changeUserData }), [userData]);
   return (
     <UserContext.Provider value={userValues}>{children}</UserContext.Provider>
   );

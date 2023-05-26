@@ -9,7 +9,7 @@ function ShopPage() {
   const [shopProducts, setShopProducts] = useState<ProductTypes[]>([]);
 
   useEffect(() => {
-    axios.get('/product/shop-books').then((res) => setShopProducts(res.data));
+    axios.get('/product/shop-get').then((res) => setShopProducts(res.data));
   }, []);
 
   return (

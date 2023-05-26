@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { SwiperSlide } from 'swiper/react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import BasicSwiper from '../swiper/BasicSwiper';
 import { ProductTypes } from '../../types/interfaces';
 import PriceSelector from '../UI/ProductCollectionHelpers/PriceSelector';
@@ -25,10 +25,6 @@ function BasicProductCollection({
   showMore,
 }: PropsTypes) {
   const [highestPrice, setHighestPrice] = useState(0);
-
-  useEffect(() => {
-    console.log(allProducts.sort());
-  }, [allProducts]);
 
   return (
     <section>

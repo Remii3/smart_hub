@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { ChangeEvent, FormEvent, useContext, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import SquidIcon from '../assets/icons/SquidIcon';
+import { SunRiseIcon } from '../assets/icons/Icons';
 import PrimaryBtn from '../components/UI/Btns/PrimaryBtn';
 import { UserContext } from '../context/UserProvider';
 import CustomInput from '../components/UI/form/CustomInput';
@@ -9,7 +9,7 @@ import CustomPasswordInput from '../components/UI/form/CustomPasswordInput';
 
 function LoginPage() {
   const navigate = useNavigate();
-  const { setUserData } = useContext(UserContext);
+  const { changeUserData } = useContext(UserContext);
 
   const [logUserData, setLogUserData] = useState({
     data: {
@@ -43,7 +43,7 @@ function LoginPage() {
         password,
       });
 
-      axios.get('/account/profile').then((res) => setUserData(res.data));
+      axios.get('/account/profile').then((res) => changeUserData(res.data));
 
       navigate('/');
     } catch (err: any) {
@@ -98,7 +98,7 @@ function LoginPage() {
           <div className="max-w-xl lg:max-w-3xl">
             <Link className="inline-block text-blue-600" to="/">
               <span className="sr-only">Home</span>
-              <SquidIcon />
+              <SunRiseIcon height={8} width="auto" />
             </Link>
 
             <h1 className="mt-6 text-2xl font-bold text-gray-900 sm:text-3xl md:text-4xl">
