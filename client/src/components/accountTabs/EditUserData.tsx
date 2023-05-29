@@ -228,6 +228,7 @@ function EditUserData() {
         <div className="flex flex-col gap-4">
           <fieldset>
             <CustomInput
+              autoComplete="email"
               name="email"
               type="email"
               optional={false}

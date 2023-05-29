@@ -2,9 +2,10 @@ import { ChangeEvent, useState } from 'react';
 
 type PropsTypes = {
   highestPrice: number;
+  category: string;
 };
 
-function PriceSelector({ highestPrice }: PropsTypes) {
+function PriceSelector({ highestPrice, category }: PropsTypes) {
   const [lowPrice, setLowPrice] = useState('');
   const [highPrice, setHighPrice] = useState('');
   const resetPriceRange = () => {
@@ -21,7 +22,7 @@ function PriceSelector({ highestPrice }: PropsTypes) {
   };
 
   return (
-    <div className="relative">
+    <div className="relative" id={`${category}-PriceSelector`}>
       <details className="group [&_summary::-webkit-details-marker]:hidden">
         <summary className="flex cursor-pointer items-center gap-2 border-b border-gray-400 pb-1 text-gray-900 transition hover:border-gray-600">
           <span className="text-sm font-medium"> Price </span>
@@ -66,6 +67,7 @@ function PriceSelector({ highestPrice }: PropsTypes) {
                   <span className="text-sm text-gray-600">$</span>
 
                   <input
+                    id={`${category}-Min-PriceSelector`}
                     type="number"
                     placeholder="From"
                     className="w-full rounded-md border-gray-200 shadow-sm sm:text-sm"
@@ -78,6 +80,7 @@ function PriceSelector({ highestPrice }: PropsTypes) {
                   <span className="text-sm text-gray-600">$</span>
 
                   <input
+                    id={`${category}-Max-PriceSelector`}
                     type="number"
                     placeholder="To"
                     className="w-full rounded-md border-gray-200 shadow-sm sm:text-sm"

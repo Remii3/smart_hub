@@ -199,6 +199,7 @@ function RegisterPage() {
             >
               <div className="col-span-6 sm:col-span-3">
                 <CustomInput
+                  autoComplete="given-name"
                   type="text"
                   name="firstName"
                   hasError={regUserData.errors.credentials.firstName}
@@ -212,6 +213,7 @@ function RegisterPage() {
 
               <div className="col-span-6 sm:col-span-3">
                 <CustomInput
+                  autoComplete="family-name"
                   hasError={regUserData.errors.credentials.lastName}
                   errorValue={regUserData.errors.credentials.lastName}
                   inputValue={regUserData.data.credentials.lastName}
@@ -225,6 +227,7 @@ function RegisterPage() {
 
               <div className="col-span-6">
                 <CustomInput
+                  autoComplete="email"
                   hasError={regUserData.errors.email}
                   errorValue={regUserData.errors.email}
                   inputValue={regUserData.data.email}
@@ -238,6 +241,7 @@ function RegisterPage() {
 
               <div className="col-span-6 sm:col-span-3">
                 <PasswordInput
+                  autoComplete="new-password"
                   hasError={regUserData.errors.password}
                   errorValue={regUserData.errors.password}
                   inputValue={regUserData.data.password}
@@ -250,6 +254,7 @@ function RegisterPage() {
 
               <div className="col-span-6 sm:col-span-3">
                 <PasswordInput
+                  autoComplete="new-password"
                   hasError={regUserData.errors.passwordConfirmation}
                   errorValue={regUserData.errors.passwordConfirmation}
                   inputValue={regUserData.data.passwordConfirmation}
@@ -276,11 +281,12 @@ function RegisterPage() {
 
               <div className="col-span-6 sm:flex sm:items-center sm:gap-4">
                 <PrimaryBtn
-                  text="Create an account"
                   usecase="default"
                   type="submit"
                   customCSS="inline-block shrink-0 rounded-md border border-blue-600 bg-blue-600 px-12 py-3 text-sm font-medium text-white transition hover:bg-transparent hover:text-blue-600 focus:outline-none focus:ring active:text-blue-500"
-                />
+                >
+                  Create an account
+                </PrimaryBtn>
 
                 <p className="mt-4 text-sm text-gray-500 sm:mt-0">
                   Already have an account?{' '}

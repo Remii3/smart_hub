@@ -13,6 +13,7 @@ type CustomPasswordInputTypes = {
   inputValue: string;
   onChange: (e: ChangeEvent<HTMLInputElement>) => void;
   onBlur?: (e: ChangeEvent<HTMLInputElement>) => void;
+  autoComplete?: string | undefined;
 };
 
 const defaultProps = {
@@ -22,6 +23,7 @@ const defaultProps = {
   min: null,
   max: null,
   onBlur: undefined,
+  autoComplete: undefined,
 };
 
 function CustomPasswordInput({
@@ -37,6 +39,7 @@ function CustomPasswordInput({
   inputValue,
   onChange,
   onBlur,
+  autoComplete,
 }: CustomPasswordInputTypes) {
   const [showPassword, setShowPassword] = useState(false);
 
@@ -63,6 +66,7 @@ function CustomPasswordInput({
       <div>
         <div className="relative mt-1">
           <input
+            autoComplete={autoComplete}
             id={name}
             name={name}
             type={showPassword ? 'text' : 'password'}

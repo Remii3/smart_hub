@@ -1,25 +1,31 @@
 type PropsTypes = {
-  usecase: 'switch' | 'outline';
+  usecase: 'underline' | 'outline';
   type: 'button' | 'submit';
   text: string;
   onClick?: (e: any) => void;
-  customCSS?: string;
+  additionalStyles?: string;
 };
 
 const defaultProps = {
   onClick: () => {},
-  customCSS: '',
+  additionalStyles: '',
 };
 
-function SecondaryBtn({ usecase, type, text, onClick, customCSS }: PropsTypes) {
+function SecondaryBtn({
+  usecase,
+  type,
+  text,
+  onClick,
+  additionalStyles,
+}: PropsTypes) {
   const usecaseClass = () => {
     switch (usecase) {
-      case 'switch':
-        return '';
+      case 'underline':
+        return 'block text-gray-500 underline underline-offset-4 hover:text-gray-600 ';
       case 'outline':
         return 'border';
       default:
-        return '';
+        return 'block rounded border border-gray-600 px-5 py-3 text-gray-600 hover:ring-1 hover:ring-gray-400';
     }
   };
 
@@ -33,10 +39,7 @@ function SecondaryBtn({ usecase, type, text, onClick, customCSS }: PropsTypes) {
     <button
       type={type === 'button' ? 'button' : 'submit'}
       className={` 
-       ${
-         customCSS ||
-         'border-primary bg-white px-4 py-2 text-primary hover:bg-primary hover:text-white focus:ring-blue-300'
-       } ${usecaseClass()} rounded-md shadow-sm transition ease-out focus:ring`}
+        ${usecaseClass()} text-sm font-medium shadow-sm transition ease-out focus:ring focus:ring-white ${additionalStyles}`}
       onClick={(e) => clickHandler(e)}
     >
       {text}

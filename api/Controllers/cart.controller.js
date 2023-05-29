@@ -94,12 +94,12 @@ const getCart = async (req, res) => {
             totalPrice,
           });
         } catch (err) {
-          res.status(422).json({ message: 'No product found' });
+          res.status(422).json({ message: 'No product found', products: null });
         }
       }
       res.status(200).json({ message: 'Success', products: productsData });
     } else {
-      res.status(200).json({ message: 'No products' });
+      res.status(200).json({ message: 'No products', products: null });
     }
   } catch (err) {
     res

@@ -72,9 +72,9 @@ function MyProducts({
           <SecondaryBtn
             text={shownAllProducts ? 'Hide more' : 'Show more'}
             type="button"
-            usecase="switch"
+            usecase="outline"
             onClick={onClick}
-            customCSS={`${
+            additionalStyles={`${
               shownAllProducts
                 ? 'bg-gray-400 text-white'
                 : 'text-gray-600 bg-white'
@@ -232,11 +232,12 @@ function MyShop() {
         </div>
         <div>
           <PrimaryBtn
-            text="Add Product"
             type="button"
             usecase="default"
             onClick={() => setIsOpen((prevState) => !prevState)}
-          />
+          >
+            Add Product
+          </PrimaryBtn>
         </div>
       </div>
       <CustomDialog
@@ -572,10 +573,11 @@ function MyShop() {
           <div className="mb-2 mt-4 flex justify-end">
             <PrimaryBtn
               type="submit"
-              text="Add"
               usecase="default"
               customCSS="flex items-center justify-center bg-green-500 px-6 py-2 border-none text-white hover:bg-green-700 focus:ring-green-300"
-            />
+            >
+              Add
+            </PrimaryBtn>
           </div>
         </form>
       </CustomDialog>

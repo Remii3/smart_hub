@@ -117,6 +117,7 @@ function LoginPage() {
             >
               <div className="col-span-6">
                 <CustomInput
+                  autoComplete="email"
                   hasError={logUserData.errors.email}
                   inputValue={logUserData.data.email}
                   labelValue="Email"
@@ -130,6 +131,7 @@ function LoginPage() {
 
               <div className="col-span-6">
                 <CustomPasswordInput
+                  autoComplete="current-password"
                   hasError={logUserData.errors.password}
                   inputValue={logUserData.data.password}
                   labelValue="Password"
@@ -156,11 +158,12 @@ function LoginPage() {
 
               <div className="col-span-6 sm:flex sm:items-center sm:gap-4">
                 <PrimaryBtn
-                  text="Log in"
                   usecase="default"
                   type="submit"
                   customCSS="inline-block shrink-0 rounded-md border border-blue-600 bg-blue-600 px-12 py-3 text-sm font-medium text-white transition hover:bg-transparent hover:text-blue-600 focus:outline-none focus:ring active:text-blue-500"
-                />
+                >
+                  Log in
+                </PrimaryBtn>
 
                 <p className="mt-4 text-sm text-gray-500 sm:mt-0">
                   No account yet?{' '}

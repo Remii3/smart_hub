@@ -14,6 +14,7 @@ type CustomInputTypes = {
   inputValue: string;
   onChange: (e: ChangeEvent<HTMLInputElement>) => void;
   onBlur?: (e: ChangeEvent<HTMLInputElement>) => void;
+  autoComplete?: string | undefined;
 };
 
 const defaultProps = {
@@ -23,6 +24,7 @@ const defaultProps = {
   min: null,
   max: null,
   onBlur: undefined,
+  autoComplete: undefined,
 };
 
 function CustomInput({
@@ -39,6 +41,7 @@ function CustomInput({
   inputValue,
   onChange,
   onBlur,
+  autoComplete,
 }: CustomInputTypes) {
   const onChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
@@ -58,6 +61,7 @@ function CustomInput({
       </div>
       <div>
         <input
+          autoComplete={autoComplete}
           id={name}
           name={name}
           type={type}
