@@ -23,18 +23,18 @@ function ProductPage() {
 
   useEffect(() => {
     axios
-      .get('/product/product-get', { params: { productId: prodId } })
+      .get('/product/product', { params: { productId: prodId } })
       .then((res) => setProductData(res.data));
   }, [prodId]);
 
   const addToCartHandler = async (e: FormEvent) => {
     e.preventDefault();
 
-    const currentUserId = userData?.cartData._id || getCookie('guestToken');
+    const currentUserId = userData?._id || getCookie('guestToken');
 
     if (productData) {
-      await axios.post('/cart/cart-add', {
-        cartId: currentUserId,
+      await axios.post('/cart/cart', {
+        userId: currentUserId,
         productId: productData._id,
         productQuantity: productData.quantity,
       });
@@ -43,7 +43,6 @@ function ProductPage() {
   };
 
   if (productData === undefined) return <p> No data</p>;
-
   return (
     <section>
       <div className="relative mx-auto max-w-screen-xl px-4 py-8">

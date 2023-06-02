@@ -8,7 +8,7 @@ function AuctionsPage() {
 
   useEffect(() => {
     axios
-      .get('/product/auction-get')
+      .get('/product/auction-products')
       .then((res) => setAuctionProducts(res.data));
   }, []);
 

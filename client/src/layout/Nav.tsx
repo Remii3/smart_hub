@@ -45,7 +45,7 @@ function Nav() {
 
   const logoutHandler = async () => {
     document.cookie = 'token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-    await axios.get('/account/guest');
+    await axios.get('/user/guest');
     changeUserData(null);
   };
 

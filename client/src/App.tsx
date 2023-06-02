@@ -50,7 +50,7 @@ function App() {
       !document.cookie.match('token') &&
       !document.cookie.match('guestToken')
     ) {
-      axios.get('/account/guest');
+      axios.get('/user/guest');
     }
   }, [pathname]);
 
