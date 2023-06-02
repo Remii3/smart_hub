@@ -1,5 +1,5 @@
-import { Fragment, useContext, useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Fragment, useContext, useRef, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import gsap from 'gsap';
 import axios from 'axios';
 
@@ -16,6 +16,7 @@ import { CartContext } from '../context/CartProvider';
 function Nav() {
   const [openedBurger, setOpenedBurger] = useState(false);
   const navMobile = useRef(null);
+  const navigate = useNavigate();
   const navLinkList = [
     { to: '/news', text: 'news' },
     { to: '/shop', text: 'shop' },
@@ -28,40 +29,33 @@ function Nav() {
   gsap.registerPlugin();
 
   const showMobileOverlay = () => {
+    setOpenedBurger((prevState) => !prevState);
+  };
+
+  const logoutHandler = () => {
+    let timeoutTimer = 0;
     if (openedBurger) {
-      gsap.to(navMobile.current, {
-        left: '100vw',
-        ease: 'sine.inOut',
-      });
+      timeoutTimer = 500;
       setOpenedBurger(false);
-    } else {
-      gsap.to(navMobile.current, {
-        left: '0',
-        ease: 'sine.inOut',
-      });
-      setOpenedBurger(true);
+      navigate('/');
     }
+    setTimeout(async () => {
+      document.cookie =
+        'token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+      await axios.get('/account/guest');
+      changeUserData(null);
+    }, timeoutTimer);
   };
-
-  const logoutHandler = async () => {
-    document.cookie = 'token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-    await axios.get('/user/guest');
-    changeUserData(null);
-  };
-
-  useEffect(() => {
-    gsap.to(navMobile.current, {
-      left: '100vw',
-      ease: 'sine.inOut',
-    });
-    setOpenedBurger(false);
-  }, []);
 
   return (
     <nav>
-      <div className="relative mx-auto flex h-[64px] max-w-[1480px] flex-row items-center justify-between px-10 py-3">
-        <div>
-          <Link to="/" className="text-white">
+      <div className="relative mx-auto flex h-[64px] max-w-[1480px] flex-row items-center justify-between px-4 py-3 sm:px-10">
+        <div className="z-30">
+          <Link
+            to="/"
+            className=" text-white"
+            onClick={() => setOpenedBurger(false)}
+          >
             SmartHub
           </Link>
         </div>
@@ -89,11 +83,7 @@ function Nav() {
                       open ? 'bg-opacity-20' : 'bg-opacity-0'
                     } inline-flex w-full justify-center rounded-md bg-black px-4 py-2 text-sm font-medium text-white transition-all ease-in-out hover:bg-opacity-30 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75`}
                   >
-                    {userData ? (
-                      <SolidAccountImg height={7} width={7} />
-                    ) : (
-                      <OutlineAccountImg height={7} width={7} />
-                    )}
+                    {userData ? <SolidAccountImg /> : <OutlineAccountImg />}
                   </Menu.Button>
                 </div>
                 <Transition
@@ -216,40 +206,8 @@ function Nav() {
             )}
           </Popover>
         </div>
-        <div className="flex  md:hidden">
-          <button
-            type="button"
-            className={`${
-              openedBurger ? 'open' : ''
-            } relative z-30 block h-10 w-10 cursor-pointer pl-2 md:hidden`}
-            onClick={showMobileOverlay}
-          >
-            <span
-              className={`${
-                openedBurger
-                  ? 'left-1/2 top-[18px] w-0'
-                  : 'left-0 top-[5px] w-full'
-              } absolute block h-1 rotate-0 rounded-lg bg-white opacity-100 transition-[top,left,width] duration-200 ease-in-out`}
-            />
-            <span
-              className={`${
-                openedBurger ? 'rotate-45' : 'rotate-0'
-              } absolute left-0 top-[18px] block h-1 w-full rounded-lg bg-white opacity-100 transition-transform`}
-            />
-            <span
-              className={`${
-                openedBurger ? '-rotate-45' : 'rotate-0'
-              } absolute left-0 top-[18px] block h-1 w-full rounded-lg bg-white opacity-100 transition-transform`}
-            />
-            <span
-              className={`${
-                openedBurger
-                  ? 'left-1/2 top-[18px] w-0'
-                  : 'left-0 top-[31px] w-full'
-              } absolute block h-1 rotate-0 rounded-lg bg-white opacity-100 transition-[top,left,width] duration-200 ease-in-out`}
-            />
-          </button>
-          <Popover className="ml-1 md:hidden">
+        <div className="flex md:hidden">
+          <Popover className="z-30 mx-1 md:hidden">
             {({ open }) => (
               <>
                 <div>
@@ -275,7 +233,7 @@ function Nav() {
                   leaveFrom="opacity-100 translate-y-0"
                   leaveTo="opacity-0 translate-y-1"
                 >
-                  <Popover.Panel className="absolute right-0 z-10 mt-[10px] w-full origin-top-right transform pl-0 pr-4">
+                  <Popover.Panel className="absolute right-0 z-10 mt-[10px] w-full origin-top-right transform pl-0">
                     <div className="overflow-hidden rounded-lg shadow-lg ring-1 ring-black ring-opacity-5">
                       <CartPopup />
                     </div>
@@ -284,11 +242,38 @@ function Nav() {
               </>
             )}
           </Popover>
+          <button
+            type="button"
+            className={`${
+              openedBurger ? 'open bg-opacity-20' : 'bg-opacity-0'
+            } relative z-30 min-w-[44px] rounded-md bg-black   text-white transition-all ease-in-out hover:bg-opacity-30 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75`}
+            onClick={showMobileOverlay}
+          >
+            <span
+              className={`${
+                openedBurger ? 'translate-y-1 rotate-45' : '-translate-y-1.5'
+              } absolute left-1/2 
+               top-[40%] block h-1 w-7 origin-center -translate-x-1/2 transform rounded-lg bg-white transition duration-200 ease-in-out`}
+            />
+            <span
+              className={`${
+                openedBurger ? 'left-1/3 opacity-0' : 'left-1/2 opacity-100'
+              } absolute block h-1 w-5 -translate-x-1/2 transform rounded-lg bg-white transition-[left,opacity] duration-200 ease-in-out`}
+            />
+            <span
+              className={`${
+                openedBurger ? '-translate-y-1 -rotate-45' : 'translate-y-1.5'
+              } absolute left-1/2 top-[60%] 
+              block h-1 w-7 origin-center -translate-x-1/2 transform rounded-lg bg-white transition duration-200 ease-in-out`}
+            />
+          </button>
         </div>
       </div>
       <div
         ref={navMobile}
-        className="mobile-overlay absolute left-[100vw] top-[0] z-10 h-screen w-full bg-pageBackground pt-16"
+        className={`${
+          openedBurger ? 'left-0 opacity-100' : 'left-[100vw] opacity-0'
+        } mobile-overlay absolute top-[0] z-10 h-screen w-full transform bg-pageBackground pt-16 transition-[left,opacity] duration-500 ease-in-out`}
       >
         <ul className="flex flex-col text-white">
           {navLinkList.map((navLink, id) => (
@@ -297,6 +282,7 @@ function Nav() {
               <Link
                 to={navLink.to}
                 className="block w-full py-3 text-center text-lg transition-[color] duration-200 ease-out hover:text-primaryText"
+                onClick={showMobileOverlay}
               >
                 {navLink.text[0].toLocaleUpperCase()}
                 {navLink.text.slice(1)}
@@ -311,14 +297,16 @@ function Nav() {
             {!userData ? (
               <div className="flex-col">
                 <Link
-                  to={{ pathname: '/account', search: 'auth=login' }}
+                  to={{ pathname: '/account/login' }}
                   className="block w-full py-3 text-center text-lg transition-[color] duration-200 ease-out hover:text-primaryText"
+                  onClick={showMobileOverlay}
                 >
                   Sign in
                 </Link>
                 <Link
-                  to={{ pathname: '/account', search: 'auth=register' }}
+                  to={{ pathname: '/account/register' }}
                   className="block w-full py-3 text-center text-lg transition-[color] duration-200 ease-out hover:text-primaryText"
+                  onClick={showMobileOverlay}
                 >
                   Sign up
                 </Link>
@@ -328,12 +316,16 @@ function Nav() {
                 <Link
                   to="/account/my"
                   className="block w-full py-3 text-center text-lg transition-[color] duration-200 ease-out hover:text-primaryText"
+                  onClick={showMobileOverlay}
                 >
                   Account
                 </Link>
                 <button
                   type="button"
                   className="block w-full py-3 text-center text-lg transition-[color] duration-200 ease-out hover:text-primaryText"
+                  onClick={() => {
+                    logoutHandler();
+                  }}
                 >
                   Logout
                 </button>

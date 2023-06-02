@@ -38,12 +38,14 @@ function CollectionCard({
       <div className="pb-16">{collectionData.title}</div>
       <div>
         <PrimaryBtn
-          usecase="normal"
-          text="Check out"
+          type="button"
+          usecase="default"
           onClick={() => {
             navigate(`/collections`);
           }}
-        />
+        >
+          Check out
+        </PrimaryBtn>
       </div>
     </div>
   );

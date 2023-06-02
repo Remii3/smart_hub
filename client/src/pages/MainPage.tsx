@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import axios from 'axios';
@@ -60,12 +60,12 @@ function MainPage() {
           className="absolute left-0 top-0 h-[110vh] w-full scale-100 bg-mainBanner bg-cover bg-center bg-no-repeat brightness-50"
         />
         <section className="relative top-20 lg:-top-16">
-          <div className="mx-auto max-w-screen-xl px-4 py-32 lg:flex lg:h-screen lg:items-center">
+          <div className="mx-auto max-w-screen-xl px-4 py-[20%] sm:py-32 lg:flex lg:h-screen lg:items-center">
             <div
               id="mainPageTitle"
               className="mx-auto max-w-xl text-center lg:max-w-3xl"
             >
-              <h1 className="text-3xl font-extrabold text-white sm:text-5xl lg:text-6xl">
+              <h1 className=" font-extrabold text-white ">
                 Understand User Flow.
                 <strong className="font-extrabold text-primary sm:block">
                   Increase Conversion.
@@ -78,19 +78,21 @@ function MainPage() {
               </p>
 
               <div className="mt-8 flex flex-wrap justify-center gap-4">
-                <a
-                  className="block w-full rounded bg-primary px-12 py-3 text-sm font-medium text-white shadow hover:bg-blue-700 focus:outline-none focus:ring active:bg-red-500 sm:w-auto"
-                  href="/get-started"
+                <Link
+                  to="/"
+                  className="block w-full rounded border border-primary bg-primary px-12 py-3 text-sm font-medium text-white shadow-sm
+                  transition ease-out hover:bg-blue-700 focus:ring focus:ring-blue-300 sm:w-auto"
                 >
                   Get Started
-                </a>
-
-                <a
-                  className="block w-full rounded px-12 py-3 text-sm font-medium text-white shadow hover:text-primary focus:outline-none focus:ring active:text-red-500 sm:w-auto"
-                  href="/about"
+                </Link>
+                <Link
+                  //
+                  // className="block w-full px-12 py-3 text-sm font-medium text-white underline underline-offset-4  hover:text-primary focus:outline-none focus:ring active:text-red-500 sm:w-auto"
+                  className="block rounded border border-white px-5 py-3 text-sm text-white transition hover:ring-1 hover:ring-white"
+                  to="/"
                 >
                   Learn More
-                </a>
+                </Link>
               </div>
             </div>
           </div>
@@ -124,11 +126,12 @@ function MainPage() {
             <PrimaryBtn
               usecase="default"
               type="button"
-              text="See all genres"
               onClick={() => {
                 navigate('/shop/categories');
               }}
-            />
+            >
+              See all genres
+            </PrimaryBtn>
           </div>
         </section>
         {/* Gallery */}
@@ -193,12 +196,13 @@ function MainPage() {
           <div className="w-full text-center">
             <PrimaryBtn
               type="button"
-              text="See all auctions"
               usecase="default"
               onClick={() => {
                 navigate('/auctions');
               }}
-            />
+            >
+              See all auctions
+            </PrimaryBtn>
           </div>
         </section>
       </div>

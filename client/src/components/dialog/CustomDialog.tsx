@@ -104,18 +104,19 @@ function CustomDialog({
                 <div className="flex justify-end space-x-3">
                   <PrimaryBtn
                     type="button"
-                    text="Try again"
                     usecase="default"
                     onClick={changeHasFailedHandler}
-                  />
+                  >
+                    Try again
+                  </PrimaryBtn>
                   <div className="flex justify-center">
-                    <SecondaryBtn
+                    <button
                       type="button"
-                      text="Close"
-                      usecase="outline"
                       onClick={changeIsOpen}
-                      customCSS="border-red-500 px-4 py-2 text-red-500 bg-white hover:text-white hover:bg-red-500 focus:ring-red-200"
-                    />
+                      className="border-red-500 bg-white px-4 py-2 text-red-500 hover:bg-red-500 hover:text-white focus:ring-red-200"
+                    >
+                      Close
+                    </button>
                   </div>
                 </div>
               </div>

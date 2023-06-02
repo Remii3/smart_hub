@@ -16,7 +16,9 @@ function MainLayout({ children }: PropsType) {
   return (
     <div id="mainContainer" className="relative overflow-hidden bg-white">
       <Header currentPathname={currentPathname} />
-      <main className="mt-16 h-full w-full">{children}</main>
+      <main className="mt-16 h-full min-h-[calc(100vh-64px-284px)] w-full">
+        {children}
+      </main>
       <Footer />
     </div>
   );

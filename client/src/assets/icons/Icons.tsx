@@ -115,7 +115,7 @@ export function CartIcon({ height, width }: CheckiconTypes) {
   );
 }
 
-export function OutlineAccountImg({ height, width }: CheckiconTypes) {
+export function OutlineAccountImg() {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -123,7 +123,7 @@ export function OutlineAccountImg({ height, width }: CheckiconTypes) {
       viewBox="0 0 24 24"
       strokeWidth={1.5}
       stroke="currentColor"
-      className={`h-${height} w-${width}`}
+      className="h-7 w-7"
     >
       <path
         strokeLinecap="round"
@@ -134,13 +134,13 @@ export function OutlineAccountImg({ height, width }: CheckiconTypes) {
   );
 }
 
-export function SolidAccountImg({ height, width }: CheckiconTypes) {
+export function SolidAccountImg() {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 24 24"
       fill="currentColor"
-      className={`h-${height} w-${width}`}
+      className="h-7 w-7"
     >
       <path
         fillRule="evenodd"
@@ -157,5 +157,3 @@ TicketIcon.defaultProps = defaultProps;
 TrashIcon.defaultProps = defaultProps;
 CloseIcon.defaultProps = defaultProps;
 CartIcon.defaultProps = defaultProps;
-OutlineAccountImg.defaultProps = defaultProps;
-SolidAccountImg.defaultProps = defaultProps;

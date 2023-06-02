@@ -4,9 +4,11 @@ import { Link } from 'react-router-dom';
 import CartItem from './CartItem';
 import { CartContext } from '../../context/CartProvider';
 import { CloseIcon } from '../../assets/icons/Icons';
+import PrimaryBtn from '../UI/Btns/PrimaryBtn';
 
 function CartPopup() {
   const { cartProducts } = useContext(CartContext);
+
   return (
     <div
       className="relative w-screen max-w-full bg-white px-6 py-8 sm:px-6 md:max-w-sm lg:px-6"
@@ -30,9 +32,8 @@ function CartPopup() {
                 inCartQuantity={cartProduct.inCartQuantity}
               />
             ))}
-          {cartProducts && cartProducts.length < 1 && (
-            <p>No products in cart yet!</p>
-          )}
+          {((cartProducts && cartProducts.length < 1) ||
+            cartProducts === null) && <p>No products in cart yet!</p>}
         </ul>
 
         <div className="space-y-4 text-center">
@@ -41,13 +42,14 @@ function CartPopup() {
             to="/cart"
             className="block rounded border border-gray-600 px-5 py-3 text-sm text-gray-600 transition hover:ring-1 hover:ring-gray-400"
           >
-            View my cart ({cartProducts?.length})
+            View my cart ({cartProducts?.length || 0})
           </Popover.Button>
 
           <Popover.Button
             as={Link}
             to="/checkout"
-            className="block rounded bg-gray-700 px-5 py-3 text-sm text-gray-100 transition hover:bg-gray-600"
+            className="block w-full rounded border border-primary bg-primary px-12 py-3 text-sm font-medium
+            text-white shadow-sm transition ease-out hover:bg-blue-700 focus:ring focus:ring-blue-300"
           >
             Checkout
           </Popover.Button>

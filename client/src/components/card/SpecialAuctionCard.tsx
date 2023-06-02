@@ -88,7 +88,7 @@ function SpecialAuctionCard({
                     <span className="text-base text-gray600">
                       Description:{' '}
                     </span>
-                    <span className="break-words text-md text-darkTint">
+                    <span className="text-md break-words text-darkTint">
                       {description}
                     </span>
                   </p>
@@ -97,18 +97,19 @@ function SpecialAuctionCard({
               <div className="flex flex-col justify-start gap-2 sm:flex-row md:flex-col lg:items-start xl:flex-row xl:pt-3">
                 <PrimaryBtn
                   type="button"
-                  text="Enter live auction"
                   usecase="default"
                   onClick={() => {
                     navigate(`/auctions/${_id}`);
                   }}
-                />
+                >
+                  Enter live auction
+                </PrimaryBtn>
                 <SecondaryBtn
                   type="button"
-                  usecase="switch"
+                  usecase="outline"
                   text={descHidden ? 'View details' : 'Hide details'}
                   onClick={showDesc}
-                  customCSS={
+                  additionalStyles={
                     descHidden ? 'text-gray-600 ' : 'text-white bg-gray-600'
                   }
                 />

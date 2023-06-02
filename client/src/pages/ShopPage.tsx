@@ -32,14 +32,17 @@ function ShopPage() {
             ))}
           </ul>
         </section>
+        {/* map fetched type products */}
         {shopProducts && (
           <BasicProductCollection
+            category="action"
             title="New collection"
             allProducts={shopProducts}
           />
         )}
         {shopProducts && (
           <BasicProductCollection
+            category="adventure"
             title="New title"
             showMore
             subTitle="adsasd asdasd"
@@ -48,6 +51,7 @@ function ShopPage() {
         )}
         {shopProducts && (
           <BasicProductCollection
+            category="science"
             title="New series"
             showMore
             subTitle="

@@ -15,12 +15,12 @@ function MainPageHeading({ mainTitle, subTitle, usecase, color }: PropsTypes) {
       {usecase === 'main' ? (
         <h2 className={`mb-5 uppercase text-${color}`}>{mainTitle}</h2>
       ) : (
-        <h3 className={`mb-5 text-${color}`}>{mainTitle}</h3>
+        <h3 className={`mb-5   text-${color}`}>{mainTitle}</h3>
       )}
       <p
         className={`${
           color === 'dark' ? 'text-darkTint' : 'text-gray900'
-        } text-sm uppercase sm:text-base lg:text-lg`}
+        }  uppercase sm:text-lg`}
       >
         {subTitle}
       </p>

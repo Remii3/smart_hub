@@ -18,12 +18,14 @@ function AuctionsPage() {
       <div className="mx-auto flex max-w-7xl flex-col gap-10 py-10">
         {auctionProducts && (
           <BasicProductCollection
+            category="adventure"
             title="New collection"
             allProducts={auctionProducts}
           />
         )}
         {auctionProducts && (
           <BasicProductCollection
+            category="action"
             title="New title"
             showMore
             subTitle="adsasd asdasd"
@@ -32,6 +34,7 @@ function AuctionsPage() {
         )}
         {auctionProducts && (
           <BasicProductCollection
+            category="science"
             title="New series"
             showMore
             subTitle="

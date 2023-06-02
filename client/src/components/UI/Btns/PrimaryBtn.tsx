@@ -1,17 +1,28 @@
+import { ReactNode } from 'react';
+
 type PropsTypes = {
   usecase: 'default' | 'proceed' | '';
   type: 'button' | 'submit';
-  text: string;
   onClick?: (e: any) => void;
   customCSS?: string;
+  additionalStyles?: string;
+  children: ReactNode;
 };
 
 const defaultProps = {
   onClick: () => {},
   customCSS: '',
+  additionalStyles: '',
 };
 
-function PrimaryBtn({ usecase, text, onClick, customCSS, type }: PropsTypes) {
+function PrimaryBtn({
+  usecase,
+  onClick,
+  customCSS,
+  type,
+  additionalStyles,
+  children,
+}: PropsTypes) {
   const usecaseClass = () => {
     switch (usecase) {
       default:
@@ -30,11 +41,11 @@ function PrimaryBtn({ usecase, text, onClick, customCSS, type }: PropsTypes) {
       type={type === 'button' ? 'button' : 'submit'}
       className={`${
         customCSS ||
-        'border-primary bg-primary px-4 py-2 text-white hover:bg-blue-700 focus:ring-blue-300'
-      } ${usecaseClass()} rounded-md border shadow-sm transition ease-out focus:ring`}
+        'border-primary bg-primary px-12 py-3 text-sm font-medium text-white hover:bg-blue-700 focus:ring-blue-300'
+      }  rounded border shadow-sm transition ease-out focus:ring ${additionalStyles} ${usecaseClass()}`}
       onClick={(e) => clickHandler(e)}
     >
-      {text}
+      {children}
     </button>
   );
 }

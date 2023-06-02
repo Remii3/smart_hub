@@ -305,12 +305,13 @@ function ProductPage() {
                 </div>
 
                 <PrimaryBtn
-                  text="Add to Cart"
                   usecase="default"
                   customCSS="block rounded bg-green-600 px-5 py-3 text-xs font-medium text-white hover:bg-green-500"
                   type="submit"
                   onClick={(e) => addToCartHandler(e)}
-                />
+                >
+                  Add to Cart
+                </PrimaryBtn>
               </div>
             </form>
           </div>

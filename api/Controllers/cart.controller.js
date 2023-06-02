@@ -109,11 +109,11 @@ const getCart = async (req, res) => {
                 products: productsData,
             });
         } else {
-            res.status(200).json({ message: 'No products' });
+            res.status(200).json({ message: 'No products', products: null });
         }
     } catch (err) {
         res.status(500).json({
-            message: 'Something went wrong with fetching cart data',
+            message: 'Something went wrong with fetching cart data', products: null,
         });
     }
 };

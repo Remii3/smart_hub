@@ -11,6 +11,7 @@ type PropsTypes = {
   subTitle?: string | null;
   showMore?: boolean;
   allProducts: ProductTypes[];
+  category: string;
 };
 
 const defaultProps = {
@@ -23,6 +24,7 @@ function BasicProductCollection({
   title,
   subTitle,
   showMore,
+  category,
 }: PropsTypes) {
   const [highestPrice, setHighestPrice] = useState(0);
 
@@ -42,35 +44,12 @@ function BasicProductCollection({
         )}
         {subTitle && <p className="mt-4 max-w-md text-gray-500">{subTitle}</p>}
       </header>
-      <div className="mt-8 px-4 sm:flex sm:items-center sm:justify-between">
-        <div className="block sm:hidden">
-          <button
-            type="button"
-            className="flex cursor-pointer items-center gap-2 border-b border-gray-400 pb-1 text-gray-900 transition hover:border-gray-600"
-          >
-            <span className="text-sm font-medium"> Filters & Sorting </span>
-
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth="1.5"
-              stroke="currentColor"
-              className="h-4 w-4 rtl:rotate-180"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M8.25 4.5l7.5 7.5-7.5 7.5"
-              />
-            </svg>
-          </button>
+      <div className="mt-8 flex items-center justify-between px-4">
+        <div className="flex gap-4">
+          <PriceSelector highestPrice={highestPrice} category={category} />
         </div>
-        <div className="hidden sm:flex sm:gap-4">
-          <PriceSelector highestPrice={highestPrice} />
-        </div>
-        <div className="hidden sm:block">
-          <SortProducts />
+        <div className="block">
+          <SortProducts category={category} />
         </div>
       </div>
       <div className="mt-4">
