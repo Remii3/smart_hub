@@ -1,5 +1,10 @@
 const Cart = require('../Models/cart');
 const Product = require('../Models/product');
+const calculateOrderAmount = require('../helpers/calculateOrderAmount');
+
+const stripe = require('stripe')(
+  'sk_test_51NDZ0zHqBBlAtOOFMShIrv9OwdfC6958wOWqZa1X59kOeyY4hNtZ80ANZ6WYv67v4a8FOFguc04SCV84QKEf6nFf005r6tKBO6',
+);
 
 const addToCart = async (req, res) => {
   const { cartId, productId, productQuantity } = req.body;
@@ -148,10 +153,28 @@ const cartItemDecrement = async (req, res) => {
   }
 };
 
+const initiatePayment = async (req, res) => {
+  const { items } = req.body;
+
+  // Create a PaymentIntent with the order amount and currency
+  const paymentIntent = await stripe.paymentIntents.create({
+    amount: calculateOrderAmount(items),
+    currency: 'eur',
+    automatic_payment_methods: {
+      enabled: true,
+    },
+  });
+
+  res.send({
+    clientSecret: paymentIntent.client_secret,
+  });
+};
+
 module.exports = {
   addToCart,
   removeFromCart,
   getCart,
   cartItemIncrement,
   cartItemDecrement,
+  initiatePayment,
 };

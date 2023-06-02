@@ -1,10 +1,10 @@
 import { Popover } from '@headlessui/react';
+import axios from 'axios';
 import { useContext } from 'react';
 import { Link } from 'react-router-dom';
 import CartItem from './CartItem';
 import { CartContext } from '../../context/CartProvider';
 import { CloseIcon } from '../../assets/icons/Icons';
-import PrimaryBtn from '../UI/Btns/PrimaryBtn';
 
 function CartPopup() {
   const { cartProducts } = useContext(CartContext);
@@ -30,6 +30,7 @@ function CartPopup() {
                 key={cartProduct.productData._id}
                 productData={cartProduct.productData}
                 inCartQuantity={cartProduct.inCartQuantity}
+                inCheckout={false}
               />
             ))}
           {((cartProducts && cartProducts.length < 1) ||
@@ -44,7 +45,6 @@ function CartPopup() {
           >
             View my cart ({cartProducts?.length || 0})
           </Popover.Button>
-
           <Popover.Button
             as={Link}
             to="/checkout"

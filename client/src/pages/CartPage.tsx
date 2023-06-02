@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import axios from 'axios';
 import { useContext } from 'react';
 import CartItem from '../components/cart/CartItem';
 import { CartContext } from '../context/CartProvider';
@@ -13,7 +14,15 @@ function CartPage() {
       cartTotalPrice += product.totalPrice;
     }
   }
-
+  const checkoutHandler = async (e: any) => {
+    axios
+      .post('/cart/create-checkout-session', {
+        items: cartProducts,
+      })
+      .then((res) => {
+        window.location = res.data.session.url;
+      });
+  };
   return (
     <section>
       <div className="mx-auto max-w-screen-xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
@@ -32,6 +41,7 @@ function CartPage() {
                     key={cartProduct.productData._id}
                     productData={cartProduct.productData}
                     inCartQuantity={cartProduct.inCartQuantity}
+                    inCheckout={false}
                   />
                 ))}
             </ul>
@@ -71,12 +81,13 @@ function CartPage() {
                 </div>
 
                 <div className="flex justify-end">
-                  <Link
-                    to="/checkout"
+                  <button
+                    type="button"
+                    onClick={checkoutHandler}
                     className="block rounded bg-primary px-5 py-3 text-sm text-gray-100 transition hover:bg-blue-700"
                   >
                     Checkout
-                  </Link>
+                  </button>
                 </div>
               </div>
             </div>

@@ -9,9 +9,10 @@ import getCookie from '../../helpers/getCookie';
 type CartItemProps = {
   productData: ProductTypes;
   inCartQuantity: number;
+  inCheckout: boolean;
 };
 
-function CartItem({ productData, inCartQuantity }: CartItemProps) {
+function CartItem({ productData, inCartQuantity, inCheckout }: CartItemProps) {
   const { userData } = useContext(UserContext);
   const { fetchCartData } = useContext(CartContext);
   const [currentQuantity, setCurrentQuantity] = useState(inCartQuantity);
@@ -64,46 +65,53 @@ function CartItem({ productData, inCartQuantity }: CartItemProps) {
       </div>
 
       <div className="flex flex-1 items-center justify-end gap-3">
-        <form>
-          <div className="flex items-center">
-            <button
-              type="button"
-              className={`${!(currentQuantity > 1) && 'text-gray-300'} px-2`}
-              disabled={!(currentQuantity > 1)}
-              onClick={() => decrementCartItemHandler()}
-            >
-              -
-            </button>
-            <label htmlFor="Line1Qty" className="sr-only">
-              Quantity
-            </label>
-            <input
-              type="number"
-              min="1"
-              value={currentQuantity}
-              readOnly
-              id="Line1Qty"
-              className="h-8 w-12 rounded border-gray-200 bg-gray-50 p-0 text-center text-xs text-gray-600 [-moz-appearance:_textfield] focus:outline-none [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none"
-            />
-            <button
-              type="button"
-              className="px-2"
-              onClick={() => incrementCartItemhandler()}
-            >
-              +
-            </button>
-          </div>
-        </form>
+        {inCheckout && (
+          <span className="text-lg text-gray-500">x{inCartQuantity}</span>
+        )}
+        {!inCheckout && (
+          <form>
+            <div className="flex items-center">
+              <button
+                type="button"
+                className={`${!(currentQuantity > 1) && 'text-gray-300'} px-2`}
+                disabled={!(currentQuantity > 1)}
+                onClick={() => decrementCartItemHandler()}
+              >
+                -
+              </button>
+              <label htmlFor="Line1Qty" className="sr-only">
+                Quantity
+              </label>
+              <input
+                type="number"
+                min="1"
+                value={currentQuantity}
+                readOnly
+                id="Line1Qty"
+                className="h-8 w-12 rounded border-gray-200 bg-gray-50 p-0 text-center text-xs text-gray-600 [-moz-appearance:_textfield] focus:outline-none [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none"
+              />
+              <button
+                type="button"
+                className="px-2"
+                onClick={() => incrementCartItemhandler()}
+              >
+                +
+              </button>
+            </div>
+          </form>
+        )}
 
-        <button
-          type="button"
-          className="text-gray-600 transition hover:text-red-600"
-          onClick={removeProductHandler}
-        >
-          <span className="sr-only">Remove item</span>
+        {!inCheckout && (
+          <button
+            type="button"
+            className="text-gray-600 transition hover:text-red-600"
+            onClick={removeProductHandler}
+          >
+            <span className="sr-only">Remove item</span>
 
-          <TrashIcon height={4} width={4} />
-        </button>
+            <TrashIcon height={4} width={4} />
+          </button>
+        )}
       </div>
     </li>
   );

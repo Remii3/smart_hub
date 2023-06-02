@@ -12,6 +12,7 @@ require('dotenv').config();
 
 app.use(express.json());
 app.use(cookieParser());
+app.use(express.static('public'));
 app.use(
   cors({
     credentials: true,
@@ -28,11 +29,11 @@ mongoose
     app.listen(PORT, () => {
       console.log(`App listening on PORT ${PORT}`);
     });
+
+    app.use('/account', account_routes);
+    app.use('/product', product_routes);
+    app.use('/cart', cart_routes);
   })
   .catch(err => {
     console.log(err);
   });
-
-app.use('/account', account_routes);
-app.use('/product', product_routes);
-app.use('/cart', cart_routes);
