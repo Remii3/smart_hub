@@ -82,15 +82,16 @@ function RegisterPage() {
 
     const { credentials, email, password, passwordConfirmation } =
       regUserData.data;
+
     try {
-      await axios.post('/account/register', {
+      await axios.post('/user/register', {
         credentials,
         email,
         password,
         passwordConfirmation,
       });
 
-      axios.get('/account/profile').then((res) => changeUserData(res.data));
+      axios.get('/user/profile').then((res) => changeUserData(res.data));
 
       navigate('/');
     } catch (err: any) {

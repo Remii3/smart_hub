@@ -37,14 +37,14 @@ function MainPage() {
     });
 
     try {
-      axios.get('/product/categories-get').then((res) => {
-        setShopList(res.data);
-      });
+      // axios.get('/product/categories-get').then((res) => {
+      //   setShopList(res.data);
+      // });
     } catch (err) {
       console.error(err);
     }
     try {
-      axios.get('/product/all-get').then((res) => {
+      axios.get('/product/all').then((res) => {
         setCollection(res.data);
       });
     } catch (err) {

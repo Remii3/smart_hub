@@ -159,7 +159,6 @@ function MyShop() {
     if (productData.category.value === 'Other') {
       currentCategory = productData.otherCategory.value;
     }
-
     const newProductData = {
       userEmail: userData?.email,
       title: productData.title.value,
@@ -177,7 +176,7 @@ function MyShop() {
 
     try {
       setIsLoading(true);
-      await axios.post('/product/add-product', newProductData);
+      await axios.post('/product/product', newProductData);
       setIsLoading(false);
       resetProductData();
       setIsSuccess(true);
@@ -189,7 +188,7 @@ function MyShop() {
 
   useEffect(() => {
     if (productData.category.value === '') {
-      axios.get('/product/categories').then((res) => {
+      axios.get('/category/all').then((res) => {
         setCategories(res.data);
         setProductData((prevState) => {
           return {

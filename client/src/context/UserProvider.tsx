@@ -17,7 +17,7 @@ function UserProvider({ children }: { children: ReactNode }) {
   const [userData, setUserData] = useState<null | UserDataTypes>(null);
 
   const fetchData = async () => {
-    const res = await axios.get('/account/profile');
+    const res = await axios.get('/user/profile');
     setUserData(res.data);
   };
 

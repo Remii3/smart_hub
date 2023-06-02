@@ -38,12 +38,12 @@ function LoginPage() {
     const { email, password } = logUserData.data;
 
     try {
-      await axios.post('/account/login', {
+      await axios.post('/user/login', {
         email,
         password,
       });
 
-      axios.get('/account/profile').then((res) => changeUserData(res.data));
+      axios.get('/user/profile').then((res) => changeUserData(res.data));
 
       navigate('/');
     } catch (err: any) {

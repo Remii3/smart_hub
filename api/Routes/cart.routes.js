@@ -3,16 +3,16 @@ const express = require('express');
 const router = express.Router();
 
 const {
-  addToCart,
-  removeFromCart,
-  getCart,
-  cartItemDecrement,
-  cartItemIncrement,
+    addToCart,
+    removeFromCart,
+    getCart,
+    cartItemDecrement,
+    cartItemIncrement,
 } = require('../Controllers/cart.controller');
 
-router.get('/cart-get', getCart);
+router.get('/cart', getCart);
 
-router.post('/cart-add', addToCart);
+router.post('/cart', addToCart);
 router.post('/cart-remove', removeFromCart);
 router.post('/cartItem-increment', cartItemIncrement);
 router.post('/cartItem-decrement', cartItemDecrement);

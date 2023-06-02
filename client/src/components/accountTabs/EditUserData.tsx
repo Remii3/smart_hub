@@ -127,12 +127,12 @@ function EditUserData() {
     }
 
     try {
-      await axios.post('/account/newData', {
+      await axios.post('/user/newData', {
         userEmail: userData.email,
         name,
         newValue,
       });
-      axios.get('/account/profile').then((res) => {
+      axios.get('/user/profile').then((res) => {
         setNewDataFieldShow({
           email: false,
           password: false,

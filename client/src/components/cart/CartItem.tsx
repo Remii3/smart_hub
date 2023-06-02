@@ -15,11 +15,11 @@ function CartItem({ productData, inCartQuantity }: CartItemProps) {
   const { userData } = useContext(UserContext);
   const { fetchCartData } = useContext(CartContext);
   const [currentQuantity, setCurrentQuantity] = useState(inCartQuantity);
-  const userCartId = userData?.cartData._id || getCookie('guestToken');
+  const userId = userData?._id || getCookie('guestToken');
 
   const removeProductHandler = async () => {
     await axios.post('/cart/cart-remove', {
-      cartId: userCartId,
+      userId,
       productId: productData._id,
     });
     fetchCartData();
@@ -27,7 +27,7 @@ function CartItem({ productData, inCartQuantity }: CartItemProps) {
 
   const incrementCartItemhandler = async () => {
     await axios.post('cart/cartItem-increment', {
-      cartId: userCartId,
+      userId,
       productId: productData._id,
     });
     fetchCartData();
@@ -36,7 +36,7 @@ function CartItem({ productData, inCartQuantity }: CartItemProps) {
 
   const decrementCartItemHandler = async () => {
     await axios.post('cart/cartItem-decrement', {
-      cartId: userCartId,
+      userId,
       productId: productData._id,
     });
     fetchCartData();
