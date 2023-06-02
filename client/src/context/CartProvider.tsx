@@ -34,11 +34,11 @@ function CartProvider({ children }: { children: ReactNode }) {
   const { userData } = useContext(UserContext);
 
   const fetchCartData = useCallback(async () => {
-    const userCartId = userData?.cartData._id || getCookie('guestToken');
+    const userId = userData?._id || getCookie('guestToken');
 
-    if (userCartId) {
-      const res = await axios.get('/cart/cart-get', {
-        params: { cartId: userCartId },
+    if (userId) {
+      const res = await axios.get('/cart/cart', {
+        params: { userId },
       });
       setCartProducts(res.data.products);
     }

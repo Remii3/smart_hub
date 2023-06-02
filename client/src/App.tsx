@@ -45,15 +45,15 @@ function App() {
   const { userData } = useContext(UserContext);
   const { pathname } = useLocation();
 
-  // useEffect(() => {
-  //   window.scrollTo(0, 0);
-  //   if (
-  //     !document.cookie.match('token') &&
-  //     !document.cookie.match('guestToken')
-  //   ) {
-  //     axios.get('/account/guest');
-  //   }
-  // }, [pathname]);
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    if (
+      !document.cookie.match('token') &&
+      !document.cookie.match('guestToken')
+    ) {
+      axios.get('/user/guest');
+    }
+  }, [pathname]);
 
   return (
     <SuspenseComponent fallback={<LoadingComponent />}>
