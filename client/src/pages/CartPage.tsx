@@ -6,23 +6,8 @@ import { CartContext } from '../context/CartProvider';
 import { TicketIcon } from '../assets/icons/Icons';
 
 function CartPage() {
-  const { cartProducts } = useContext(CartContext);
-  let cartTotalPrice = 0;
+  const { cart } = useContext(CartContext);
 
-  if (cartProducts) {
-    for (const product of cartProducts) {
-      cartTotalPrice += product.totalPrice;
-    }
-  }
-  const checkoutHandler = async (e: any) => {
-    axios
-      .post('/cart/create-checkout-session', {
-        items: cartProducts,
-      })
-      .then((res) => {
-        window.location = res.data.session.url;
-      });
-  };
   return (
     <section>
       <div className="mx-auto max-w-screen-xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
@@ -35,8 +20,8 @@ function CartPage() {
 
           <div className="mt-8">
             <ul className="space-y-4">
-              {cartProducts &&
-                cartProducts.map((cartProduct) => (
+              {cart &&
+                cart.products.map((cartProduct) => (
                   <CartItem
                     key={cartProduct.productData._id}
                     productData={cartProduct.productData}
@@ -66,7 +51,7 @@ function CartPage() {
 
                   <div className="flex justify-between !text-base font-medium">
                     <dt>Total</dt>
-                    <dd>£{cartTotalPrice}</dd>
+                    <dd>{cart && cart.cartPrice}</dd>
                   </div>
                 </dl>
 
@@ -81,13 +66,12 @@ function CartPage() {
                 </div>
 
                 <div className="flex justify-end">
-                  <button
-                    type="button"
-                    onClick={checkoutHandler}
+                  <Link
+                    to={'/checkout'}
                     className="block rounded bg-primary px-5 py-3 text-sm text-gray-100 transition hover:bg-blue-700"
                   >
                     Checkout
-                  </button>
+                  </Link>
                 </div>
               </div>
             </div>

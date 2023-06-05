@@ -4,12 +4,20 @@ import {
   LinkAuthenticationElement,
   PaymentElement,
 } from '@stripe/react-stripe-js';
-import { useState, useEffect } from 'react';
+import { StripeLinkAuthenticationElementChangeEvent } from '@stripe/stripe-js';
+import axios from 'axios';
+import { useState, useEffect, ChangeEvent, useContext } from 'react';
+import { UserContext } from '../../context/UserProvider';
+import getCookie from '../../helpers/getCookie';
+import { useNavigate } from 'react-router-dom';
+import { CartContext } from '../../context/CartProvider';
 
 export default function CheckoutForm() {
-  const [test, setTest] = useState<any>(null);
   const stripe = useStripe();
   const elements = useElements();
+  const { userData } = useContext(UserContext);
+  const { fetchCartData, cart } = useContext(CartContext);
+  const navigate = useNavigate();
 
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState<any>(null);
@@ -52,8 +60,6 @@ export default function CheckoutForm() {
     e.preventDefault();
 
     if (!stripe || !elements) {
-      // Stripe.js hasn't yet loaded.
-      // Make sure to disable form submission until Stripe.js has loaded.
       return;
     }
 
@@ -62,52 +68,57 @@ export default function CheckoutForm() {
     const { error } = await stripe.confirmPayment({
       elements,
       confirmParams: {
-        // Make sure to change this to your payment completion page
         return_url: 'http://localhost:5173',
       },
+      redirect: 'if_required',
     });
-
-    // This point will only be reached if there is an immediate error when
-    // confirming the payment. Otherwise, your customer will be redirected to
-    // your `return_url`. For some payment methods like iDEAL, your customer will
-    // be redirected to an intermediate site first to authorize the payment, then
-    // redirected to the `return_url`.
-    if (error.type === 'card_error' || error.type === 'validation_error') {
-      setMessage(error.message);
+    if (error) {
+      if (error.type === 'card_error' || error.type === 'validation_error') {
+        setMessage(error.message);
+      } else {
+        setMessage('An unexpected error occurred.');
+      }
     } else {
-      setMessage('An unexpected error occurred.');
-    }
+      const currentUserId = userData?._id || getCookie('guestToken');
+      await axios.post('/cart/cart-remove', {
+        userId: currentUserId,
+        productId: 'all',
+      });
+      fetchCartData();
 
+      navigate('/thankyou');
+    }
     setIsLoading(false);
   };
 
   const paymentElementOptions = {
     layout: 'tabs',
   };
-  if (test === null) {
-    const test2 = document.querySelector('input[name="email"]');
-    console.log(test2);
-    // test2?.mount('#test');
-    setTest('asd');
-  }
 
   return (
     <form id="payment-form" onSubmit={handleSubmit}>
       <LinkAuthenticationElement
         id="link-authentication-element"
-        onChange={(e: any) => setEmail(e.target.value)}
+        onChange={(e: StripeLinkAuthenticationElementChangeEvent) =>
+          setEmail(e.value.email)
+        }
+        options={{ defaultValues: { email: userData?.email || '' } }}
       />
       <PaymentElement id="payment-element" options={paymentElementOptions} />
       <button
         type="submit"
-        disabled={isLoading || !stripe || !elements}
+        disabled={
+          isLoading ||
+          !stripe ||
+          !elements ||
+          (cart?.products && cart?.products.length < 1)
+        }
         id="submit"
       >
         <span id="button-text">
           {isLoading ? <div className="spinner" id="spinner" /> : 'Pay now'}
         </span>
       </button>
-      {/* Show any error or success messages */}
       {message && <div id="payment-message">{message}</div>}
     </form>
   );

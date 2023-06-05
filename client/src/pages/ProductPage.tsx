@@ -9,6 +9,8 @@ import getCookie from '../helpers/getCookie';
 
 function ProductPage() {
   const [selectedQuantity, setSelectedQuantity] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isMyProduct, setIsMyProduct] = useState(false);
   const [productData, setProductData] = useState<ProductTypes>();
   const { userData } = useContext(UserContext);
   const { fetchCartData } = useContext(CartContext);
@@ -33,14 +35,22 @@ function ProductPage() {
     const currentUserId = userData?._id || getCookie('guestToken');
 
     if (productData) {
+      setIsLoading(true);
       await axios.post('/cart/cart', {
         userId: currentUserId,
         productId: productData._id,
         productQuantity: productData.quantity,
       });
       fetchCartData();
+      setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (userData?.my_products.find((item) => item._id === productData?._id)) {
+      setIsMyProduct(true);
+    }
+  }, [userData, productData]);
 
   if (productData === undefined) return <p> No data</p>;
   return (
@@ -84,16 +94,26 @@ function ProductPage() {
           </div>
 
           <div className="sticky top-0">
-            {productData.marketPlace === 'Shop' && (
-              <strong className="rounded-full border border-blue-600 bg-gray-100 px-3 py-0.5 text-xs font-medium tracking-wide text-blue-600">
-                {productData.marketPlace}
-              </strong>
-            )}
-            {productData.marketPlace === 'Auction' && (
-              <strong className="rounded-full border border-pink-600 bg-gray-100 px-3 py-0.5 text-xs font-medium tracking-wide text-pink-600">
-                {productData.marketPlace}
-              </strong>
-            )}
+            <div className="relative w-full">
+              {productData.marketPlace === 'Shop' && (
+                <strong className="rounded-full border border-blue-600 bg-gray-100 px-3 py-0.5 text-xs font-medium tracking-wide text-blue-600">
+                  {productData.marketPlace}
+                </strong>
+              )}
+              {productData.marketPlace === 'Auction' && (
+                <strong className="rounded-full border border-pink-600 bg-gray-100 px-3 py-0.5 text-xs font-medium tracking-wide text-pink-600">
+                  {productData.marketPlace}
+                </strong>
+              )}
+              {isMyProduct && (
+                <button
+                  type="button"
+                  className="absolute right-0 inline-block rounded-md border border-gray-300 px-2"
+                >
+                  Hello
+                </button>
+              )}
+            </div>
 
             <div className="mt-8 flex justify-between">
               <div className="max-w-[35ch] space-y-2">
@@ -151,7 +171,7 @@ function ProductPage() {
                 </div>
               </div>
 
-              <p className="text-lg font-bold">${productData.price}</p>
+              <p className="text-lg font-bold">€{productData.price}</p>
             </div>
 
             <div className="mt-4">
@@ -304,14 +324,22 @@ function ProductPage() {
                   />
                 </div>
 
-                <PrimaryBtn
-                  usecase="default"
-                  customCSS="block rounded bg-green-600 px-5 py-3 text-xs font-medium text-white hover:bg-green-500"
-                  type="submit"
+                <button
+                  className={`${
+                    !isLoading && ''
+                  } block rounded bg-[#5469d4] px-5 py-3 text-xs font-medium text-white`}
+                  type="button"
                   onClick={(e) => addToCartHandler(e)}
+                  disabled={isLoading}
                 >
-                  Add to Cart
-                </PrimaryBtn>
+                  <span id="button-text">
+                    {isLoading ? (
+                      <div className="spinner" id="spinner" />
+                    ) : (
+                      'Add to Cart'
+                    )}
+                  </span>
+                </button>
               </div>
             </form>
           </div>

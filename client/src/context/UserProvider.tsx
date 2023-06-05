@@ -6,17 +6,19 @@ import { UserDataTypes } from '../types/interfaces';
 type ContextTypes = {
   userData: null | UserDataTypes;
   changeUserData: (data: null | UserDataTypes) => void;
+  fetchUserData: () => void;
 };
 
 export const UserContext = createContext<ContextTypes>({
   userData: null,
   changeUserData() {},
+  fetchUserData() {},
 });
 
 function UserProvider({ children }: { children: ReactNode }) {
   const [userData, setUserData] = useState<null | UserDataTypes>(null);
 
-  const fetchData = async () => {
+  const fetchUserData = async () => {
     const res = await axios.get('/user/profile');
     setUserData(res.data);
   };
@@ -34,11 +36,14 @@ function UserProvider({ children }: { children: ReactNode }) {
     }
 
     if (!userData && token) {
-      fetchData();
+      fetchUserData();
     }
   }, [userData]);
 
-  const userValues = useMemo(() => ({ userData, changeUserData }), [userData]);
+  const userValues = useMemo(
+    () => ({ userData, changeUserData, fetchUserData }),
+    [userData]
+  );
   return (
     <UserContext.Provider value={userValues}>{children}</UserContext.Provider>
   );
