@@ -96,7 +96,7 @@ function MyShop() {
   const [categories, setCategories] = useState<ProductCategories[]>();
   const [shownAllProducts, setShownAllProducts] = useState(false);
 
-  const { userData } = useContext(UserContext);
+  const { userData, fetchUserData } = useContext(UserContext);
 
   const resetProductData = () => {
     setTimeout(() => {
@@ -178,7 +178,9 @@ function MyShop() {
       setIsLoading(true);
       await axios.post('/product/product', newProductData);
       setIsLoading(false);
+      fetchUserData();
       resetProductData();
+
       setIsSuccess(true);
     } catch (err) {
       setIsLoading(false);

@@ -5,6 +5,7 @@ const Product = require('../Models/product');
 const mongoose = require('mongoose');
 const Cart = require('../Models/cart');
 const getRandomString = require('../helpers/getRandomString');
+const { checkEmail } = require('../helpers/checkUserData');
 
 const salt = bcrypt.genSaltSync(12);
 
@@ -119,24 +120,11 @@ const profile = async (req, res) => {
 const newData = async (req, res) => {
     let { userEmail, name, newValue } = req.body;
     let isCredentials = false;
-
+    let errors = [];
     if (name === 'email') {
-        // prettier-ignore
-        const emailRegex = /^\S+@\S+\.\S+$/
-
-        if (newValue.trim() === '') {
-            return res.status(422).json({
-                name: 'email',
-                message: 'Minumum 1 character is required',
-            });
-        } else if (!name.match(emailRegex)) {
-            return res.status(422).json({
-                name: 'email',
-                message: 'Incorrect email address',
-            });
-        }
+        const emailErrors = checkEmail(newValue);
+        errors.push(...emailErrors);
     }
-
     if (name === 'firstName') {
         if (newValue.trim() === '') {
             return res.status(422).json({
@@ -180,7 +168,9 @@ const newData = async (req, res) => {
         }
         newValue = bcrypt.hashSync(newValue, salt);
     }
-
+    if (errors.length > 0) {
+        return res.status(422).json(errors[0]);
+    }
     try {
         if (isCredentials) {
             const credentialsPath = 'credentials.' + name;
@@ -197,7 +187,7 @@ const newData = async (req, res) => {
         res.status(200).json({ message: 'Successfully updated data' });
     } catch (err) {
         if (err.code === 11000) {
-            const responseObject = e.keyValue;
+            console.log(err);
             return res.status(422).json({
                 name: Object.keys(responseObject)[0],
                 message: Object.values(responseObject)[0] + ` already exists`,

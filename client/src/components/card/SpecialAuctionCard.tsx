@@ -47,7 +47,7 @@ function SpecialAuctionCard({
   }
 
   return (
-    <div id={`${_id}`} className="h-auto rounded-lg p-2">
+    <div id={`${_id}`} className="h-auto rounded-lg">
       <div className="rounded-2xl bg-white px-3 py-3">
         <div className="flex flex-col lg:flex-row">
           <div className="w-full min-w-[160px] overflow-hidden rounded-md lg:block lg:max-w-xs lg:pr-4">
@@ -64,8 +64,8 @@ function SpecialAuctionCard({
           <div className="flex-grow pt-3">
             <h4 className="pb-6 text-dark">{titleShortened}</h4>
             <div className="flex flex-col justify-between pb-3 lg:flex-row">
-              <div className="flex flex-row justify-between lg:max-w-lg">
-                <div className="flex flex-col gap-3">
+              <div className="flex flex-row lg:max-w-lg">
+                <div className="flex w-full flex-col gap-3">
                   <p className="flex justify-between sm:text-lg">
                     <span className="text-gray600"> Highest bid:</span>
                     <span className="text-darkTint">${highBid}</span>
@@ -95,15 +95,13 @@ function SpecialAuctionCard({
                 </div>
               </div>
               <div className="flex flex-col justify-start gap-2 sm:flex-row md:flex-col lg:items-start xl:flex-row xl:pt-3">
-                <PrimaryBtn
+                <Link
                   type="button"
-                  usecase="default"
-                  onClick={() => {
-                    navigate(`/auctions/${_id}`);
-                  }}
+                  to={`/auctions/${_id}`}
+                  className="w-auto rounded border border-primary bg-primary px-5 py-3 text-center text-sm font-medium text-white shadow-sm transition ease-out hover:bg-blue-700 focus:ring focus:ring-blue-300"
                 >
                   Enter live auction
-                </PrimaryBtn>
+                </Link>
                 <SecondaryBtn
                   type="button"
                   usecase="outline"

@@ -4,7 +4,6 @@ import { Routes, Route, useLocation } from 'react-router-dom';
 import { UserContext } from './context/UserProvider';
 import LoadingComponent from './components/UI/Loaders/LoadingComponent';
 import SuspenseComponent from './components/suspense/SuspenseComponent';
-
 import MainLayout from './layout/MainLayout';
 import ShopPage from './pages/ShopPage';
 import LoginPage from './pages/LoginPage';
@@ -14,8 +13,9 @@ import MyAccount from './pages/MyAccount';
 import NewsPage from './pages/NewsPage';
 import CollectionsPage from './pages/CollectionsPage';
 import AuctionsPage from './pages/AuctionsPage';
+import CartPage from './pages/CartPage';
+import CheckoutPage from './pages/CheckoutPage';
 
-const CheckoutPage = lazy(() => import('./pages/CheckoutPage'));
 const SearchPage = lazy(() => import('./pages/SearchPage'));
 const CategoriesPage = lazy(() => import('./pages/CategoriesPage'));
 const NoPage404 = lazy(() => import('./pages/NoPage404'));
@@ -23,7 +23,7 @@ const ProductPage = lazy(() => import('./pages/ProductPage'));
 const ContactPage = lazy(() => import('./pages/ContactPage'));
 const MyProductsPage = lazy(() => import('./pages/MyProductsPage'));
 const BlogPage = lazy(() => import('./pages/BlogPage'));
-const CartPage = lazy(() => import('./pages/CartPage'));
+const ThankYouPage = lazy(() => import('./pages/ThankYouPage'));
 
 let properUrl = 'http://localhost:4000';
 
@@ -72,6 +72,7 @@ function App() {
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/blog" element={<BlogPage />} />
           <Route path="/cart" element={<CartPage />} />
+          <Route path="/thankyou" element={<ThankYouPage />} />
           <Route path="/checkout" element={<CheckoutPage />} />
           <Route path="/account/register" element={<RegisterPage />} />
           <Route path="/account/login" element={<LoginPage />} />

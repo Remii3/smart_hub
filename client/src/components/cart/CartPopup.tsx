@@ -1,14 +1,13 @@
 import { Popover } from '@headlessui/react';
+import axios from 'axios';
 import { useContext } from 'react';
 import { Link } from 'react-router-dom';
 import CartItem from './CartItem';
 import { CartContext } from '../../context/CartProvider';
 import { CloseIcon } from '../../assets/icons/Icons';
-import PrimaryBtn from '../UI/Btns/PrimaryBtn';
 
 function CartPopup() {
-  const { cartProducts } = useContext(CartContext);
-
+  const { cart } = useContext(CartContext);
   return (
     <div
       className="relative w-screen max-w-full bg-white px-6 py-8 sm:px-6 md:max-w-sm lg:px-6"
@@ -24,16 +23,18 @@ function CartPopup() {
 
       <div className="mt-4 space-y-6">
         <ul className="max-h-[396px] space-y-4 overflow-y-auto pr-2">
-          {cartProducts &&
-            cartProducts.map((cartProduct) => (
+          {cart &&
+            cart.products.map((cartProduct) => (
               <CartItem
                 key={cartProduct.productData._id}
                 productData={cartProduct.productData}
                 inCartQuantity={cartProduct.inCartQuantity}
+                inCheckout={false}
               />
             ))}
-          {((cartProducts && cartProducts.length < 1) ||
-            cartProducts === null) && <p>No products in cart yet!</p>}
+          {((cart && cart.products.length < 1) || cart === null) && (
+            <p>No products in cart yet!</p>
+          )}
         </ul>
 
         <div className="space-y-4 text-center">
@@ -42,9 +43,8 @@ function CartPopup() {
             to="/cart"
             className="block rounded border border-gray-600 px-5 py-3 text-sm text-gray-600 transition hover:ring-1 hover:ring-gray-400"
           >
-            View my cart ({cartProducts?.length || 0})
+            View my cart ({cart?.products?.length || 0})
           </Popover.Button>
-
           <Popover.Button
             as={Link}
             to="/checkout"
@@ -56,7 +56,7 @@ function CartPopup() {
 
           <Popover.Button
             as={Link}
-            to="/"
+            to="/shop"
             className="inline-block text-sm text-gray-500 underline underline-offset-4 transition hover:text-gray-600"
           >
             Continue shopping

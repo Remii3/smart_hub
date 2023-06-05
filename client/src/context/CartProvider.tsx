@@ -13,36 +13,47 @@ import { UserContext } from './UserProvider';
 import getCookie from '../helpers/getCookie';
 
 type CartTypes = {
-  cartProducts:
-    | null
-    | {
-        inCartQuantity: number;
-        productData: ProductTypes;
-        totalPrice: number;
-      }[];
+  cart: null | {
+    products: {
+      inCartQuantity: number;
+      productData: ProductTypes;
+      totalPrice: number;
+    }[];
+    cartPrice: number;
+  };
+  cartUpdateStatus: boolean;
+  changeCartUpdateStatus: (status: boolean) => void;
   fetchCartData: () => void;
 };
 
 export const CartContext = createContext<CartTypes>({
-  cartProducts: null,
+  cart: null,
+  cartUpdateStatus: false,
   fetchCartData() {},
+  changeCartUpdateStatus(status) {},
 });
 
 function CartProvider({ children }: { children: ReactNode }) {
-  const [cartProducts, setCartProducts] = useState(null);
-
+  const [cart, setCart] = useState(null);
+  const [cartUpdateStatus, setCartUpdateStatus] = useState(false);
   const { userData } = useContext(UserContext);
 
   const fetchCartData = useCallback(async () => {
     const userId = userData?._id || getCookie('guestToken');
 
     if (userId) {
+      setCartUpdateStatus(true);
       const res = await axios.get('/cart/cart', {
         params: { userId },
       });
-      setCartProducts(res.data.products);
+      setCart(res.data.cartData);
+      setCartUpdateStatus(false);
     }
   }, [userData]);
+
+  const changeCartUpdateStatus = (status: boolean) => {
+    setCartUpdateStatus(status);
+  };
 
   useEffect(() => {
     fetchCartData();
@@ -50,10 +61,12 @@ function CartProvider({ children }: { children: ReactNode }) {
 
   const cartValues = useMemo(
     () => ({
-      cartProducts,
+      cart,
+      cartUpdateStatus,
       fetchCartData,
+      changeCartUpdateStatus,
     }),
-    [cartProducts, fetchCartData]
+    [cart, cartUpdateStatus, fetchCartData, changeCartUpdateStatus]
   );
 
   return (
