@@ -91,26 +91,36 @@ const getCart = async (req, res) => {
 
     try {
         const cartData = await Cart.findOne({ userId });
+        console.log(cartData);
         if (cartData) {
             const items = cartData.items;
             const productsData = [];
 
             for (const item of items) {
-                try {
-                    let totalPrice = 0;
-                    const contents = await Product.findOne({ _id: item._id });
+                // try {
+                let totalPrice = 0;
+                const contents = await Product.findOne({ _id: item._id });
+                console.log(contents);
+                if (contents) {
                     totalPrice += contents.price * item.quantity;
                     productsData.push({
                         productData: contents,
                         inCartQuantity: item.quantity,
                         totalPrice,
                     });
-                } catch (err) {
-                    res.status(500).json({
-                        message: 'No product found',
-                        cartData: null,
-                    });
+                } else {
+                    console.log('object');
+                    await Cart.updateOne(
+                        { userId },
+                        { $pull: { 'items.$._id': item._id } },
+                    );
                 }
+                // } catch (err) {
+                // res.status(500).json({
+                //     message: 'No product found',
+                //     cartData: null,
+                // });
+                // }
             }
             let cartPrice = 0;
 

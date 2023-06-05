@@ -1,17 +1,19 @@
 import { ChangeEvent, FormEvent, useEffect, useState, useContext } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { ProductTypes } from '../types/interfaces';
 import { UserContext } from '../context/UserProvider';
 import { CartContext } from '../context/CartProvider';
 import getCookie from '../helpers/getCookie';
+import { Dialog } from '@headlessui/react';
+import CustomDialog from '../components/dialog/CustomDialog';
 
 function ProductPage() {
   const [selectedQuantity, setSelectedQuantity] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [isMyProduct, setIsMyProduct] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-
+  const [deleteDialog, setDeleteDialog] = useState(false);
   const [productData, setProductData] = useState<ProductTypes>();
   const [newData, setNewData] = useState({
     newTitle: productData?.title,
@@ -21,6 +23,8 @@ function ProductPage() {
 
   const { userData } = useContext(UserContext);
   const { fetchCartData } = useContext(CartContext);
+  const navigate = useNavigate();
+
   const quantityChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
     setSelectedQuantity(Number(e.target.value));
@@ -98,7 +102,13 @@ function ProductPage() {
       setIsEditing(true);
     }
   };
-
+  const deleteItemHandler = async () => {
+    await axios.post('/product/delete', { _id: productData?._id });
+    console.log('object');
+    setDeleteDialog(false);
+    fetchProductData();
+    navigate('/');
+  };
   if (productData === undefined) return <p> No data</p>;
   return (
     <section>
@@ -154,6 +164,33 @@ function ProductPage() {
               )}
               {isMyProduct && (
                 <div className="absolute right-0 top-0 flex gap-3">
+                  <CustomDialog
+                    isOpen={deleteDialog}
+                    changeIsOpen={() => setDeleteDialog(false)}
+                    title="Are you sure?"
+                    description="Deleting this will permamently remove the item from the
+                    database."
+                  >
+                    <div className="flex w-full justify-end gap-3">
+                      <button onClick={() => deleteItemHandler()}>
+                        Delete
+                      </button>
+                      <button
+                        className="rounded-md bg-red-500 px-3 py-1 text-white"
+                        onClick={() => setDeleteDialog(false)}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </CustomDialog>
+
+                  <button
+                    type="button"
+                    onClick={() => setDeleteDialog(true)}
+                    className="text-red-400"
+                  >
+                    Delete
+                  </button>
                   <button
                     type="button"
                     className="inline-block rounded-md border border-gray-300 px-2"

@@ -96,10 +96,24 @@ const updateProduct = async (req, res) => {
     const { _id, title, description, price } = req.body;
     try {
         await Product.updateOne({ _id }, { title, description, price });
+        res.status(200).json({ message: 'Success' });
     } catch (err) {
         res.status(500).json({ message: 'Failed' });
     }
-    res.status(200).json({ message: 'Success' });
+};
+
+const deleteProduct = async (req, res) => {
+    const { _id, userId } = req.body;
+    try {
+        await Product.deleteOne({ _id });
+        await User.updateOne(
+            { _id: userId },
+            { $pull: { 'my_products.$._id': _id } },
+        );
+        res.status(200).json({ message: 'Success' });
+    } catch (err) {
+        res.status(500).json({ message: 'Failed' });
+    }
 };
 
 module.exports = {
@@ -109,4 +123,5 @@ module.exports = {
     getProduct,
     addProduct,
     updateProduct,
+    deleteProduct,
 };
