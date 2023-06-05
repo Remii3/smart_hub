@@ -7,6 +7,7 @@ const {
     getAuctionProducts,
     getShopProducts,
     getProduct,
+    updateProduct,
 } = require('../Controllers/product.controller');
 
 router.get('/all', getAllProducts);
@@ -15,5 +16,5 @@ router.get('/auction-products', getAuctionProducts);
 router.get('/product', getProduct);
 
 router.post('/product', addProduct);
-
+router.post('/update', updateProduct);
 module.exports = router;
