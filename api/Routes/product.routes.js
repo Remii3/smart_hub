@@ -7,6 +7,8 @@ const {
     getAuctionProducts,
     getShopProducts,
     getProduct,
+    updateProduct,
+    deleteProduct,
 } = require('../Controllers/product.controller');
 
 router.get('/all', getAllProducts);
@@ -15,5 +17,6 @@ router.get('/auction-products', getAuctionProducts);
 router.get('/product', getProduct);
 
 router.post('/product', addProduct);
-
+router.post('/update', updateProduct);
+router.post('/delete', deleteProduct);
 module.exports = router;

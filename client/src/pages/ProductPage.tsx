@@ -1,19 +1,30 @@
 import { ChangeEvent, FormEvent, useEffect, useState, useContext } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import PrimaryBtn from '../components/UI/Btns/PrimaryBtn';
 import { ProductTypes } from '../types/interfaces';
 import { UserContext } from '../context/UserProvider';
 import { CartContext } from '../context/CartProvider';
 import getCookie from '../helpers/getCookie';
+import { Dialog } from '@headlessui/react';
+import CustomDialog from '../components/dialog/CustomDialog';
 
 function ProductPage() {
   const [selectedQuantity, setSelectedQuantity] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [isMyProduct, setIsMyProduct] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [deleteDialog, setDeleteDialog] = useState(false);
   const [productData, setProductData] = useState<ProductTypes>();
+  const [newData, setNewData] = useState({
+    newTitle: productData?.title,
+    newPrice: productData?.price,
+    newDescription: productData?.description,
+  });
+
   const { userData } = useContext(UserContext);
   const { fetchCartData } = useContext(CartContext);
+  const navigate = useNavigate();
+
   const quantityChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
     setSelectedQuantity(Number(e.target.value));
@@ -23,10 +34,21 @@ function ProductPage() {
   prodId = path.pathname.split('/');
   prodId = prodId[prodId.length - 1];
 
-  useEffect(() => {
+  const fetchProductData = () => {
     axios
       .get('/product/product', { params: { productId: prodId } })
-      .then((res) => setProductData(res.data));
+      .then((res) => {
+        setNewData({
+          newDescription: res.data.description,
+          newPrice: res.data.price,
+          newTitle: res.data.title,
+        });
+        setProductData(res.data);
+      });
+  };
+
+  useEffect(() => {
+    fetchProductData();
   }, [prodId]);
 
   const addToCartHandler = async (e: FormEvent) => {
@@ -52,6 +74,41 @@ function ProductPage() {
     }
   }, [userData, productData]);
 
+  const newDataChangeHandler = (
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    e.preventDefault();
+    setNewData((prevState) => {
+      return { ...prevState, [e.target.name]: e.target.value };
+    });
+  };
+
+  const updateProductData = async () => {
+    await axios.post('/product/update', {
+      _id: productData?._id,
+      title: newData.newTitle,
+      price: newData.newPrice,
+      description: newData.newDescription,
+    });
+    fetchProductData();
+    setIsEditing(false);
+  };
+
+  const toggleEditting = () => {
+    if (isEditing) {
+      fetchProductData();
+      setIsEditing(false);
+    } else {
+      setIsEditing(true);
+    }
+  };
+  const deleteItemHandler = async () => {
+    await axios.post('/product/delete', { _id: productData?._id });
+    console.log('object');
+    setDeleteDialog(false);
+    fetchProductData();
+    navigate('/');
+  };
   if (productData === undefined) return <p> No data</p>;
   return (
     <section>
@@ -106,20 +163,69 @@ function ProductPage() {
                 </strong>
               )}
               {isMyProduct && (
-                <button
-                  type="button"
-                  className="absolute right-0 inline-block rounded-md border border-gray-300 px-2"
-                >
-                  Hello
-                </button>
+                <div className="absolute right-0 top-0 flex gap-3">
+                  <CustomDialog
+                    isOpen={deleteDialog}
+                    changeIsOpen={() => setDeleteDialog(false)}
+                    title="Are you sure?"
+                    description="Deleting this will permamently remove the item from the
+                    database."
+                  >
+                    <div className="flex w-full justify-end gap-3">
+                      <button onClick={() => deleteItemHandler()}>
+                        Delete
+                      </button>
+                      <button
+                        className="rounded-md bg-red-500 px-3 py-1 text-white"
+                        onClick={() => setDeleteDialog(false)}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </CustomDialog>
+
+                  <button
+                    type="button"
+                    onClick={() => setDeleteDialog(true)}
+                    className="text-red-400"
+                  >
+                    Delete
+                  </button>
+                  <button
+                    type="button"
+                    className="inline-block rounded-md border border-gray-300 px-2"
+                    onClick={toggleEditting}
+                  >
+                    {isEditing ? 'Cancel' : 'Edit'}
+                  </button>
+                  {isEditing && (
+                    <button
+                      type="button"
+                      className="inline-block rounded-md border border-gray-300 px-2 text-green-500"
+                      onClick={() => updateProductData()}
+                    >
+                      Accept
+                    </button>
+                  )}
+                </div>
               )}
             </div>
 
             <div className="mt-8 flex justify-between">
               <div className="max-w-[35ch] space-y-2">
-                <h1 className="text-xl font-bold sm:text-2xl">
-                  {productData.title}
-                </h1>
+                {isEditing ? (
+                  <input
+                    name="newTitle"
+                    type="text"
+                    value={newData.newTitle}
+                    className="border-1 border"
+                    onChange={(e) => newDataChangeHandler(e)}
+                  />
+                ) : (
+                  <h1 className="text-xl font-bold sm:text-2xl">
+                    {productData.title}
+                  </h1>
+                )}
 
                 <p className="text-sm">Highest Rated Product</p>
 
@@ -170,13 +276,31 @@ function ProductPage() {
                   </svg>
                 </div>
               </div>
-
-              <p className="text-lg font-bold">€{productData.price}</p>
+              {isEditing ? (
+                <input
+                  name="newPrice"
+                  type="number"
+                  value={newData.newPrice}
+                  className="h-min"
+                  onChange={(e) => newDataChangeHandler(e)}
+                />
+              ) : (
+                <p className="text-lg font-bold">€{productData.price}</p>
+              )}
             </div>
 
             <div className="mt-4">
               <div className="prose max-w-none">
-                <p>{productData.description}</p>
+                {isEditing ? (
+                  <textarea
+                    name="newDescription"
+                    className="resize-none"
+                    value={newData.newDescription}
+                    onChange={(e) => newDataChangeHandler(e)}
+                  />
+                ) : (
+                  <p>{productData.description}</p>
+                )}
               </div>
 
               {productData.description &&
@@ -191,122 +315,6 @@ function ProductPage() {
             </div>
 
             <form className="mt-8">
-              <fieldset>
-                <legend className="mb-1 text-sm font-medium">Cover</legend>
-
-                <div className="flex flex-wrap gap-1">
-                  <label htmlFor="color_tt" className="cursor-pointer">
-                    <input
-                      type="radio"
-                      name="color"
-                      id="color_tt"
-                      className="peer sr-only"
-                    />
-
-                    <span className="group inline-block rounded-full border px-3 py-1 text-xs font-medium peer-checked:bg-black peer-checked:text-white">
-                      Soft
-                    </span>
-                  </label>
-
-                  <label htmlFor="color_fr" className="cursor-pointer">
-                    <input
-                      type="radio"
-                      name="color"
-                      id="color_fr"
-                      className="peer sr-only"
-                    />
-
-                    <span className="group inline-block rounded-full border px-3 py-1 text-xs font-medium peer-checked:bg-black peer-checked:text-white">
-                      Medium
-                    </span>
-                  </label>
-
-                  <label htmlFor="color_cb" className="cursor-pointer">
-                    <input
-                      type="radio"
-                      name="color"
-                      id="color_cb"
-                      className="peer sr-only"
-                    />
-
-                    <span className="group inline-block rounded-full border px-3 py-1 text-xs font-medium peer-checked:bg-black peer-checked:text-white">
-                      Hard
-                    </span>
-                  </label>
-                </div>
-              </fieldset>
-
-              <fieldset className="mt-4">
-                <legend className="mb-1 text-sm font-medium">Size</legend>
-
-                <div className="flex flex-wrap gap-1">
-                  <label htmlFor="size_xs" className="cursor-pointer">
-                    <input
-                      type="radio"
-                      name="size"
-                      id="size_xs"
-                      className="peer sr-only"
-                    />
-
-                    <span className="group inline-flex h-8 w-8 items-center justify-center rounded-full border text-xs font-medium peer-checked:bg-black peer-checked:text-white">
-                      XS
-                    </span>
-                  </label>
-
-                  <label htmlFor="size_s" className="cursor-pointer">
-                    <input
-                      type="radio"
-                      name="size"
-                      id="size_s"
-                      className="peer sr-only"
-                    />
-
-                    <span className="group inline-flex h-8 w-8 items-center justify-center rounded-full border text-xs font-medium peer-checked:bg-black peer-checked:text-white">
-                      S
-                    </span>
-                  </label>
-
-                  <label htmlFor="size_m" className="cursor-pointer">
-                    <input
-                      type="radio"
-                      name="size"
-                      id="size_m"
-                      className="peer sr-only"
-                    />
-
-                    <span className="group inline-flex h-8 w-8 items-center justify-center rounded-full border text-xs font-medium peer-checked:bg-black peer-checked:text-white">
-                      M
-                    </span>
-                  </label>
-
-                  <label htmlFor="size_l" className="cursor-pointer">
-                    <input
-                      type="radio"
-                      name="size"
-                      id="size_l"
-                      className="peer sr-only"
-                    />
-
-                    <span className="group inline-flex h-8 w-8 items-center justify-center rounded-full border text-xs font-medium peer-checked:bg-black peer-checked:text-white">
-                      L
-                    </span>
-                  </label>
-
-                  <label htmlFor="size_xl" className="cursor-pointer">
-                    <input
-                      type="radio"
-                      name="size"
-                      id="size_xl"
-                      className="peer sr-only"
-                    />
-
-                    <span className="group inline-flex h-8 w-8 items-center justify-center rounded-full border text-xs font-medium peer-checked:bg-black peer-checked:text-white">
-                      XL
-                    </span>
-                  </label>
-                </div>
-              </fieldset>
-
               <div className="mt-8 flex gap-4">
                 <div>
                   <label htmlFor="quantity" className="sr-only">
