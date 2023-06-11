@@ -103,8 +103,10 @@ const getCart = async (req, res) => {
           });
         } else {
           await Cart.updateOne(
+
             { userId, 'items._id': item._id },
             { $pull: { items: { _id: item._id } } },
+
           );
         }
       }
