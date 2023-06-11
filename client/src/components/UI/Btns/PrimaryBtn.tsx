@@ -1,13 +1,16 @@
+/* eslint-disable react/button-has-type */
 import { ReactNode } from 'react';
 
 type PropsTypes = {
-  usecase: 'default' | 'proceed' | '';
+  usecase: 'default' | 'action' | '';
   type: 'button' | 'submit';
   onClick?: (e: any) => void;
   customCSS?: string;
   additionalStyles?: string;
   children: ReactNode;
   disabled?: boolean;
+  isLoading?: false;
+  size?: string;
 };
 
 const defaultProps = {
@@ -15,6 +18,8 @@ const defaultProps = {
   customCSS: '',
   additionalStyles: '',
   disabled: false,
+  isLoading: false,
+  size: null,
 };
 
 function PrimaryBtn({
@@ -25,35 +30,50 @@ function PrimaryBtn({
   additionalStyles,
   children,
   disabled,
+  isLoading,
+  size,
 }: PropsTypes) {
-  const usecaseClass = () => {
-    switch (usecase) {
-      default:
-        return '';
-    }
-  };
-
   const clickHandler = (e: any) => {
     if (onClick) {
       onClick(e);
     }
   };
-
-  return (
-    <button
-      type={type === 'button' ? 'button' : 'submit'}
-      className={`${
-        customCSS ||
-        'border-primary bg-primary px-12 py-3 text-sm font-medium text-white focus:ring-blue-300'
-      } ${
-        !disabled && ': hover:bg-blue-700 '
-      }  rounded border shadow-sm transition ease-out focus:ring ${additionalStyles} ${usecaseClass()}`}
-      onClick={(e) => clickHandler(e)}
-      disabled={disabled}
-    >
-      {children}
-    </button>
-  );
+  // bg-[#5469d4]
+  const defaultClasses = `block font-medium rounded text-white border shadow-sm transition ease-out focus:ring ${
+    size || 'px-5 py-3'
+  }`;
+  const primaryClasses = 'border-primary bg-primary focus:ring-blue-300';
+  switch (usecase) {
+    case 'action':
+      return (
+        <button
+          className={`
+           text-xs ${defaultClasses} ${primaryClasses}`}
+          onClick={(e) => clickHandler(e)}
+          type={type}
+          disabled={disabled}
+        >
+          {isLoading && (
+            <span id="button-text">
+              {isLoading ? <div className="spinner" id="spinner" /> : children}
+            </span>
+          )}
+        </button>
+      );
+    default:
+      return (
+        <button
+          type={type}
+          className={`${customCSS || 'px-12 py-3 text-sm font-medium '} ${
+            !disabled && ': hover:bg-blue-700 '
+          } ${defaultClasses} ${primaryClasses} `}
+          onClick={(e) => clickHandler(e)}
+          disabled={disabled}
+        >
+          {children}
+        </button>
+      );
+  }
 }
 
 PrimaryBtn.defaultProps = defaultProps;
