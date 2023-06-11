@@ -1,11 +1,17 @@
-import { ChangeEvent, FormEvent, useEffect, useState, useContext } from 'react';
+import {
+  ChangeEvent,
+  FormEvent,
+  useEffect,
+  useState,
+  useContext,
+  useCallback,
+} from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { ProductTypes } from '../types/interfaces';
 import { UserContext } from '../context/UserProvider';
 import { CartContext } from '../context/CartProvider';
 import getCookie from '../helpers/getCookie';
-import { Dialog } from '@headlessui/react';
 import CustomDialog from '../components/dialog/CustomDialog';
 
 function ProductPage() {
@@ -34,7 +40,7 @@ function ProductPage() {
   prodId = path.pathname.split('/');
   prodId = prodId[prodId.length - 1];
 
-  const fetchProductData = () => {
+  const fetchProductData = useCallback(() => {
     axios
       .get('/product/product', { params: { productId: prodId } })
       .then((res) => {
@@ -45,11 +51,11 @@ function ProductPage() {
         });
         setProductData(res.data);
       });
-  };
+  }, [prodId]);
 
   useEffect(() => {
     fetchProductData();
-  }, [prodId]);
+  }, [fetchProductData]);
 
   const addToCartHandler = async (e: FormEvent) => {
     e.preventDefault();
@@ -172,7 +178,7 @@ function ProductPage() {
                     database."
                   >
                     <div className="flex w-full justify-end gap-3">
-                      <button onClick={() => deleteItemHandler()}>
+                      <button type="button" onClick={() => deleteItemHandler()}>
                         Delete
                       </button>
                       <button
