@@ -13,34 +13,42 @@ import { UserContext } from '../context/UserProvider';
 import { CartContext } from '../context/CartProvider';
 import getCookie from '../helpers/getCookie';
 import CustomDialog from '../components/dialog/CustomDialog';
+import ProductImage from '../components/productParts/ProductImage';
+import ProductPill from '../components/productParts/ProductPill';
+import StarRating from '../components/productParts/StarRating';
+import PrimaryBtn from '../components/UI/Btns/PrimaryBtn';
 
 function ProductPage() {
-  const [selectedQuantity, setSelectedQuantity] = useState(1);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isAddingToCart, setIsAddingToCart] = useState(false);
+  const [isFetchingData, setIsFetchingData] = useState(false);
   const [isMyProduct, setIsMyProduct] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [deleteDialog, setDeleteDialog] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [productData, setProductData] = useState<ProductTypes>();
   const [newData, setNewData] = useState({
     newTitle: productData?.title,
     newPrice: productData?.price,
     newDescription: productData?.description,
   });
+  const [selectedQuantity, setSelectedQuantity] = useState(1);
 
   const { userData } = useContext(UserContext);
   const { fetchCartData } = useContext(CartContext);
+
   const navigate = useNavigate();
 
-  const quantityChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {
-    e.preventDefault();
-    setSelectedQuantity(Number(e.target.value));
-  };
   const path = useLocation();
+
   let prodId: string | any[] | null = null;
   prodId = path.pathname.split('/');
   prodId = prodId[prodId.length - 1];
 
+  const quantityChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {
+    setSelectedQuantity(Number(e.target.value));
+  };
+
   const fetchProductData = useCallback(() => {
+    setIsFetchingData(true);
     axios
       .get('/product/product', { params: { productId: prodId } })
       .then((res) => {
@@ -51,26 +59,26 @@ function ProductPage() {
         });
         setProductData(res.data);
       });
+    setIsFetchingData(false);
   }, [prodId]);
 
   useEffect(() => {
     fetchProductData();
   }, [fetchProductData]);
 
-  const addToCartHandler = async (e: FormEvent) => {
+  const addToCartHandler = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
     const currentUserId = userData?._id || getCookie('guestToken');
 
     if (productData) {
-      setIsLoading(true);
+      setIsAddingToCart(true);
       await axios.post('/cart/cart', {
         userId: currentUserId,
         productId: productData._id,
         productQuantity: productData.quantity,
       });
       fetchCartData();
-      setIsLoading(false);
+      setIsAddingToCart(false);
     }
   };
 
@@ -108,71 +116,42 @@ function ProductPage() {
       setIsEditing(true);
     }
   };
+
   const deleteItemHandler = async () => {
     await axios.post('/product/delete', { _id: productData?._id });
-    console.log('object');
-    setDeleteDialog(false);
+    setShowDeleteDialog(false);
     fetchProductData();
     navigate('/');
   };
+
+  if (productData === undefined && isFetchingData) return <p>Loading</p>;
   if (productData === undefined) return <p> No data</p>;
+
+  const DUMMYIMGS = [{ id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }];
+
   return (
     <section>
       <div className="relative mx-auto max-w-screen-xl px-4 py-8">
         <div className="grid grid-cols-1 items-start gap-8 md:grid-cols-2">
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4 md:grid-cols-1">
-              <img
-                alt="Les Paul"
-                src="https://images.unsplash.com/photo-1456948927036-ad533e53865c?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80"
-                className="aspect-square w-full rounded-xl object-cover"
-              />
-
+              <ProductImage />
               <div className="grid grid-cols-2 gap-4 lg:mt-4">
-                <img
-                  alt="Les Paul"
-                  src="https://images.unsplash.com/photo-1456948927036-ad533e53865c?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80"
-                  className="aspect-square w-full rounded-xl object-cover"
-                />
-
-                <img
-                  alt="Les Paul"
-                  src="https://images.unsplash.com/photo-1456948927036-ad533e53865c?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80"
-                  className="aspect-square w-full rounded-xl object-cover"
-                />
-
-                <img
-                  alt="Les Paul"
-                  src="https://images.unsplash.com/photo-1456948927036-ad533e53865c?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80"
-                  className="aspect-square w-full rounded-xl object-cover"
-                />
-
-                <img
-                  alt="Les Paul"
-                  src="https://images.unsplash.com/photo-1456948927036-ad533e53865c?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80"
-                  className="aspect-square w-full rounded-xl object-cover"
-                />
+                {DUMMYIMGS.map((img) => (
+                  <ProductImage key={img.id} />
+                ))}
               </div>
             </div>
           </div>
 
           <div className="sticky top-0">
             <div className="relative w-full">
-              {productData.marketPlace === 'Shop' && (
-                <strong className="rounded-full border border-blue-600 bg-gray-100 px-3 py-0.5 text-xs font-medium tracking-wide text-blue-600">
-                  {productData.marketPlace}
-                </strong>
-              )}
-              {productData.marketPlace === 'Auction' && (
-                <strong className="rounded-full border border-pink-600 bg-gray-100 px-3 py-0.5 text-xs font-medium tracking-wide text-pink-600">
-                  {productData.marketPlace}
-                </strong>
-              )}
+              <ProductPill text={productData.marketPlace} />
               {isMyProduct && (
                 <div className="absolute right-0 top-0 flex gap-3">
                   <CustomDialog
-                    isOpen={deleteDialog}
-                    changeIsOpen={() => setDeleteDialog(false)}
+                    isOpen={showDeleteDialog}
+                    changeIsOpen={() => setShowDeleteDialog(false)}
                     title="Are you sure?"
                     description="Deleting this will permamently remove the item from the
                     database."
@@ -182,8 +161,9 @@ function ProductPage() {
                         Delete
                       </button>
                       <button
+                        type="button"
                         className="rounded-md bg-red-500 px-3 py-1 text-white"
-                        onClick={() => setDeleteDialog(false)}
+                        onClick={() => setShowDeleteDialog(false)}
                       >
                         Cancel
                       </button>
@@ -192,7 +172,7 @@ function ProductPage() {
 
                   <button
                     type="button"
-                    onClick={() => setDeleteDialog(true)}
+                    onClick={() => setShowDeleteDialog(true)}
                     className="text-red-400"
                   >
                     Delete
@@ -235,52 +215,7 @@ function ProductPage() {
 
                 <p className="text-sm">Highest Rated Product</p>
 
-                <div className="-ms-0.5 flex">
-                  <svg
-                    className="h-5 w-5 text-yellow-400"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                  </svg>
-
-                  <svg
-                    className="h-5 w-5 text-yellow-400"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                  </svg>
-
-                  <svg
-                    className="h-5 w-5 text-yellow-400"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                  </svg>
-
-                  <svg
-                    className="h-5 w-5 text-yellow-400"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                  </svg>
-
-                  <svg
-                    className="h-5 w-5 text-gray-200"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                  </svg>
-                </div>
+                <StarRating />
               </div>
               {isEditing ? (
                 <input
@@ -320,7 +255,7 @@ function ProductPage() {
                 )}
             </div>
 
-            <form className="mt-8">
+            <form className="mt-8" onSubmit={(e) => addToCartHandler(e)}>
               <div className="mt-8 flex gap-4">
                 <div>
                   <label htmlFor="quantity" className="sr-only">
@@ -337,17 +272,17 @@ function ProductPage() {
                     className="w-12 rounded border-gray-200 py-3 text-center text-xs [-moz-appearance:_textfield] [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none"
                   />
                 </div>
-
+                <PrimaryBtn type="button" usecase="action">
+                  Hello
+                </PrimaryBtn>
                 <button
-                  className={`${
-                    !isLoading && ''
-                  } block rounded bg-[#5469d4] px-5 py-3 text-xs font-medium text-white`}
-                  type="button"
-                  onClick={(e) => addToCartHandler(e)}
-                  disabled={isLoading}
+                  className={`
+                   block rounded bg-[#5469d4] px-5 py-3 text-xs font-medium text-white`}
+                  type="submit"
+                  disabled={isAddingToCart}
                 >
                   <span id="button-text">
-                    {isLoading ? (
+                    {isAddingToCart ? (
                       <div className="spinner" id="spinner" />
                     ) : (
                       'Add to Cart'

@@ -8,7 +8,7 @@ export interface ProductTypes {
   quantity?: number | undefined;
   language?: string | undefined;
   price: number;
-  marketPlace: string;
+  marketPlace: 'Shop' | 'Auction';
   shippingData?: { height: number; width: number; depth: number } | undefined;
 }
 
