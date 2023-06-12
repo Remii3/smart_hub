@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import CartItem from './CartItem';
 import { CartContext } from '../../context/CartProvider';
 import { CloseIcon } from '../../assets/icons/Icons';
+import CartPopupProdList from './CartPopupProdList';
 
 function CartPopup() {
   const { cart } = useContext(CartContext);
@@ -22,20 +23,20 @@ function CartPopup() {
       </Popover.Button>
 
       <div className="mt-4 space-y-6">
-        <ul className="max-h-[396px] space-y-4 overflow-y-auto pr-2">
+        <CartPopupProdList />
+        {/* <ul className="max-h-[396px] space-y-4 overflow-y-auto pr-2">
           {cart &&
             cart.products.map((cartProduct) => (
               <CartItem
                 key={cartProduct.productData._id}
                 productData={cartProduct.productData}
                 inCartQuantity={cartProduct.inCartQuantity}
-                inCheckout={false}
               />
             ))}
           {((cart && cart.products.length < 1) || cart === null) && (
             <p>No products in cart yet!</p>
           )}
-        </ul>
+        </ul> */}
 
         <div className="space-y-4 text-center">
           <Popover.Button

@@ -7,15 +7,16 @@ import { ProductTypes } from '../../types/interfaces';
 import getCookie from '../../helpers/getCookie';
 import { Link } from 'react-router-dom';
 
-type CartItemProps = {
+type CartPopupItemTypes = {
   productData: ProductTypes;
   inCartQuantity: number;
+  inCheckout: boolean;
 };
 
-export default function CartItem({
+export default function CartPopupItem({
   productData,
   inCartQuantity,
-}: CartItemProps) {
+}: CartPopupItemTypes) {
   const { userData } = useContext(UserContext);
   const { fetchCartData } = useContext(CartContext);
   const [currentQuantity, setCurrentQuantity] = useState(inCartQuantity);

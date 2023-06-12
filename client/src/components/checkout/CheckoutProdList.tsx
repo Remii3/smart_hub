@@ -2,22 +2,22 @@ import { useContext } from 'react';
 import { CartContext } from '../../context/CartProvider';
 import CartItem from '../cart/CartItem';
 import { UserContext } from '../../context/UserProvider';
+import CheckoutItem from './CheckoutItem';
 
 export default function CheckoutProdList() {
   const { cart } = useContext(CartContext);
   const { userData } = useContext(UserContext);
 
-  let productsList = <div></div>;
+  let ProductsList = <div></div>;
 
   if (cart && cart.products) {
-    productsList = (
+    ProductsList = (
       <ul className="-my-4 divide-y divide-gray-100">
         {cart.products.map((cartProduct) => (
-          <CartItem
+          <CheckoutItem
             key={cartProduct.productData._id}
             productData={cartProduct.productData}
             inCartQuantity={cartProduct.inCartQuantity}
-            inCheckout={true}
           />
         ))}
       </ul>
@@ -43,7 +43,7 @@ export default function CheckoutProdList() {
       </div>
 
       <div>
-        <div className="flow-root">{productsList}</div>
+        <div className="flow-root">{ProductsList}</div>
       </div>
     </>
   );

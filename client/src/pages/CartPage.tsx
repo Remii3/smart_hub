@@ -1,5 +1,4 @@
 import { Link } from 'react-router-dom';
-import axios from 'axios';
 import { useContext } from 'react';
 import CartItem from '../components/cart/CartItem';
 import { CartContext } from '../context/CartProvider';
@@ -26,7 +25,6 @@ function CartPage() {
                     key={cartProduct.productData._id}
                     productData={cartProduct.productData}
                     inCartQuantity={cartProduct.inCartQuantity}
-                    inCheckout={false}
                   />
                 ))}
             </ul>
