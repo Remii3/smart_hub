@@ -9,7 +9,7 @@ type PropsTypes = {
   additionalStyles?: string;
   children: ReactNode;
   disabled?: boolean;
-  isLoading?: false;
+  isLoading?: boolean;
   size?: string;
 };
 
@@ -38,7 +38,6 @@ function PrimaryBtn({
       onClick(e);
     }
   };
-  // bg-[#5469d4]
   const defaultClasses = `block font-medium rounded text-white border shadow-sm transition ease-out focus:ring ${
     size || 'px-5 py-3'
   }`;
@@ -53,11 +52,9 @@ function PrimaryBtn({
           type={type}
           disabled={disabled}
         >
-          {isLoading && (
-            <span id="button-text">
-              {isLoading ? <div className="spinner" id="spinner" /> : children}
-            </span>
-          )}
+          <span id="button-text">
+            {isLoading ? <div className="spinner" id="spinner" /> : children}
+          </span>
         </button>
       );
     default:

@@ -272,12 +272,18 @@ function ProductPage() {
                     className="w-12 rounded border-gray-200 py-3 text-center text-xs [-moz-appearance:_textfield] [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none"
                   />
                 </div>
-                <PrimaryBtn type="button" usecase="action">
-                  Hello
+                <PrimaryBtn
+                  type="submit"
+                  usecase="action"
+                  disabled={isAddingToCart}
+                  isLoading={isAddingToCart}
+                >
+                  Add to Cart
                 </PrimaryBtn>
+
                 <button
                   className={`
-                   block rounded bg-[#5469d4] px-5 py-3 text-xs font-medium text-white`}
+                   block rounded bg-secondary px-5 py-3 text-xs font-medium text-darkTint`}
                   type="submit"
                   disabled={isAddingToCart}
                 >
@@ -288,6 +294,12 @@ function ProductPage() {
                       'Add to Cart'
                     )}
                   </span>
+                </button>
+                <button
+                  type="button"
+                  className="text-text rounded bg-success px-5 py-3"
+                >
+                  hello
                 </button>
               </div>
             </form>
