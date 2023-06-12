@@ -25,3 +25,8 @@ export interface UserDataTypes {
   credentials: { firstName: string; lastName: string };
   my_products: ProductTypes[];
 }
+
+export interface SimpleFetchDataTypes {
+  isLoading: boolean;
+  hasError: null | string;
+}

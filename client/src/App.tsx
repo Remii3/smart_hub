@@ -1,6 +1,7 @@
 import axios from 'axios';
-
 import WebRoutes from './WebRoutes';
+import UserProvider from './context/UserProvider';
+import CartProvider from './context/CartProvider';
 
 let properUrl = 'http://localhost:4000';
 
@@ -19,6 +20,12 @@ axios.defaults.baseURL = properUrl;
 axios.defaults.withCredentials = true;
 
 function App() {
-  return <WebRoutes />;
+  return (
+    <UserProvider>
+      <CartProvider>
+        <WebRoutes />
+      </CartProvider>
+    </UserProvider>
+  );
 }
 export default App;

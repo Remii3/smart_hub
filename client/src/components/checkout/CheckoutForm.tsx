@@ -4,9 +4,12 @@ import {
   LinkAuthenticationElement,
   PaymentElement,
 } from '@stripe/react-stripe-js';
-import { StripeLinkAuthenticationElementChangeEvent } from '@stripe/stripe-js';
+import {
+  Layout,
+  StripeLinkAuthenticationElementChangeEvent,
+} from '@stripe/stripe-js';
 import axios from 'axios';
-import { useState, useEffect, ChangeEvent, useContext } from 'react';
+import { useState, useEffect, useContext, FormEvent } from 'react';
 import { UserContext } from '../../context/UserProvider';
 import getCookie from '../../helpers/getCookie';
 import { useNavigate } from 'react-router-dom';
@@ -56,7 +59,7 @@ export default function CheckoutForm() {
       });
   }, [stripe]);
 
-  const handleSubmit = async (e: any) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (!stripe || !elements) {
@@ -93,7 +96,7 @@ export default function CheckoutForm() {
 
   const paymentElementOptions = {
     layout: 'tabs',
-  };
+  } as { layout: Layout };
 
   return (
     <form id="payment-form" onSubmit={handleSubmit}>
@@ -102,9 +105,10 @@ export default function CheckoutForm() {
         onChange={(e: StripeLinkAuthenticationElementChangeEvent) =>
           setEmail(e.value.email)
         }
-        options={{ defaultValues: { email: userData?.email || '' } }}
+        options={{ defaultValues: { email: userData?.email || email } }}
       />
       <PaymentElement id="payment-element" options={paymentElementOptions} />
+
       <button
         type="submit"
         disabled={

@@ -36,6 +36,7 @@ function WebRoutes() {
       axios.get('/user/guest');
     }
   }, [pathname]);
+
   return (
     <MainLayout>
       <Routes>
