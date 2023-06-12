@@ -1,6 +1,6 @@
 import { useContext } from 'react';
 import { CartContext } from '../../context/CartProvider';
-import CartItem from './CartItem';
+import CartPopupItem from './CartPopupItem';
 
 export default function CartPopupProdList() {
   const { cart } = useContext(CartContext);
@@ -11,7 +11,7 @@ export default function CartPopupProdList() {
     ProductsList = (
       <ul className="max-h-[396px] space-y-4 overflow-y-auto pr-2">
         {cart.products.map((cartProduct) => (
-          <CartItem
+          <CartPopupItem
             key={cartProduct.productData._id}
             productData={cartProduct.productData}
             inCartQuantity={cartProduct.inCartQuantity}

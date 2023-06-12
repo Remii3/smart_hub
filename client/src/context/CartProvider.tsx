@@ -7,6 +7,7 @@ import {
   useEffect,
   useMemo,
   useState,
+  useReducer,
 } from 'react';
 import { ProductTypes } from '../types/interfaces';
 import { UserContext } from './UserProvider';
@@ -33,7 +34,11 @@ export const CartContext = createContext<CartTypes>({
   changeCartUpdateStatus(status) {},
 });
 
+const initialTasks = { data: '' };
+const cartReducer = (state, action) => {};
+
 function CartProvider({ children }: { children: ReactNode }) {
+  const [cartTest, dispatch] = useReducer(cartReducer, initialTasks);
   const [cart, setCart] = useState(null);
   const [cartUpdateStatus, setCartUpdateStatus] = useState(false);
   const { userData } = useContext(UserContext);
@@ -73,5 +78,4 @@ function CartProvider({ children }: { children: ReactNode }) {
     <CartContext.Provider value={cartValues}>{children}</CartContext.Provider>
   );
 }
-
 export default CartProvider;

@@ -5,11 +5,11 @@ import CartItem from './CartItem';
 export default function CartProdList() {
   const { cart } = useContext(CartContext);
 
-  let ProductsList = <div></div>;
+  let ProductsList = <div />;
 
   if (cart && cart.products) {
     ProductsList = (
-      <ul className="-my-4 divide-y divide-gray-100">
+      <ul className="space-y-4">
         {cart.products.map((cartProduct) => (
           <CartItem
             key={cartProduct.productData._id}
@@ -20,5 +20,5 @@ export default function CartProdList() {
       </ul>
     );
   }
-  return <ul className="space-y-4">{ProductsList}</ul>;
+  return <div>{ProductsList}</div>;
 }

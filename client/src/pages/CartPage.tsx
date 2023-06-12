@@ -1,8 +1,8 @@
 import { Link } from 'react-router-dom';
 import { useContext } from 'react';
-import CartItem from '../components/cart/CartItem';
 import { CartContext } from '../context/CartProvider';
 import { TicketIcon } from '../assets/icons/Icons';
+import CartProdList from '../components/cart/CartProdList';
 
 function CartPage() {
   const { cart } = useContext(CartContext);
@@ -18,16 +18,7 @@ function CartPage() {
           </header>
 
           <div className="mt-8">
-            <ul className="space-y-4">
-              {cart &&
-                cart.products.map((cartProduct) => (
-                  <CartItem
-                    key={cartProduct.productData._id}
-                    productData={cartProduct.productData}
-                    inCartQuantity={cartProduct.inCartQuantity}
-                  />
-                ))}
-            </ul>
+            <CartProdList />
 
             <div className="mt-8 flex justify-end border-t border-gray-100 pt-8">
               <div className="w-screen max-w-lg space-y-4">
@@ -65,7 +56,7 @@ function CartPage() {
 
                 <div className="flex justify-end">
                   <Link
-                    to={'/checkout'}
+                    to="/checkout"
                     className="block rounded bg-primary px-5 py-3 text-sm text-gray-100 transition hover:bg-blue-700"
                   >
                     Checkout

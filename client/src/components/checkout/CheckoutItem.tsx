@@ -1,5 +1,5 @@
-import { ProductTypes } from '../../types/interfaces';
 import { Link } from 'react-router-dom';
+import { ProductTypes } from '../../types/interfaces';
 
 type CheckoutItemTypes = {
   productData: ProductTypes;

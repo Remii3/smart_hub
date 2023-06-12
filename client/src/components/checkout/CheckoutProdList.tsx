@@ -1,6 +1,5 @@
 import { useContext } from 'react';
 import { CartContext } from '../../context/CartProvider';
-import CartItem from '../cart/CartItem';
 import { UserContext } from '../../context/UserProvider';
 import CheckoutItem from './CheckoutItem';
 
@@ -8,7 +7,7 @@ export default function CheckoutProdList() {
   const { cart } = useContext(CartContext);
   const { userData } = useContext(UserContext);
 
-  let ProductsList = <div></div>;
+  let ProductsList = <div />;
 
   if (cart && cart.products) {
     ProductsList = (

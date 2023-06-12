@@ -1,16 +1,15 @@
 import axios from 'axios';
 import { useContext, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { TrashIcon } from '../../assets/icons/Icons';
 import { UserContext } from '../../context/UserProvider';
 import { CartContext } from '../../context/CartProvider';
 import { ProductTypes } from '../../types/interfaces';
 import getCookie from '../../helpers/getCookie';
-import { Link } from 'react-router-dom';
 
 type CartPopupItemTypes = {
   productData: ProductTypes;
   inCartQuantity: number;
-  inCheckout: boolean;
 };
 
 export default function CartPopupItem({
