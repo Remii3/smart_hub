@@ -17,6 +17,7 @@ import ProductImage from '../components/productParts/ProductImage';
 import ProductPill from '../components/productParts/ProductPill';
 import StarRating from '../components/productParts/StarRating';
 import PrimaryBtn from '../components/UI/Btns/PrimaryBtn';
+import { Types } from '../reducers/cartReducers';
 
 function ProductPage() {
   const [isAddingToCart, setIsAddingToCart] = useState(false);
@@ -31,12 +32,12 @@ function ProductPage() {
     newDescription: productData?.description,
   });
   const [selectedQuantity, setSelectedQuantity] = useState(1);
-
+  const { dispatch, cartState } = useContext(CartContext);
   const { userData } = useContext(UserContext);
   const { fetchCartData } = useContext(CartContext);
 
   const navigate = useNavigate();
-
+  console.log(cartState);
   const path = useLocation();
 
   let prodId: string | any[] | null = null;
@@ -298,6 +299,12 @@ function ProductPage() {
                 <button
                   type="button"
                   className="text-text rounded bg-success px-5 py-3"
+                  onClick={() => {
+                    dispatch({
+                      type: Types.Update,
+                      payload: { price: 1 },
+                    });
+                  }}
                 >
                   hello
                 </button>

@@ -8,74 +8,83 @@ import {
   useMemo,
   useState,
   useReducer,
+  Reducer,
+  Dispatch,
 } from 'react';
 import { ProductTypes } from '../types/interfaces';
 import { UserContext } from './UserProvider';
 import getCookie from '../helpers/getCookie';
+import { cartReducer, CartActions, Types } from '../reducers/cartReducers';
 
-type CartTypes = {
+type InitialStateType = {
   cart: null | {
-    products: {
-      inCartQuantity: number;
-      productData: ProductTypes;
-      totalPrice: number;
-    }[];
+    products:
+      | {
+          inCartQuantity: number;
+          productData: ProductTypes;
+          totalPrice: number;
+        }[];
     cartPrice: number;
   };
-  cartUpdateStatus: boolean;
-  changeCartUpdateStatus: (status: boolean) => void;
-  fetchCartData: () => void;
+  cartIsLoading: boolean;
 };
 
-export const CartContext = createContext<CartTypes>({
+const initialState = {
   cart: null,
-  cartUpdateStatus: false,
-  fetchCartData() {},
-  changeCartUpdateStatus(status) {},
+  cartIsLoading: false,
+};
+
+export const CartContext = createContext<{
+  cartState: InitialStateType;
+  dispatch: Dispatch<CartActions>;
+}>({
+  cartState: initialState,
+  dispatch: () => null,
 });
 
-const initialTasks = { data: '' };
-const cartReducer = (state, action) => {};
-
 function CartProvider({ children }: { children: ReactNode }) {
-  const [cartTest, dispatch] = useReducer(cartReducer, initialTasks);
-  const [cart, setCart] = useState(null);
-  const [cartUpdateStatus, setCartUpdateStatus] = useState(false);
+  const [cartState, dispatch] = useReducer(cartReducer, initialState);
+
+  // const [cart, setCart] = useState(null);
+  // const [cartUpdateStatus, setCartUpdateStatus] = useState(false);
   const { userData } = useContext(UserContext);
 
   const fetchCartData = useCallback(async () => {
     const userId = userData?._id || getCookie('guestToken');
 
     if (userId) {
-      setCartUpdateStatus(true);
+      // setCartUpdateStatus(true);
+      dispatch({ type: Types.IsLoadingUpdate, payload: { status: true } });
       const res = await axios.get('/cart/cart', {
         params: { userId },
       });
-      setCart(res.data.cartData);
-      setCartUpdateStatus(false);
+      // setCart(res.data.cartData);
+      dispatch({ type: Types.IsLoadingUpdate, payload: { status: false } });
     }
   }, [userData]);
 
-  const changeCartUpdateStatus = (status: boolean) => {
-    setCartUpdateStatus(status);
-  };
+  // const changeCartUpdateStatus = useCallback((status: boolean) => {
+  //   setCartUpdateStatus(status);
+  // }, []);
 
   useEffect(() => {
     fetchCartData();
   }, [fetchCartData]);
 
-  const cartValues = useMemo(
-    () => ({
-      cart,
-      cartUpdateStatus,
-      fetchCartData,
-      changeCartUpdateStatus,
-    }),
-    [cart, cartUpdateStatus, fetchCartData, changeCartUpdateStatus]
-  );
-
   return (
-    <CartContext.Provider value={cartValues}>{children}</CartContext.Provider>
+    // eslint-disable-next-line react/jsx-no-constructed-context-values
+    <CartContext.Provider value={{ cartState, dispatch }}>
+      {children}
+    </CartContext.Provider>
   );
 }
+
+export function useTasks() {
+  return useContext(CartContext);
+}
+
+// export function useTasksDispatch() {
+//   return useContext(CartDispatchContext);
+// }
+
 export default CartProvider;
