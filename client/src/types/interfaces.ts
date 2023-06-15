@@ -5,10 +5,10 @@ export interface ProductTypes {
   categories?: string[] | undefined;
   description?: string | undefined;
   imgs?: string[] | undefined;
-  quantity?: number | undefined;
+  quantity: number;
   language?: string | undefined;
   price: number;
-  marketPlace: 'Shop' | 'Auction';
+  marketPlace: 'Shop' | 'Auction' | null;
   shippingData?: { height: number; width: number; depth: number } | undefined;
 }
 

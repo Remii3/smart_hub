@@ -65,7 +65,10 @@ export default function CartItem({
             />
             <button
               type="button"
-              className="px-2"
+              className={`${
+                inCartQuantity >= productData.quantity && 'text-gray-300'
+              } px-2`}
+              disabled={inCartQuantity >= productData.quantity}
               onClick={() => incrementCartItemHandler(productData._id)}
             >
               +

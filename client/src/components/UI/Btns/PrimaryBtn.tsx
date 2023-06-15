@@ -38,16 +38,21 @@ function PrimaryBtn({
       onClick(e);
     }
   };
-  const defaultClasses = `block font-medium rounded text-white border shadow-sm transition ease-out focus:ring ${
+  const defaultClasses = `block font-medium rounded text-white border shadow-sm transition-all duration-200 ease-out focus:ring ${
     size || 'px-5 py-3'
   }`;
-  const primaryClasses = 'border-primary bg-primary focus:ring-blue-300';
+  const primaryClasses =
+    'border-primary bg-primary focus:ring-blue-300 hover:bg-blue-600';
+  const disabledClasses = 'border-gray-300 bg-gray-300';
+
   switch (usecase) {
     case 'action':
       return (
         <button
           className={`
-           text-xs ${defaultClasses} ${primaryClasses}`}
+           text-xs ${defaultClasses} ${
+            disabled ? disabledClasses : primaryClasses
+          } `}
           onClick={(e) => clickHandler(e)}
           type={type}
           disabled={disabled}
@@ -63,7 +68,7 @@ function PrimaryBtn({
           type={type}
           className={`${customCSS || 'px-12 py-3 text-sm font-medium '} ${
             !disabled && ': hover:bg-blue-700 '
-          } ${defaultClasses} ${primaryClasses} `}
+          }  ${defaultClasses} ${primaryClasses} `}
           onClick={(e) => clickHandler(e)}
           disabled={disabled}
         >

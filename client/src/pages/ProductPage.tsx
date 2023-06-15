@@ -23,15 +23,16 @@ function ProductPage() {
   const [isMyProduct, setIsMyProduct] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [productData, setProductData] = useState<ProductTypes>();
+  const [productData, setProductData] = useState<ProductTypes | null>(null);
   const [newData, setNewData] = useState({
     newTitle: productData?.title,
     newPrice: productData?.price,
     newDescription: productData?.description,
+    newQuantity: productData?.quantity,
   });
   const [selectedQuantity, setSelectedQuantity] = useState(1);
   const { userData } = useContext(UserContext);
-  const { addProductToCart } = useContext(CartContext);
+  const { addProductToCart, cartState } = useContext(CartContext);
   const navigate = useNavigate();
   const path = useLocation();
 
@@ -39,8 +40,14 @@ function ProductPage() {
   prodId = path.pathname.split('/');
   prodId = prodId[prodId.length - 1];
 
-  const quantityChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {
-    setSelectedQuantity(Number(e.target.value));
+  const incrementQuantityHandler = () => {
+    if (!productData) return;
+    if (productData.quantity <= selectedQuantity) return;
+    setSelectedQuantity((prevState) => (prevState += 1));
+  };
+  const decrementQuantityHandler = () => {
+    if (selectedQuantity <= 1) return;
+    setSelectedQuantity((prevState) => (prevState -= 1));
   };
 
   const fetchProductData = useCallback(() => {
@@ -52,6 +59,7 @@ function ProductPage() {
           newDescription: res.data.description,
           newPrice: res.data.price,
           newTitle: res.data.title,
+          newQuantity: res.data.quantity,
         });
         setProductData(res.data);
       });
@@ -70,9 +78,9 @@ function ProductPage() {
 
       addProductToCart({
         productId: productData._id,
-        productQuantity: productData.quantity,
+        productQuantity: selectedQuantity,
       });
-
+      setSelectedQuantity(1);
       setIsAddingToCart(false);
     }
   };
@@ -98,6 +106,7 @@ function ProductPage() {
       title: newData.newTitle,
       price: newData.newPrice,
       description: newData.newDescription,
+      quantity: newData.newQuantity,
     });
     fetchProductData();
     setIsEditing(false);
@@ -123,6 +132,17 @@ function ProductPage() {
   if (productData === undefined) return <p> No data</p>;
 
   const DUMMYIMGS = [{ id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }];
+  const currentItem = cartState.cart?.products.find(
+    (product) => product.productData._id === productData?._id
+  );
+  const itemCapacity =
+    (productData && productData.quantity <= selectedQuantity) ||
+    currentItem?.inCartQuantity + selectedQuantity >= productData.quantity ||
+    false;
+  const itemBtnCapacity =
+    (productData && productData.quantity <= selectedQuantity) ||
+    currentItem?.inCartQuantity + selectedQuantity > productData.quantity ||
+    false;
 
   return (
     <section>
@@ -141,7 +161,7 @@ function ProductPage() {
 
           <div className="sticky top-0">
             <div className="relative w-full">
-              <ProductPill text={productData.marketPlace} />
+              <ProductPill text={productData && productData.marketPlace} />
               {isMyProduct && (
                 <div className="absolute right-0 top-0 flex gap-3">
                   <CustomDialog
@@ -204,7 +224,7 @@ function ProductPage() {
                   />
                 ) : (
                   <h1 className="text-xl font-bold sm:text-2xl">
-                    {productData.title}
+                    {productData && productData.title}
                   </h1>
                 )}
 
@@ -221,11 +241,25 @@ function ProductPage() {
                   onChange={(e) => newDataChangeHandler(e)}
                 />
               ) : (
-                <p className="text-lg font-bold">€{productData.price}</p>
+                <p className="text-lg font-bold">
+                  €{productData && productData.price}
+                </p>
               )}
             </div>
 
             <div className="mt-4">
+              <div className="max-w-none">
+                <span>Available: </span>
+                {isEditing ? (
+                  <input
+                    name="newQuantity"
+                    value={newData.newQuantity}
+                    onChange={(e) => newDataChangeHandler(e)}
+                  />
+                ) : (
+                  <span>{productData && productData.quantity}</span>
+                )}
+              </div>
               <div className="prose max-w-none">
                 {isEditing ? (
                   <textarea
@@ -235,11 +269,12 @@ function ProductPage() {
                     onChange={(e) => newDataChangeHandler(e)}
                   />
                 ) : (
-                  <p>{productData.description}</p>
+                  <p>{productData && productData.description}</p>
                 )}
               </div>
 
-              {productData.description &&
+              {productData &&
+                productData.description &&
                 productData.description.length > 600 && (
                   <button
                     type="button"
@@ -253,24 +288,41 @@ function ProductPage() {
             <form className="mt-8" onSubmit={(e) => addToCartHandler(e)}>
               <div className="mt-8 flex gap-4">
                 <div>
+                  <button
+                    type="button"
+                    className={`${
+                      selectedQuantity <= 1 && 'text-gray-300'
+                    } px-2`}
+                    disabled={selectedQuantity <= 1}
+                    onClick={decrementQuantityHandler}
+                  >
+                    -
+                  </button>
                   <label htmlFor="quantity" className="sr-only">
                     Qty
                   </label>
-
                   <input
                     type="number"
                     id="quantity"
                     min="1"
                     step="1"
                     value={selectedQuantity}
-                    onChange={(e) => quantityChangeHandler(e)}
+                    disabled
                     className="w-12 rounded border-gray-200 py-3 text-center text-xs [-moz-appearance:_textfield] [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none"
                   />
+                  <button
+                    type="button"
+                    className={`${itemCapacity && 'text-gray-300'} px-2`}
+                    disabled={itemCapacity}
+                    onClick={incrementQuantityHandler}
+                  >
+                    +
+                  </button>
                 </div>
                 <PrimaryBtn
                   type="submit"
                   usecase="action"
-                  disabled={isAddingToCart}
+                  disabled={isAddingToCart || itemBtnCapacity}
                   isLoading={isAddingToCart}
                 >
                   Add to Cart

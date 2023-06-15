@@ -89,9 +89,9 @@ const addProduct = async (req, res) => {
 };
 
 const updateProduct = async (req, res) => {
-  const { _id, title, description, price } = req.body;
+  const { _id, title, description, price, quantity } = req.body;
   try {
-    await Product.updateOne({ _id }, { title, description, price });
+    await Product.updateOne({ _id }, { title, description, price, quantity });
     res.status(200).json({ message: 'Success' });
   } catch (err) {
     res.status(500).json({ message: 'Failed' });
