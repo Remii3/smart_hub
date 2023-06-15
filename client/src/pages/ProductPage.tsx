@@ -11,13 +11,11 @@ import axios from 'axios';
 import { ProductTypes } from '../types/interfaces';
 import { UserContext } from '../context/UserProvider';
 import { CartContext } from '../context/CartProvider';
-import getCookie from '../helpers/getCookie';
 import CustomDialog from '../components/dialog/CustomDialog';
 import ProductImage from '../components/productParts/ProductImage';
 import ProductPill from '../components/productParts/ProductPill';
 import StarRating from '../components/productParts/StarRating';
 import PrimaryBtn from '../components/UI/Btns/PrimaryBtn';
-import { Types } from '../reducers/cartReducers';
 
 function ProductPage() {
   const [isAddingToCart, setIsAddingToCart] = useState(false);
@@ -32,12 +30,9 @@ function ProductPage() {
     newDescription: productData?.description,
   });
   const [selectedQuantity, setSelectedQuantity] = useState(1);
-  const { dispatch, cartState } = useContext(CartContext);
   const { userData } = useContext(UserContext);
-  const { fetchCartData } = useContext(CartContext);
-
+  const { addProductToCartHandler } = useContext(CartContext);
   const navigate = useNavigate();
-  console.log(cartState);
   const path = useLocation();
 
   let prodId: string | any[] | null = null;
@@ -62,23 +57,26 @@ function ProductPage() {
       });
     setIsFetchingData(false);
   }, [prodId]);
-
   useEffect(() => {
     fetchProductData();
   }, [fetchProductData]);
 
   const addToCartHandler = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const currentUserId = userData?._id || getCookie('guestToken');
 
     if (productData) {
+      // const currentUserId = userData?._id || getCookie('guestToken');
       setIsAddingToCart(true);
-      await axios.post('/cart/cart', {
-        userId: currentUserId,
+      // await axios.post('/cart/cart', {
+      //   userId: currentUserId,
+      //   productId: productData._id,
+      //   productQuantity: productData.quantity,
+      // });
+      // fetchCartDatahandler();
+      addProductToCartHandler({
         productId: productData._id,
         productQuantity: productData.quantity,
       });
-      fetchCartData();
       setIsAddingToCart(false);
     }
   };
@@ -281,33 +279,6 @@ function ProductPage() {
                 >
                   Add to Cart
                 </PrimaryBtn>
-
-                <button
-                  className={`
-                   block rounded bg-secondary px-5 py-3 text-xs font-medium text-darkTint`}
-                  type="submit"
-                  disabled={isAddingToCart}
-                >
-                  <span id="button-text">
-                    {isAddingToCart ? (
-                      <div className="spinner" id="spinner" />
-                    ) : (
-                      'Add to Cart'
-                    )}
-                  </span>
-                </button>
-                <button
-                  type="button"
-                  className="text-text rounded bg-success px-5 py-3"
-                  onClick={() => {
-                    dispatch({
-                      type: Types.Update,
-                      payload: { price: 1 },
-                    });
-                  }}
-                >
-                  hello
-                </button>
               </div>
             </form>
           </div>

@@ -3,18 +3,38 @@ import { CartContext } from '../../context/CartProvider';
 import CartItem from './CartItem';
 
 export default function CartProdList() {
-  const { cart } = useContext(CartContext);
+  const {
+    cartState,
+    incrementDataHandler,
+    decrementDataHandler,
+    removeCartItemHandler,
+  } = useContext(CartContext);
 
   let ProductsList = <div />;
 
-  if (cart && cart.products) {
+  const removeItemHandler = async (productId: string) => {
+    removeCartItemHandler(productId);
+  };
+
+  const incrementCartItemHandler = (productId: string) => {
+    incrementDataHandler(productId);
+  };
+
+  const decrementCartItemHandler = (productId: string) => {
+    decrementDataHandler(productId);
+  };
+
+  if (cartState && cartState.cart?.products) {
     ProductsList = (
       <ul className="space-y-4">
-        {cart.products.map((cartProduct) => (
+        {cartState.cart.products.map((cartProduct) => (
           <CartItem
             key={cartProduct.productData._id}
             productData={cartProduct.productData}
             inCartQuantity={cartProduct.inCartQuantity}
+            incrementCartItemHandler={incrementCartItemHandler}
+            decrementCartItemHandler={decrementCartItemHandler}
+            removeCartItemHandler={removeItemHandler}
           />
         ))}
       </ul>

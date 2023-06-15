@@ -6,7 +6,7 @@ import { CloseIcon } from '../../assets/icons/Icons';
 import CartPopupProdList from './CartPopupProdList';
 
 function CartPopup() {
-  const { cart } = useContext(CartContext);
+  const { cartState } = useContext(CartContext);
   return (
     <div
       className="relative w-screen max-w-full bg-white px-6 py-8 sm:px-6 md:max-w-sm lg:px-6"
@@ -29,7 +29,7 @@ function CartPopup() {
             to="/cart"
             className="block rounded border border-gray-600 px-5 py-3 text-sm text-gray-600 transition hover:ring-1 hover:ring-gray-400"
           >
-            View my cart ({cart?.products?.length || 0})
+            View my cart ({cartState.cart?.products?.length || 0})
           </Popover.Button>
           <Popover.Button
             as={Link}

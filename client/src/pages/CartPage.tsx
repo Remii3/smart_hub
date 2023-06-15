@@ -5,8 +5,8 @@ import { TicketIcon } from '../assets/icons/Icons';
 import CartProdList from '../components/cart/CartProdList';
 
 function CartPage() {
-  const { cart } = useContext(CartContext);
-
+  const { cartState } = useContext(CartContext);
+  console.log('cartState:', cartState);
   return (
     <section>
       <div className="mx-auto max-w-screen-xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
@@ -40,7 +40,7 @@ function CartPage() {
 
                   <div className="flex justify-between !text-base font-medium">
                     <dt>Total</dt>
-                    <dd>{cart && cart.cartPrice}</dd>
+                    <dd>{cartState && cartState.cart?.cartPrice}</dd>
                   </div>
                 </dl>
 
