@@ -24,18 +24,22 @@ function CartPage() {
                 <dl className="space-y-0.5 text-sm text-gray-700">
                   <div className="flex justify-between">
                     <dt>Subtotal</dt>
-                    <dd>£250</dd>
+                    <dd>{cartState && cartState.cart?.cartPrice}</dd>
                   </div>
 
-                  <div className="flex justify-between">
-                    <dt>VAT</dt>
-                    <dd>£25</dd>
-                  </div>
+                  {false && (
+                    <div className="flex justify-between">
+                      <dt>VAT</dt>
+                      <dd>£25</dd>
+                    </div>
+                  )}
 
-                  <div className="flex justify-between">
-                    <dt>Discount</dt>
-                    <dd>-£20</dd>
-                  </div>
+                  {false && (
+                    <div className="flex justify-between">
+                      <dt>Discount</dt>
+                      <dd>-£20</dd>
+                    </div>
+                  )}
 
                   <div className="flex justify-between !text-base font-medium">
                     <dt>Total</dt>
@@ -43,15 +47,17 @@ function CartPage() {
                   </div>
                 </dl>
 
-                <div className="flex justify-end">
-                  <span className="inline-flex items-center justify-center rounded-full bg-indigo-100 px-2.5 py-0.5 text-indigo-700">
-                    <TicketIcon height={4} width={4} />
+                {false && (
+                  <div className="flex justify-end">
+                    <span className="inline-flex items-center justify-center rounded-full bg-indigo-100 px-2.5 py-0.5 text-indigo-700">
+                      <TicketIcon height={4} width={4} />
 
-                    <p className="whitespace-nowrap text-xs">
-                      2 Discounts Applied
-                    </p>
-                  </span>
-                </div>
+                      <p className="whitespace-nowrap text-xs">
+                        2 Discounts Applied
+                      </p>
+                    </span>
+                  </div>
+                )}
 
                 <div className="flex justify-end">
                   <Link
