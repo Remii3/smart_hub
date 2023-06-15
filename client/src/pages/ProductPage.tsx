@@ -31,7 +31,7 @@ function ProductPage() {
   });
   const [selectedQuantity, setSelectedQuantity] = useState(1);
   const { userData } = useContext(UserContext);
-  const { addProductToCartHandler } = useContext(CartContext);
+  const { addProductToCart } = useContext(CartContext);
   const navigate = useNavigate();
   const path = useLocation();
 
@@ -57,6 +57,7 @@ function ProductPage() {
       });
     setIsFetchingData(false);
   }, [prodId]);
+
   useEffect(() => {
     fetchProductData();
   }, [fetchProductData]);
@@ -64,19 +65,14 @@ function ProductPage() {
   const addToCartHandler = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (productData) {
-      // const currentUserId = userData?._id || getCookie('guestToken');
+    if (productData && productData.quantity) {
       setIsAddingToCart(true);
-      // await axios.post('/cart/cart', {
-      //   userId: currentUserId,
-      //   productId: productData._id,
-      //   productQuantity: productData.quantity,
-      // });
-      // fetchCartDatahandler();
-      addProductToCartHandler({
+
+      addProductToCart({
         productId: productData._id,
         productQuantity: productData.quantity,
       });
+
       setIsAddingToCart(false);
     }
   };

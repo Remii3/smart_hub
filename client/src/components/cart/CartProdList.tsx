@@ -5,24 +5,24 @@ import CartItem from './CartItem';
 export default function CartProdList() {
   const {
     cartState,
-    incrementDataHandler,
-    decrementDataHandler,
-    removeCartItemHandler,
+    decrementCartItem,
+    incrementCartItem,
+    removeProductFromCart,
   } = useContext(CartContext);
 
-  let ProductsList = <div />;
-
-  const removeItemHandler = async (productId: string) => {
-    removeCartItemHandler(productId);
-  };
-
   const incrementCartItemHandler = (productId: string) => {
-    incrementDataHandler(productId);
+    incrementCartItem(productId);
   };
 
   const decrementCartItemHandler = (productId: string) => {
-    decrementDataHandler(productId);
+    decrementCartItem(productId);
   };
+
+  const removeCartItemHandler = async (productId: string) => {
+    removeProductFromCart(productId);
+  };
+
+  let ProductsList = <div />;
 
   if (cartState && cartState.cart?.products) {
     ProductsList = (
@@ -34,7 +34,7 @@ export default function CartProdList() {
             inCartQuantity={cartProduct.inCartQuantity}
             incrementCartItemHandler={incrementCartItemHandler}
             decrementCartItemHandler={decrementCartItemHandler}
-            removeCartItemHandler={removeItemHandler}
+            removeCartItemHandler={removeCartItemHandler}
           />
         ))}
       </ul>

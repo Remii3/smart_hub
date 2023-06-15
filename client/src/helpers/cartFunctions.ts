@@ -5,7 +5,7 @@ type CartItemTypes = {
   productId?: string;
   productQuantity?: number;
 };
-export const fetchCartData = async ({ userId }: CartItemTypes) => {
+export const getFetchCartData = async ({ userId }: CartItemTypes) => {
   if (userId) {
     const res = await axios.get('/cart/cart', {
       params: { userId },
@@ -15,7 +15,7 @@ export const fetchCartData = async ({ userId }: CartItemTypes) => {
   return null;
 };
 
-export const addProductToCart = async ({
+export const postAddProductToCart = async ({
   userId,
   productId,
   productQuantity,
@@ -27,7 +27,7 @@ export const addProductToCart = async ({
   });
 };
 
-export const incrementCartItem = async ({
+export const postIncrementCartItem = async ({
   userId,
   productId,
 }: CartItemTypes) => {
@@ -37,7 +37,7 @@ export const incrementCartItem = async ({
   });
 };
 
-export const decrementCartItem = async ({
+export const postDecrementCartItem = async ({
   userId,
   productId,
 }: CartItemTypes) => {
@@ -47,7 +47,10 @@ export const decrementCartItem = async ({
   });
 };
 
-export const removeCartItem = async ({ userId, productId }: CartItemTypes) => {
+export const postRemoveProductFromCart = async ({
+  userId,
+  productId,
+}: CartItemTypes) => {
   await axios.post('/cart/cart-remove', {
     userId,
     productId,

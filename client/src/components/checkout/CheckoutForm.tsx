@@ -8,18 +8,18 @@ import {
   Layout,
   StripeLinkAuthenticationElementChangeEvent,
 } from '@stripe/stripe-js';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useState, useEffect, useContext, FormEvent } from 'react';
 import { UserContext } from '../../context/UserProvider';
 import getCookie from '../../helpers/getCookie';
-import { useNavigate } from 'react-router-dom';
 import { CartContext } from '../../context/CartProvider';
 
 export default function CheckoutForm() {
   const stripe = useStripe();
   const elements = useElements();
   const { userData } = useContext(UserContext);
-  const { fetchCartData, cart } = useContext(CartContext);
+  const { fetchCartData, cartState } = useContext(CartContext);
   const navigate = useNavigate();
 
   const [email, setEmail] = useState('');
@@ -115,7 +115,7 @@ export default function CheckoutForm() {
           isLoading ||
           !stripe ||
           !elements ||
-          (cart?.products && cart?.products.length < 1)
+          (cartState.cart?.products && cartState.cart?.products.length < 1)
         }
         id="submit"
       >

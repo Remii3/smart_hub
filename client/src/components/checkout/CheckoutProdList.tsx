@@ -4,15 +4,15 @@ import { UserContext } from '../../context/UserProvider';
 import CheckoutItem from './CheckoutItem';
 
 export default function CheckoutProdList() {
-  const { cart } = useContext(CartContext);
+  const { cartState } = useContext(CartContext);
   const { userData } = useContext(UserContext);
 
   let ProductsList = <div />;
 
-  if (cart && cart.products) {
+  if (cartState && cartState.cart && cartState.cart.products) {
     ProductsList = (
       <ul className="-my-4 divide-y divide-gray-100">
-        {cart.products.map((cartProduct) => (
+        {cartState.cart.products.map((cartProduct) => (
           <CheckoutItem
             key={cartProduct.productData._id}
             productData={cartProduct.productData}
@@ -35,7 +35,7 @@ export default function CheckoutProdList() {
 
       <div>
         <p className="text-2xl font-medium tracking-tight text-gray-900">
-          {cart && cart.cartPrice}
+          {cartState && cartState.cart && cartState.cart.cartPrice}
         </p>
 
         <p className="mt-1 text-sm text-gray-600">For the purchase of</p>

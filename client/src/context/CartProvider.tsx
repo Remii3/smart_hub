@@ -10,11 +10,11 @@ import {
 import { ProductTypes } from '../types/interfaces';
 import { UserContext } from './UserProvider';
 import {
-  addProductToCart,
-  decrementCartItem,
-  fetchCartData,
-  incrementCartItem,
-  removeCartItem,
+  postAddProductToCart,
+  postDecrementCartItem,
+  postIncrementCartItem,
+  getFetchCartData,
+  postRemoveProductFromCart,
 } from '../helpers/cartFunctions';
 import getCookie from '../helpers/getCookie';
 
@@ -38,24 +38,24 @@ const initialState = {
 
 export const CartContext = createContext<{
   cartState: InitialStateType;
-  fetchCartDatahandler: () => void;
-  incrementDataHandler: (productId: string) => void;
-  decrementDataHandler: (productId: string) => void;
-  addProductToCartHandler: ({
+  fetchCartData: () => void;
+  addProductToCart: ({
     productId,
     productQuantity,
   }: {
     productId: string;
     productQuantity: number;
   }) => void;
-  removeCartItemHandler: (productId: string) => void;
+  incrementCartItem: (productId: string) => void;
+  decrementCartItem: (productId: string) => void;
+  removeProductFromCart: (productId: string) => void;
 }>({
   cartState: initialState,
-  addProductToCartHandler: () => null,
-  fetchCartDatahandler: () => null,
-  incrementDataHandler: () => null,
-  decrementDataHandler: () => null,
-  removeCartItemHandler: () => null,
+  fetchCartData: () => null,
+  addProductToCart: () => null,
+  incrementCartItem: () => null,
+  decrementCartItem: () => null,
+  removeProductFromCart: () => null,
 });
 
 function CartProvider({ children }: { children: ReactNode }) {
@@ -64,14 +64,30 @@ function CartProvider({ children }: { children: ReactNode }) {
   const { userData } = useContext(UserContext);
   const userId = userData?._id || getCookie('guestToken');
 
-  const fetchCartDatahandler = useCallback(async () => {
-    const res = await fetchCartData({ userId });
-    setCart((prevState) => {
-      return { ...prevState, cart: res };
-    });
+  const fetchCartData = useCallback(async () => {
+    if (userId) {
+      const res = await getFetchCartData({ userId });
+      setCart((prevState) => {
+        return { ...prevState, cart: res };
+      });
+    }
   }, [userId]);
 
-  const incrementDataHandler = useCallback(
+  const addProductToCart = useCallback(
+    async ({
+      productId,
+      productQuantity,
+    }: {
+      productId: string;
+      productQuantity: number;
+    }) => {
+      await postAddProductToCart({ userId, productId, productQuantity });
+      await fetchCartData();
+    },
+    [userId, fetchCartData]
+  );
+
+  const incrementCartItem = useCallback(
     async (productId: string) => {
       if (!cartState.cart) return;
 
@@ -83,18 +99,22 @@ function CartProvider({ children }: { children: ReactNode }) {
 
       newProducts[productIndex].inCartQuantity += 1;
 
-      await incrementCartItem({ userId, productId });
+      await postIncrementCartItem({ userId, productId });
+      await fetchCartData();
 
       setCart((prevState) => {
         return {
           ...prevState,
-          cart: { ...prevState.cart, products: newProducts },
+          cart: {
+            cartPrice: prevState.cart?.cartPrice || 0,
+            products: newProducts,
+          },
         };
       });
     },
-    [cartState.cart, userId]
+    [cartState.cart, fetchCartData, userId]
   );
-  const decrementDataHandler = useCallback(
+  const decrementCartItem = useCallback(
     async (productId: string) => {
       if (!cartState.cart) return;
 
@@ -106,72 +126,65 @@ function CartProvider({ children }: { children: ReactNode }) {
 
       newProducts[productIndex].inCartQuantity -= 1;
 
-      await decrementCartItem({ userId, productId });
+      await postDecrementCartItem({ userId, productId });
+      await fetchCartData();
 
       setCart((prevState) => {
         return {
           ...prevState,
-          cart: { ...prevState.cart, products: newProducts },
+          cart: {
+            cartPrice: prevState.cart?.cartPrice || 0,
+            products: newProducts,
+          },
         };
       });
     },
-    [cartState.cart, userId]
+    [cartState.cart, fetchCartData, userId]
   );
 
-  const removeCartItemHandler = useCallback(
+  const removeProductFromCart = useCallback(
     async (productId: string) => {
+      if (!cartState.cart) return;
+
       const newProducts = cartState.cart?.products.filter(
         (product) => product.productData._id !== productId
       );
-      await removeCartItem({ userId, productId });
+      await postRemoveProductFromCart({ userId, productId });
+      await fetchCartData();
 
       setCart((prevState) => {
         return {
           ...prevState,
-          cart: { ...prevState.cart, products: newProducts },
+          cart: {
+            cartPrice: prevState.cart?.cartPrice || 0,
+            products: newProducts,
+          },
         };
       });
     },
-    [cartState.cart?.products, userId]
-  );
-
-  const addProductToCartHandler = useCallback(
-    async ({
-      productId,
-      productQuantity,
-    }: {
-      productId: string;
-      productQuantity: number;
-    }) => {
-      await addProductToCart({ userId, productId, productQuantity });
-      const res = await fetchCartData({ userId });
-      setCart((prevState) => {
-        return { ...prevState, cart: res };
-      });
-    },
-    [userId]
+    [cartState.cart, fetchCartData, userId]
   );
 
   useEffect(() => {
-    fetchCartDatahandler();
-  }, [fetchCartDatahandler]);
+    fetchCartData();
+  }, [fetchCartData]);
 
   const contextValues = useMemo(
     () => ({
       cartState,
-      addProductToCartHandler,
-      fetchCartDatahandler,
-      incrementDataHandler,
-      decrementDataHandler,
-      removeCartItemHandler,
+      fetchCartData,
+      addProductToCart,
+      incrementCartItem,
+      decrementCartItem,
+      removeProductFromCart,
     }),
     [
       cartState,
-      addProductToCartHandler,
-      fetchCartDatahandler,
-      incrementDataHandler,
-      decrementDataHandler,
-      removeCartItemHandler,
+      fetchCartData,
+      addProductToCart,
+      incrementCartItem,
+      decrementCartItem,
+      removeProductFromCart,
     ]
   );
 
