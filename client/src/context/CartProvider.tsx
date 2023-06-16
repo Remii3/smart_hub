@@ -81,8 +81,16 @@ function CartProvider({ children }: { children: ReactNode }) {
       productId: string;
       productQuantity: number;
     }) => {
+      setCart((prevState) => {
+        return { ...prevState, cartIsLoading: true };
+      });
+
       await postAddProductToCart({ userId, productId, productQuantity });
       await fetchCartData();
+
+      setCart((prevState) => {
+        return { ...prevState, cartIsLoading: false };
+      });
     },
     [userId, fetchCartData]
   );
@@ -99,8 +107,16 @@ function CartProvider({ children }: { children: ReactNode }) {
 
       newProducts[productIndex].inCartQuantity += 1;
 
+      setCart((prevState) => {
+        return { ...prevState, cartIsLoading: true };
+      });
+
       await postIncrementCartItem({ userId, productId });
       await fetchCartData();
+
+      setCart((prevState) => {
+        return { ...prevState, cartIsLoading: false };
+      });
 
       setCart((prevState) => {
         return {
@@ -126,8 +142,16 @@ function CartProvider({ children }: { children: ReactNode }) {
 
       newProducts[productIndex].inCartQuantity -= 1;
 
+      setCart((prevState) => {
+        return { ...prevState, cartIsLoading: true };
+      });
+
       await postDecrementCartItem({ userId, productId });
       await fetchCartData();
+
+      setCart((prevState) => {
+        return { ...prevState, cartIsLoading: false };
+      });
 
       setCart((prevState) => {
         return {

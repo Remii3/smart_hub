@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom';
+import { useContext } from 'react';
 import { TrashIcon } from '../../assets/icons/Icons';
 import { ProductTypes } from '../../types/interfaces';
+import { CartContext } from '../../context/CartProvider';
 
 type CartItemProps = {
   productData: ProductTypes;
@@ -17,6 +19,8 @@ export default function CartItem({
   decrementCartItemHandler,
   removeCartItemHandler,
 }: CartItemProps) {
+  const { cartState } = useContext(CartContext);
+
   if (!productData) return <div />;
 
   return (
@@ -46,7 +50,10 @@ export default function CartItem({
           <div className="flex items-center">
             <button
               type="button"
-              className={`${!(inCartQuantity > 1) && 'text-gray-300'} px-2`}
+              className={`${
+                (!(inCartQuantity > 1) || cartState.cartIsLoading) &&
+                'text-gray-300'
+              } px-2`}
               disabled={!(inCartQuantity > 1)}
               onClick={() => decrementCartItemHandler(productData._id)}
             >
@@ -58,15 +65,19 @@ export default function CartItem({
             <input
               type="number"
               min="1"
+              max={productData.quantity}
               value={inCartQuantity}
               readOnly
+              disabled
               id="Line1Qty"
               className="h-8 w-12 rounded border-gray-200 bg-gray-50 p-0 text-center text-xs text-gray-600 [-moz-appearance:_textfield] focus:outline-none [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none"
             />
             <button
               type="button"
               className={`${
-                inCartQuantity >= productData.quantity && 'text-gray-300'
+                (inCartQuantity >= productData.quantity ||
+                  cartState.cartIsLoading) &&
+                'text-gray-300'
               } px-2`}
               disabled={inCartQuantity >= productData.quantity}
               onClick={() => incrementCartItemHandler(productData._id)}

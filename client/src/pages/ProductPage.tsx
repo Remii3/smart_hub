@@ -31,10 +31,15 @@ function ProductPage() {
     newQuantity: productData?.quantity,
   });
   const [selectedQuantity, setSelectedQuantity] = useState(1);
+
   const { userData } = useContext(UserContext);
   const { addProductToCart, cartState } = useContext(CartContext);
+
   const navigate = useNavigate();
   const path = useLocation();
+
+  let itemCapacity = false;
+  let itemBtnCapacity = false;
 
   let prodId: string | any[] | null = null;
   prodId = path.pathname.split('/');
@@ -72,8 +77,8 @@ function ProductPage() {
 
   const addToCartHandler = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
-    if (productData && productData.quantity) {
+    if (cartState.cartIsLoading) return;
+    if (productData) {
       setIsAddingToCart(true);
 
       addProductToCart({
@@ -135,14 +140,26 @@ function ProductPage() {
   const currentItem = cartState.cart?.products.find(
     (product) => product.productData._id === productData?._id
   );
-  const itemCapacity =
-    (productData && productData.quantity <= selectedQuantity) ||
-    currentItem?.inCartQuantity + selectedQuantity >= productData.quantity ||
-    false;
-  const itemBtnCapacity =
-    (productData && productData.quantity <= selectedQuantity) ||
-    currentItem?.inCartQuantity + selectedQuantity > productData.quantity ||
-    false;
+
+  if (productData && currentItem) {
+    itemCapacity =
+      productData.quantity <= selectedQuantity ||
+      currentItem?.inCartQuantity + selectedQuantity >= productData.quantity ||
+      false;
+    itemBtnCapacity =
+      productData.quantity < selectedQuantity ||
+      currentItem?.inCartQuantity + selectedQuantity > productData.quantity ||
+      false;
+  } else if (productData) {
+    itemCapacity =
+      productData.quantity <= selectedQuantity ||
+      currentItem?.inCartQuantity + selectedQuantity >= productData.quantity ||
+      false;
+    itemBtnCapacity =
+      productData.quantity < selectedQuantity ||
+      currentItem?.inCartQuantity + selectedQuantity > productData.quantity ||
+      false;
+  }
 
   return (
     <section>
@@ -306,6 +323,7 @@ function ProductPage() {
                     id="quantity"
                     min="1"
                     step="1"
+                    max={productData?.quantity}
                     value={selectedQuantity}
                     disabled
                     className="w-12 rounded border-gray-200 py-3 text-center text-xs [-moz-appearance:_textfield] [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none"

@@ -11,14 +11,17 @@ export default function CartProdList() {
   } = useContext(CartContext);
 
   const incrementCartItemHandler = (productId: string) => {
+    if (cartState.cartIsLoading) return;
     incrementCartItem(productId);
   };
 
   const decrementCartItemHandler = (productId: string) => {
+    if (cartState.cartIsLoading) return;
     decrementCartItem(productId);
   };
 
   const removeCartItemHandler = async (productId: string) => {
+    if (cartState.cartIsLoading) return;
     removeProductFromCart(productId);
   };
 
