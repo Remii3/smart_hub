@@ -1,7 +1,6 @@
 import { Fragment } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
-import SecondaryBtn from '../UI/Btns/SecondaryBtn';
-import PrimaryBtn from '../UI/Btns/PrimaryBtn';
+import PrimaryBtn from '../Btns/PrimaryBtn';
 
 type CustomDialogTypes = {
   children: React.ReactNode;
@@ -24,7 +23,7 @@ const defaultPropsValues = {
   isSuccess: false,
 };
 
-function CustomDialog({
+export default function CustomDialog({
   children,
   isOpen,
   changeIsOpen,
@@ -158,5 +157,5 @@ function CustomDialog({
     </Transition>
   );
 }
+
 CustomDialog.defaultProps = defaultPropsValues;
-export default CustomDialog;

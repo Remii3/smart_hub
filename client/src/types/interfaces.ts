@@ -1,15 +1,14 @@
 export interface ProductTypes {
   _id: string;
   title: string;
-  author?: string | undefined;
-  categories?: string[] | undefined;
-  description?: string | undefined;
-  imgs?: string[] | undefined;
-  quantity: number;
-  language?: string | undefined;
+  description?: string;
   price: number;
-  marketPlace: 'Shop' | 'Auction' | null;
-  shippingData?: { height: number; width: number; depth: number } | undefined;
+  imgs?: string[];
+  categories?: string[];
+  authors?: string[];
+  rating?: number;
+  quantity: number;
+  marketPlace: 'Shop' | 'Auction';
 }
 
 export interface ProductCategories {

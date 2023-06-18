@@ -1,9 +1,9 @@
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { ProductTypes } from '../types/interfaces';
-import BasicProductCollection from '../components/productCollection/BasicProductCollection';
+import BasicProductCollection from '../components/collections/BasicProductCollection';
 
-function ShopPage() {
+export default function ShopPage() {
   const mainCategories = ['Categories', 'Prices', 'Types', 'Something'];
 
   const [shopProducts, setShopProducts] = useState<ProductTypes[]>([]);
@@ -67,5 +67,3 @@ function ShopPage() {
     </div>
   );
 }
-
-export default ShopPage;

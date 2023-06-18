@@ -15,7 +15,7 @@ export const UserContext = createContext<ContextTypes>({
   fetchUserData() {},
 });
 
-function UserProvider({ children }: { children: ReactNode }) {
+export default function UserProvider({ children }: { children: ReactNode }) {
   const [userData, setUserData] = useState<null | UserDataTypes>(null);
 
   const fetchUserData = async () => {
@@ -48,5 +48,3 @@ function UserProvider({ children }: { children: ReactNode }) {
     <UserContext.Provider value={userValues}>{children}</UserContext.Provider>
   );
 }
-
-export default UserProvider;

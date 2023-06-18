@@ -1,7 +1,7 @@
 import { ReactNode } from 'react';
 import { Swiper } from 'swiper/react';
 import { Navigation } from 'swiper';
-import SuspenseComponent from '../suspense/SuspenseComponent';
+import SuspenseComponent from '../UI/suspense/SuspenseComponent';
 import LoadingComponent from '../UI/Loaders/LoadingComponent';
 import 'swiper/swiper-bundle.min.css';
 import 'swiper/swiper.min.css';

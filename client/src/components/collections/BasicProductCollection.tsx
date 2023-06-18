@@ -19,7 +19,7 @@ const defaultProps = {
   subTitle: null,
 };
 
-function BasicProductCollection({
+export default function BasicProductCollection({
   allProducts,
   title,
   subTitle,
@@ -93,5 +93,3 @@ function BasicProductCollection({
 }
 
 BasicProductCollection.defaultProps = defaultProps;
-
-export default BasicProductCollection;

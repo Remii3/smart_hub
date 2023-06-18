@@ -5,7 +5,7 @@ type PropsTypes = {
   category: string;
 };
 
-function PriceSelector({ highestPrice, category }: PropsTypes) {
+export default function PriceSelector({ highestPrice, category }: PropsTypes) {
   const [lowPrice, setLowPrice] = useState('');
   const [highPrice, setHighPrice] = useState('');
   const resetPriceRange = () => {
@@ -96,5 +96,3 @@ function PriceSelector({ highestPrice, category }: PropsTypes) {
     </div>
   );
 }
-
-export default PriceSelector;

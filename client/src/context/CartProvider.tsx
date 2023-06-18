@@ -58,7 +58,7 @@ export const CartContext = createContext<{
   removeProductFromCart: () => null,
 });
 
-function CartProvider({ children }: { children: ReactNode }) {
+export default function CartProvider({ children }: { children: ReactNode }) {
   const [cartState, setCart] = useState<InitialStateType>(initialState);
 
   const { userData } = useContext(UserContext);
@@ -222,5 +222,3 @@ function CartProvider({ children }: { children: ReactNode }) {
 export function useTasks() {
   return useContext(CartContext);
 }
-
-export default CartProvider;

@@ -7,7 +7,7 @@ import { UserContext } from '../context/UserProvider';
 import CustomInput from '../components/UI/form/CustomInput';
 import CustomPasswordInput from '../components/UI/form/CustomPasswordInput';
 
-function LoginPage() {
+export default function LoginPage() {
   const navigate = useNavigate();
   const { changeUserData } = useContext(UserContext);
 
@@ -183,5 +183,3 @@ function LoginPage() {
     </section>
   );
 }
-
-export default LoginPage;

@@ -1,21 +1,26 @@
 import { Link } from 'react-router-dom';
-import { ProductTypes } from '../../types/interfaces';
 
-interface PropsTypes extends ProductTypes {
+type DefaultCardType = {
+  _id: string;
+  title: string;
+  authors?: string[];
+  price: number;
+  imgs?: string[];
   deadline?: Date | null;
-}
+};
 const defaultProps = {
+  imgs: [],
   deadline: null,
+  authors: [],
 };
 function DefaultCard({
   _id,
   title,
-  author,
+  authors,
   deadline,
   price,
   imgs,
-  marketPlace,
-}: PropsTypes) {
+}: DefaultCardType) {
   let titleShortened = title;
 
   if (title.length >= 50) {
@@ -45,7 +50,11 @@ function DefaultCard({
             <h5 className="text-lg text-dark">{titleShortened}</h5>
             <div className="flex items-center justify-between ">
               <div>
-                <p className="text-gray600 sm:text-base">{author}</p>
+                <p className="text-gray600 sm:text-base">
+                  {authors?.map((author) => (
+                    <span key={author}>{author}</span>
+                  ))}
+                </p>
                 <p className="text-gray600 sm:text-base">
                   {deadline?.toISOString().slice(0, 4) || 'Unlimited'}
                 </p>

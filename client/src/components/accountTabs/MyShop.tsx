@@ -3,7 +3,7 @@ import { RadioGroup } from '@headlessui/react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import PrimaryBtn from '../UI/Btns/PrimaryBtn';
-import CustomDialog from '../dialog/CustomDialog';
+import CustomDialog from '../UI/dialog/CustomDialog';
 import { ProductCategories, ProductTypes } from '../../types/interfaces';
 import DefaultCard from '../card/DefaultCard';
 import SecondaryBtn from '../UI/Btns/SecondaryBtn';

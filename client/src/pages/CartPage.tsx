@@ -4,7 +4,7 @@ import { CartContext } from '../context/CartProvider';
 import { TicketIcon } from '../assets/icons/Icons';
 import CartProdList from '../components/cart/CartProdList';
 
-function CartPage() {
+export default function CartPage() {
   const { cartState } = useContext(CartContext);
   return (
     <section>
@@ -75,5 +75,3 @@ function CartPage() {
     </section>
   );
 }
-
-export default CartPage;

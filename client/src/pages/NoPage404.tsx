@@ -5,7 +5,7 @@ import { loadFull } from 'tsparticles';
 
 import type { Engine } from 'tsparticles-engine';
 
-function NoPage404() {
+export default function NoPage404() {
   const particlesInit = useCallback(async (engine: Engine) => {
     await loadFull(engine);
   }, []);
@@ -131,5 +131,3 @@ function NoPage404() {
     </div>
   );
 }
-
-export default NoPage404;

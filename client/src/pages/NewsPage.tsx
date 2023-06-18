@@ -1,5 +1,3 @@
-function NewsPage() {
+export default function NewsPage() {
   return <div>NewsPage</div>;
 }
-
-export default NewsPage;

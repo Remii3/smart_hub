@@ -5,6 +5,7 @@ type CartItemTypes = {
   productId?: string;
   productQuantity?: number;
 };
+
 export const getFetchCartData = async ({ userId }: CartItemTypes) => {
   if (userId) {
     const res = await axios.get('/cart/cart', {

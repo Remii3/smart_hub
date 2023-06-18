@@ -1,7 +1,7 @@
 import EditUserData from '../components/accountTabs/EditUserData';
 import MyShop from '../components/accountTabs/MyShop';
 
-function MyAccount() {
+export default function MyAccount() {
   return (
     <div className="relative mb-16 min-h-screen">
       <div>
@@ -15,5 +15,3 @@ function MyAccount() {
     </div>
   );
 }
-
-export default MyAccount;

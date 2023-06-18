@@ -11,7 +11,7 @@ const defaultProps = {
   additionalStyles: '',
 };
 
-function SecondaryBtn({
+export default function SecondaryBtn({
   usecase,
   type,
   text,
@@ -46,5 +46,5 @@ function SecondaryBtn({
     </button>
   );
 }
+
 SecondaryBtn.defaultProps = defaultProps;
-export default SecondaryBtn;

@@ -3,8 +3,12 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, Navigation, Scrollbar } from 'swiper';
 import axios from 'axios';
 import { ProductTypes } from '../../types/interfaces';
-import SuspenseComponent from '../suspense/SuspenseComponent';
+import SuspenseComponent from '../UI/suspense/SuspenseComponent';
 import LoadingComponent from '../UI/Loaders/LoadingComponent';
+import 'swiper/css/scrollbar';
+import 'swiper/css/navigation';
+import 'swiper/css';
+import 'swiper/css/pagination';
 
 const DefaultCard = lazy(() => import('../card/DefaultCard'));
 
@@ -75,11 +79,10 @@ function AuctionsSwiper() {
             <DefaultCard
               _id={auctionItem._id}
               title={auctionItem.title}
-              author={auctionItem.author ?? 'No author'}
+              authors={auctionItem.authors}
               deadline={auctionItem.deadline || null}
               price={auctionItem.price}
               imgs={auctionItem.imgs}
-              marketPlace={auctionItem.marketPlace}
             />
           </SuspenseComponent>
         </SwiperSlide>

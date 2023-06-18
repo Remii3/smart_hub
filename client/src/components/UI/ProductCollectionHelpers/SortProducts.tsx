@@ -4,7 +4,7 @@ type SortProductsTypes = {
   category: string;
 };
 
-function SortProducts({ category }: SortProductsTypes) {
+export default function SortProducts({ category }: SortProductsTypes) {
   const [sortOption, setSortOption] = useState('');
   const sortOptionChangeHandler = (e: ChangeEvent<HTMLSelectElement>) => {
     setSortOption(e.target.value);
@@ -30,5 +30,3 @@ function SortProducts({ category }: SortProductsTypes) {
     </div>
   );
 }
-
-export default SortProducts;

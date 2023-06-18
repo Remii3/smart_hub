@@ -3,8 +3,10 @@ import { Autoplay, Pagination } from 'swiper';
 import { lazy, useEffect, useState } from 'react';
 import axios from 'axios';
 import { ProductTypes } from '../../types/interfaces';
-import SuspenseComponent from '../suspense/SuspenseComponent';
+import SuspenseComponent from '../UI/suspense/SuspenseComponent';
 import LoadingComponent from '../UI/Loaders/LoadingComponent';
+import 'swiper/css';
+import 'swiper/css/pagination';
 
 const SpecialAuctionCard = lazy(() => import('../card/SpecialAuctionCard'));
 
@@ -56,7 +58,6 @@ function SpecialAuctionsSwiper() {
               deadline={auctionItem.deadline || null}
               price={auctionItem.price}
               swipedFlag={bestAuctionCardFlag}
-              marketPlace={auctionItem.marketPlace}
             />
           </SuspenseComponent>
         </SwiperSlide>

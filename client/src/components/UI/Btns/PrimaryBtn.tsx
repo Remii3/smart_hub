@@ -22,7 +22,7 @@ const defaultProps = {
   size: null,
 };
 
-function PrimaryBtn({
+export default function PrimaryBtn({
   usecase,
   onClick,
   customCSS,
@@ -79,5 +79,3 @@ function PrimaryBtn({
 }
 
 PrimaryBtn.defaultProps = defaultProps;
-
-export default PrimaryBtn;

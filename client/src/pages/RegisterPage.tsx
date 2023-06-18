@@ -7,7 +7,7 @@ import CustomInput from '../components/UI/form/CustomInput';
 import { UserContext } from '../context/UserProvider';
 import PasswordInput from '../components/UI/form/CustomPasswordInput';
 
-function RegisterPage() {
+export default function RegisterPage() {
   const navigate = useNavigate();
   const { changeUserData } = useContext(UserContext);
 
@@ -304,5 +304,3 @@ function RegisterPage() {
     </section>
   );
 }
-
-export default RegisterPage;

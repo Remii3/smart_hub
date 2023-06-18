@@ -1,9 +1,9 @@
 import axios from 'axios';
 import { useEffect, useState } from 'react';
-import BasicProductCollection from '../components/productCollection/BasicProductCollection';
+import BasicProductCollection from '../components/collections/BasicProductCollection';
 import { ProductTypes } from '../types/interfaces';
 
-function AuctionsPage() {
+export default function AuctionsPage() {
   const [auctionProducts, setAuctionProducts] = useState<ProductTypes[]>([]);
 
   useEffect(() => {
@@ -50,5 +50,3 @@ function AuctionsPage() {
     </div>
   );
 }
-
-export default AuctionsPage;

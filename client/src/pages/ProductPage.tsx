@@ -1,6 +1,5 @@
 import {
   ChangeEvent,
-  FormEvent,
   useEffect,
   useState,
   useContext,
@@ -10,15 +9,12 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { ProductTypes } from '../types/interfaces';
 import { UserContext } from '../context/UserProvider';
-import { CartContext } from '../context/CartProvider';
-import CustomDialog from '../components/dialog/CustomDialog';
-import ProductImage from '../components/productParts/ProductImage';
-import ProductPill from '../components/productParts/ProductPill';
-import StarRating from '../components/productParts/StarRating';
-import PrimaryBtn from '../components/UI/Btns/PrimaryBtn';
+import CustomDialog from '../components/UI/dialog/CustomDialog';
+import ProductImage from '../components/product/ProductImage';
+import ProductPill from '../components/product/ProductPill';
+import StarRating from '../components/product/StarRating';
 
-function ProductPage() {
-  const [isAddingToCart, setIsAddingToCart] = useState(false);
+export default function ProductPage() {
   const [isFetchingData, setIsFetchingData] = useState(false);
   const [isMyProduct, setIsMyProduct] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -30,30 +26,15 @@ function ProductPage() {
     newDescription: productData?.description,
     newQuantity: productData?.quantity,
   });
-  const [selectedQuantity, setSelectedQuantity] = useState(1);
 
   const { userData } = useContext(UserContext);
-  const { addProductToCart, cartState } = useContext(CartContext);
 
   const navigate = useNavigate();
   const path = useLocation();
 
-  let itemCapacity = false;
-  let itemBtnCapacity = false;
-
   let prodId: string | any[] | null = null;
   prodId = path.pathname.split('/');
   prodId = prodId[prodId.length - 1];
-
-  const incrementQuantityHandler = () => {
-    if (!productData) return;
-    if (productData.quantity <= selectedQuantity) return;
-    setSelectedQuantity((prevState) => (prevState += 1));
-  };
-  const decrementQuantityHandler = () => {
-    if (selectedQuantity <= 1) return;
-    setSelectedQuantity((prevState) => (prevState -= 1));
-  };
 
   const fetchProductData = useCallback(() => {
     setIsFetchingData(true);
@@ -74,21 +55,6 @@ function ProductPage() {
   useEffect(() => {
     fetchProductData();
   }, [fetchProductData]);
-
-  const addToCartHandler = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (cartState.cartIsLoading) return;
-    if (productData) {
-      setIsAddingToCart(true);
-
-      addProductToCart({
-        productId: productData._id,
-        productQuantity: selectedQuantity,
-      });
-      setSelectedQuantity(1);
-      setIsAddingToCart(false);
-    }
-  };
 
   useEffect(() => {
     if (userData?.my_products.find((item) => item._id === productData?._id)) {
@@ -137,29 +103,6 @@ function ProductPage() {
   if (productData === undefined) return <p> No data</p>;
 
   const DUMMYIMGS = [{ id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }];
-  const currentItem = cartState.cart?.products.find(
-    (product) => product.productData._id === productData?._id
-  );
-
-  if (productData && currentItem) {
-    itemCapacity =
-      productData.quantity <= selectedQuantity ||
-      currentItem?.inCartQuantity + selectedQuantity >= productData.quantity ||
-      false;
-    itemBtnCapacity =
-      productData.quantity < selectedQuantity ||
-      currentItem?.inCartQuantity + selectedQuantity > productData.quantity ||
-      false;
-  } else if (productData) {
-    itemCapacity =
-      productData.quantity <= selectedQuantity ||
-      currentItem?.inCartQuantity + selectedQuantity >= productData.quantity ||
-      false;
-    itemBtnCapacity =
-      productData.quantity < selectedQuantity ||
-      currentItem?.inCartQuantity + selectedQuantity > productData.quantity ||
-      false;
-  }
 
   return (
     <section>
@@ -301,57 +244,9 @@ function ProductPage() {
                   </button>
                 )}
             </div>
-
-            <form className="mt-8" onSubmit={(e) => addToCartHandler(e)}>
-              <div className="mt-8 flex gap-4">
-                <div>
-                  <button
-                    type="button"
-                    className={`${
-                      selectedQuantity <= 1 && 'text-gray-300'
-                    } px-2`}
-                    disabled={selectedQuantity <= 1}
-                    onClick={decrementQuantityHandler}
-                  >
-                    -
-                  </button>
-                  <label htmlFor="quantity" className="sr-only">
-                    Qty
-                  </label>
-                  <input
-                    type="number"
-                    id="quantity"
-                    min="1"
-                    step="1"
-                    max={productData?.quantity}
-                    value={selectedQuantity}
-                    disabled
-                    className="w-12 rounded border-gray-200 py-3 text-center text-xs [-moz-appearance:_textfield] [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none"
-                  />
-                  <button
-                    type="button"
-                    className={`${itemCapacity && 'text-gray-300'} px-2`}
-                    disabled={itemCapacity}
-                    onClick={incrementQuantityHandler}
-                  >
-                    +
-                  </button>
-                </div>
-                <PrimaryBtn
-                  type="submit"
-                  usecase="action"
-                  disabled={isAddingToCart || itemBtnCapacity}
-                  isLoading={isAddingToCart}
-                >
-                  Add to Cart
-                </PrimaryBtn>
-              </div>
-            </form>
           </div>
         </div>
       </div>
     </section>
   );
 }
-
-export default ProductPage;

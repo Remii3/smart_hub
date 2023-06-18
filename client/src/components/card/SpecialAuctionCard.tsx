@@ -1,17 +1,22 @@
 import { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import PrimaryBtn from '../UI/Btns/PrimaryBtn';
+import { Link } from 'react-router-dom';
 import SecondaryBtn from '../UI/Btns/SecondaryBtn';
-import { ProductTypes } from '../../types/interfaces';
 
-interface PropsTypes extends ProductTypes {
+type SepcialAuctionCardType = {
+  _id: string;
+  title: string;
+  description?: string;
+  price: number;
+  imgs?: string[];
   highBid?: number;
   swipedFlag: boolean;
   deadline: Date | null;
-}
+};
 
 const defalutProps = {
   highBid: 0,
+  description: '',
+  imgs: [],
 };
 
 function SpecialAuctionCard({
@@ -23,9 +28,8 @@ function SpecialAuctionCard({
   price,
   imgs,
   swipedFlag,
-}: PropsTypes) {
+}: SepcialAuctionCardType) {
   const [descHidden, setDescHidden] = useState(true);
-  const navigate = useNavigate();
 
   const showDesc = () => {
     setDescHidden((prevState) => !prevState);
