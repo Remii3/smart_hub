@@ -57,6 +57,8 @@ const addProduct = async (req, res) => {
   const categoryData = Category.findOne({ name: category });
   try {
     const newProductsId = new mongoose.Types.ObjectId();
+    const addedDate = new Date().getTime();
+
     try {
       await Product.create({
         _id: newProductsId,
@@ -69,6 +71,7 @@ const addProduct = async (req, res) => {
         authors,
         quantity,
         marketPlace,
+        addedDate,
       });
     } catch (err) {
       return res.status(500).json({ message: 'Failed creating new product' });

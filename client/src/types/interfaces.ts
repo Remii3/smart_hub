@@ -8,7 +8,9 @@ export interface ProductTypes {
   authors?: string[];
   rating?: number;
   quantity: number;
+  userEmail: string;
   marketPlace: 'Shop' | 'Auction';
+  addedDate: Date;
 }
 
 export interface ProductCategories {

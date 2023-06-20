@@ -1,10 +1,12 @@
 import { Link } from 'react-router-dom';
 import { SwiperSlide } from 'swiper/react';
-import { useState } from 'react';
+import { ChangeEvent, useState } from 'react';
 import BasicSwiper from '../swiper/BasicSwiper';
 import { ProductTypes } from '../../types/interfaces';
 import PriceSelector from '../UI/ProductCollectionHelpers/PriceSelector';
 import SortProducts from '../UI/ProductCollectionHelpers/SortProducts';
+import sortProducts, { sortProductsTypes } from '../../helpers/sortProducts';
+import { filterProductsByPrice } from '../../helpers/filterProducts';
 
 type PropsTypes = {
   title: string;
@@ -26,7 +28,45 @@ export default function BasicProductCollection({
   showMore,
   category,
 }: PropsTypes) {
-  const [highestPrice, setHighestPrice] = useState(0);
+  const [sortOption, setSortOption] = useState('');
+  const [minPrice, setMinPrice] = useState<string | number>('');
+  const [maxPrice, setMaxPrice] = useState<string | number>('');
+  let finalProducts = allProducts;
+  const highestPrice =
+    sortProducts({
+      products: allProducts,
+      sortType: sortProductsTypes.PRICE_DESC,
+    })[0] || 0;
+
+  const sortOptionChangeHandler = (e: ChangeEvent<HTMLSelectElement>) => {
+    setSortOption(e.target.value);
+  };
+
+  const resetPriceRange = () => {
+    setMinPrice('');
+    setMaxPrice('');
+  };
+
+  const minPriceChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {
+    setMinPrice(Number(e.target.value));
+  };
+
+  const maxPriceChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {
+    setMaxPrice(Number(e.target.value));
+  };
+
+  if (sortOption) {
+    finalProducts = sortProducts({
+      products: allProducts,
+      sortType: sortOption,
+    });
+  }
+
+  finalProducts = filterProductsByPrice({
+    products: finalProducts,
+    minPrice,
+    maxPrice,
+  });
 
   return (
     <section>
@@ -45,23 +85,34 @@ export default function BasicProductCollection({
         {subTitle && <p className="mt-4 max-w-md text-gray-500">{subTitle}</p>}
       </header>
       <div className="mt-8 flex items-center justify-between px-4">
-        <div className="flex gap-4">
-          <PriceSelector highestPrice={highestPrice} category={category} />
+        <div className="flex flex-grow gap-4">
+          <PriceSelector
+            highestPrice={highestPrice.price}
+            category={category}
+            minPrice={minPrice}
+            maxPrice={maxPrice}
+            maxPriceChangeHandler={maxPriceChangeHandler}
+            minPriceChangeHandler={minPriceChangeHandler}
+            resetPriceRange={resetPriceRange}
+          />
         </div>
         <div className="block">
-          <SortProducts category={category} />
+          <SortProducts
+            category={category}
+            sortOption={sortOption}
+            sortOptionChangeHandler={sortOptionChangeHandler}
+          />
         </div>
       </div>
       <div className="mt-4">
-        <BasicSwiper>
-          {allProducts &&
-            allProducts.length > 0 &&
-            allProducts.map((product, id) => (
+        {finalProducts && finalProducts.length > 0 ? (
+          <BasicSwiper>
+            {finalProducts.map((product, id) => (
               <SwiperSlide key={id}>
                 <div>
                   <Link
                     to={`/product/${product._id}`}
-                    className="group block overflow-hidden"
+                    className="group block overflow-hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                   >
                     <img
                       src="https://images.unsplash.com/photo-1523381210434-271e8be1f52b?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80"
@@ -86,7 +137,10 @@ export default function BasicProductCollection({
                 </div>
               </SwiperSlide>
             ))}
-        </BasicSwiper>
+          </BasicSwiper>
+        ) : (
+          <h6 className="pl-4">No products found</h6>
+        )}
       </div>
     </section>
   );

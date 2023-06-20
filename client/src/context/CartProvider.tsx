@@ -85,18 +85,19 @@ export default function CartProvider({ children }: { children: ReactNode }) {
         return { ...prevState, cartIsLoading: true };
       });
 
-      await postAddProductToCart({ userId, productId, productQuantity });
-      await fetchCartData();
-
-      setCart((prevState) => {
-        return { ...prevState, cartIsLoading: false };
-      });
+      postAddProductToCart({ userId, productId, productQuantity })
+        .then(() => fetchCartData())
+        .then(() => {
+          setCart((prevState) => {
+            return { ...prevState, cartIsLoading: false };
+          });
+        });
     },
     [userId, fetchCartData]
   );
 
   const incrementCartItem = useCallback(
-    async (productId: string) => {
+    (productId: string) => {
       if (!cartState.cart) return;
 
       const newProducts = cartState.cart.products;
@@ -111,27 +112,30 @@ export default function CartProvider({ children }: { children: ReactNode }) {
         return { ...prevState, cartIsLoading: true };
       });
 
-      await postIncrementCartItem({ userId, productId });
-      await fetchCartData();
+      postIncrementCartItem({ userId, productId })
+        .then(() => fetchCartData())
+        .then(() => {
+          setCart((prevState) => {
+            return { ...prevState, cartIsLoading: false };
+          });
 
-      setCart((prevState) => {
-        return { ...prevState, cartIsLoading: false };
-      });
+          setCart((prevState) => {
+            return {
+              ...prevState,
+              cart: {
+                cartPrice: prevState.cart?.cartPrice || 0,
+                products: newProducts,
+              },
+            };
+          });
+        });
 
-      setCart((prevState) => {
-        return {
-          ...prevState,
-          cart: {
-            cartPrice: prevState.cart?.cartPrice || 0,
-            products: newProducts,
-          },
-        };
-      });
+      // eslint-disable-next-line consistent-return
     },
     [cartState.cart, fetchCartData, userId]
   );
   const decrementCartItem = useCallback(
-    async (productId: string) => {
+    (productId: string) => {
       if (!cartState.cart) return;
 
       const newProducts = cartState.cart.products;
@@ -146,45 +150,47 @@ export default function CartProvider({ children }: { children: ReactNode }) {
         return { ...prevState, cartIsLoading: true };
       });
 
-      await postDecrementCartItem({ userId, productId });
-      await fetchCartData();
+      postDecrementCartItem({ userId, productId })
+        .then(() => fetchCartData())
+        .then(() => {
+          setCart((prevState) => {
+            return { ...prevState, cartIsLoading: false };
+          });
 
-      setCart((prevState) => {
-        return { ...prevState, cartIsLoading: false };
-      });
-
-      setCart((prevState) => {
-        return {
-          ...prevState,
-          cart: {
-            cartPrice: prevState.cart?.cartPrice || 0,
-            products: newProducts,
-          },
-        };
-      });
+          setCart((prevState) => {
+            return {
+              ...prevState,
+              cart: {
+                cartPrice: prevState.cart?.cartPrice || 0,
+                products: newProducts,
+              },
+            };
+          });
+        });
     },
     [cartState.cart, fetchCartData, userId]
   );
 
   const removeProductFromCart = useCallback(
-    async (productId: string) => {
+    (productId: string) => {
       if (!cartState.cart) return;
 
       const newProducts = cartState.cart?.products.filter(
         (product) => product.productData._id !== productId
       );
-      await postRemoveProductFromCart({ userId, productId });
-      await fetchCartData();
-
-      setCart((prevState) => {
-        return {
-          ...prevState,
-          cart: {
-            cartPrice: prevState.cart?.cartPrice || 0,
-            products: newProducts,
-          },
-        };
-      });
+      postRemoveProductFromCart({ userId, productId })
+        .then(() => fetchCartData())
+        .then(() => {
+          setCart((prevState) => {
+            return {
+              ...prevState,
+              cart: {
+                cartPrice: prevState.cart?.cartPrice || 0,
+                products: newProducts,
+              },
+            };
+          });
+        });
     },
     [cartState.cart, fetchCartData, userId]
   );

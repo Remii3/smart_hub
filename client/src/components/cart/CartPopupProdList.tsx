@@ -3,27 +3,7 @@ import { CartContext } from '../../context/CartProvider';
 import CartPopupItem from './CartPopupItem';
 
 export default function CartPopupProdList() {
-  const {
-    cartState,
-    incrementCartItem,
-    decrementCartItem,
-    removeProductFromCart,
-  } = useContext(CartContext);
-
-  const incrementCartItemHandler = (productId: string) => {
-    if (cartState.cartIsLoading) return;
-    incrementCartItem(productId);
-  };
-
-  const decrementCartItemHandler = (productId: string) => {
-    if (cartState.cartIsLoading) return;
-    decrementCartItem(productId);
-  };
-
-  const removeCartItemHandler = async (productId: string) => {
-    if (cartState.cartIsLoading) return;
-    removeProductFromCart(productId);
-  };
+  const { cartState } = useContext(CartContext);
 
   let ProductsList = <div />;
 
@@ -35,9 +15,6 @@ export default function CartPopupProdList() {
             key={cartProduct.productData._id}
             productData={cartProduct.productData}
             inCartQuantity={cartProduct.inCartQuantity}
-            incrementCartItemHandler={incrementCartItemHandler}
-            decrementCartItemHandler={decrementCartItemHandler}
-            removeCartItemHandler={removeCartItemHandler}
           />
         ))}
       </ul>

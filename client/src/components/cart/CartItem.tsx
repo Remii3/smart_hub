@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import { TrashIcon } from '../../assets/icons/Icons';
 import { ProductTypes } from '../../types/interfaces';
 import { CartContext } from '../../context/CartProvider';
@@ -7,22 +7,29 @@ import { CartContext } from '../../context/CartProvider';
 type CartItemProps = {
   productData: ProductTypes;
   inCartQuantity: number;
-  incrementCartItemHandler: (productId: string) => void;
-  decrementCartItemHandler: (productId: string) => void;
-  removeCartItemHandler: (productId: string) => void;
 };
 
 export default function CartItem({
   productData,
   inCartQuantity,
-  incrementCartItemHandler,
-  decrementCartItemHandler,
-  removeCartItemHandler,
 }: CartItemProps) {
-  const { cartState } = useContext(CartContext);
+  const [localQuantity, setLocalQuantity] = useState(inCartQuantity);
+  const { incrementCartItem, decrementCartItem, removeProductFromCart } =
+    useContext(CartContext);
 
   if (!productData) return <div />;
+  const decrementHandler = () => {
+    setLocalQuantity((prevState) => prevState - 1);
+    decrementCartItem(productData._id);
+  };
 
+  const incrementHandler = () => {
+    setLocalQuantity((prevState) => prevState + 1);
+    incrementCartItem(productData._id);
+  };
+  const removeHandler = () => {
+    removeProductFromCart(productData._id);
+  };
   return (
     <li className="flex items-center gap-4">
       <Link to={`/product/${productData._id}`}>
@@ -50,12 +57,9 @@ export default function CartItem({
           <div className="flex items-center">
             <button
               type="button"
-              className={`${
-                (!(inCartQuantity > 1) || cartState.cartIsLoading) &&
-                'text-gray-300'
-              } px-2`}
-              disabled={!(inCartQuantity > 1)}
-              onClick={() => decrementCartItemHandler(productData._id)}
+              className={`${!(localQuantity > 1) && 'text-gray-300'} px-2`}
+              disabled={!(localQuantity > 1)}
+              onClick={() => decrementHandler()}
             >
               -
             </button>
@@ -66,7 +70,7 @@ export default function CartItem({
               type="number"
               min="1"
               max={productData.quantity}
-              value={inCartQuantity}
+              value={localQuantity}
               readOnly
               disabled
               id="Line1Qty"
@@ -75,12 +79,10 @@ export default function CartItem({
             <button
               type="button"
               className={`${
-                (inCartQuantity >= productData.quantity ||
-                  cartState.cartIsLoading) &&
-                'text-gray-300'
+                localQuantity >= productData.quantity && 'text-gray-300'
               } px-2`}
-              disabled={inCartQuantity >= productData.quantity}
-              onClick={() => incrementCartItemHandler(productData._id)}
+              disabled={localQuantity >= productData.quantity}
+              onClick={() => incrementHandler()}
             >
               +
             </button>
@@ -90,7 +92,7 @@ export default function CartItem({
         <button
           type="button"
           className="text-gray-600 transition hover:text-red-600"
-          onClick={() => removeCartItemHandler(productData._id)}
+          onClick={() => removeHandler()}
         >
           <span className="sr-only">Remove item</span>
 

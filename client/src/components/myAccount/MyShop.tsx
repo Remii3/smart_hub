@@ -3,90 +3,37 @@ import { RadioGroup } from '@headlessui/react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import PrimaryBtn from '../UI/Btns/PrimaryBtn';
-import CustomDialog from '../UI/dialog/CustomDialog';
-import { ProductCategories, ProductTypes } from '../../types/interfaces';
-import DefaultCard from '../card/DefaultCard';
-import SecondaryBtn from '../UI/Btns/SecondaryBtn';
+import CustomDialog from '../UI/headlessUI/CustomDialog';
+import { ProductCategories } from '../../types/interfaces';
 import { UserContext } from '../../context/UserProvider';
 import { CheckIcon } from '../../assets/icons/Icons';
+import MyProducts from './MyProducts';
 
 type ProductDataTypes = {
   title: { value: string; hasError: boolean };
-  author: { value: string; hasError: boolean };
-  category: { value: string; hasError: boolean };
+  authors: { value: string[]; hasError: boolean };
+  categories: { value: string[]; hasError: boolean };
   otherCategory: { value: string; hasError: boolean };
   description: { value: string; hasError: boolean };
   imgs: { value: string[]; hasError: boolean };
   quantity: { value: number; hasError: boolean };
   price: { value: number; hasError: boolean };
   marketPlace: { value: string; hasError: boolean };
-  height: { value: number; hasError: boolean };
-  width: { value: number; hasError: boolean };
-  depth: { value: number; hasError: boolean };
 };
 
 const initialProductData = {
   title: { value: '', hasError: false },
-  author: { value: '', hasError: false },
-  category: { value: '', hasError: false },
+  authors: { value: [], hasError: false },
+  categories: { value: [], hasError: false },
   otherCategory: { value: '', hasError: false },
   description: { value: '', hasError: false },
   imgs: { value: [], hasError: false },
   quantity: { value: 1, hasError: false },
   price: { value: 1, hasError: false },
   marketPlace: { value: '', hasError: false },
-  height: { value: 1, hasError: false },
-  width: { value: 1, hasError: false },
-  depth: { value: 1, hasError: false },
 };
 
-function MyProducts({
-  shownAllProducts,
-  myProducts,
-  onClick,
-}: {
-  shownAllProducts: boolean;
-  myProducts: ProductTypes[];
-  onClick: () => void;
-}) {
-  return (
-    <div>
-      <div
-        className={`${
-          shownAllProducts ? 'max-h-[556px]' : 'max-h-[278px]'
-        } grid grid-cols-1 gap-4 overflow-hidden p-4 transition-[max-height] duration-300 ease-in-out sm:grid-cols-2 xl:grid-cols-3`}
-      >
-        {myProducts.map((product, id) => (
-          <DefaultCard
-            key={id}
-            _id={product._id}
-            title={product.title}
-            marketPlace={product.marketPlace}
-            price={product.price}
-          />
-        ))}
-      </div>
-
-      {myProducts.length > 3 && (
-        <div className="flex w-full justify-center">
-          <SecondaryBtn
-            text={shownAllProducts ? 'Hide more' : 'Show more'}
-            type="button"
-            usecase="outline"
-            onClick={onClick}
-            additionalStyles={`${
-              shownAllProducts
-                ? 'bg-gray-400 text-white'
-                : 'text-gray-600 bg-white'
-            } px-3 py-2`}
-          />
-        </div>
-      )}
-    </div>
-  );
-}
-
-function MyShop() {
+export default function MyShop() {
   const [isOpen, setIsOpen] = useState(false);
   const [productData, setProductData] =
     useState<ProductDataTypes>(initialProductData);
@@ -137,6 +84,16 @@ function MyShop() {
         return {
           ...prevState,
           imgs: {
+            value: [...prevState.imgs.value, e.target.value],
+            hasError: false,
+          },
+        };
+      });
+    } else if (e.target.name === 'authors') {
+      setProductData((prevState) => {
+        return {
+          ...prevState,
+          authors: {
             value: [...prevState.imgs.value, e.target.value],
             hasError: false,
           },
@@ -205,13 +162,15 @@ function MyShop() {
   const showAllHandler = () => {
     setShownAllProducts((prevState) => !prevState);
   };
+
+  const addAuthorHandler = (e: HTMLInputElement) => {};
   return (
     <div>
       <div>
         <div className="mb-8">
           <div className="flex justify-between align-bottom">
-            <h2 className="mb-0">My products</h2>
-            {userData?.my_products && (
+            <h3 className="mb-0">My products</h3>
+            {userData?.my_products && userData.my_products.length > 6 && (
               <div className="flex items-end">
                 <Link to="/account/my/my-products" className="text-sm">
                   Show all
@@ -275,21 +234,24 @@ function MyShop() {
 
           <fieldset className="mb-2 space-y-1">
             <label
-              htmlFor="author"
+              htmlFor="authors"
               className="block text-sm font-medium text-gray-700"
             >
-              Author
+              Authors
             </label>
 
             <input
-              name="author"
-              id="author"
+              name="authors"
+              id="authors"
               type="text"
               placeholder="R.R. Martin..."
               className="w-full rounded-md border-gray-200 shadow-sm sm:text-sm"
               value={productData.author.value}
               onChange={(e) => productDataChangeHandler(e)}
             />
+            <button type="button" onClick={() => addAuthorHandler()}>
+              +
+            </button>
           </fieldset>
 
           <fieldset className="mb-2 space-y-1">
@@ -510,67 +472,6 @@ function MyShop() {
             </RadioGroup>
           </fieldset>
 
-          <div className="flex flex-col sm:flex-row sm:space-x-1">
-            <fieldset className="mb-2 space-y-1">
-              <label
-                htmlFor="height"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Height
-              </label>
-
-              <input
-                name="height"
-                id="height"
-                type="number"
-                placeholder="1cm..."
-                min={1}
-                className="w-full rounded-md border-gray-200 shadow-sm sm:text-sm"
-                value={productData.height.value}
-                onChange={(e) => productDataChangeHandler(e)}
-              />
-            </fieldset>
-
-            <fieldset className="mb-2 space-y-1">
-              <label
-                htmlFor="width"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Width
-              </label>
-
-              <input
-                name="width"
-                id="width"
-                type="number"
-                placeholder="1cm..."
-                min={1}
-                className="w-full rounded-md border-gray-200 shadow-sm sm:text-sm"
-                value={productData.width.value}
-                onChange={(e) => productDataChangeHandler(e)}
-              />
-            </fieldset>
-
-            <fieldset className="mb-2 space-y-1">
-              <label
-                htmlFor="depth"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Depth
-              </label>
-
-              <input
-                name="depth"
-                id="depth"
-                type="number"
-                placeholder="1cm..."
-                min={1}
-                className="w-full rounded-md border-gray-200 shadow-sm sm:text-sm"
-                value={productData.depth.value}
-                onChange={(e) => productDataChangeHandler(e)}
-              />
-            </fieldset>
-          </div>
           <div className="mb-2 mt-4 flex justify-end">
             <PrimaryBtn
               type="submit"
@@ -585,5 +486,3 @@ function MyShop() {
     </div>
   );
 }
-
-export default MyShop;

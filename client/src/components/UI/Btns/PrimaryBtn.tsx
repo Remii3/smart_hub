@@ -38,7 +38,7 @@ export default function PrimaryBtn({
       onClick(e);
     }
   };
-  const defaultClasses = `block font-medium rounded text-white border shadow-sm transition-all duration-200 ease-out focus:ring ${
+  const defaultClasses = `inline-block font-medium rounded text-white border shadow-sm transition-all duration-200 ease-out focus:ring ${
     size || 'px-5 py-3'
   }`;
   const primaryClasses =

@@ -12,10 +12,7 @@ function Footer() {
     { to: '/collections', text: 'Collections' },
     { to: '/contact', text: 'Contact' },
   ];
-  const rightColumnLinks = [
-    { to: '/news', text: 'News' },
-    { to: '/blog', text: 'Blog' },
-  ];
+  const rightColumnLinks = [{ to: '/blog', text: 'Blog' }];
   return (
     <footer className="relative w-full bg-pageBackground">
       <div className="mx-auto flex max-w-[1200px] flex-col justify-center gap-10 pb-20 pl-4 pt-10 text-white md:flex-row md:gap-5">

@@ -5,14 +5,15 @@ import {
   useContext,
   useCallback,
 } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { ProductTypes } from '../types/interfaces';
 import { UserContext } from '../context/UserProvider';
-import CustomDialog from '../components/UI/dialog/CustomDialog';
+import CustomDialog from '../components/UI/headlessUI/CustomDialog';
 import ProductImage from '../components/product/ProductImage';
 import ProductPill from '../components/product/ProductPill';
 import StarRating from '../components/product/StarRating';
+import ProductForm from '../components/product/ProductForm';
 
 export default function ProductPage() {
   const [isFetchingData, setIsFetchingData] = useState(false);
@@ -103,9 +104,8 @@ export default function ProductPage() {
   if (productData === undefined) return <p> No data</p>;
 
   const DUMMYIMGS = [{ id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }];
-
   return (
-    <section>
+    <section className="relative">
       <div className="relative mx-auto max-w-screen-xl px-4 py-8">
         <div className="grid grid-cols-1 items-start gap-8 md:grid-cols-2">
           <div className="space-y-4">
@@ -119,8 +119,8 @@ export default function ProductPage() {
             </div>
           </div>
 
-          <div className="sticky top-0">
-            <div className="relative w-full">
+          <div className="sticky top-24">
+            <div className="relative mb-3 w-full">
               <ProductPill text={productData && productData.marketPlace} />
               {isMyProduct && (
                 <div className="absolute right-0 top-0 flex gap-3">
@@ -187,7 +187,9 @@ export default function ProductPage() {
                     {productData && productData.title}
                   </h1>
                 )}
-
+                <p className="text-xs">
+                  Added by: <Link to="/">{productData?.userEmail}</Link>
+                </p>
                 <p className="text-sm">Highest Rated Product</p>
 
                 <StarRating />
@@ -244,6 +246,10 @@ export default function ProductPage() {
                   </button>
                 )}
             </div>
+            <ProductForm
+              productId={productData?._id}
+              productQuantity={productData?.quantity}
+            />
           </div>
         </div>
       </div>

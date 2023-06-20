@@ -3,8 +3,13 @@ import PrimaryBtn from '../UI/Btns/PrimaryBtn';
 import { CartContext } from '../../context/CartProvider';
 
 type ProductFormType = {
-  productId: string;
-  productQuantity: number;
+  productId?: string;
+  productQuantity?: number;
+};
+
+const defaultProps = {
+  productId: '',
+  productQuantity: 0,
 };
 
 export default function ProductForm({
@@ -34,8 +39,7 @@ export default function ProductForm({
   };
 
   const incrementQuantityHandler = () => {
-    // if (!productQuantity) return;
-    if (productQuantity <= selectedQuantity) return;
+    if (productQuantity! <= selectedQuantity) return;
     setSelectedQuantity((prevState) => (prevState += 1));
   };
   const decrementQuantityHandler = () => {
@@ -49,16 +53,16 @@ export default function ProductForm({
 
   if (currentItem) {
     itemCapacity =
-      productQuantity <= selectedQuantity ||
-      currentItem.inCartQuantity + selectedQuantity >= productQuantity ||
+      productQuantity! <= selectedQuantity ||
+      currentItem.inCartQuantity + selectedQuantity >= productQuantity! ||
       false;
     itemBtnCapacity =
-      productQuantity < selectedQuantity ||
-      currentItem.inCartQuantity + selectedQuantity > productQuantity ||
+      productQuantity! < selectedQuantity ||
+      currentItem.inCartQuantity + selectedQuantity > productQuantity! ||
       false;
   } else {
-    itemCapacity = productQuantity <= selectedQuantity || false;
-    itemBtnCapacity = productQuantity < selectedQuantity || false;
+    itemCapacity = productQuantity! <= selectedQuantity || false;
+    itemBtnCapacity = productQuantity! < selectedQuantity || false;
   }
 
   return (
@@ -107,3 +111,4 @@ export default function ProductForm({
     </form>
   );
 }
+ProductForm.defaultProps = defaultProps;
