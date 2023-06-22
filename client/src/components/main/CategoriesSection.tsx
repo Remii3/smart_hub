@@ -12,13 +12,14 @@ export default function CategoriesSection() {
   const navigate = useNavigate();
   useEffect(() => {
     try {
-      axios.get('/product/categories-get').then((res) => {
+      axios.get('/category/all').then((res) => {
         setShopList(res.data);
       });
     } catch (err) {
       console.error(err);
     }
   }, []);
+
   return (
     <section className="relative flex w-full flex-col items-center gap-12 pb-16">
       <div className="relative -top-4 left-0 w-full bg-pageBackground">
@@ -36,7 +37,8 @@ export default function CategoriesSection() {
             <CategoryCard
               key={cardItem._id}
               _id={cardItem._id}
-              name={cardItem.name}
+              label={cardItem.label}
+              value={cardItem.value}
               description={cardItem.description}
             />
           ))}

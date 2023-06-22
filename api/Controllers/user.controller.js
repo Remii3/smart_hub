@@ -83,7 +83,7 @@ const signUp = async (req, res) => {
           .json({ message: 'Succesfully created an account' });
       },
     );
-  } catch (e) {
+  } catch (err) {
     if (e.code === 11000) {
       const responseObject = e.keyValue;
       return res.status(422).json({
@@ -91,7 +91,7 @@ const signUp = async (req, res) => {
         message: Object.values(responseObject)[0] + ` already exists`,
       });
     }
-    res.status(422).json(e);
+    res.status(500).json({ message: 'Failed to register', err });
   }
 };
 
@@ -111,7 +111,7 @@ const profile = async (req, res) => {
       my_products,
     });
   } catch (err) {
-    res.status(500).json({ message: 'Failed to fetch user data' });
+    res.status(500).json({ message: 'Failed to fetch user data', err });
   }
 };
 
@@ -190,7 +190,7 @@ const newData = async (req, res) => {
         message: Object.values(responseObject)[0] + ` already exists`,
       });
     } else {
-      res.status(500).json({ message: 'Failed to update data' });
+      res.status(500).json({ message: 'Failed to update data', err });
     }
   }
 };

@@ -102,7 +102,6 @@ export default function ProductPage() {
 
   if (productData === undefined && isFetchingData) return <p>Loading</p>;
   if (productData === undefined) return <p> No data</p>;
-
   const DUMMYIMGS = [{ id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }];
   return (
     <section className="relative">
@@ -187,8 +186,17 @@ export default function ProductPage() {
                     {productData && productData.title}
                   </h1>
                 )}
+                <div>
+                  {productData &&
+                    productData.categories?.map((category) => (
+                      <span key={category._id}>{category.value}</span>
+                    ))}
+                </div>
                 <p className="text-xs">
-                  Added by: <Link to="/">{productData?.userEmail}</Link>
+                  Added: {productData && productData.addedDate.slice(0, 10)}
+                </p>
+                <p className="text-xs">
+                  by: <Link to="/">{productData?.userEmail}</Link>
                 </p>
                 <p className="text-sm">Highest Rated Product</p>
 

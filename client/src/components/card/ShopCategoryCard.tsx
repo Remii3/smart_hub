@@ -1,26 +1,16 @@
 import { Link } from 'react-router-dom';
 import { ProductCategories } from '../../types/interfaces';
 
-function CategoryCard({ _id, name, description }: ProductCategories) {
-  const categoryName = name.charAt(0).toUpperCase() + name.slice(1);
-
-  const maxDescLength = 100;
-  let trimmedDesc = description.slice(0, maxDescLength);
-  trimmedDesc = trimmedDesc.substring(
-    0,
-    Math.min(trimmedDesc.length, trimmedDesc.lastIndexOf(' '))
-  );
-
-  const categoryDescription = `${trimmedDesc}...`;
+function CategoryCard({ _id, label, value, description }: ProductCategories) {
   return (
     <div id={_id}>
       <Link
-        to={{ pathname: `/shop/search`, search: `category=${name}` }}
-        className="relative flex cursor-pointer flex-col gap-4 rounded-lg bg-gray900 px-10 py-12 shadow transition-[transform,box-shadow] duration-300 ease-out hover:scale-105 hover:shadow-lg active:scale-100"
+        to={{ pathname: `/shop/search`, search: `category=${value}` }}
+        className="relative flex h-full cursor-pointer flex-col gap-4 rounded-lg bg-gray900 px-10 py-12 shadow transition-[transform,box-shadow] duration-300 ease-out hover:scale-105 hover:shadow-lg active:scale-100"
       >
-        <h4 className="text-dark">{categoryName}</h4>
-        <p className="text-darkTint sm:text-lg lg:text-xl">
-          {categoryDescription}
+        <h4 className="text-dark">{label}</h4>
+        <p className="line-clamp-2  text-darkTint sm:text-lg lg:text-xl">
+          {description}
         </p>
         <svg
           xmlns="http://www.w3.org/2000/svg"

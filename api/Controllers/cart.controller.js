@@ -54,6 +54,7 @@ const addToCart = async (req, res) => {
   } catch (err) {
     res.status(500).json({
       message: 'Server error',
+      err,
     });
   }
 };
@@ -77,6 +78,7 @@ const removeFromCart = async (req, res) => {
   } catch (err) {
     res.status(500).json({
       message: 'Something went wrong with removing product',
+      err,
     });
   }
 };
@@ -124,6 +126,7 @@ const getCart = async (req, res) => {
     res.status(500).json({
       message: 'Something went wrong with fetching cart data',
       products: null,
+      err,
     });
   }
 };
@@ -147,6 +150,7 @@ const cartItemIncrement = async (req, res) => {
   } catch (err) {
     res.status(500).json({
       message: 'Cart or product was not found',
+      err,
     });
   }
 };
@@ -171,24 +175,28 @@ const cartItemDecrement = async (req, res) => {
   } catch (err) {
     res.status(500).json({
       message: 'Cart or product was not found',
+      err,
     });
   }
 };
 
 const initiatePayment = async (req, res) => {
   const { items } = req.body;
+  try {
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: calculateOrderAmount(items),
+      currency: 'eur',
+      automatic_payment_methods: {
+        enabled: true,
+      },
+    });
 
-  const paymentIntent = await stripe.paymentIntents.create({
-    amount: calculateOrderAmount(items),
-    currency: 'eur',
-    automatic_payment_methods: {
-      enabled: true,
-    },
-  });
-
-  res.send({
-    clientSecret: paymentIntent.client_secret,
-  });
+    res.status(200).send({
+      clientSecret: paymentIntent.client_secret,
+    });
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to initiate payment', err });
+  }
 };
 
 module.exports = {

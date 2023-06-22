@@ -1,10 +1,16 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, {
+  ChangeEvent,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
 import { RadioGroup } from '@headlessui/react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
+import AsyncCreatableSelect from 'react-select/async-creatable';
 import PrimaryBtn from '../UI/Btns/PrimaryBtn';
 import CustomDialog from '../UI/headlessUI/CustomDialog';
-import { ProductCategories } from '../../types/interfaces';
 import { UserContext } from '../../context/UserProvider';
 import { CheckIcon } from '../../assets/icons/Icons';
 import MyProducts from './MyProducts';
@@ -37,22 +43,41 @@ export default function MyShop() {
   const [isOpen, setIsOpen] = useState(false);
   const [productData, setProductData] =
     useState<ProductDataTypes>(initialProductData);
-  const [isLoading, setIsLoading] = useState(false);
-  const [hasFailed, setHasFailed] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
-  const [categories, setCategories] = useState<ProductCategories[]>();
-  const [shownAllProducts, setShownAllProducts] = useState(false);
 
+  const [categoryState, setCategoryState] = useState<{
+    isLoading: boolean;
+    options: any;
+    value: [];
+  }>({
+    isLoading: false,
+    options: [],
+    value: [],
+  });
+
+  const [status, setStatus] = useState({
+    isLoading: false,
+    hasFailed: false,
+    isSuccess: false,
+  });
+  const [newAuthor, setNewAuthor] = useState('');
+
+  const [shownAllProducts, setShownAllProducts] = useState(false);
   const { userData, fetchUserData } = useContext(UserContext);
 
   const resetProductData = () => {
     setTimeout(() => {
       setProductData(initialProductData);
+      setCategoryState((prevState) => {
+        return { ...prevState, value: [] };
+      });
+      setNewAuthor('');
     }, 200);
   };
 
   const resetHasFailed = () => {
-    setHasFailed(false);
+    setStatus((prevState) => {
+      return { ...prevState, hasFailed: false };
+    });
   };
 
   const changeIsOpen = () => {
@@ -60,7 +85,9 @@ export default function MyShop() {
     resetProductData();
     setTimeout(() => {
       resetHasFailed();
-      setIsSuccess(false);
+      setStatus((prevState) => {
+        return { ...prevState, isSuccess: false };
+      });
     }, 200);
   };
 
@@ -109,61 +136,94 @@ export default function MyShop() {
     }
   };
 
+  const fetchAllCategories = useCallback(async () => {
+    const res = await axios.get('/category/all');
+    setCategoryState((prevState) => {
+      return { ...prevState, options: [...res.data] };
+    });
+  }, []);
+
   const addProductHandler = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    let currentCategory = productData.category.value;
-    if (productData.category.value === 'Other') {
-      currentCategory = productData.otherCategory.value;
-    }
     const newProductData = {
       userEmail: userData?.email,
       title: productData.title.value,
-      author: productData.author.value,
-      category: currentCategory,
       description: productData.description.value,
-      imgs: productData.imgs.value,
-      quantity: productData.quantity.value,
       price: productData.price.value,
+      imgs: productData.imgs.value,
+      categories: categoryState.value,
+      authors: productData.authors.value,
+      quantity: productData.quantity.value,
       marketPlace: productData.marketPlace.value,
-      height: productData.height.value,
-      width: productData.width.value,
-      depth: productData.depth.value,
     };
 
     try {
-      setIsLoading(true);
+      setStatus((prevState) => {
+        return { ...prevState, isLoading: true };
+      });
       await axios.post('/product/product', newProductData);
-      setIsLoading(false);
+      setStatus((prevState) => {
+        return { ...prevState, isLoading: false };
+      });
       fetchUserData();
       resetProductData();
 
-      setIsSuccess(true);
+      setStatus((prevState) => {
+        return { ...prevState, isSuccess: true };
+      });
+      fetchAllCategories();
     } catch (err) {
-      setIsLoading(false);
-      setHasFailed(true);
-    }
-  };
-
-  useEffect(() => {
-    if (productData.category.value === '') {
-      axios.get('/category/all').then((res) => {
-        setCategories(res.data);
-        setProductData((prevState) => {
-          return {
-            ...prevState,
-            category: { value: res.data[0].name, hasError: false },
-          };
-        });
+      setStatus((prevState) => {
+        return { ...prevState, isLoading: false, hasFailed: true };
       });
     }
-  }, [productData.category.value]);
+  };
 
   const showAllHandler = () => {
     setShownAllProducts((prevState) => !prevState);
   };
 
-  const addAuthorHandler = (e: HTMLInputElement) => {};
+  const addAuthorHandler = () => {
+    setNewAuthor('');
+    setProductData((prevState) => {
+      return {
+        ...prevState,
+        authors: {
+          ...prevState.authors,
+          value: [...prevState.authors.value, newAuthor],
+        },
+      };
+    });
+  };
+
+  const changeNewAuthorHandler = (e: ChangeEvent<HTMLInputElement>) => {
+    setNewAuthor(e.target.value);
+  };
+
+  const filterColors = (inputValue: string) => {
+    return categoryState.options.filter((i: { label: string }) =>
+      i.label.toLowerCase().includes(inputValue.toLowerCase())
+    );
+  };
+
+  const promiseOptions = (inputValue: string) =>
+    new Promise<any[]>((resolve) => {
+      setTimeout(() => {
+        resolve(filterColors(inputValue));
+      }, 1000);
+    });
+
+  const slectedChangetest = (selectedOptions: any) => {
+    setCategoryState((prevState) => {
+      return { ...prevState, value: selectedOptions };
+    });
+  };
+
+  useEffect(() => {
+    fetchAllCategories();
+  }, [fetchAllCategories]);
+
   return (
     <div>
       <div>
@@ -207,10 +267,10 @@ export default function MyShop() {
         description={
           "Fill in your product data. Click the 'add' button when you're done."
         }
-        isLoading={isLoading}
-        hasFailed={hasFailed}
+        isLoading={status.isLoading}
+        hasFailed={status.hasFailed}
         changeHasFailed={resetHasFailed}
-        isSuccess={isSuccess}
+        isSuccess={status.isSuccess}
       >
         <form onSubmit={(e) => addProductHandler(e)} className="w-full">
           <fieldset className="mb-2 space-y-1">
@@ -233,58 +293,61 @@ export default function MyShop() {
           </fieldset>
 
           <fieldset className="mb-2 space-y-1">
-            <label
-              htmlFor="authors"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Authors
-            </label>
-
-            <input
-              name="authors"
-              id="authors"
-              type="text"
-              placeholder="R.R. Martin..."
-              className="w-full rounded-md border-gray-200 shadow-sm sm:text-sm"
-              value={productData.author.value}
-              onChange={(e) => productDataChangeHandler(e)}
-            />
-            <button type="button" onClick={() => addAuthorHandler()}>
-              +
-            </button>
+            <p className="block text-sm font-medium text-gray-700">Authors</p>
+            <div>
+              {productData.authors.value.map((author) => (
+                <span key={author}>{author}</span>
+              ))}
+            </div>
+            <div className="flex">
+              <label
+                htmlFor="newAuthor"
+                className="sr-only block text-sm font-medium text-gray-700"
+              >
+                Author
+              </label>
+              <input
+                name="newAuthor"
+                id="newAuthor"
+                type="text"
+                placeholder="R.R. Martin..."
+                className="w-full rounded-md border-gray-200 shadow-sm sm:text-sm"
+                value={newAuthor}
+                onChange={(e) => changeNewAuthorHandler(e)}
+              />
+              <button
+                className="w-1/4 border border-red-100"
+                type="button"
+                onClick={() => addAuthorHandler()}
+              >
+                +
+              </button>
+            </div>
           </fieldset>
 
           <fieldset className="mb-2 space-y-1">
-            <label
-              htmlFor="category"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Category
-            </label>
-            <select
-              name="category"
-              id="category"
-              value={productData.category.value}
-              onChange={(e) => productDataChangeHandler(e)}
-            >
-              {categories?.map((item) => (
-                <option key={item._id} value={item.name}>
-                  {item.name[0].toUpperCase()}
-                  {item.name.slice(1)}
-                </option>
-              ))}
-              <option value="Other">Other</option>
-            </select>
-            {productData.category.value === 'Other' && (
-              <input
-                id="otherCategory"
-                name="otherCategory"
-                type="text"
-                placeholder="Fantasy..."
-                value={productData.otherCategory.value}
-                onChange={(e) => productDataChangeHandler(e)}
+            <p className="block text-sm font-medium text-gray-700">
+              Categories
+            </p>
+            {productData.categories.value.map((category) => (
+              <span key={category}>{category}</span>
+            ))}
+            <div>
+              <label
+                htmlFor="newCategory"
+                className="sr-only block text-sm font-medium text-gray-700"
+              >
+                Category
+              </label>
+              <AsyncCreatableSelect
+                isMulti
+                cacheOptions
+                defaultOptions
+                loadOptions={promiseOptions}
+                value={categoryState.value}
+                onChange={slectedChangetest}
               />
-            )}
+            </div>
           </fieldset>
 
           <fieldset className="mb-2 space-y-1">

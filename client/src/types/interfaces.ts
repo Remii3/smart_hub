@@ -4,18 +4,19 @@ export interface ProductTypes {
   description?: string;
   price: number;
   imgs?: string[];
-  categories?: string[];
+  categories?: { value: string; label: string; _id: string }[];
   authors?: string[];
   rating?: number;
   quantity: number;
   userEmail: string;
   marketPlace: 'Shop' | 'Auction';
-  addedDate: Date;
+  addedDate: string;
 }
 
 export interface ProductCategories {
   _id: string;
-  name: string;
+  label: string;
+  value: string;
   description: string;
 }
 
