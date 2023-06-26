@@ -120,6 +120,7 @@ const getCart = async (req, res) => {
 
       res.status(200).json({ products: productsData, cartPrice });
     } else {
+      cartPrice = '€0';
       res.status(200).json({ products: [], cartPrice });
     }
   } catch (err) {

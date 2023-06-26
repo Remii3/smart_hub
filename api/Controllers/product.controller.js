@@ -43,7 +43,7 @@ const getProduct = async (req, res) => {
 
 const addProduct = async (req, res) => {
   let {
-    userEmail,
+    userProp,
     title,
     authors,
     categories,
@@ -77,7 +77,7 @@ const addProduct = async (req, res) => {
     try {
       await Product.create({
         _id: newProductsId,
-        userEmail,
+        userProp,
         title,
         description,
         price,
@@ -95,7 +95,7 @@ const addProduct = async (req, res) => {
     }
     try {
       await User.updateOne(
-        { email: userEmail },
+        { email: userProp.email },
         { $push: { my_products: { _id: newProductsId } } },
       );
     } catch (err) {

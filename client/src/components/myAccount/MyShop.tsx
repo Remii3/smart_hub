@@ -145,9 +145,8 @@ export default function MyShop() {
 
   const addProductHandler = async (e: React.FormEvent) => {
     e.preventDefault();
-
     const newProductData = {
-      userEmail: userData?.email,
+      userProp: { email: userData?.email, id: userData?._id },
       title: productData.title.value,
       description: productData.description.value,
       price: productData.price.value,
@@ -230,7 +229,7 @@ export default function MyShop() {
         <div className="mb-8">
           <div className="flex justify-between align-bottom">
             <h3 className="mb-0">My products</h3>
-            {userData?.my_products && userData.my_products.length > 6 && (
+            {userData?.my_products && userData.my_products.length > 3 && (
               <div className="flex items-end">
                 <Link to="/account/my/my-products" className="text-sm">
                   Show all
@@ -241,11 +240,7 @@ export default function MyShop() {
           {userData &&
           userData.my_products &&
           userData.my_products.length > 0 ? (
-            <MyProducts
-              myProducts={userData.my_products}
-              onClick={showAllHandler}
-              shownAllProducts={shownAllProducts}
-            />
+            <MyProducts myProducts={userData.my_products} />
           ) : (
             'No products added.'
           )}

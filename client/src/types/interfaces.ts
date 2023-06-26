@@ -8,7 +8,7 @@ export interface ProductTypes {
   authors?: string[];
   rating?: number;
   quantity: number;
-  userEmail: string;
+  userProp: { email: string; id: string };
   marketPlace: 'Shop' | 'Auction';
   addedDate: string;
 }

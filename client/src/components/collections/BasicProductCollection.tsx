@@ -68,6 +68,14 @@ export default function BasicProductCollection({
     maxPrice,
   });
 
+  // if (allProducts.length < 1) return <div />;
+  const noProducts =
+    allProducts.length < 1 ? (
+      <p className="pl-4">Empty collection </p>
+    ) : (
+      <p className="pl-4">No products found</p>
+    );
+
   return (
     <section>
       <header className="px-4">
@@ -120,7 +128,7 @@ export default function BasicProductCollection({
                       className="h-[350px] w-full object-cover transition duration-500 group-hover:scale-105 sm:h-[450px]"
                     />
 
-                    <div className="relative bg-white pt-3">
+                    <div className="relative w-full bg-white pt-3 transition duration-500 group-hover:scale-105">
                       <h3 className="mt-4 text-lg text-gray-700 group-hover:underline group-hover:underline-offset-4">
                         {product.title}
                       </h3>
@@ -139,7 +147,7 @@ export default function BasicProductCollection({
             ))}
           </BasicSwiper>
         ) : (
-          <h6 className="pl-4">No products found</h6>
+          noProducts
         )}
       </div>
     </section>

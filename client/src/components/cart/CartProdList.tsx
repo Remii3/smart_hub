@@ -7,7 +7,7 @@ export default function CartProdList() {
 
   let ProductsList = <div />;
 
-  if (cartState && cartState.cart?.products) {
+  if (cartState && cartState.cart && cartState.cart.products) {
     ProductsList = (
       <ul className="space-y-4">
         {cartState.cart.products.map((cartProduct) => (
@@ -20,5 +20,13 @@ export default function CartProdList() {
       </ul>
     );
   }
-  return <div>{ProductsList}</div>;
+  return (
+    <div>
+      {cartState && cartState.cart && cartState.cart.products.length < 1 ? (
+        <p>No products in cart yet!</p>
+      ) : (
+        ProductsList
+      )}
+    </div>
+  );
 }

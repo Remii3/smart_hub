@@ -30,6 +30,11 @@ export default function ProductPage() {
 
   const { userData } = useContext(UserContext);
 
+  const creatorPath =
+    productData?.userProp.id === userData?._id
+      ? 'my'
+      : productData?.userProp.id;
+
   const navigate = useNavigate();
   const path = useLocation();
 
@@ -103,6 +108,7 @@ export default function ProductPage() {
   if (productData === undefined && isFetchingData) return <p>Loading</p>;
   if (productData === undefined) return <p> No data</p>;
   const DUMMYIMGS = [{ id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }];
+  console.log(productData);
   return (
     <section className="relative">
       <div className="relative mx-auto max-w-screen-xl px-4 py-8">
@@ -196,7 +202,10 @@ export default function ProductPage() {
                   Added: {productData && productData.addedDate.slice(0, 10)}
                 </p>
                 <p className="text-xs">
-                  by: <Link to="/">{productData?.userEmail}</Link>
+                  by:{' '}
+                  <Link to={`/account/${creatorPath}`}>
+                    {productData?.userProp.email}
+                  </Link>
                 </p>
                 <p className="text-sm">Highest Rated Product</p>
 

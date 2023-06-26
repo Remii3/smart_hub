@@ -28,7 +28,7 @@ function AuctionsSwiper() {
       console.error(err);
     }
   }, []);
-
+  if (auctions.length < 1) return <div />;
   return (
     <Swiper
       scrollbar={{
@@ -67,10 +67,6 @@ function AuctionsSwiper() {
         1680: {
           slidesPerView: 6,
         },
-      }}
-      style={{
-        paddingBottom: '26px',
-        paddingTop: '26px',
       }}
     >
       {auctions.map((auctionItem) => (

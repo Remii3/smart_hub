@@ -42,7 +42,11 @@ export default function CheckoutProdList() {
       </div>
 
       <div>
-        <div className="flow-root">{ProductsList}</div>
+        {cartState && cartState.cart && cartState.cart.products.length < 1 ? (
+          <p>No products in cart yet!</p>
+        ) : (
+          <div className="flow-root">{ProductsList}</div>
+        )}
       </div>
     </>
   );
