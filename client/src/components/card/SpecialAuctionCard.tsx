@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import SecondaryBtn from '../UI/Btns/SecondaryBtn';
+import PrimaryBtn from '../UI/Btns/PrimaryBtn';
 
 type SepcialAuctionCardType = {
   _id: string;
@@ -51,23 +52,28 @@ function SpecialAuctionCard({
   }
 
   return (
-    <div id={`${_id}`} className="h-auto rounded-lg">
+    <div id={`${_id}`} className="h-full w-full rounded-lg">
       <div className="rounded-2xl bg-white px-3 py-3">
-        <div className="flex flex-col lg:flex-row">
+        <div className="flex flex-col xl:flex-row">
           <div className="w-full min-w-[160px] overflow-hidden rounded-md lg:block lg:max-w-xs lg:pr-4">
-            <Link to={`auctions/${_id}`}>
-              {imgs && (
-                <img
-                  src={imgs[0]}
-                  className="m-auto h-full max-h-[400px] rounded-md object-contain object-top "
-                  alt="cover_img"
-                />
-              )}
-            </Link>
+            {/* <Link to={`auctions/${_id}`}> */}
+            {imgs && (
+              // <img
+              // src={imgs[0]}
+              // className="m-auto h-full max-h-[400px] rounded-md object-contain object-top "
+              // alt="cover_img"
+              // />
+              <img
+                alt="Les Paul"
+                src="https://images.unsplash.com/photo-1456948927036-ad533e53865c?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80"
+                className="m-auto aspect-square h-full max-h-[400px] w-full rounded-xl object-contain object-cover object-top"
+              />
+            )}
+            {/* </Link> */}
           </div>
           <div className="flex-grow pt-3">
             <h4 className="pb-6 text-dark">{titleShortened}</h4>
-            <div className="flex flex-col justify-between pb-3 lg:flex-row">
+            <div className="flex flex-col justify-between pb-3">
               <div className="flex flex-row lg:max-w-lg">
                 <div className="flex w-full flex-col gap-3">
                   <p className="flex justify-between sm:text-lg">
@@ -87,7 +93,7 @@ function SpecialAuctionCard({
                   <p
                     className={`${
                       descHidden ? 'max-h-0 opacity-0' : 'max-h-72 opacity-100'
-                    } overflow-hidden pb-3 transition-[max-height,opacity] duration-300 ease-in-out lg:hidden`}
+                    } overflow-hidden pb-3 transition-[max-height,opacity] duration-300 ease-in-out`}
                   >
                     <span className="text-base text-gray600">
                       Description:{' '}
@@ -98,33 +104,35 @@ function SpecialAuctionCard({
                   </p>
                 </div>
               </div>
-              <div className="flex flex-col justify-start gap-2 sm:flex-row md:flex-col lg:items-start xl:flex-row xl:pt-3">
-                <Link
+              <div className="flex flex-col justify-start gap-2">
+                <PrimaryBtn
                   type="button"
-                  to={`/auctions/${_id}`}
-                  className="w-auto rounded border border-primary bg-primary px-5 py-3 text-center text-sm font-medium text-white shadow-sm transition ease-out hover:bg-blue-700 focus:ring focus:ring-blue-300"
+                  usecase="default"
+                  asLink
+                  linkPath={`/product/${_id}`}
                 >
                   Enter live auction
-                </Link>
-                <SecondaryBtn
-                  type="button"
-                  usecase="outline"
-                  text={descHidden ? 'View details' : 'Hide details'}
-                  onClick={showDesc}
-                  additionalStyles={
-                    descHidden ? 'text-gray-600 ' : 'text-white bg-gray-600'
-                  }
-                />
+                </PrimaryBtn>
+                {description && (
+                  <SecondaryBtn
+                    type="button"
+                    usecase="toggle"
+                    onClick={showDesc}
+                    toggler={!descHidden}
+                  >
+                    {descHidden ? 'View details' : 'Hide details'}
+                  </SecondaryBtn>
+                )}
               </div>
             </div>
-            <p
+            {/* <p
               className={`${
                 descHidden ? 'max-h-0 opacity-0' : 'max-h-72 opacity-100'
               } hidden overflow-hidden transition-[max-height,opacity] duration-300 ease-in-out sm:text-lg lg:block`}
             >
               <span className="text-gray600">Description: </span>
               <span className="break-words text-darkTint">{description}</span>
-            </p>
+            </p> */}
           </div>
         </div>
       </div>

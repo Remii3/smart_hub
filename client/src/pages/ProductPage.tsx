@@ -108,7 +108,6 @@ export default function ProductPage() {
   if (productData === undefined && isFetchingData) return <p>Loading</p>;
   if (productData === undefined) return <p> No data</p>;
   const DUMMYIMGS = [{ id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }];
-  console.log(productData);
   return (
     <section className="relative">
       <div className="relative mx-auto max-w-screen-xl px-4 py-8">

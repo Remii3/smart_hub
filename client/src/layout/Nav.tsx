@@ -278,7 +278,7 @@ function Nav() {
         ref={navMobile}
         className={`${
           openedBurger ? 'left-0 opacity-100' : 'left-[100vw] opacity-0'
-        } mobile-overlay absolute top-[0] z-10 h-screen w-full transform bg-pageBackground pt-16 transition-[left,opacity] duration-500 ease-in-out`}
+        } mobile-overlay absolute top-[0] z-10 h-screen w-full transform bg-pageBackground pt-16 transition-[left,opacity] duration-500 ease-in-out md:hidden`}
       >
         <ul className="flex flex-col text-white">
           {navLinkList.map((navLink, id) => (

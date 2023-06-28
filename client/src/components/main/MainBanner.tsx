@@ -1,7 +1,8 @@
 import { useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import PrimaryBtn from '../UI/Btns/PrimaryBtn';
+import TertiaryBtn from '../UI/Btns/TertiaryBtn';
 
 export default function MainBanner() {
   const imgBg = useRef(null);
@@ -19,7 +20,7 @@ export default function MainBanner() {
   }, []);
 
   return (
-    <section className="h-screen w-full">
+    <section className="h-[102vh] w-full">
       <div
         ref={imgBg}
         className="absolute left-0 top-0 h-[110vh] w-full scale-100 bg-mainBanner bg-cover bg-center bg-no-repeat brightness-50"
@@ -43,21 +44,22 @@ export default function MainBanner() {
             </p>
 
             <div className="mt-8 flex flex-wrap justify-center gap-4">
-              <Link
-                to="/"
-                className="block w-full rounded border border-primary bg-primary px-12 py-3 text-sm font-medium text-white shadow-sm
-                  transition ease-out hover:bg-blue-700 focus:ring focus:ring-blue-300 sm:w-auto"
+              <PrimaryBtn
+                type="button"
+                usecase="default"
+                asLink
+                linkPath="/asd"
               >
-                Get Started
-              </Link>
-              <Link
-                //
-                // className="block w-full px-12 py-3 text-sm font-medium text-white underline underline-offset-4  hover:text-primary focus:outline-none focus:ring active:text-red-500 sm:w-auto"
-                className="block rounded border border-white px-5 py-3 text-sm text-white transition hover:ring-1 hover:ring-white"
-                to="/"
-              >
+                Get started
+              </PrimaryBtn>
+              <TertiaryBtn usecase="light" type="button" asLink linkPath="/">
                 Learn More
-              </Link>
+              </TertiaryBtn>
+            </div>
+          </div>
+          <div className="scroll-downs">
+            <div className="mousey">
+              <div className="scroller" />
             </div>
           </div>
         </div>

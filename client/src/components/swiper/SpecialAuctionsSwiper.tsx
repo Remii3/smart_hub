@@ -1,5 +1,5 @@
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Autoplay, Pagination } from 'swiper';
+import { Autoplay, Navigation, Pagination } from 'swiper';
 import { lazy, useEffect, useState } from 'react';
 import axios from 'axios';
 import { ProductTypes } from '../../types/interfaces';
@@ -32,20 +32,30 @@ function SpecialAuctionsSwiper() {
     <Swiper
       className="bestAuction-swiper"
       pagination
+      grabCursor
       autoplay={{
-        delay: 8000,
+        delay: 5000,
         disableOnInteraction: true,
         pauseOnMouseEnter: true,
-        waitForTransition: true,
       }}
-      grabCursor
-      modules={[Autoplay, Pagination]}
-      spaceBetween={52}
-      slidesPerView={1}
+      touchEventsTarget="container"
+      modules={[Pagination, Autoplay]}
+      spaceBetween={60}
       onSlideChange={() => setBestAuctionCardFlag((prev) => !prev)}
       style={{
-        paddingBottom: '52px',
+        paddingBottom: '50px',
+        cursor: 'grab',
       }}
+      effect="coverflow"
+      centeredSlides
+      coverflowEffect={{
+        rotate: 0,
+        stretch: 0,
+        depth: 100,
+        modifier: 2,
+        slideShadows: true,
+      }}
+      slidesPerView={2}
     >
       {specialAuctions.map((auctionItem) => (
         <SwiperSlide key={auctionItem._id}>

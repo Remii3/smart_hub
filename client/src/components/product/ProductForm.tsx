@@ -1,4 +1,5 @@
 import { FormEvent, useContext, useState } from 'react';
+import { ShoppingBagIcon } from '@heroicons/react/24/solid';
 import PrimaryBtn from '../UI/Btns/PrimaryBtn';
 import { CartContext } from '../../context/CartProvider';
 
@@ -102,10 +103,12 @@ export default function ProductForm({
         <PrimaryBtn
           type="submit"
           usecase="action"
+          textSize="text-sm"
           disabled={isAddingToCart || itemBtnCapacity}
           isLoading={isAddingToCart}
         >
           Add to Cart
+          <ShoppingBagIcon className="ml-2 inline-block h-6 w-6" />
         </PrimaryBtn>
       </div>
     </form>
