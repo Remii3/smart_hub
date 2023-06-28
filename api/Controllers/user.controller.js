@@ -211,10 +211,20 @@ const guestData = async (req, res) => {
   );
 };
 
+const otherUserData = async (req, res) => {
+  const { userId } = req.query;
+  try {
+    User.findOne({ userId }).then((res) => res.status(200).json({ res }));
+  } catch (err) {
+    res.status(500).json({ message: "Failed to fetch user data", err });
+  }
+};
+
 module.exports = {
   signIn,
   signUp,
   profile,
   newData,
   guestData,
+  otherUserData,
 };

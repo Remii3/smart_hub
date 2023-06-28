@@ -3,6 +3,7 @@ import {
   useElements,
   LinkAuthenticationElement,
   PaymentElement,
+  AddressElement,
 } from '@stripe/react-stripe-js';
 import {
   Layout,
@@ -15,7 +16,7 @@ import { UserContext } from '../../context/UserProvider';
 import getCookie from '../../helpers/getCookie';
 import { CartContext } from '../../context/CartProvider';
 
-export default function CheckoutForm() {
+export default function CheckoutForm({ changeShowThankYouHandler }: any) {
   const stripe = useStripe();
   const elements = useElements();
   const { userData } = useContext(UserContext);
@@ -87,9 +88,8 @@ export default function CheckoutForm() {
         userId: currentUserId,
         productId: 'all',
       });
+      changeShowThankYouHandler(cartState.cart?.products || []);
       fetchCartData();
-
-      navigate('/thankyou');
     }
     setIsLoading(false);
   };
@@ -108,7 +108,7 @@ export default function CheckoutForm() {
         options={{ defaultValues: { email: userData?.email || email } }}
       />
       <PaymentElement id="payment-element" options={paymentElementOptions} />
-
+      {/* <AddressElement options={{}} /> */}
       <button
         type="submit"
         disabled={

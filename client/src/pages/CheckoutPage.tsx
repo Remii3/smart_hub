@@ -20,6 +20,7 @@ export default function CheckoutPage() {
     isLoading: false,
     hasError: null,
   });
+  const [showThankYou, setShowThankYou] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -54,32 +55,59 @@ export default function CheckoutPage() {
     appearance,
   };
 
-  return (
-    <section>
-      <h1 className="sr-only">Checkout</h1>
-      <div className="mx-auto grid max-w-screen-2xl grid-cols-1 md:grid-cols-2">
-        <div className="bg-gray-50 py-12 md:min-h-[632px] md:py-24">
-          <div className="mx-auto max-w-lg space-y-8 px-4 lg:px-8">
-            <CheckoutProdList />
-          </div>
-        </div>
+  let lastCartState = [];
 
-        <div className="bg-white py-12 md:py-24">
-          <div className="mx-auto max-w-lg px-4 lg:px-8">
-            {!clientSecret.data && clientSecret.isLoading && <p>Loading...</p>}
-            {!clientSecret.isLoading && clientSecret.hasError && (
-              <p className="text-red-500">{clientSecret.hasError}</p>
-            )}
-            {clientSecret.data &&
-              !clientSecret.isLoading &&
-              !clientSecret.hasError && (
-                <Elements options={options} stripe={stripePromise}>
-                  <CheckoutForm />
-                </Elements>
-              )}
+  const changeShowThankYouHandler = (lastCartStateData) => {
+    lastCartState = lastCartStateData;
+    setShowThankYou((prevState) => !prevState);
+  };
+
+  return (
+    <div>
+      {showThankYou ? (
+        <div className="flex flex-col items-center justify-center">
+          <h3 className="pb-6 pt-8">Thank you!</h3>
+          <p className="py-3">Your order has been submitted.</p>
+          <p className="py-3">You&apos;ve bought:</p>
+          <div className="py-3">
+            {lastCartState.map((item) => (
+              <div>hello</div>
+            ))}
           </div>
+          <p>Please check your email for further information.</p>
         </div>
-      </div>
-    </section>
+      ) : (
+        <section>
+          <h1 className="sr-only">Checkout</h1>
+          <div className="mx-auto grid max-w-screen-2xl grid-cols-1 md:grid-cols-2">
+            <div className="bg-gray-50 py-12 md:min-h-[632px] md:py-24">
+              <div className="mx-auto max-w-lg space-y-8 px-4 lg:px-8">
+                <CheckoutProdList />
+              </div>
+            </div>
+
+            <div className="bg-white py-12 md:py-24">
+              <div className="mx-auto max-w-lg px-4 lg:px-8">
+                {!clientSecret.data && clientSecret.isLoading && (
+                  <p>Loading...</p>
+                )}
+                {!clientSecret.isLoading && clientSecret.hasError && (
+                  <p className="text-red-500">{clientSecret.hasError}</p>
+                )}
+                {clientSecret.data &&
+                  !clientSecret.isLoading &&
+                  !clientSecret.hasError && (
+                    <Elements options={options} stripe={stripePromise}>
+                      <CheckoutForm
+                        changeShowThankYouHandler={changeShowThankYouHandler}
+                      />
+                    </Elements>
+                  )}
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+    </div>
   );
 }
