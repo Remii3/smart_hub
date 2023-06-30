@@ -4,7 +4,13 @@ import { loadStripe } from '@stripe/stripe-js';
 import { useState, useEffect } from 'react';
 import CheckoutForm from '../components/checkout/CheckoutForm';
 import CheckoutProdList from '../components/checkout/CheckoutProdList';
-import { SimpleFetchDataTypes } from '../types/interfaces';
+import {
+  InitialStateType,
+  ProductTypes,
+  SimpleFetchDataTypes,
+} from '../types/interfaces';
+import CheckoutItem from '../components/checkout/CheckoutItem';
+import PrimaryBtn from '../components/UI/Btns/PrimaryBtn';
 
 interface ClientSecretTypes extends SimpleFetchDataTypes {
   data: string;
@@ -21,7 +27,7 @@ export default function CheckoutPage() {
     hasError: null,
   });
   const [showThankYou, setShowThankYou] = useState(false);
-
+  const [lastCartState, setLastCartState] = useState<InitialStateType>();
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -55,10 +61,8 @@ export default function CheckoutPage() {
     appearance,
   };
 
-  let lastCartState = [];
-
-  const changeShowThankYouHandler = (lastCartStateData) => {
-    lastCartState = lastCartStateData;
+  const changeShowThankYouHandler = (lastCartStateData: InitialStateType) => {
+    setLastCartState(lastCartStateData);
     setShowThankYou((prevState) => !prevState);
   };
 
@@ -70,11 +74,21 @@ export default function CheckoutPage() {
           <p className="py-3">Your order has been submitted.</p>
           <p className="py-3">You&apos;ve bought:</p>
           <div className="py-3">
-            {lastCartState.map((item) => (
-              <div>hello</div>
-            ))}
+            {lastCartState &&
+              lastCartState.cart?.products.map((item) => (
+                <CheckoutItem
+                  key={item.productData._id}
+                  productData={item.productData}
+                  inCartQuantity={item.inCartQuantity}
+                />
+              ))}
           </div>
-          <p>Please check your email for further information.</p>
+          <p className="py-3">
+            Please check your email for further information.
+          </p>
+          <PrimaryBtn type="button" usecase="default" asLink linkPath="/">
+            Return to main page
+          </PrimaryBtn>
         </div>
       ) : (
         <section>

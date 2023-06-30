@@ -9,7 +9,6 @@ import {
   Layout,
   StripeLinkAuthenticationElementChangeEvent,
 } from '@stripe/stripe-js';
-import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useState, useEffect, useContext, FormEvent } from 'react';
 import { UserContext } from '../../context/UserProvider';
@@ -21,11 +20,28 @@ export default function CheckoutForm({ changeShowThankYouHandler }: any) {
   const elements = useElements();
   const { userData } = useContext(UserContext);
   const { fetchCartData, cartState } = useContext(CartContext);
-  const navigate = useNavigate();
 
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [buyerData, setBuyerData] = useState<{
+    name: string;
+    address:
+      | {
+          line1: string;
+          line2: string | null;
+          city: string;
+          state: string;
+          postal_code: string;
+          country: string;
+        }
+      | undefined;
+    phone: string | undefined;
+  }>({
+    name: '',
+    address: undefined,
+    phone: undefined,
+  });
 
   useEffect(() => {
     if (!stripe) {
@@ -59,7 +75,7 @@ export default function CheckoutForm({ changeShowThankYouHandler }: any) {
         }
       });
   }, [stripe]);
-
+  const addOrderHandler = () => {};
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -88,7 +104,9 @@ export default function CheckoutForm({ changeShowThankYouHandler }: any) {
         userId: currentUserId,
         productId: 'all',
       });
-      changeShowThankYouHandler(cartState.cart?.products || []);
+      addOrderHandler();
+      changeShowThankYouHandler(cartState);
+
       fetchCartData();
     }
     setIsLoading(false);
@@ -108,7 +126,22 @@ export default function CheckoutForm({ changeShowThankYouHandler }: any) {
         options={{ defaultValues: { email: userData?.email || email } }}
       />
       <PaymentElement id="payment-element" options={paymentElementOptions} />
-      {/* <AddressElement options={{}} /> */}
+      <AddressElement
+        options={{
+          mode: 'shipping',
+          fields: { phone: 'always' },
+          blockPoBox: true,
+          validation: { phone: { required: 'auto' } },
+          display: { name: 'full' },
+        }}
+        onChange={(event) => {
+          if (event.complete) {
+            // Extract potentially complete address
+            const { name, address, phone } = event.value;
+            setBuyerData({ name, address, phone });
+          }
+        }}
+      />
       <button
         type="submit"
         disabled={
@@ -118,6 +151,7 @@ export default function CheckoutForm({ changeShowThankYouHandler }: any) {
           (cartState.cart?.products && cartState.cart?.products.length < 1)
         }
         id="submit"
+        style={{ marginTop: '1rem' }}
       >
         <span id="button-text">
           {isLoading ? <div className="spinner" id="spinner" /> : 'Pay now'}

@@ -7,7 +7,7 @@ import {
   useMemo,
   useState,
 } from 'react';
-import { ProductTypes } from '../types/interfaces';
+import { InitialStateType } from '../types/interfaces';
 import { UserContext } from './UserProvider';
 import {
   postAddProductToCart,
@@ -17,19 +17,6 @@ import {
   postRemoveProductFromCart,
 } from '../helpers/cartFunctions';
 import getCookie from '../helpers/getCookie';
-
-type InitialStateType = {
-  cart: null | {
-    products:
-      | {
-          inCartQuantity: number;
-          productData: ProductTypes;
-          totalPrice: number;
-        }[];
-    cartPrice: number;
-  };
-  cartIsLoading: boolean;
-};
 
 const initialState = {
   cart: null,

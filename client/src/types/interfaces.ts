@@ -32,3 +32,15 @@ export interface SimpleFetchDataTypes {
   isLoading: boolean;
   hasError: null | string;
 }
+export type InitialStateType = {
+  cart: null | {
+    products:
+      | {
+          inCartQuantity: number;
+          productData: ProductTypes;
+          totalPrice: number;
+        }[];
+    cartPrice: number;
+  };
+  cartIsLoading: boolean;
+};
