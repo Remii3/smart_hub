@@ -213,11 +213,21 @@ const guestData = async (req, res) => {
 
 const otherUserData = async (req, res) => {
   const { userId } = req.query;
-  try {
-    User.findOne({ userId }).then((res) => res.status(200).json({ res }));
-  } catch (err) {
-    res.status(500).json({ message: "Failed to fetch user data", err });
-  }
+  
+    User.findOne({ _id: userId })
+      .populate("my_products")
+      .then((data) =>
+        res.status(200).json({
+          email: data.email,
+          address: data.address,
+          credentials: data.credentials,
+          my_products: data.my_products,
+        })
+      )
+      .catch((err) => {
+        console.error(err);
+        res.status(500).json({ message: "Failed to fetch user data" });
+      });
 };
 
 module.exports = {

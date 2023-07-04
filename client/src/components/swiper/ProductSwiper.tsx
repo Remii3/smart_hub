@@ -4,39 +4,30 @@ import { Navigation, Pagination } from 'swiper';
 import SuspenseComponent from '../UI/suspense/SuspenseComponent';
 import LoadingComponent from '../UI/Loaders/LoadingComponent';
 
-function BasicSwiper({ children }: { children: ReactNode }) {
+import 'swiper/swiper-bundle.css';
+
+function ProductSwiper({ children }: { children: ReactNode }) {
   return (
     <Swiper
       style={{ paddingBottom: '50px' }}
       slidesPerView={3}
-      slidesPerGroup={1}
+      //   slidesPerGroup={1}
       spaceBetween={24}
       grabCursor
       allowTouchMove
       navigation
       pagination
       modules={[Navigation, Pagination]}
-      watchOverflow
+      //   watchOverflow
       breakpoints={{
         0: {
-          slidesPerView: 1.2,
-          slidesPerGroup: 1,
-          spaceBetween: 28,
+          slidesPerView: 1,
         },
-        480: {
-          slidesPerView: 1.5,
-          slidesPerGroup: 1,
-          spaceBetween: 28,
+        700: {
+          slidesPerView: 2,
         },
-        767: {
-          slidesPerView: 3.2,
-          slidesPerGroup: 1,
-          spaceBetween: 28,
-        },
-        992: {
-          slidesPerView: 4,
-          slidesPerGroup: 1,
-          spaceBetween: 28,
+        1100: {
+          slidesPerView: 3,
         },
       }}
     >
@@ -47,4 +38,4 @@ function BasicSwiper({ children }: { children: ReactNode }) {
   );
 }
 
-export default BasicSwiper;
+export default ProductSwiper;

@@ -14,11 +14,9 @@ const getOrders = async (req, res) => {
 
 const addOrder = async (req, res) => {
   try {
-    const { user, items } = req.body;
-    const totalAmount = 0;
+    const { buyerId, products } = req.body;
 
-    const order = new Order({ user, items, totalAmount });
-    await order.save();
+    const order = new Order({ buyer: buyerId, items: products });
     res.status(201).json(order);
   } catch (err) {
     res.status(500).json({ message: 'Failed adding new order', err });

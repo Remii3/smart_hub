@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import PrimaryBtn from '../UI/Btns/PrimaryBtn';
 
 type DefaultCardType = {
   _id: string;
@@ -7,17 +8,20 @@ type DefaultCardType = {
   price: number;
   imgs?: string[];
   deadline?: Date | null;
+  description?: string;
 };
 const defaultProps = {
   imgs: [],
   deadline: null,
   authors: [],
+  description: '',
 };
 function DefaultCard({
   _id,
   title,
   authors,
   deadline,
+  description,
   price,
   imgs,
 }: DefaultCardType) {
@@ -32,30 +36,51 @@ function DefaultCard({
     titleShortened = `${titleShortened}...`;
   }
 
+  const addToCart = (e) => {
+    e.preventDefault();
+    console.log('asd');
+  };
+
   return (
-    <div id={`${_id}`} className="min-w-[258px]">
+    <div id={`${_id}`} className="h-full w-full ">
       <div>
         <Link
           to={`/product/${_id}`}
-          className="blok group gap-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+          className="inline-block rounded-2xl bg-white p-5 shadow"
         >
-          <div className="overflow-hidden">
-            <img
-              src="https://images.unsplash.com/photo-1523381210434-271e8be1f52b?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80"
-              alt=""
-              className="h-[350px] w-full object-cover transition duration-500 group-hover:scale-105 sm:h-[450px]"
-            />
-
-            <div className="relative w-full bg-white pt-3">
-              <h3 className="mt-4 text-lg text-gray-700 group-hover:underline group-hover:underline-offset-4">
-                {titleShortened}
-              </h3>
-
-              <p className="mt-2">
-                <span className="sr-only"> Regular Price </span>
-
-                <span className="tracking-wider text-gray-900">€{price}</span>
-              </p>
+          <div className="flex flex-col gap-5">
+            <div className="flex flex-col gap-3">
+              <img
+                src="https://images.unsplash.com/photo-1523381210434-271e8be1f52b?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80"
+                alt="img"
+                className="w-full rounded-2xl object-cover"
+              />
+              <div>
+                <h6 className="m-0 pb-1">{titleShortened}</h6>
+                <span>
+                  {authors?.map((author, id) => (
+                    <span key={id} className="mr-3">
+                      {author}
+                    </span>
+                  ))}
+                </span>
+              </div>
+            </div>
+            <div className="flex flex-col gap-10">
+              <p>{description}</p>
+              <div className="flex justify-between gap-3">
+                <h4 className="flex items-center">{price}</h4>
+                <div>
+                  <div className="pb-3">stars</div>
+                  <PrimaryBtn
+                    type="button"
+                    usecase="default"
+                    onClick={addToCart}
+                  >
+                    Add to cart
+                  </PrimaryBtn>
+                </div>
+              </div>
             </div>
           </div>
         </Link>

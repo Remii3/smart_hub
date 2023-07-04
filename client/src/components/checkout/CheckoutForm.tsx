@@ -100,10 +100,15 @@ export default function CheckoutForm({ changeShowThankYouHandler }: any) {
       }
     } else {
       const currentUserId = userData?._id || getCookie('guestToken');
+      await axios.post('/order/add', {
+        buyerId: currentUserId,
+        products: cartState.cart?.products,
+      });
       await axios.post('/cart/cart-remove', {
         userId: currentUserId,
         productId: 'all',
       });
+
       addOrderHandler();
       changeShowThankYouHandler(cartState);
 

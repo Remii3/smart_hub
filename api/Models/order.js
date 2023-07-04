@@ -3,8 +3,7 @@ const mongoose = require('mongoose');
 const OrderSchema = mongoose.Schema({
   owner: { type: mongoose.Types.ObjectId },
   buyer: { type: mongoose.Types.ObjectId },
-  items: { type: [{ product: mongoose.Types.ObjectId, quantity: Number }] },
-  totalAmount: Number,
+  items: [{ type: { product: mongoose.Types.ObjectId, quantity: Number } }],
   createdAt: new Date(),
 });
 
