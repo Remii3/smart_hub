@@ -11,6 +11,14 @@ export interface ProductTypes {
   userProp: { email: string; id: string };
   marketPlace: 'Shop' | 'Auction';
   addedDate: string;
+  comments: [CommentTypes];
+}
+
+export interface CommentTypes {
+  _id: string;
+  user: UserDataTypes;
+  productId: string;
+  value: { rating: number; comment: string };
 }
 
 export interface ProductCategories {

@@ -5,10 +5,11 @@ const Category = require('../Models/category');
 
 const getAllProducts = async (req, res) => {
   try {
-    const books = await Product.find().populate('categories authors');
+    const books = await Product.find().populate('categories');
 
     res.status(200).json(books);
   } catch (err) {
+    console.log(err);
     res.status(500).json({ error: 'Fetching data went wrong', err });
   }
 };
@@ -35,7 +36,10 @@ const getProduct = async (req, res) => {
   const { productId } = req.query;
   if (!productId) res.status(422).json({ message: 'Product id is requried' });
   try {
-    const product = await Product.findOne({ _id: productId });
+    const product = await Product.findOne({ _id: productId }).populate({
+      path: 'comments',
+      populate: { path: 'user' },
+    });
     res.status(200).json(product);
   } catch (err) {
     res.status(500).json({ message: 'Fetching data went wrong', err });

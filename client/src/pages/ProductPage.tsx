@@ -14,6 +14,7 @@ import ProductImage from '../components/product/ProductImage';
 import ProductPill from '../components/product/ProductPill';
 import StarRating from '../components/product/StarRating';
 import ProductForm from '../components/product/ProductForm';
+import PrimaryBtn from '../components/UI/Btns/PrimaryBtn';
 
 export default function ProductPage() {
   const [isFetchingData, setIsFetchingData] = useState(false);
@@ -27,9 +28,9 @@ export default function ProductPage() {
     newDescription: productData?.description,
     newQuantity: productData?.quantity,
   });
-
   const { userData } = useContext(UserContext);
-
+  const [newComment, setNewComment] = useState('');
+  const [isAddingComment, setIsAddingComment] = useState(false);
   const creatorPath =
     productData?.userProp.id === userData?._id
       ? 'my'
@@ -41,7 +42,7 @@ export default function ProductPage() {
   let prodId: string | any[] | null = null;
   prodId = path.pathname.split('/');
   prodId = prodId[prodId.length - 1];
-
+  console.log(userData?._id);
   const fetchProductData = useCallback(() => {
     setIsFetchingData(true);
     axios
@@ -108,6 +109,16 @@ export default function ProductPage() {
   if (productData === undefined && isFetchingData) return <p>Loading</p>;
   if (productData === undefined) return <p> No data</p>;
   const DUMMYIMGS = [{ id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }];
+  const addNewCommentHandler = async () => {
+    setIsAddingComment(true);
+    await axios.post('/comment/add-comment', {
+      userId: userData?._id,
+      productId: prodId,
+      value: { rating: 2, comment: newComment },
+    });
+    setIsAddingComment(false);
+    fetchProductData();
+  };
   return (
     <section className="relative">
       <div className="relative mx-auto max-w-screen-xl px-4 py-8">
@@ -267,6 +278,54 @@ export default function ProductPage() {
               productQuantity={productData?.quantity}
             />
           </div>
+        </div>
+        <div>
+          <h5>Comments</h5>
+          <section>
+            <div className="flex gap-5">
+              <div>
+                <p>You</p>
+                <p>rating</p>
+              </div>
+              <div>
+                <label htmlFor="newComment" className="sr-only">
+                  New comment
+                </label>
+                <input
+                  id="newComment"
+                  name="newComment"
+                  type="text"
+                  value={newComment}
+                  onChange={(e) => setNewComment(e.target.value)}
+                />
+              </div>
+            </div>
+            <PrimaryBtn
+              type="button"
+              usecase="action"
+              isLoading={isAddingComment}
+              onClick={addNewCommentHandler}
+              disabled={!userData?._id}
+            >
+              Publish
+            </PrimaryBtn>
+          </section>
+          <section>
+            {productData?.comments.map((comment) => (
+              <div key={comment._id} className="flex gap-5">
+                <div>
+                  <p>
+                    {comment.user.credentials.firstName}{' '}
+                    {comment.user.credentials.lastName}
+                  </p>
+                  <p>{comment.value.rating}</p>
+                </div>
+                <div>
+                  <p>{comment.value.comment}</p>
+                </div>
+              </div>
+            ))}
+          </section>
         </div>
       </div>
     </section>
