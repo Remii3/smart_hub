@@ -2,7 +2,7 @@ export interface ProductTypes {
   _id: string;
   title: string;
   description?: string;
-  price: number;
+  price: { value: number; currency: string };
   imgs?: string[];
   categories?: { value: string; label: string; _id: string }[];
   authors?: string[];
@@ -26,6 +26,8 @@ export interface UserDataTypes {
   cartData: { products: ProductTypes[]; _id: string };
   credentials: { firstName: string; lastName: string };
   my_products: ProductTypes[];
+  followers: string[];
+  following: string[];
 }
 
 export interface SimpleFetchDataTypes {

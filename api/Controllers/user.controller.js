@@ -97,9 +97,10 @@ const signUp = async (req, res) => {
 
 const profile = async (req, res) => {
   try {
-    let { _id, email, credentials, my_products } = await User.findOne({
-      _id: req.user.userId,
-    });
+    let { _id, email, credentials, my_products, following, followers } =
+      await User.findOne({
+        _id: req.user.userId,
+      });
 
     my_products = await Product.find({ _id: my_products });
     const cartData = await Cart.findOne({ userId: _id });
@@ -109,9 +110,12 @@ const profile = async (req, res) => {
       credentials,
       cartData,
       my_products,
+      following,
+      followers,
     });
   } catch (err) {
-    res.status(500).json({ message: 'Failed to fetch user data', err });
+    console.log(err);
+    res.status(500).json({ message: 'Failed to fetch user data' });
   }
 };
 
@@ -213,21 +217,56 @@ const guestData = async (req, res) => {
 
 const otherUserData = async (req, res) => {
   const { userId } = req.query;
-  
-    User.findOne({ _id: userId })
-      .populate("my_products")
-      .then((data) =>
-        res.status(200).json({
-          email: data.email,
-          address: data.address,
-          credentials: data.credentials,
-          my_products: data.my_products,
-        })
-      )
-      .catch((err) => {
-        console.error(err);
-        res.status(500).json({ message: "Failed to fetch user data" });
-      });
+
+  User.findOne({ _id: userId })
+    .populate('my_products')
+    .then(data =>
+      res.status(200).json({
+        email: data.email,
+        address: data.address,
+        credentials: data.credentials,
+        my_products: data.my_products,
+      }),
+    )
+    .catch(err => {
+      console.error(err);
+      res.status(500).json({ message: 'Failed to fetch user data' });
+    });
+};
+
+const addFollow = async (req, res) => {
+  const { followGiverId, followReceiverId } = req.body;
+
+  try {
+    await User.updateOne(
+      { _id: followGiverId },
+      { $addToSet: { following: followReceiverId } },
+    );
+    await User.updateOne(
+      { _id: followReceiverId },
+      { $addToSet: { followers: followGiverId } },
+    );
+    res.status(200).json('success');
+  } catch (err) {
+    console.log(err);
+  }
+};
+const removeFollow = async (req, res) => {
+  const { followGiverId, followReceiverId } = req.body;
+
+  try {
+    await User.updateOne(
+      { _id: followGiverId },
+      { $pull: { following: followReceiverId } },
+    );
+    await User.updateOne(
+      { _id: followReceiverId },
+      { $pull: { followers: followGiverId } },
+    );
+    res.status(200).json('success');
+  } catch (err) {
+    console.log(err);
+  }
 };
 
 module.exports = {
@@ -237,4 +276,6 @@ module.exports = {
   newData,
   guestData,
   otherUserData,
+  addFollow,
+  removeFollow,
 };

@@ -1,12 +1,14 @@
 import { Link } from 'react-router-dom';
 import { SwiperSlide } from 'swiper/react';
 import { ChangeEvent, useState } from 'react';
-import BasicSwiper from '../swiper/BasicSwiper';
 import { ProductTypes } from '../../types/interfaces';
 import PriceSelector from '../UI/ProductCollectionHelpers/PriceSelector';
 import SortProducts from '../UI/ProductCollectionHelpers/SortProducts';
 import sortProducts, { sortProductsTypes } from '../../helpers/sortProducts';
 import { filterProductsByPrice } from '../../helpers/filterProducts';
+import ProductCard from '../card/ProductCard';
+import LongSwiper from '../swiper/LongSwiper';
+import AuctionCard from '../card/AuctionCard';
 
 type PropsTypes = {
   title: string;
@@ -14,6 +16,7 @@ type PropsTypes = {
   showMore?: boolean;
   allProducts: ProductTypes[];
   category: string;
+  marketPlace: 'Product' | 'Auction';
 };
 
 const defaultProps = {
@@ -27,6 +30,7 @@ export default function BasicProductCollection({
   subTitle,
   showMore,
   category,
+  marketPlace,
 }: PropsTypes) {
   const [sortOption, setSortOption] = useState('');
   const [minPrice, setMinPrice] = useState<string | number>('');
@@ -75,7 +79,6 @@ export default function BasicProductCollection({
     ) : (
       <p className="pl-4">No products found</p>
     );
-
   return (
     <section>
       <header className="px-4">
@@ -114,40 +117,34 @@ export default function BasicProductCollection({
       </div>
       <div className="mt-4">
         {finalProducts && finalProducts.length > 0 ? (
-          <BasicSwiper>
+          <LongSwiper swiperCategory={category}>
             {finalProducts.map((product, id) => (
               <SwiperSlide key={id}>
                 <div>
-                  <Link
-                    to={`/product/${product._id}`}
-                    className="blok group gap-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-                  >
-                    <div className="overflow-hidden">
-                      <img
-                        src="https://images.unsplash.com/photo-1523381210434-271e8be1f52b?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80"
-                        alt=""
-                        className="h-[350px] w-full object-cover transition duration-500 group-hover:scale-105 sm:h-[450px]"
-                      />
-
-                      <div className="relative w-full bg-white pt-3 ">
-                        <h3 className="mt-4 text-lg text-gray-700 group-hover:underline group-hover:underline-offset-4">
-                          {product.title}
-                        </h3>
-
-                        <p className="mt-2">
-                          <span className="sr-only"> Regular Price </span>
-
-                          <span className="tracking-wider text-gray-900">
-                            €{product.price}
-                          </span>
-                        </p>
-                      </div>
-                    </div>
-                  </Link>
+                  {marketPlace === 'Product' ? (
+                    <ProductCard
+                      _id={product._id}
+                      price={product.price}
+                      productQuantity={product.quantity}
+                      title={product.title}
+                      authors={product.authors}
+                      description={product.description}
+                      imgs={product.imgs}
+                    />
+                  ) : (
+                    <AuctionCard
+                      _id={product._id}
+                      price={product.price}
+                      title={product.title}
+                      authors={product.authors}
+                      description={product.description}
+                      imgs={product.imgs}
+                    />
+                  )}
                 </div>
               </SwiperSlide>
             ))}
-          </BasicSwiper>
+          </LongSwiper>
         ) : (
           noProducts
         )}

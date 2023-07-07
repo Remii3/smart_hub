@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import PrimaryBtn from '../UI/Btns/PrimaryBtn';
 import MainPageHeading from '../UI/MainPageHeading';
-import CategoryCard from '../card/ShopCategoryCard';
+import CategoryCard from '../card/CategoryCard';
 import { ProductCategories } from '../../types/interfaces';
 
 export default function CategoriesSection() {

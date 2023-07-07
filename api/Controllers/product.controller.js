@@ -6,6 +6,7 @@ const Category = require('../Models/category');
 const getAllProducts = async (req, res) => {
   try {
     const books = await Product.find().populate('categories authors');
+
     res.status(200).json(books);
   } catch (err) {
     res.status(500).json({ error: 'Fetching data went wrong', err });
@@ -80,7 +81,7 @@ const addProduct = async (req, res) => {
         userProp,
         title,
         description,
-        price,
+        price: { value: price, currency: 'EUR' },
         imgs,
         categories,
         authors,

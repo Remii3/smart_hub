@@ -4,10 +4,6 @@
 .swiper-button-prev {
   display: none !important;
 }
-.swiper {
-  padding-left: 24px !important;
-  padding-right: 24px !important;
-}
 
 @media screen and (min-width: 1002px) {
   .swiper-button-next,
@@ -16,9 +12,5 @@
   }
   .swiper-button-disabled {
     display: none !important;
-  }
-  .swiper {
-    padding-left: 50px !important;
-    padding-right: 50px !important;
   }
 }

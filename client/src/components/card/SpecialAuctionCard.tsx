@@ -2,17 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import SecondaryBtn from '../UI/Btns/SecondaryBtn';
 import PrimaryBtn from '../UI/Btns/PrimaryBtn';
-
-type SepcialAuctionCardType = {
-  _id: string;
-  title: string;
-  description?: string;
-  price: number;
-  imgs?: string[];
-  highBid?: number;
-  swipedFlag: boolean;
-  deadline: Date | null;
-};
+import { SepcialAuctionCardType } from '../../types/types';
 
 const defalutProps = {
   highBid: 0,
@@ -50,39 +40,39 @@ function SpecialAuctionCard({
     );
     titleShortened = `${titleShortened}...`;
   }
-
+  console.log(description);
   return (
-    <div id={`${_id}`} className="h-full w-full rounded-lg">
+    <div
+      id={`${_id}`}
+      className="mx-auto h-full w-full max-w-md rounded-lg md:max-w-none"
+    >
       <div className="rounded-2xl bg-white px-3 py-3">
-        <div className="flex flex-col xl:flex-row">
-          <div className="w-full min-w-[160px] overflow-hidden rounded-md lg:block lg:max-w-xs lg:pr-4">
-            {/* <Link to={`auctions/${_id}`}> */}
+        <div className="flex flex-col gap-3 xl:flex-row">
+          <div className="mx-auto w-full max-w-xs basis-1/2 overflow-hidden rounded-md lg:block">
             {imgs && (
-              // <img
-              // src={imgs[0]}
-              // className="m-auto h-full max-h-[400px] rounded-md object-contain object-top "
-              // alt="cover_img"
-              // />
-              <img
-                alt="Les Paul"
-                src="https://images.unsplash.com/photo-1456948927036-ad533e53865c?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80"
-                className="m-auto aspect-square h-full max-h-[400px] w-full rounded-xl object-contain object-cover object-top"
-              />
+              <Link to={`/product/${_id}`}>
+                <img
+                  alt="Les Paul"
+                  src="https://images.unsplash.com/photo-1456948927036-ad533e53865c?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80"
+                  className="m-auto aspect-square h-full max-h-[400px] w-full rounded-xl object-cover object-top"
+                />
+              </Link>
             )}
-            {/* </Link> */}
           </div>
           <div className="flex-grow pt-3">
-            <h4 className="pb-6 text-dark">{titleShortened}</h4>
+            <Link to={`/product/${_id}`}>
+              <h4 className="pb-6 text-dark">{titleShortened}</h4>
+            </Link>
             <div className="flex flex-col justify-between pb-3">
               <div className="flex flex-row lg:max-w-lg">
                 <div className="flex w-full flex-col gap-3">
                   <p className="flex justify-between sm:text-lg">
                     <span className="text-gray600"> Highest bid:</span>
-                    <span className="text-darkTint">${highBid}</span>
+                    <span className="text-darkTint">{highBid}€</span>
                   </p>
                   <p className="flex justify-between  sm:text-lg">
                     <span className="text-gray600"> Min bid:</span>
-                    <span className="text-darkTint">${price}</span>
+                    <span className="text-darkTint">{price.value}€</span>
                   </p>
                   <p className="flex justify-between sm:text-lg">
                     <span className="text-gray600"> Deadline:</span>

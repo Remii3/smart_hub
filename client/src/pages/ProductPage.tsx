@@ -23,7 +23,7 @@ export default function ProductPage() {
   const [productData, setProductData] = useState<ProductTypes | null>(null);
   const [newData, setNewData] = useState({
     newTitle: productData?.title,
-    newPrice: productData?.price,
+    newPrice: productData?.price.value,
     newDescription: productData?.description,
     newQuantity: productData?.quantity,
   });
@@ -220,7 +220,7 @@ export default function ProductPage() {
                 />
               ) : (
                 <p className="text-lg font-bold">
-                  €{productData && productData.price}
+                  {productData && productData.price.value}€
                 </p>
               )}
             </div>

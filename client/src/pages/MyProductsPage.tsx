@@ -1,6 +1,7 @@
 import { useContext } from 'react';
 import { UserContext } from '../context/UserProvider';
-import DefaultCard from '../components/card/DefaultCard';
+import ProductCard from '../components/card/ProductCard';
+import AuctionCard from '../components/card/AuctionCard';
 
 export default function MyProductsPage() {
   const { userData } = useContext(UserContext);
@@ -10,14 +11,28 @@ export default function MyProductsPage() {
       <div className="grid h-full grid-cols-1 gap-4 overflow-hidden pb-4 transition-[max-height] duration-300 ease-in-out sm:grid-cols-2 xl:grid-cols-3">
         {userData &&
           userData.my_products &&
-          userData.my_products.map((product, id) => (
-            <DefaultCard
-              key={id}
-              _id={product._id}
-              title={product.title}
-              price={product.price}
-            />
-          ))}
+          userData.my_products.map((product) => {
+            return product.marketPlace === 'Shop' ? (
+              <ProductCard
+                _id={product._id}
+                price={product.price}
+                productQuantity={product.quantity}
+                title={product.title}
+                authors={product.authors}
+                description={product.description}
+                imgs={product.imgs}
+              />
+            ) : (
+              <AuctionCard
+                _id={product._id}
+                price={product.price}
+                title={product.title}
+                authors={product.authors}
+                description={product.description}
+                imgs={product.imgs}
+              />
+            );
+          })}
       </div>
     </section>
   );

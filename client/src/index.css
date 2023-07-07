@@ -163,7 +163,7 @@
   left: 0;
   margin: auto;
   transform: translateY(400px);
-  width :34px;
+  width: 34px;
   height: 55px;
 }
 .mousey {
@@ -182,86 +182,29 @@
   background-color: #fff;
   animation-name: scroll;
   animation-duration: 2.2s;
-  animation-timing-function: cubic-bezier(.15,.41,.69,.94);
+  animation-timing-function: cubic-bezier(0.15, 0.41, 0.69, 0.94);
   animation-iteration-count: infinite;
 }
 @keyframes scroll {
-  0% { opacity: 0; }
-  10% { transform: translateY(0); opacity: 1; }
-  100% { transform: translateY(15px); opacity: 0;}
+  0% {
+    opacity: 0;
+  }
+  10% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(15px);
+    opacity: 0;
+  }
 }
 
 /* Special slider !! */
 
-/* .test {
-  position: relative !important;
-  width: 100% !important;
-  min-height: 100vh !important;
-  display: flex !important;
-  justify-content: center !important;
-  align-items: center !important;
-  background: #2196f3;
-  overflow: hidden !important;
-} */
-
-.test .swiper {
-}
-
 .test .swiper-slide {
-  /* width: 300px !important; */
-  /* height: 400px !important; */
-  box-shadow: 0 15px 50px rgba(0, 0, 0, 0.2) !important;
   filter: blur(1px) brightness(0.8) !important;
-  border-radius: 10px !important;
-  display: flex !important;
-  flex-direction: column !important;
-  justify-content: flex-end !important;
-  align-items: self-start !important;
 }
 
 .test .swiper-slide-active {
   filter: blur(0px) !important;
 }
-
-.test .swiper-pagination-bullet,
-.test .swiper-pagination-bullet-active {
-  background: #fff !important;
-}
-
-/* .test .swiper-slide span {
-  text-transform: uppercase !important;
-  color: #fff !important;
-  background: #1b7402 !important;
-  padding: 7px 18px 7px 25px !important;
-  display: inline-block !important;
-  border-radius: 0 20px 20px 0px !important;
-  letter-spacing: 2px !important;
-  font-size: 0.8rem !important;
-  font-family: "Open Sans", sans-serif !important;
-} */
-
-/* .test .swiper-slide h2 {
-  color: #fff;
-  font-family: "Roboto", sans-serif;
-  font-weight: 400;
-  font-size: 1.3rem;
-  line-height: 1.4;
-  margin-bottom: 15px;
-  padding: 25px 45px 0 25px;
-}
-
-.test .swiper-slide p {
-  color: #fff;
-  font-family: "Roboto", sans-serif;
-  font-weight: 300;
-  display: flex;
-  align-items: center;
-  padding: 0 25px 35px 25px;
-}
-
-.test .swiper-slide svg {
-  color: #fff;
-  width: 22px;
-  height: 22px;
-  margin-right: 7px;
-} */

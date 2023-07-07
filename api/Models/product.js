@@ -4,7 +4,7 @@ const ProductSchema = mongoose.Schema({
   userProp: { type: { email: String, id: String }, required: true },
   title: { type: String, required: true },
   description: { type: String },
-  price: { type: Number, required: true },
+  price: { type: { value: Number, currency: String }, required: true },
   imgs: [{ type: String }],
   categories: [{ type: { value: String, label: String } }],
   authors: [{ type: String }],

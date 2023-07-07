@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
-import { ProductCategories } from '../../types/interfaces';
+import { CategoryCardType } from '../../types/types';
 
-function CategoryCard({ _id, label, value, description }: ProductCategories) {
+function CategoryCard({ _id, label, value, description }: CategoryCardType) {
   return (
     <div id={_id}>
       <Link

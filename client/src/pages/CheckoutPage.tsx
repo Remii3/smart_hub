@@ -4,11 +4,7 @@ import { loadStripe } from '@stripe/stripe-js';
 import { useState, useEffect } from 'react';
 import CheckoutForm from '../components/checkout/CheckoutForm';
 import CheckoutProdList from '../components/checkout/CheckoutProdList';
-import {
-  InitialStateType,
-  ProductTypes,
-  SimpleFetchDataTypes,
-} from '../types/interfaces';
+import { InitialStateType, SimpleFetchDataTypes } from '../types/interfaces';
 import CheckoutItem from '../components/checkout/CheckoutItem';
 import PrimaryBtn from '../components/UI/Btns/PrimaryBtn';
 

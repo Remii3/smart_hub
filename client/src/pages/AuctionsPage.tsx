@@ -21,6 +21,7 @@ export default function AuctionsPage() {
             category="adventure"
             title="New collection"
             allProducts={auctionProducts}
+            marketPlace="Auction"
           />
         )}
         {auctionProducts && (
@@ -30,6 +31,7 @@ export default function AuctionsPage() {
             showMore
             subTitle="adsasd asdasd"
             allProducts={auctionProducts}
+            marketPlace="Auction"
           />
         )}
         {auctionProducts && (
@@ -44,6 +46,7 @@ export default function AuctionsPage() {
           neque beatae.
         "
             allProducts={auctionProducts}
+            marketPlace="Auction"
           />
         )}
       </div>

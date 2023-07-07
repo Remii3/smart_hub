@@ -1,5 +1,6 @@
 import { ProductTypes } from '../../types/interfaces';
-import DefaultCard from '../card/DefaultCard';
+import AuctionCard from '../card/AuctionCard';
+import ProductCard from '../card/ProductCard';
 
 export default function MyProducts({
   myProducts,
@@ -12,14 +13,28 @@ export default function MyProducts({
     <div>
       <p className="pb-2 pt-4 text-lg">Latest:</p>
       <div className="grid h-full grid-cols-1 gap-4 overflow-hidden pb-4 transition-[max-height] duration-300 ease-in-out sm:grid-cols-2 xl:grid-cols-3">
-        {shortenedProducts.map((product, id) => (
-          <DefaultCard
-            key={id}
-            _id={product._id}
-            title={product.title}
-            price={product.price}
-          />
-        ))}
+        {shortenedProducts.map((product) => {
+          return product.marketPlace === 'Shop' ? (
+            <ProductCard
+              _id={product._id}
+              price={product.price}
+              productQuantity={product.quantity}
+              title={product.title}
+              authors={product.authors}
+              description={product.description}
+              imgs={product.imgs}
+            />
+          ) : (
+            <AuctionCard
+              _id={product._id}
+              price={product.price}
+              title={product.title}
+              authors={product.authors}
+              description={product.description}
+              imgs={product.imgs}
+            />
+          );
+        })}
       </div>
     </div>
   );

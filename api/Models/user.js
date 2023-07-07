@@ -8,18 +8,20 @@ const UserSchema = new mongoose.Schema({
   },
   password: { type: String, required: true },
   address: { type: String },
-  orders: [{ type: mongoose.Types.ObjectId, ref: "Order" }],
+  orders: [{ type: mongoose.Types.ObjectId, ref: 'Order' }],
   transaction_history: [
     {
       type: {
         status: String,
         data: mongoose.Types.ObjectId,
       },
-      ref: "Product",
+      ref: 'Product',
     },
   ],
   cart: mongoose.Types.ObjectId,
-  my_products: [{ type: mongoose.Types.ObjectId, ref: "Product" }],
+  my_products: [{ type: mongoose.Types.ObjectId, ref: 'Product' }],
+  followers: [{ type: mongoose.Types.ObjectId }],
+  following: [{ type: mongoose.Types.ObjectId }],
 });
 
 const UserModel = mongoose.model('User', UserSchema);

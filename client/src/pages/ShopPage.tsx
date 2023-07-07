@@ -38,6 +38,7 @@ export default function ShopPage() {
             category="action"
             title="New collection"
             allProducts={shopProducts}
+            marketPlace="Product"
           />
         )}
         {shopProducts && (
@@ -47,6 +48,7 @@ export default function ShopPage() {
             showMore
             subTitle="adsasd asdasd"
             allProducts={shopProducts}
+            marketPlace="Product"
           />
         )}
         {shopProducts && (
@@ -61,6 +63,7 @@ export default function ShopPage() {
               neque beatae.
             "
             allProducts={shopProducts}
+            marketPlace="Product"
           />
         )}
       </div>
