@@ -1,3 +1,5 @@
+import { MarketPlaceTypes } from './types';
+
 export interface ProductTypes {
   _id: string;
   title: string;
@@ -9,7 +11,7 @@ export interface ProductTypes {
   rating?: number;
   quantity: number;
   userProp: { email: string; id: string };
-  marketPlace: 'Shop' | 'Auction';
+  marketPlace: MarketPlaceTypes;
   addedDate: string;
   comments: [CommentTypes];
 }

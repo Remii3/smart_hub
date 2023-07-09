@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { useEffect, useState, useContext } from 'react';
+import { useEffect, useState, useContext, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 import { SwiperSlide } from 'swiper/react';
 import { ProductTypes } from '../types/interfaces';
@@ -21,6 +21,8 @@ type OtherUserDataType = {
   };
   credentials: { firstName: string; lastName: string };
   my_products: ProductTypes[];
+  followers: string[];
+  following: string[];
 };
 
 export default function OtherUserPage() {
@@ -34,45 +36,59 @@ export default function OtherUserPage() {
   userId = path.pathname.split('/');
   userId = userId[userId.length - 1];
 
-  useEffect(() => {
-    if (userData && userData.following.find((user) => user === userId)) {
-      console.log('first');
-      setIsFollowing(true);
-    } else {
-      console.log('second');
-    }
-  }, [userData, userId]);
-  useEffect(() => {
+  const getOtherUserData = useCallback(() => {
     axios
       .get('/user/otherUser', { params: { userId } })
       .then((data) => setOtherUserData(data.data));
   }, [userId]);
 
+  useEffect(() => {
+    getOtherUserData();
+  }, [getOtherUserData, userId, isFollowing]);
+
+  useEffect(() => {
+    if (userData && userData.following.find((user) => user === userId)) {
+      setIsFollowing(true);
+    } else {
+      setIsFollowing(false);
+    }
+  }, [getOtherUserData, userData, userId]);
   const shopProducts = otherUserData?.my_products.filter(
     (item) => item.marketPlace === 'Shop'
   );
+
   const auctionProducts = otherUserData?.my_products.filter(
     (item) => item.marketPlace === 'Auction'
   );
+
   const otherUserStats = [
     { text: 'Products', quantity: shopProducts?.length },
     { text: 'Auctions', quantity: auctionProducts?.length },
-    { text: 'Followers', quantity: 0 },
+    { text: 'Followers', quantity: otherUserData?.followers.length },
   ];
+
   const followHandler = () => {
     if (userData === null) return;
     if (isFollowing) {
-      axios.post('/user/remove-follow', {
-        followReceiverId: userId,
-        followGiverId: userData._id,
-      });
-      setIsFollowing(false);
+      axios
+        .post('/user/remove-follow', {
+          followReceiverId: userId,
+          followGiverId: userData._id,
+        })
+        .then(() => {
+          setIsFollowing(false);
+          getOtherUserData();
+        });
     } else {
-      axios.post('/user/add-follow', {
-        followReceiverId: userId,
-        followGiverId: userData._id,
-      });
-      setIsFollowing(true);
+      axios
+        .post('/user/add-follow', {
+          followReceiverId: userId,
+          followGiverId: userData._id,
+        })
+        .then(() => {
+          setIsFollowing(true);
+          getOtherUserData();
+        });
     }
   };
 

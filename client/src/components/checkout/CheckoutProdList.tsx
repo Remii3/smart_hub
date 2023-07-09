@@ -6,7 +6,6 @@ import CheckoutItem from './CheckoutItem';
 export default function CheckoutProdList() {
   const { cartState } = useContext(CartContext);
   const { userData } = useContext(UserContext);
-
   let ProductsList = <div />;
 
   if (cartState && cartState.cart && cartState.cart.products) {

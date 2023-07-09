@@ -42,7 +42,6 @@ export default function ProductPage() {
   let prodId: string | any[] | null = null;
   prodId = path.pathname.split('/');
   prodId = prodId[prodId.length - 1];
-  console.log(userData?._id);
   const fetchProductData = useCallback(() => {
     setIsFetchingData(true);
     axios

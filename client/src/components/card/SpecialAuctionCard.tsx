@@ -40,7 +40,6 @@ function SpecialAuctionCard({
     );
     titleShortened = `${titleShortened}...`;
   }
-  console.log(description);
   return (
     <div
       id={`${_id}`}

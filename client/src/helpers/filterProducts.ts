@@ -1,4 +1,5 @@
 import { ProductTypes } from '../types/interfaces';
+import { MarketPlaceTypes } from '../types/types';
 
 export function filterProductsByPrice({
   minPrice,
@@ -14,16 +15,21 @@ export function filterProductsByPrice({
   }
 
   if (minPrice === '') {
-    return products.filter((product) => product.price <= Number(maxPrice));
+    return products.filter(
+      (product) => product.price.value <= Number(maxPrice)
+    );
   }
 
   if (maxPrice === '') {
-    return products.filter((product) => product.price >= Number(minPrice));
+    return products.filter(
+      (product) => product.price.value >= Number(minPrice)
+    );
   }
 
   return products.filter((product) => {
     return (
-      product.price >= Number(minPrice) && product.price <= Number(maxPrice)
+      product.price.value >= Number(minPrice) &&
+      product.price.value <= Number(maxPrice)
     );
   });
 }
@@ -35,3 +41,24 @@ export function filterProductsById({
   minPrice: number;
   maxPrice: number;
 }) {}
+
+export function filterProductsByMarketplace({
+  selectedMarketplace,
+  products,
+}: {
+  selectedMarketplace: {
+    name: string;
+    isChecked: boolean;
+  }[];
+  products: ProductTypes[];
+}) {
+  const marketplaces = [] as string[];
+  for (const type of selectedMarketplace) {
+    if (type.isChecked) {
+      marketplaces.push(type.name.toLowerCase());
+    }
+  }
+  return products.filter((product) => {
+    return marketplaces.includes(product.marketPlace.toLowerCase());
+  });
+}

@@ -21,7 +21,6 @@ export default function PriceSelector({
   minPriceChangeHandler,
   maxPriceChangeHandler,
 }: PriceSelectorPropsTypes) {
-  console.log(highestPrice);
   return (
     <div className="flex-grow sm:relative" id={`${category}-PriceSelector`}>
       <Popover>

@@ -98,11 +98,11 @@ const getCart = async (req, res) => {
         let totalPrice = 0;
         const contents = await Product.findOne({ _id: item._id });
         if (contents) {
-          totalPrice += contents.price * item.quantity;
+          totalPrice += contents.price.value * item.quantity;
           productsData.push({
             productData: contents,
             inCartQuantity: item.quantity,
-            totalPrice,
+            totalPrice: totalPrice,
           });
         } else {
           await Cart.updateOne(
@@ -115,6 +115,8 @@ const getCart = async (req, res) => {
       for (const product of productsData) {
         cartPrice += product.totalPrice;
       }
+
+      cartPrice = cartPrice.toFixed(2);
 
       cartPrice = `€${cartPrice}`;
 

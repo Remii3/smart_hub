@@ -36,3 +36,5 @@ export type CategoryCardType = {
   value: string;
   description: string;
 };
+
+export type MarketPlaceTypes = 'Auction' | 'Shop';

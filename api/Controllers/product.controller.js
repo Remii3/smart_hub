@@ -46,6 +46,34 @@ const getProduct = async (req, res) => {
   }
 };
 
+const getSearchedProducts = async (req, res) => {
+  const { phrase } = req.query;
+  const searchParams = new URLSearchParams(phrase);
+  const finalQuery = {};
+  const finalRawData = {};
+
+  for (const [key, value] of searchParams.entries()) {
+    if (key === 'phrase') {
+      finalQuery['$text'] = { $search: `${value}` };
+      finalRawData[key] = value;
+    }
+    if (key === 'category') {
+      finalQuery['categories.value'] = value;
+      finalRawData[key] = value;
+    }
+  }
+  try {
+    const products = await Product.find(finalQuery).sort({ _id: 1 }).limit(20);
+    res.status(200).json({
+      products,
+      finalRawData,
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: 'Faield fetching searched query' });
+  }
+};
+
 const addProduct = async (req, res) => {
   let {
     userProp,
@@ -147,4 +175,5 @@ module.exports = {
   addProduct,
   updateProduct,
   deleteProduct,
+  getSearchedProducts,
 };

@@ -1,11 +1,22 @@
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { CategoryCardType } from '../../types/types';
 
 function CategoryCard({ _id, label, value, description }: CategoryCardType) {
+  const location = useLocation();
+
+  const existingSearch = new URLSearchParams(location.search);
+  let finalQuery = `category=${value}`;
+
+  for (const [key, queryValue] of existingSearch.entries()) {
+    if (key !== 'category') {
+      finalQuery += `&${key}=${queryValue}`;
+    }
+  }
+
   return (
     <div id={_id}>
       <Link
-        to={{ pathname: `/shop/search`, search: `category=${value}` }}
+        to={{ pathname: `/shop/search`, search: finalQuery }}
         className="relative flex h-full cursor-pointer flex-col gap-4 rounded-lg bg-gray900 px-10 py-12 shadow transition-[transform,box-shadow] duration-300 ease-out hover:scale-105 hover:shadow-lg active:scale-100"
       >
         <h4 className="text-dark">{label}</h4>

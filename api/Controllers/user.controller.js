@@ -226,6 +226,8 @@ const otherUserData = async (req, res) => {
         address: data.address,
         credentials: data.credentials,
         my_products: data.my_products,
+        followers: data.followers,
+        following: data.following,
       }),
     )
     .catch(err => {

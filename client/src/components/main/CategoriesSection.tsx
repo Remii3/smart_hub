@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import PrimaryBtn from '../UI/Btns/PrimaryBtn';
 import MainPageHeading from '../UI/MainPageHeading';
 import CategoryCard from '../card/CategoryCard';
