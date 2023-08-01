@@ -1,6 +1,7 @@
 const Cart = require('../Models/cart');
 const Product = require('../Models/product');
 const calculateOrderAmount = require('../helpers/calculateOrderAmount');
+const prepareProductObject = require('../helpers/prepareProductObject');
 
 const stripe = require('stripe')(
   'sk_test_51NDZ0zHqBBlAtOOFMShIrv9OwdfC6958wOWqZa1X59kOeyY4hNtZ80ANZ6WYv67v4a8FOFguc04SCV84QKEf6nFf005r6tKBO6',
@@ -19,23 +20,23 @@ const addToCart = async (req, res) => {
   }
 
   try {
-    const cart = await Cart.findOne({ userId });
+    const cart = await Cart.findOne({ user_id: userId });
     if (cart) {
       const existingItem = await Cart.findOne({
-        userId,
-        'items._id': productId,
+        user_id: userId,
+        'products._id': productId,
       });
       if (existingItem) {
         await Cart.updateOne(
-          { userId, 'items._id': productId },
-          { $inc: { 'items.$.quantity': productQuantity } },
+          { user_id: userId, 'products._id': productId },
+          { $inc: { 'products.$.quantity': productQuantity } },
         );
       } else {
         await Cart.updateOne(
-          { userId },
+          { user_id: userId },
           {
             $push: {
-              items: {
+              products: {
                 _id: productId,
                 quantity: productQuantity,
               },
@@ -43,11 +44,10 @@ const addToCart = async (req, res) => {
           },
         );
       }
-      await cart.save();
     } else {
       await Cart.create({
-        userId,
-        items: [{ _id: productId, quantity: productQuantity }],
+        user_id: userId,
+        products: [{ _id: productId, quantity: productQuantity }],
       });
     }
     res.status(201).json({ message: 'Successfully added' });
@@ -88,26 +88,29 @@ const getCart = async (req, res) => {
   if (!userId) return res.status(422).json({ message: 'User id is required!' });
 
   try {
-    const cartData = await Cart.findOne({ userId });
+    const cartData = await Cart.findOne({ user_id: userId });
     let cartPrice = 0;
+
     if (cartData) {
-      const items = cartData.items;
+      console.log(cartData);
+      const products = cartData.products;
       const productsData = [];
 
-      for (const item of items) {
+      for (const product of products) {
         let totalPrice = 0;
-        const contents = await Product.findOne({ _id: item._id });
+        const contents = await Product.findOne({ _id: product._id });
         if (contents) {
-          totalPrice += contents.price.value * item.quantity;
+          totalPrice += contents.shop_info.price * product.quantity;
+          const preparedProduct = prepareProductObject(contents);
           productsData.push({
-            productData: contents,
-            inCartQuantity: item.quantity,
+            productData: preparedProduct,
+            inCartQuantity: product.quantity,
             totalPrice: totalPrice,
           });
         } else {
           await Cart.updateOne(
-            { userId, 'items._id': item._id },
-            { $pull: { items: { _id: item._id } } },
+            { user_id: userId, 'products._id': product._id },
+            { $pull: { products: { _id: product._id } } },
           );
         }
       }
@@ -129,7 +132,6 @@ const getCart = async (req, res) => {
     res.status(500).json({
       message: 'Something went wrong with fetching cart data',
       products: null,
-      err,
     });
   }
 };

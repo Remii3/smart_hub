@@ -18,7 +18,7 @@ export const UserContext = createContext<ContextTypes>({
 export default function UserProvider({ children }: { children: ReactNode }) {
   const [userData, setUserData] = useState<null | UserDataTypes>(null);
   const fetchUserData = async () => {
-    const res = await axios.get('/user/profile');
+    const res = await axios.get('/user/myProfile');
     setUserData(res.data);
   };
 

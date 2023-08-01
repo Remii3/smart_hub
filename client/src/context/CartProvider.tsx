@@ -7,7 +7,6 @@ import {
   useMemo,
   useState,
 } from 'react';
-import { InitialStateType } from '../types/interfaces';
 import { UserContext } from './UserProvider';
 import {
   postAddProductToCart,
@@ -17,14 +16,19 @@ import {
   postRemoveProductFromCart,
 } from '../helpers/cartFunctions';
 import getCookie from '../helpers/getCookie';
+import { CartTypes } from '../types/interfaces';
 
 const initialState = {
-  cart: null,
-  cartIsLoading: false,
+  products: {
+    inCartQuantity: 0,
+    productsData: [],
+    productsTotalPrice: 0,
+  },
+  cartPrice: 0,
 };
 
 export const CartContext = createContext<{
-  cartState: InitialStateType;
+  cartState: CartTypes;
   fetchCartData: () => void;
   addProductToCart: ({
     productId,
@@ -46,7 +50,7 @@ export const CartContext = createContext<{
 });
 
 export default function CartProvider({ children }: { children: ReactNode }) {
-  const [cartState, setCart] = useState<InitialStateType>(initialState);
+  const [cartState, setCart] = useState<CartTypes>(initialState);
 
   const { userData } = useContext(UserContext);
   const userId = userData?._id || getCookie('guestToken');
@@ -55,7 +59,7 @@ export default function CartProvider({ children }: { children: ReactNode }) {
     if (userId) {
       const res = await getFetchCartData({ userId });
       setCart((prevState) => {
-        return { ...prevState, cart: res };
+        return { ...prevState, res };
       });
     }
   }, [userId]);

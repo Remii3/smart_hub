@@ -75,7 +75,7 @@ export default function CheckoutForm({ changeShowThankYouHandler }: any) {
         }
       });
   }, [stripe]);
-  const addOrderHandler = () => {};
+
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -84,7 +84,6 @@ export default function CheckoutForm({ changeShowThankYouHandler }: any) {
     }
 
     setIsLoading(true);
-
     const { error } = await stripe.confirmPayment({
       elements,
       confirmParams: {
@@ -102,14 +101,13 @@ export default function CheckoutForm({ changeShowThankYouHandler }: any) {
       const currentUserId = userData?._id || getCookie('guestToken');
       await axios.post('/order/add', {
         buyerId: currentUserId,
-        products: cartState.cart?.products,
+        items: cartState.cart?.products,
       });
-      await axios.post('/cart/cart-remove', {
+      await axios.post('/cart/remove-one', {
         userId: currentUserId,
         productId: 'all',
       });
 
-      addOrderHandler();
       changeShowThankYouHandler(cartState);
 
       fetchCartData();

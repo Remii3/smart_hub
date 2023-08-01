@@ -8,30 +8,34 @@ export default function MyProducts({
   myProducts: ProductTypes[];
 }) {
   const shortenedProducts = myProducts.slice(0, 3);
-
+  console.log(shortenedProducts);
   return (
     <div>
       <p className="pb-2 pt-4 text-lg">Latest:</p>
       <div className="grid h-full grid-cols-1 gap-4 overflow-hidden pb-4 transition-[max-height] duration-300 ease-in-out sm:grid-cols-2 xl:grid-cols-3">
         {shortenedProducts.map((product) => {
-          return product.marketPlace === 'Shop' ? (
+          return product.market_place === 'Shop' ? (
             <ProductCard
+              key={product._id}
               _id={product._id}
-              price={product.price}
+              price={product.shop_info.price}
               productQuantity={product.quantity}
               title={product.title}
               authors={product.authors}
               description={product.description}
-              imgs={product.imgs}
+              img={product.img}
             />
           ) : (
             <AuctionCard
+              key={product._id}
               _id={product._id}
-              price={product.price}
               title={product.title}
               authors={product.authors}
               description={product.description}
-              imgs={product.imgs}
+              img={product.img}
+              startingPrice={product.auction_info.starting_price}
+              currentPrice={product.auction_info.current_price}
+              auctionEndDate={product.auction_info.auction_end_date}
             />
           );
         })}

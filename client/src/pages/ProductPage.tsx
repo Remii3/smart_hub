@@ -24,17 +24,13 @@ export default function ProductPage() {
   const [productData, setProductData] = useState<ProductTypes | null>(null);
   const [newData, setNewData] = useState({
     newTitle: productData?.title,
-    newPrice: productData?.price.value,
+    newPrice: productData?.shop_info?.price,
     newDescription: productData?.description,
     newQuantity: productData?.quantity,
   });
   const { userData } = useContext(UserContext);
   const [newComment, setNewComment] = useState('');
   const [isAddingComment, setIsAddingComment] = useState(false);
-  const creatorPath =
-    productData?.userProp.id === userData?._id
-      ? 'my'
-      : productData?.userProp.id;
 
   const navigate = useNavigate();
   const path = useLocation();
@@ -63,7 +59,13 @@ export default function ProductPage() {
   }, [fetchProductData]);
 
   useEffect(() => {
-    if (userData?.my_products.find((item) => item._id === productData?._id)) {
+    if (
+      userData &&
+      userData.role !== 'User' &&
+      userData.author_info.my_products.find(
+        (product) => product._id === productData?._id
+      )
+    ) {
       setIsMyProduct(true);
     }
   }, [userData, productData]);
@@ -118,6 +120,7 @@ export default function ProductPage() {
     setIsAddingComment(false);
     fetchProductData();
   };
+  console.log(productData);
   return (
     <section className="relative">
       <div className="relative mx-auto max-w-screen-xl px-4 py-8">
@@ -135,7 +138,7 @@ export default function ProductPage() {
 
           <div className="sticky top-24">
             <div className="relative mb-3 w-full">
-              <ProductPill text={productData && productData.marketPlace} />
+              <ProductPill text={productData && productData.market_place} />
               {isMyProduct && (
                 <div className="absolute right-0 top-0 flex gap-3">
                   <CustomDialog
@@ -208,13 +211,15 @@ export default function ProductPage() {
                     ))}
                 </div>
                 <p className="text-xs">
-                  Added: {productData && productData.addedDate.slice(0, 10)}
+                  Added: {productData && productData.created_at.slice(0, 10)}
                 </p>
                 <p className="text-xs">
-                  by:{' '}
-                  <Link to={`/account/${creatorPath}`}>
-                    {productData?.userProp.email}
-                  </Link>
+                  Authors:{' '}
+                  {productData?.authors?.map((author) => (
+                    <Link key={author._id} to={`/account/${author._id}`}>
+                      {author.user_info && author.author_info.pseudonim}
+                    </Link>
+                  ))}
                 </p>
                 <p className="text-sm">Highest Rated Product</p>
 
@@ -224,13 +229,15 @@ export default function ProductPage() {
                 <input
                   name="newPrice"
                   type="number"
-                  value={newData.newPrice}
+                  value={newData.newPrice?.$numberDecimal}
                   className="h-min"
                   onChange={(e) => newDataChangeHandler(e)}
                 />
               ) : (
                 <p className="text-lg font-bold">
-                  {productData && productData.price.value}€
+                  {productData?.shop_info &&
+                    productData.shop_info.price.$numberDecimal}
+                  €
                 </p>
               )}
             </div>
@@ -313,10 +320,7 @@ export default function ProductPage() {
             {productData?.comments.map((comment) => (
               <div key={comment._id} className="flex gap-5">
                 <div>
-                  <p>
-                    {comment.user.credentials.firstName}{' '}
-                    {comment.user.credentials.lastName}
-                  </p>
+                  <p>{comment.user.user_info.credentials.full_name}</p>
                   <p>{comment.value.rating}</p>
                 </div>
                 <div>

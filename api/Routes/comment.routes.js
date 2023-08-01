@@ -7,7 +7,9 @@ const {
   getComments,
 } = require('../Controllers/comment.controller');
 
-router.get('/get-comments', getComments);
-router.post('/add-comment', addComment);
+router.get('/all', getComments);
+router.get('/one');
+
+router.post('/one', addComment);
 
 module.exports = router;

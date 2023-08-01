@@ -3,7 +3,12 @@ import axios from 'axios';
 import { useLocation, useNavigate } from 'react-router-dom';
 import AdvancedFilter from '../components/search/AdvancedFilter';
 import { filterProductsByMarketplace } from '../helpers/filterProducts';
-import { ProductTypes } from '../types/interfaces';
+import {
+  ProductAuctionCardType,
+  ProductShopCardType,
+  ProductTypes,
+  UnknownProductTypes,
+} from '../types/interfaces';
 import ProductCard from '../components/card/ProductCard';
 import AuctionCard from '../components/card/AuctionCard';
 
@@ -24,12 +29,17 @@ export default function SearchPage() {
       isChecked: true,
     },
   ]);
-  const [products, setProducts] = useState<ProductTypes[]>([]);
-  const [searchedData, setSearchedData] = useState<FinalRawDataTypes>();
+  const [products, setProducts] = useState<UnknownProductTypes[]>([]);
+  const [searchedData, setSearchedData] = useState<FinalRawDataTypes>({
+    author: '',
+    category: '',
+    phrase: '',
+  });
 
   const searchQuery = useLocation();
   const updatedQuery = searchQuery.search.slice(1);
   const navigate = useNavigate();
+
   useEffect(() => {
     axios
       .get('/product/searched', { params: { phrase: updatedQuery } })
@@ -56,7 +66,7 @@ export default function SearchPage() {
     });
   }
 
-  const removeQueryhandler = (e: any) => {
+  const removeQueryHandler = (e: any) => {
     const currentQueryParams = new URLSearchParams(searchQuery.search);
     currentQueryParams.delete(e.currentTarget.name);
     navigate({
@@ -64,7 +74,6 @@ export default function SearchPage() {
       search: currentQueryParams.toString(),
     });
   };
-
   return (
     <div className="mx-auto max-w-7xl">
       <div className="flex justify-between">
@@ -85,7 +94,7 @@ export default function SearchPage() {
                 <button
                   name="category"
                   type="button"
-                  onClick={(e) => removeQueryhandler(e)}
+                  onClick={(e) => removeQueryHandler(e)}
                 >
                   <span>Category: {searchedData.category}</span>
                   <span>X</span>
@@ -97,7 +106,7 @@ export default function SearchPage() {
                 <button
                   name="phrase"
                   type="button"
-                  onClick={(e) => removeQueryhandler(e)}
+                  onClick={(e) => removeQueryHandler(e)}
                 >
                   <span> Phrase: {searchedData.phrase}</span>
                   <span>X</span>
@@ -108,26 +117,28 @@ export default function SearchPage() {
           <div className="grid grid-flow-row grid-cols-3">
             {updatedProducts && updatedProducts.length > 0 ? (
               updatedProducts.map((item) => {
-                return item.marketPlace === 'Shop' ? (
+                return item.market_place === 'Shop' ? (
                   <ProductCard
                     key={item._id}
                     _id={item._id}
-                    price={item.price}
+                    price={item.shop_info.price}
                     productQuantity={item.quantity}
                     title={item.title}
                     authors={item.authors}
                     description={item.description}
-                    imgs={item.imgs}
+                    img={item.img}
                   />
                 ) : (
                   <AuctionCard
                     key={item._id}
                     _id={item._id}
-                    price={item.price}
                     title={item.title}
                     authors={item.authors}
                     description={item.description}
-                    imgs={item.imgs}
+                    img={item.img}
+                    auctionEndDate={item.auction_info.auction_end_date}
+                    currentPrice={item.auction_info.current_price}
+                    startingPrice={item.auction_info.starting_price}
                   />
                 );
               })

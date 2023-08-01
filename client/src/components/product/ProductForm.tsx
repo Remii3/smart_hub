@@ -38,7 +38,7 @@ export default function ProductForm({
       setIsAddingToCart(false);
     }
   };
-
+  console.log('cartState: ', cartState);
   const incrementQuantityHandler = () => {
     if (productQuantity! <= selectedQuantity) return;
     setSelectedQuantity((prevState) => (prevState += 1));
@@ -48,9 +48,10 @@ export default function ProductForm({
     setSelectedQuantity((prevState) => (prevState -= 1));
   };
 
-  const currentItem = cartState.cart?.products.find(
-    (product) => product.productData._id === productId
-  );
+  const currentItem = cartState.cart?.products.find((product) => {
+    console.log('product:', product);
+    return product.productData._id === productId;
+  });
 
   if (currentItem) {
     itemCapacity =

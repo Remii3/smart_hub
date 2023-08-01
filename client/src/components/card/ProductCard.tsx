@@ -3,9 +3,10 @@ import { Link } from 'react-router-dom';
 import PrimaryBtn from '../UI/Btns/PrimaryBtn';
 import { CartContext } from '../../context/CartProvider';
 import { ProductCardType } from '../../types/types';
+import { CartProductTypes, ProductTypes } from '../../types/interfaces';
 
 const defaultProps = {
-  imgs: [],
+  img: [],
   authors: [],
   description: '',
 };
@@ -15,12 +16,11 @@ function ProductCard({
   authors,
   description,
   price,
-  imgs,
+  img,
   productQuantity,
 }: ProductCardType) {
   const [isAddingToCart, setIsAddingToCart] = useState(false);
   const { addProductToCart, cartState } = useContext(CartContext);
-
   let itemBtnCapacity = false;
 
   let titleShortened = title;
@@ -49,7 +49,7 @@ function ProductCard({
   };
 
   const currentItem = cartState.cart?.products.find(
-    (product) => product.productData._id === _id
+    (product: CartProductTypes) => product.productData._id === _id
   );
 
   if (currentItem) {
@@ -83,7 +83,7 @@ function ProductCard({
                 <div className="line-clamp-1 h-[24px]">
                   {authors?.map((author, id) => (
                     <span key={id} className="mr-3">
-                      {author}
+                      {author.author_info && author.author_info.pseudonim}
                     </span>
                   ))}
                 </div>
@@ -92,7 +92,7 @@ function ProductCard({
             <div className="flex flex-col gap-3 px-3 pb-3">
               <p className="line-clamp-4 min-h-[80px]">{description}</p>
               <div className="flex justify-between gap-3">
-                <h4 className="flex items-center">{price.value}€</h4>
+                <h4 className="flex items-center">{price}€</h4>
                 <div>
                   <div className="pb-3">stars</div>
                   <PrimaryBtn

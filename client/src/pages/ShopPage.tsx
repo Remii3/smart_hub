@@ -4,8 +4,6 @@ import { ProductTypes } from '../types/interfaces';
 import BasicProductCollection from '../components/collections/BasicProductCollection';
 
 export default function ShopPage() {
-  const mainCategories = ['Categories', 'Prices', 'Types', 'Something'];
-
   const [shopProducts, setShopProducts] = useState<ProductTypes[]>([]);
 
   useEffect(() => {
@@ -18,7 +16,7 @@ export default function ShopPage() {
     <div className="min-h-screen">
       <div className="h-[40vh] w-full bg-blue-200">{/* banner */}</div>
       <div className="mx-auto flex max-w-7xl flex-col gap-10 py-10">
-        <section>
+        {/* <section>
           <ul className=" mx-auto grid max-w-2xl grid-cols-1 py-5 text-center sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
             {mainCategories.map((category, id) => (
               <li
@@ -31,14 +29,14 @@ export default function ShopPage() {
               </li>
             ))}
           </ul>
-        </section>
+        </section> */}
         {/* map fetched type products */}
         {shopProducts && (
           <BasicProductCollection
             category="action"
             title="New collection"
             allProducts={shopProducts}
-            marketPlace="Product"
+            marketPlace="Shop"
           />
         )}
         {shopProducts && (
@@ -48,7 +46,7 @@ export default function ShopPage() {
             showMore
             subTitle="adsasd asdasd"
             allProducts={shopProducts}
-            marketPlace="Product"
+            marketPlace="Shop"
           />
         )}
         {shopProducts && (
@@ -63,7 +61,7 @@ export default function ShopPage() {
               neque beatae.
             "
             allProducts={shopProducts}
-            marketPlace="Product"
+            marketPlace="Shop"
           />
         )}
       </div>
