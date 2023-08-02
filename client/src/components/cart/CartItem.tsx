@@ -1,18 +1,14 @@
 import { Link } from 'react-router-dom';
 import { useContext, useState } from 'react';
 import { TrashIcon } from '../../assets/icons/Icons';
-import { ProductTypes } from '../../types/interfaces';
+import { CartProductTypes, ProductTypes } from '../../types/interfaces';
 import { CartContext } from '../../context/CartProvider';
-
-type CartItemProps = {
-  productData: ProductTypes;
-  inCartQuantity: number;
-};
 
 export default function CartItem({
   productData,
   inCartQuantity,
-}: CartItemProps) {
+  productsTotalPrice,
+}: CartProductTypes) {
   const [localQuantity, setLocalQuantity] = useState(inCartQuantity);
   const { incrementCartItem, decrementCartItem, removeProductFromCart } =
     useContext(CartContext);

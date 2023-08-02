@@ -70,7 +70,7 @@ export interface UserTypes {
     };
     phone: string;
   };
-  cart_data: { products: ProductTypes[]; _id: string };
+  cart_data: { products: UnknownProductTypes[]; _id: string };
   following: AuthorTypes[];
   orders: OrderTypes[];
   role: UserRoleTypes;
@@ -84,7 +84,7 @@ export interface AuthorTypes extends UserTypes {
     quote: string;
     avg_products_grade: number;
     sold_books_quantity: number;
-    my_products: ProductTypes[];
+    my_products: UnknownProductTypes[];
     followers: string[];
   };
 }
@@ -93,7 +93,7 @@ export interface AuthorTypes extends UserTypes {
 
 export interface TransactionHistoryTypes {
   status: string;
-  data: ProductTypes;
+  data: UnknownProductTypes;
 }
 
 // * Order types
@@ -101,7 +101,7 @@ export interface TransactionHistoryTypes {
 export interface OrderTypes {
   _id: string;
   buyer_id: string;
-  items: ProductTypes[];
+  items: UnknownProductTypes[];
   created_at: string;
 }
 
@@ -116,16 +116,18 @@ export interface SimpleFetchDataTypes {
 
 export interface CartProductTypes {
   inCartQuantity: number;
-  productData: ProductTypes;
+  productData: UnknownProductTypes;
   productsTotalPrice: number;
 }
 
 export interface CartTypes {
-  products: {
-    inCartQuantity: number;
-    productData: ProductTypes;
-    productsTotalPrice: number;
-  }[];
+  products:
+    | {
+        inCartQuantity: number;
+        productData: UnknownProductTypes;
+        productsTotalPrice: number;
+      }[]
+    | [];
   cartPrice: number;
 }
 

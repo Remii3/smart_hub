@@ -19,11 +19,7 @@ import getCookie from '../helpers/getCookie';
 import { CartTypes } from '../types/interfaces';
 
 const initialState = {
-  products: {
-    inCartQuantity: 0,
-    productsData: [],
-    productsTotalPrice: 0,
-  },
+  products: [],
   cartPrice: 0,
 };
 
@@ -89,11 +85,11 @@ export default function CartProvider({ children }: { children: ReactNode }) {
 
   const incrementCartItem = useCallback(
     (productId: string) => {
-      if (!cartState.cart) return;
+      if (!cartState) return;
 
-      const newProducts = cartState.cart.products;
+      const newProducts = cartState.products;
 
-      const productIndex = cartState.cart.products.findIndex(
+      const productIndex = cartState.products.findIndex(
         (product) => product.productData._id === productId
       );
 
@@ -114,7 +110,7 @@ export default function CartProvider({ children }: { children: ReactNode }) {
             return {
               ...prevState,
               cart: {
-                cartPrice: prevState.cart?.cartPrice || 0,
+                cartPrice: prevState.cartPrice || 0,
                 products: newProducts,
               },
             };
@@ -123,15 +119,15 @@ export default function CartProvider({ children }: { children: ReactNode }) {
 
       // eslint-disable-next-line consistent-return
     },
-    [cartState.cart, fetchCartData, userId]
+    [cartState, fetchCartData, userId]
   );
   const decrementCartItem = useCallback(
     (productId: string) => {
-      if (!cartState.cart) return;
+      if (!cartState) return;
 
-      const newProducts = cartState.cart.products;
+      const newProducts = cartState.products;
 
-      const productIndex = cartState.cart.products.findIndex(
+      const productIndex = cartState.products.findIndex(
         (product) => product.productData._id === productId
       );
 
@@ -152,21 +148,21 @@ export default function CartProvider({ children }: { children: ReactNode }) {
             return {
               ...prevState,
               cart: {
-                cartPrice: prevState.cart?.cartPrice || 0,
+                cartPrice: prevState.cartPrice || 0,
                 products: newProducts,
               },
             };
           });
         });
     },
-    [cartState.cart, fetchCartData, userId]
+    [cartState, fetchCartData, userId]
   );
 
   const removeProductFromCart = useCallback(
     (productId: string) => {
-      if (!cartState.cart) return;
+      if (!cartState) return;
 
-      const newProducts = cartState.cart?.products.filter(
+      const newProducts = cartState.products.filter(
         (product) => product.productData._id !== productId
       );
       postRemoveProductFromCart({ userId, productId })
@@ -176,14 +172,14 @@ export default function CartProvider({ children }: { children: ReactNode }) {
             return {
               ...prevState,
               cart: {
-                cartPrice: prevState.cart?.cartPrice || 0,
+                cartPrice: prevState.cartPrice || 0,
                 products: newProducts,
               },
             };
           });
         });
     },
-    [cartState.cart, fetchCartData, userId]
+    [cartState, fetchCartData, userId]
   );
 
   useEffect(() => {
