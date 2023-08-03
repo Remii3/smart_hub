@@ -6,6 +6,7 @@ const mongoose = require('mongoose');
 const Cart = require('../Models/cart');
 const getRandomString = require('../helpers/getRandomString');
 const { verifyNewUserData } = require('../helpers/verify');
+const prepareProductObject = require('../helpers/prepareProductObject');
 
 const salt = bcrypt.genSaltSync(12);
 
@@ -20,7 +21,7 @@ const signIn = async (req, res) => {
       jwt.sign(
         {
           email,
-          userId: userDoc._id,
+          user_id: userDoc._id,
         },
         process.env.JWT_SECRET,
         {},
@@ -125,48 +126,67 @@ const signUp = async (req, res) => {
 
 const myProfile = async (req, res) => {
   try {
-    const myProfileData = await User.findOne({
-      _id: req.user.userId,
-    }).populate('author_info.my_products');
+    const {
+      _id,
+      email,
+      username,
+      user_info,
+      following,
+      orders,
+      role,
+      author_info,
+    } = await User.findOne(
+      {
+        _id: req.user.user_id,
+      },
+      { password: 0 },
+    ).populate('author_info.my_products');
 
     const cartData = await Cart.findOne({
-      user_id: myProfileData._id,
+      user_id: _id,
     });
 
-    let finalData = {
-      _id: myProfileData._id,
-      email: myProfileData.email,
-      username: myProfileData.username,
-      user_info: {
-        profile_img: myProfileData.user_info.profile_img,
-        profile_img_type: myProfileData.user_info.profile_img_type,
-        background_img: myProfileData.user_info.background_img,
-        background_img_type: myProfileData.user_info.background_img_type,
-        credentials: {
-          first_name: myProfileData.user_info.credentials.first_name,
-          last_name: myProfileData.user_info.credentials.last_name,
-          full_name: myProfileData.user_info.credentials.full_name,
-        },
-        address: {
-          line1: myProfileData.user_info.address.line1,
-          line2: myProfileData.user_info.address.line2,
-          city: myProfileData.user_info.address.city,
-          state: myProfileData.user_info.address.state,
-          postal_code: myProfileData.user_info.address.postal_code,
-          country: myProfileData.user_info.address.country,
-        },
-        phone: myProfileData.user_info.phone,
-      },
-      following: myProfileData.following,
-      orders: myProfileData.orders,
-      cart: cartData,
-      role: myProfileData.role,
+    const {
+      avg_products_grade,
+      categories,
+      followers,
+      pseudonim,
+      quote,
+      short_description,
+      sold_books_quantity,
+    } = author_info;
+
+    const preparedMyProducts = author_info.my_products.map(item => {
+      return prepareProductObject(item);
+    });
+
+    const preparedAuthorInfo = {
+      avg_products_grade,
+      categories,
+      followers,
+      my_products: preparedMyProducts,
+      pseudonim,
+      quote,
+      short_description,
+      sold_books_quantity,
+      _id,
     };
 
-    if (myProfileData.role !== 'User') {
-      finalData.author_info = myProfileData.author_info;
+    let preparedUserData = {
+      _id,
+      email,
+      username,
+      user_info,
+      following,
+      orders,
+      cart: cartData,
+      role,
+    };
+
+    if (role !== 'User') {
+      preparedUserData.author_info = preparedAuthorInfo;
     }
-    res.status(200).json(finalData);
+    res.status(200).json(preparedUserData);
   } catch (err) {
     res.status(500).json({ message: 'Failed to fetch user data' });
   }
@@ -212,7 +232,7 @@ const guestData = async (req, res) => {
   jwt.sign(
     {
       email: getRandomString(10),
-      userId: getRandomString(15),
+      user_id: getRandomString(15),
     },
     getRandomString(40),
     {},
@@ -228,14 +248,42 @@ const otherUserData = async (req, res) => {
   const { userId } = req.query;
   try {
     const { role, email, username, user_info, author_info } =
-      await User.findOne({ _id: userId }).populate('my_products');
+      await User.findOne({
+        _id: userId,
+      }).populate('author_info.my_products');
+    const {
+      avg_products_grade,
+      categories,
+      followers,
+      pseudonim,
+      quote,
+      short_description,
+      sold_books_quantity,
+      _id,
+    } = author_info;
+
+    const preparedMyProducts = author_info.my_products.map(item => {
+      return prepareProductObject(item);
+    });
+
+    const preparedAuthorInfo = {
+      avg_products_grade,
+      categories,
+      followers,
+      my_products: preparedMyProducts,
+      pseudonim,
+      quote,
+      short_description,
+      sold_books_quantity,
+      _id,
+    };
 
     if (role === 'Author') {
       res.status(200).json({
         email,
         username,
         user_info,
-        author_info,
+        author_info: preparedAuthorInfo,
       });
     } else {
       res.status(200).json({

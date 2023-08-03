@@ -59,7 +59,6 @@ export default function MyShop() {
     hasFailed: false,
     isSuccess: false,
   });
-  // const [newAuthor, setNewAuthor] = useState('');
   const [authorState, setAuthorState] = useState<{
     isLoading: boolean;
     options: any;
@@ -70,7 +69,6 @@ export default function MyShop() {
     value: [],
   });
 
-  const [shownAllProducts, setShownAllProducts] = useState(false);
   const { userData, fetchUserData } = useContext(UserContext);
 
   const resetProductData = () => {
@@ -168,7 +166,7 @@ export default function MyShop() {
   const addProductHandler = async (e: React.FormEvent) => {
     e.preventDefault();
     const newProductData = {
-      userId: userData?._id,
+      user_id: userData?._id,
       title: productData.title.value,
       description: productData.description.value,
       price: Number(productData.price.value),
@@ -176,7 +174,7 @@ export default function MyShop() {
       categories: categoryState.value,
       authors: authorState.value,
       quantity: productData.quantity.value,
-      marketPlace: productData.marketPlace.value,
+      market_place: productData.marketPlace.value,
     };
 
     try {

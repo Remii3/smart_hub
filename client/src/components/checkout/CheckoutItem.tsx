@@ -1,21 +1,11 @@
 import { Link } from 'react-router-dom';
-import {
-  CartProductTypes,
-  CartTypes,
-  ProductTypes,
-} from '../../types/interfaces';
-
-type CheckoutItemTypes = {
-  productData: ProductTypes;
-  inCartQuantity: number;
-};
+import { CartProductTypes } from '../../types/interfaces';
 
 export default function CheckoutItem({
   productData,
   inCartQuantity,
 }: CartProductTypes) {
   if (!productData) return <div />;
-  console.log(productData);
   return (
     <li className="flex items-center gap-4">
       <Link to={`/product/${productData._id}`}>

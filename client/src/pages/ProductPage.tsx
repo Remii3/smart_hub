@@ -7,7 +7,7 @@ import {
 } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { ProductTypes } from '../types/interfaces';
+import { UnknownProductTypes } from '../types/interfaces';
 import { UserContext } from '../context/UserProvider';
 import CustomDialog from '../components/UI/headlessUI/CustomDialog';
 import ProductImage from '../components/product/ProductImage';
@@ -21,7 +21,7 @@ export default function ProductPage() {
   const [isMyProduct, setIsMyProduct] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [productData, setProductData] = useState<ProductTypes | null>(null);
+  const [productData, setProductData] = useState<UnknownProductTypes>();
   const [newData, setNewData] = useState({
     newTitle: productData?.title,
     newPrice: productData?.shop_info?.price,
@@ -38,6 +38,7 @@ export default function ProductPage() {
   let prodId: string | any[] | null = null;
   prodId = path.pathname.split('/');
   prodId = prodId[prodId.length - 1];
+
   const fetchProductData = useCallback(() => {
     setIsFetchingData(true);
     axios
@@ -63,7 +64,7 @@ export default function ProductPage() {
       userData &&
       userData.role !== 'User' &&
       userData.author_info.my_products.find(
-        (product) => product._id === productData?._id
+        (product: UnknownProductTypes) => product._id === productData?._id
       )
     ) {
       setIsMyProduct(true);
@@ -110,6 +111,7 @@ export default function ProductPage() {
   if (productData === undefined && isFetchingData) return <p>Loading</p>;
   if (productData === undefined) return <p> No data</p>;
   const DUMMYIMGS = [{ id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }];
+
   const addNewCommentHandler = async () => {
     setIsAddingComment(true);
     await axios.post('/comment/add-comment', {
@@ -120,7 +122,7 @@ export default function ProductPage() {
     setIsAddingComment(false);
     fetchProductData();
   };
-  console.log(productData);
+
   return (
     <section className="relative">
       <div className="relative mx-auto max-w-screen-xl px-4 py-8">
@@ -217,7 +219,7 @@ export default function ProductPage() {
                   Authors:{' '}
                   {productData?.authors?.map((author) => (
                     <Link key={author._id} to={`/account/${author._id}`}>
-                      {author.user_info && author.author_info.pseudonim}
+                      {author.author_info.pseudonim}
                     </Link>
                   ))}
                 </p>
@@ -229,15 +231,13 @@ export default function ProductPage() {
                 <input
                   name="newPrice"
                   type="number"
-                  value={newData.newPrice?.$numberDecimal}
+                  value={newData.newPrice}
                   className="h-min"
                   onChange={(e) => newDataChangeHandler(e)}
                 />
               ) : (
                 <p className="text-lg font-bold">
-                  {productData?.shop_info &&
-                    productData.shop_info.price.$numberDecimal}
-                  €
+                  {productData?.shop_info && productData.shop_info.price}€
                 </p>
               )}
             </div>
@@ -279,9 +279,11 @@ export default function ProductPage() {
                   </button>
                 )}
             </div>
+
             <ProductForm
               productId={productData?._id}
               productQuantity={productData?.quantity}
+              sold={productData.sold}
             />
           </div>
         </div>

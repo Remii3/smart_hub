@@ -2,31 +2,15 @@ import axios from 'axios';
 import { useEffect, useState, useContext, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 import { SwiperSlide } from 'swiper/react';
-import { ProductTypes } from '../types/interfaces';
+import { AuthorTypes } from '../types/interfaces';
 import PrimaryBtn from '../components/UI/Btns/PrimaryBtn';
-import ProductCard from '../components/card/ProductCard';
+import ShopCard from '../components/card/ShopCard';
 import AuctionCard from '../components/card/AuctionCard';
 import ShortSwiper from '../components/swiper/ShortSwiper';
 import { UserContext } from '../context/UserProvider';
 
-type OtherUserDataType = {
-  email: string;
-  address: {
-    line1: string;
-    line2: string | null;
-    city: string;
-    state: string;
-    postal_code: string;
-    country: string;
-  };
-  credentials: { firstName: string; lastName: string };
-  my_products: ProductTypes[];
-  followers: string[];
-  following: string[];
-};
-
 export default function OtherUserPage() {
-  const [otherUserData, setOtherUserData] = useState<OtherUserDataType>();
+  const [otherUserData, setOtherUserData] = useState<AuthorTypes>();
   const [isFollowing, setIsFollowing] = useState(false);
   const path = useLocation();
 
@@ -47,24 +31,28 @@ export default function OtherUserPage() {
   }, [getOtherUserData, userId, isFollowing]);
 
   useEffect(() => {
-    if (userData && userData.following.find((user) => user === userId)) {
+    if (userData && userData.following.find((user) => user._id === userId)) {
       setIsFollowing(true);
     } else {
       setIsFollowing(false);
     }
   }, [getOtherUserData, userData, userId]);
-  const shopProducts = otherUserData?.my_products.filter(
-    (item) => item.marketPlace === 'Shop'
+
+  const shopProducts = otherUserData?.author_info.my_products.filter(
+    (item) => item.market_place === 'Shop'
   );
 
-  const auctionProducts = otherUserData?.my_products.filter(
-    (item) => item.marketPlace === 'Auction'
+  const auctionProducts = otherUserData?.author_info.my_products.filter(
+    (item) => item.market_place === 'Auction'
   );
 
   const otherUserStats = [
     { text: 'Products', quantity: shopProducts?.length },
     { text: 'Auctions', quantity: auctionProducts?.length },
-    { text: 'Followers', quantity: otherUserData?.followers.length },
+    {
+      text: 'Followers',
+      quantity: otherUserData?.author_info.followers.length,
+    },
   ];
 
   const followHandler = () => {
@@ -91,19 +79,18 @@ export default function OtherUserPage() {
         });
     }
   };
-
   return (
     <div className="mx-auto flex max-w-[1900px] flex-col gap-5 p-5 lg:items-center lg:justify-center xl:flex-row">
       <section className="flex w-1/2 basis-1/2 flex-col items-center justify-center">
         <div className="flex flex-col items-center justify-center rounded p-5 shadow">
           <div>profileImg</div>
           <h6>
-            {otherUserData?.credentials.firstName}{' '}
-            {otherUserData?.credentials.lastName}
+            {otherUserData?.user_info.credentials.first_name}{' '}
+            {otherUserData?.user_info.credentials.last_name}
           </h6>
           <p>
-            {otherUserData?.address.city}
-            {otherUserData?.address.country}
+            {otherUserData?.user_info.address.city}
+            {otherUserData?.user_info.address.country}
           </p>
           <div className="flex gap-4">
             {otherUserStats.map((field, i) => (
@@ -134,13 +121,13 @@ export default function OtherUserPage() {
                 key={product._id}
                 style={{ maxWidth: '', margin: '0 auto' }}
               >
-                <ProductCard
+                <ShopCard
                   _id={product._id}
                   title={product.title}
                   authors={product.authors}
                   description={product.description}
-                  price={product.price}
-                  imgs={product.imgs}
+                  price={product.shop_info.price}
+                  img={product.img}
                   productQuantity={product.quantity}
                 />
               </SwiperSlide>
@@ -160,8 +147,10 @@ export default function OtherUserPage() {
                   title={item.title}
                   authors={item.authors}
                   description={item.description}
-                  price={item.price}
-                  imgs={item.imgs}
+                  img={item.img}
+                  auctionEndDate={item.auction_info.auction_end_date}
+                  currentPrice={item.auction_info.current_price}
+                  startingPrice={item.auction_info.starting_price}
                 />
               </SwiperSlide>
             ))}

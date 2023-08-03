@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import PrimaryBtn from '../UI/Btns/PrimaryBtn';
-import { AuctionCardType } from '../../types/types';
+// import { AuctionCardType } from '../../types/types';
+import { ProductAuctionCardType } from '../../types/interfaces';
 
 const defaultProps = {
   img: [],
@@ -12,12 +13,12 @@ function AuctionCard({
   _id,
   title,
   authors,
-  auctionEndDate,
   description,
-  startingPrice,
-  currentPrice,
   img,
-}: AuctionCardType) {
+  auctionEndDate,
+  currentPrice,
+  startingPrice,
+}: ProductAuctionCardType) {
   let titleShortened = title;
 
   if (title.length >= 50) {

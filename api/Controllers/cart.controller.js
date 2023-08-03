@@ -54,7 +54,6 @@ const addToCart = async (req, res) => {
   } catch (err) {
     res.status(500).json({
       message: 'Server error',
-      err,
     });
   }
 };
@@ -64,21 +63,19 @@ const removeFromCart = async (req, res) => {
 
   if (!userId) res.status(422).json({ message: 'User id is required!' });
   if (!productId) res.status(422).json({ message: 'Product id is required!' });
-
   try {
     if (productId === 'all') {
-      await Cart.updateOne({ userId }, { $pull: { items: {} } });
+      await Cart.updateOne({ user_id: userId }, { $pull: { products: {} } });
     } else {
       await Cart.updateOne(
-        { userId },
-        { $pull: { items: { _id: productId } } },
+        { user_id: userId },
+        { $pull: { products: { _id: productId } } },
       );
     }
     res.status(200).json({ message: 'Success' });
   } catch (err) {
     res.status(500).json({
       message: 'Something went wrong with removing product',
-      err,
     });
   }
 };
@@ -92,7 +89,6 @@ const getCart = async (req, res) => {
     let cartPrice = 0;
 
     if (cartData) {
-      console.log(cartData);
       const products = cartData.products;
       const productsData = [];
 
@@ -122,7 +118,6 @@ const getCart = async (req, res) => {
       cartPrice = cartPrice.toFixed(2);
 
       cartPrice = `€${cartPrice}`;
-
       res.status(200).json({ products: productsData, cartPrice });
     } else {
       cartPrice = '€0';
@@ -146,16 +141,14 @@ const cartItemIncrement = async (req, res) => {
     return res.status(422).json({ message: 'Product id is required!' });
   }
   try {
-    await Cart.updateOne(
-      { userId, 'items._id': productId },
-      { $inc: { 'items.$.quantity': 1 } },
+    const test = await Cart.updateOne(
+      { user_id: userId, 'products._id': productId },
+      { $inc: { 'products.$.quantity': 1 } },
     );
-
     res.status(200).json({ message: 'Sduccessfuly updated data' });
   } catch (err) {
     res.status(500).json({
       message: 'Cart or product was not found',
-      err,
     });
   }
 };
@@ -172,15 +165,14 @@ const cartItemDecrement = async (req, res) => {
 
   try {
     await Cart.updateOne(
-      { userId, 'items._id': productId },
-      { $inc: { 'items.$.quantity': -1 } },
+      { user_id: userId, 'products._id': productId },
+      { $inc: { 'products.$.quantity': -1 } },
     );
 
     res.status(200).json({ message: 'Successfuly updated data' });
   } catch (err) {
     res.status(500).json({
       message: 'Cart or product was not found',
-      err,
     });
   }
 };

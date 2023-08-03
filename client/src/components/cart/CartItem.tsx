@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useContext, useState } from 'react';
 import { TrashIcon } from '../../assets/icons/Icons';
-import { CartProductTypes, ProductTypes } from '../../types/interfaces';
+import { CartProductTypes } from '../../types/interfaces';
 import { CartContext } from '../../context/CartProvider';
 
 export default function CartItem({
@@ -14,6 +14,7 @@ export default function CartItem({
     useContext(CartContext);
 
   if (!productData) return <div />;
+
   const decrementHandler = () => {
     setLocalQuantity((prevState) => prevState - 1);
     decrementCartItem(productData._id);
@@ -23,15 +24,17 @@ export default function CartItem({
     setLocalQuantity((prevState) => prevState + 1);
     incrementCartItem(productData._id);
   };
+
   const removeHandler = () => {
     removeProductFromCart(productData._id);
   };
+
   return (
     <li className="flex items-center gap-4">
       <Link to={`/product/${productData._id}`}>
         <img
           src="https://images.unsplash.com/photo-1618354691373-d851c5c3a990?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=830&q=80"
-          alt=""
+          alt="product_img"
           className="h-16 w-16 rounded object-cover"
         />
       </Link>

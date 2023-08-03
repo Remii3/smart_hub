@@ -30,27 +30,41 @@ const getOneOrder = async (req, res) => {
 const addOrder = async (req, res) => {
   try {
     const { buyerId, items } = req.body;
+
     const orderId = new mongoose.Types.ObjectId();
     await Order.create({
       _id: orderId,
-      buyer: buyerId,
-      items,
+      buyer_id: buyerId,
+      products: items,
     });
-    await User.findOne({ _id: buyerId }, { $push: { orders: orderId } });
+    await User.updateOne({ _id: buyerId }, { $push: { orders: orderId } });
     for (const item of items) {
       const quantityAfterBuy = item.productData.quantity - item.inCartQuantity;
-      await Product.updateOne(
-        { _id: item.productData._id },
-        {
-          $set: {
-            quantity: quantityAfterBuy,
+      if (quantityAfterBuy <= 0) {
+        await Product.updateOne(
+          { _id: item.productData._id },
+          {
+            $set: {
+              quantity: quantityAfterBuy,
+              sold: true,
+            },
           },
-        },
-      );
+        );
+      } else {
+        await Product.updateOne(
+          { _id: item.productData._id },
+          {
+            $set: {
+              quantity: quantityAfterBuy,
+            },
+          },
+        );
+      }
     }
 
     res.status(201).json({ message: 'Success' });
   } catch (err) {
+    console.log(err);
     res.status(500).json({ message: 'Failed adding new order', err });
   }
 };

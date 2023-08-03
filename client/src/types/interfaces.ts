@@ -14,11 +14,12 @@ export interface ProductTypes {
   description?: string;
   img?: string;
   categories?: { value: string; label: string; _id: string }[];
-  authors: UserTypes[];
+  authors: AuthorTypes[];
   rating?: number;
   quantity: number;
   market_place: MarketPlaceTypes;
   created_at: string;
+  sold: boolean;
   comments: [
     {
       _id: string;
@@ -129,6 +130,7 @@ export interface CartTypes {
       }[]
     | [];
   cartPrice: number;
+  isLoading: boolean;
 }
 
 // * Card types
@@ -137,7 +139,7 @@ export interface ProductCardTypes {
   _id: string;
   title: string;
   description?: string;
-  authors: UserTypes[];
+  authors: AuthorTypes[];
 }
 
 export interface ProductSpecialAuctionCardTypes extends ProductCardTypes {

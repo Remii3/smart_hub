@@ -233,13 +233,11 @@ export default function Nav() {
                 group inline-flex w-full justify-center rounded-md bg-black px-4 py-2 text-sm font-medium text-white transition-all ease-in-out hover:bg-opacity-30 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75`}
                   >
                     <CartIcon height={7} width={7} />
-                    {cartState &&
-                      cartState.cart &&
-                      cartState.cart.products.length > 0 && (
-                        <span className="absolute bottom-0 right-2 flex h-5 w-5 items-center justify-center rounded-full bg-pageBackground">
-                          {cartState.cart.products.length}
-                        </span>
-                      )}
+                    {cartState && cartState.products.length > 0 && (
+                      <span className="absolute bottom-0 right-2 flex h-5 w-5 items-center justify-center rounded-full bg-pageBackground">
+                        {cartState.products.length}
+                      </span>
+                    )}
                   </Popover.Button>
                 </div>
                 <Transition
@@ -334,13 +332,11 @@ export default function Nav() {
                 group relative inline-flex w-full justify-center rounded-md bg-black px-4 py-2 text-sm font-medium text-white transition-all ease-in-out hover:bg-opacity-30 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75`}
                   >
                     <CartIcon height={7} width={7} />
-                    {cartState &&
-                      cartState.cart &&
-                      cartState.cart.products.length > 0 && (
-                        <span className="absolute bottom-0 right-2 flex h-5 w-5 items-center justify-center rounded-full bg-pageBackground">
-                          {cartState.cart.products.length}
-                        </span>
-                      )}
+                    {cartState && cartState.products.length > 0 && (
+                      <span className="absolute bottom-0 right-2 flex h-5 w-5 items-center justify-center rounded-full bg-pageBackground">
+                        {cartState.products.length}
+                      </span>
+                    )}
                   </Popover.Button>
                 </div>
                 <Transition

@@ -19,6 +19,7 @@ const ShopDataSchema = mongoose.Schema({
   market_place: { type: String, enum: ['Shop', 'Auction'], required: true },
   created_at: { type: Date, required: true, default: Date.now },
   comments: [{ type: mongoose.Types.ObjectId, ref: 'Comment' }],
+  sold: { type: Boolean, default: false },
   currency: { type: String, default: 'EUR' },
   shop_info: {
     price: { type: mongoose.Types.Decimal128 },

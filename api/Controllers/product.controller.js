@@ -140,10 +140,8 @@ const addProduct = async (req, res) => {
   } catch (err) {
     return res.status(500).json({ message: 'Failed verifying categories' });
   }
-
   try {
     const _id = new mongoose.Types.ObjectId();
-
     if (market_place === 'Shop') {
       if (typeof price !== 'number') {
         return res.status(400).json({ message: 'Price is required' });

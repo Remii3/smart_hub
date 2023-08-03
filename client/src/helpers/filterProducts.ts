@@ -1,4 +1,4 @@
-import { ProductTypes, UnknownProductTypes } from '../types/interfaces';
+import { UnknownProductTypes } from '../types/interfaces';
 
 export function filterProductsByPrice({
   minPrice,
@@ -7,7 +7,7 @@ export function filterProductsByPrice({
 }: {
   minPrice: number | string;
   maxPrice: number | string;
-  products: ProductTypes[];
+  products: UnknownProductTypes[];
 }) {
   if (minPrice === '' && maxPrice === '') {
     return products;
@@ -15,20 +15,20 @@ export function filterProductsByPrice({
 
   if (minPrice === '') {
     return products.filter(
-      (product) => product.shop_info.price.$numberDecimal <= Number(maxPrice)
+      (product) => product.shop_info.price <= Number(maxPrice)
     );
   }
 
   if (maxPrice === '') {
     return products.filter(
-      (product) => product.shop_info.price.$numberDecimal >= Number(minPrice)
+      (product) => product.shop_info.price >= Number(minPrice)
     );
   }
 
   return products.filter((product) => {
     return (
-      product.shop_info.price.$numberDecimal >= Number(minPrice) &&
-      product.shop_info.price.$numberDecimal <= Number(maxPrice)
+      product.shop_info.price >= Number(minPrice) &&
+      product.shop_info.price <= Number(maxPrice)
     );
   });
 }

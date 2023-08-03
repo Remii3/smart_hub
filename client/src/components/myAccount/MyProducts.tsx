@@ -1,21 +1,20 @@
-import { ProductTypes } from '../../types/interfaces';
+import { UnknownProductTypes } from '../../types/interfaces';
 import AuctionCard from '../card/AuctionCard';
-import ProductCard from '../card/ProductCard';
+import ShopCard from '../card/ShopCard';
 
 export default function MyProducts({
   myProducts,
 }: {
-  myProducts: ProductTypes[];
+  myProducts: UnknownProductTypes[];
 }) {
   const shortenedProducts = myProducts.slice(0, 3);
-  console.log(shortenedProducts);
   return (
     <div>
       <p className="pb-2 pt-4 text-lg">Latest:</p>
       <div className="grid h-full grid-cols-1 gap-4 overflow-hidden pb-4 transition-[max-height] duration-300 ease-in-out sm:grid-cols-2 xl:grid-cols-3">
         {shortenedProducts.map((product) => {
           return product.market_place === 'Shop' ? (
-            <ProductCard
+            <ShopCard
               key={product._id}
               _id={product._id}
               price={product.shop_info.price}

@@ -1,10 +1,10 @@
 import axios from 'axios';
 import { useEffect, useState } from 'react';
-import { ProductTypes } from '../types/interfaces';
+import { UnknownProductTypes } from '../types/interfaces';
 import BasicProductCollection from '../components/collections/BasicProductCollection';
 
 export default function ShopPage() {
-  const [shopProducts, setShopProducts] = useState<ProductTypes[]>([]);
+  const [shopProducts, setShopProducts] = useState<UnknownProductTypes[]>([]);
 
   useEffect(() => {
     axios
@@ -16,21 +16,6 @@ export default function ShopPage() {
     <div className="min-h-screen">
       <div className="h-[40vh] w-full bg-blue-200">{/* banner */}</div>
       <div className="mx-auto flex max-w-7xl flex-col gap-10 py-10">
-        {/* <section>
-          <ul className=" mx-auto grid max-w-2xl grid-cols-1 py-5 text-center sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-            {mainCategories.map((category, id) => (
-              <li
-                key={id}
-                className="border-r-2 first:border-l-0 last:border-r-0"
-              >
-                <button type="button" className="w-full py-3">
-                  {category}
-                </button>
-              </li>
-            ))}
-          </ul>
-        </section> */}
-        {/* map fetched type products */}
         {shopProducts && (
           <BasicProductCollection
             category="action"

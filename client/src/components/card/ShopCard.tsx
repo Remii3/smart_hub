@@ -2,15 +2,14 @@ import { FormEvent, useContext, useState } from 'react';
 import { Link } from 'react-router-dom';
 import PrimaryBtn from '../UI/Btns/PrimaryBtn';
 import { CartContext } from '../../context/CartProvider';
-import { ProductCardType } from '../../types/types';
-import { CartProductTypes, ProductTypes } from '../../types/interfaces';
+import { CartProductTypes, ProductShopCardType } from '../../types/interfaces';
 
 const defaultProps = {
   img: [],
   authors: [],
   description: '',
 };
-function ProductCard({
+export default function ShopCard({
   _id,
   title,
   authors,
@@ -18,7 +17,7 @@ function ProductCard({
   price,
   img,
   productQuantity,
-}: ProductCardType) {
+}: ProductShopCardType) {
   const [isAddingToCart, setIsAddingToCart] = useState(false);
   const { addProductToCart, cartState } = useContext(CartContext);
   let itemBtnCapacity = false;
@@ -36,7 +35,6 @@ function ProductCard({
 
   const addToCartHandler = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (cartState.cartIsLoading) return;
     if (_id) {
       setIsAddingToCart(true);
 
@@ -48,7 +46,7 @@ function ProductCard({
     }
   };
 
-  const currentItem = cartState.cart?.products.find(
+  const currentItem = cartState.products.find(
     (product: CartProductTypes) => product.productData._id === _id
   );
 
@@ -113,5 +111,4 @@ function ProductCard({
     </div>
   );
 }
-ProductCard.defaultProps = defaultProps;
-export default ProductCard;
+ShopCard.defaultProps = defaultProps;

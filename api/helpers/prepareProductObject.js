@@ -10,6 +10,7 @@ const prepareProductObject = product => {
     quantity,
     market_place,
     created_at,
+    sold,
     comments,
     currency,
     shop_info,
@@ -27,6 +28,7 @@ const prepareProductObject = product => {
     quantity,
     market_place,
     created_at,
+    sold,
     comments,
     currency,
   };

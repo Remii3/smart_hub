@@ -1,6 +1,6 @@
 import { useContext } from 'react';
 import { UserContext } from '../context/UserProvider';
-import ProductCard from '../components/card/ProductCard';
+import ShopCard from '../components/card/ShopCard';
 import AuctionCard from '../components/card/AuctionCard';
 
 export default function MyProductsPage() {
@@ -10,26 +10,28 @@ export default function MyProductsPage() {
       <p className="pb-2 pt-4 text-lg">All products:</p>
       <div className="grid h-full grid-cols-1 gap-4 overflow-hidden pb-4 transition-[max-height] duration-300 ease-in-out sm:grid-cols-2 xl:grid-cols-3">
         {userData &&
-          userData.my_products &&
-          userData.my_products.map((product) => {
-            return product.marketPlace === 'Shop' ? (
-              <ProductCard
+          userData.author_info.my_products &&
+          userData.author_info.my_products.map((product) => {
+            return product.market_place === 'Shop' ? (
+              <ShopCard
                 _id={product._id}
-                price={product.price}
+                price={product.shop_info.price}
                 productQuantity={product.quantity}
                 title={product.title}
                 authors={product.authors}
                 description={product.description}
-                imgs={product.imgs}
+                img={product.img}
               />
             ) : (
               <AuctionCard
                 _id={product._id}
-                price={product.price}
                 title={product.title}
                 authors={product.authors}
                 description={product.description}
-                imgs={product.imgs}
+                img={product.img}
+                auctionEndDate={product.auction_info.auction_end_date}
+                currentPrice={product.auction_info.current_price}
+                startingPrice={product.auction_info.starting_price}
               />
             );
           })}

@@ -1,4 +1,4 @@
-import { ProductTypes } from '../types/interfaces';
+import { UnknownProductTypes } from '../types/interfaces';
 
 export const sortProductsTypes = {
   DATE_DESC: 'Date, DESC',
@@ -13,7 +13,7 @@ export default function sortProducts({
   products,
   sortType,
 }: {
-  products: ProductTypes[];
+  products: UnknownProductTypes[];
   sortType: string;
 }) {
   switch (sortType) {
@@ -38,10 +38,7 @@ export default function sortProducts({
         return product.shop_info;
       });
       return filteredData.sort((a, b) => {
-        return a.shop_info.price.$numberDecimal >
-          b.shop_info.price.$numberDecimal
-          ? -1
-          : 1;
+        return a.shop_info.price > b.shop_info.price ? -1 : 1;
       });
     }
 
@@ -51,10 +48,7 @@ export default function sortProducts({
       );
 
       return filteredData.sort((a, b) => {
-        return b.shop_info.price.$numberDecimal >
-          a.shop_info.price.$numberDecimal
-          ? -1
-          : 1;
+        return b.shop_info.price > a.shop_info.price ? -1 : 1;
       });
     }
     default:

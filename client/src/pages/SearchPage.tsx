@@ -3,13 +3,8 @@ import axios from 'axios';
 import { useLocation, useNavigate } from 'react-router-dom';
 import AdvancedFilter from '../components/search/AdvancedFilter';
 import { filterProductsByMarketplace } from '../helpers/filterProducts';
-import {
-  ProductAuctionCardType,
-  ProductShopCardType,
-  ProductTypes,
-  UnknownProductTypes,
-} from '../types/interfaces';
-import ProductCard from '../components/card/ProductCard';
+import { UnknownProductTypes } from '../types/interfaces';
+import ShopCard from '../components/card/ShopCard';
 import AuctionCard from '../components/card/AuctionCard';
 
 type FinalRawDataTypes = {
@@ -58,7 +53,6 @@ export default function SearchPage() {
   };
 
   let updatedProducts = products;
-
   if (updatedProducts) {
     updatedProducts = filterProductsByMarketplace({
       selectedMarketplace,
@@ -74,6 +68,7 @@ export default function SearchPage() {
       search: currentQueryParams.toString(),
     });
   };
+
   return (
     <div className="mx-auto max-w-7xl">
       <div className="flex justify-between">
@@ -118,7 +113,7 @@ export default function SearchPage() {
             {updatedProducts && updatedProducts.length > 0 ? (
               updatedProducts.map((item) => {
                 return item.market_place === 'Shop' ? (
-                  <ProductCard
+                  <ShopCard
                     key={item._id}
                     _id={item._id}
                     price={item.shop_info.price}
