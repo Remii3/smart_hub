@@ -25,7 +25,8 @@ export interface ProductTypes {
       _id: string;
       product_id: string;
       user: UserTypes;
-      value: { rating: number; comment: string };
+      value: { rating: number; text: string };
+      created_at: string;
     }
   ];
   currency: string;

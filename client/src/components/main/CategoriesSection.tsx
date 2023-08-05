@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
-import PrimaryBtn from '../UI/Btns/PrimaryBtn';
-import MainPageHeading from '../UI/MainPageHeading';
+import { Link, useNavigate } from 'react-router-dom';
+// import PrimaryBtn from '../UI/Btns/PrimaryBtn';
+import MainPageHeading from '../UI/SpecialElements/MainPageHeading';
 import CategoryCard from '../card/CategoryCard';
 import { ProductCategories } from '../../types/interfaces';
+import { buttonVariants } from '../UI/Btns/Button';
 
 export default function CategoriesSection() {
   const [shopList, setShopList] = useState<ProductCategories[]>([]);
@@ -41,7 +42,13 @@ export default function CategoriesSection() {
         </div>
       </div>
       <div className="w-full text-center">
-        <PrimaryBtn
+        <Link
+          to="/shop/categories"
+          className={buttonVariants({ variant: 'primary' })}
+        >
+          Show more
+        </Link>
+        {/* <PrimaryBtn
           usecase="default"
           type="button"
           onClick={() => {
@@ -49,7 +56,7 @@ export default function CategoriesSection() {
           }}
         >
           See all genres
-        </PrimaryBtn>
+        </PrimaryBtn> */}
       </div>
     </section>
   );

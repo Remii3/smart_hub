@@ -3,11 +3,11 @@ import { useEffect, useState, useContext, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 import { SwiperSlide } from 'swiper/react';
 import { AuthorTypes } from '../types/interfaces';
-import PrimaryBtn from '../components/UI/Btns/PrimaryBtn';
 import ShopCard from '../components/card/ShopCard';
 import AuctionCard from '../components/card/AuctionCard';
 import ShortSwiper from '../components/swiper/ShortSwiper';
 import { UserContext } from '../context/UserProvider';
+import { Button } from '../components/UI/Btns/Button';
 
 export default function OtherUserPage() {
   const [otherUserData, setOtherUserData] = useState<AuthorTypes>();
@@ -101,14 +101,14 @@ export default function OtherUserPage() {
             ))}
           </div>
           <div>
-            <PrimaryBtn
-              type="button"
-              usecase="default"
-              onClick={followHandler}
+            <Button
+              variant="primary"
+              isDisabled={userData === null ? 'yes' : 'no'}
               disabled={userData === null}
+              onClick={() => followHandler()}
             >
               {isFollowing ? 'Following' : 'Follow'}
-            </PrimaryBtn>
+            </Button>
           </div>
         </div>
       </section>

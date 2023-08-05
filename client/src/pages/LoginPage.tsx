@@ -2,10 +2,10 @@ import axios from 'axios';
 import { ChangeEvent, FormEvent, useContext, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { SunRiseIcon } from '../assets/icons/Icons';
-import PrimaryBtn from '../components/UI/Btns/PrimaryBtn';
 import { UserContext } from '../context/UserProvider';
 import CustomInput from '../components/UI/form/CustomInput';
 import CustomPasswordInput from '../components/UI/form/CustomPasswordInput';
+import { Button } from '../components/UI/Btns/Button';
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -157,13 +157,9 @@ export default function LoginPage() {
               </div>
 
               <div className="col-span-6 sm:flex sm:items-center sm:gap-4">
-                <PrimaryBtn
-                  usecase="default"
-                  type="submit"
-                  customCSS="inline-block shrink-0 rounded-md border border-blue-600 bg-blue-600 px-12 py-3 text-sm font-medium text-white transition hover:bg-transparent hover:text-blue-600 focus:outline-none focus:ring active:text-blue-500"
-                >
-                  Log in
-                </PrimaryBtn>
+                <Button variant="primary" type="submit" size="big">
+                  Sign in
+                </Button>
 
                 <p className="mt-4 text-sm text-gray-500 sm:mt-0">
                   No account yet?{' '}

@@ -7,9 +7,7 @@ const ShopDataSchema = mongoose.Schema({
   img_type: { type: String },
   categories: [
     {
-      type: {
-        _id: mongoose.Types.ObjectId,
-      },
+      type: mongoose.Types.ObjectId,
       ref: 'Category',
     },
   ],

@@ -60,7 +60,7 @@ const getOneProduct = async (req, res) => {
         path: 'comments',
         populate: { path: 'user' },
       },
-      { path: 'categories' },
+      { path: 'categories', select: ['value', 'label'] },
       {
         path: 'authors',
         select: [
@@ -72,7 +72,6 @@ const getOneProduct = async (req, res) => {
     ]);
 
     const preparedProduct = prepareProductObject(product);
-
     res.status(200).json(preparedProduct);
   } catch (err) {
     res.status(500).json({ message: 'Fetching data went wrong' });
@@ -91,7 +90,8 @@ const getSearchedProducts = async (req, res) => {
       finalRawData[key] = value;
     }
     if (key === 'category') {
-      finalQuery['categories.value'] = value;
+      const category = await Category.findOne({ label: value });
+      finalQuery['categories'] = category._id;
       finalRawData[key] = value;
     }
   }

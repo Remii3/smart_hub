@@ -1,12 +1,13 @@
 import { Elements } from '@stripe/react-stripe-js';
 import axios from 'axios';
 import { loadStripe } from '@stripe/stripe-js';
+import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import CheckoutForm from '../components/checkout/CheckoutForm';
 import CheckoutProdList from '../components/checkout/CheckoutProdList';
 import { CartTypes, SimpleFetchDataTypes } from '../types/interfaces';
 import CheckoutItem from '../components/checkout/CheckoutItem';
-import PrimaryBtn from '../components/UI/Btns/PrimaryBtn';
+import { buttonVariants } from '../components/UI/Btns/Button';
 
 interface ClientSecretTypes extends SimpleFetchDataTypes {
   data: string;
@@ -83,9 +84,9 @@ export default function CheckoutPage() {
           <p className="py-3">
             Please check your email for further information.
           </p>
-          <PrimaryBtn type="button" usecase="default" asLink linkPath="/">
+          <Link to="/" className={buttonVariants({ variant: 'primary' })}>
             Return to main page
-          </PrimaryBtn>
+          </Link>
         </div>
       ) : (
         <section>

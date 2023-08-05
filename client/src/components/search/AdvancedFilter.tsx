@@ -1,4 +1,5 @@
-import TertiaryBtn from '../UI/Btns/TertiaryBtn';
+// import TertiaryBtn from '../UI/Btns/TertiaryBtn';
+import { Button, buttonVariants } from '../UI/Btns/Button';
 import MarketplaceSelector from './MarketplaceSelector';
 
 type AdvancedFilterTypes = {
@@ -16,24 +17,24 @@ export default function AdvancedFilter({
     <div>
       <div>
         <p>Advanced filter</p>
-        <TertiaryBtn
-          type="button"
-          usecase="default"
-          onClick={clearAllSelectors}
+        <Button
+          variant="tertiary"
+          size="default"
+          onClick={() => clearAllSelectors()}
         >
-          Clear all
-        </TertiaryBtn>
+          Clear
+        </Button>
       </div>
       <div>
         <div>
           <h6>Type of offer</h6>
-          <TertiaryBtn
-            type="button"
-            usecase="default"
-            onClick={clearMarketplaceSelectors}
+          <Button
+            variant="tertiary"
+            size="default"
+            onClick={() => clearMarketplaceSelectors()}
           >
-            Clear
-          </TertiaryBtn>
+            Clear all
+          </Button>
         </div>
         <MarketplaceSelector
           options={selectedMarketplace}

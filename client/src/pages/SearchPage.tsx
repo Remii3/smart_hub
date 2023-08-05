@@ -6,6 +6,7 @@ import { filterProductsByMarketplace } from '../helpers/filterProducts';
 import { UnknownProductTypes } from '../types/interfaces';
 import ShopCard from '../components/card/ShopCard';
 import AuctionCard from '../components/card/AuctionCard';
+import MainContainer from '../components/UI/SpecialElements/MainContainer';
 
 type FinalRawDataTypes = {
   phrase: string;
@@ -64,18 +65,17 @@ export default function SearchPage() {
     const currentQueryParams = new URLSearchParams(searchQuery.search);
     currentQueryParams.delete(e.currentTarget.name);
     navigate({
-      pathname: '/shop/search',
+      pathname: '/search',
       search: currentQueryParams.toString(),
     });
   };
-
   return (
-    <div className="mx-auto max-w-7xl">
+    <MainContainer>
       <div className="flex justify-between">
         <p>Results: {updatedProducts && updatedProducts.length}</p>
         <div>Sort</div>
       </div>
-      <div className="flex">
+      <div className="flex flex-col justify-between gap-8 md:flex-row">
         <aside>
           <AdvancedFilter
             selectedMarketplace={selectedMarketplace}
@@ -83,7 +83,7 @@ export default function SearchPage() {
           />
         </aside>
         <section>
-          <ul className="grid auto-cols-max grid-flow-col auto-rows-max gap-5">
+          <ul className="mb-4 grid auto-cols-max grid-flow-col auto-rows-max gap-5">
             {searchedData?.category && (
               <li>
                 <button
@@ -109,7 +109,7 @@ export default function SearchPage() {
               </li>
             )}
           </ul>
-          <div className="grid grid-flow-row grid-cols-3">
+          <div className="grid grid-flow-row grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {updatedProducts && updatedProducts.length > 0 ? (
               updatedProducts.map((item) => {
                 return item.market_place === 'Shop' ? (
@@ -143,6 +143,6 @@ export default function SearchPage() {
           </div>
         </section>
       </div>
-    </div>
+    </MainContainer>
   );
 }

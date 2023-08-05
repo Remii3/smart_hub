@@ -85,7 +85,7 @@ export default function BasicProductCollection({
         </h2>
         {showMore && (
           <Link
-            to={{ pathname: '/shop/search', search: 'category=New-series' }}
+            to={{ pathname: '/search', search: 'category=New-series' }}
             className="pl-4 text-sm"
           >
             Show more

@@ -1,11 +1,11 @@
 import { ChangeEvent, FormEvent, useContext, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import PrimaryBtn from '../components/UI/Btns/PrimaryBtn';
 import { SunRiseIcon } from '../assets/icons/Icons';
 import CustomInput from '../components/UI/form/CustomInput';
 import { UserContext } from '../context/UserProvider';
 import PasswordInput from '../components/UI/form/CustomPasswordInput';
+import { Button } from '../components/UI/Btns/Button';
 
 export default function RegisterPage() {
   const navigate = useNavigate();
@@ -298,14 +298,9 @@ export default function RegisterPage() {
               </div>
 
               <div className="col-span-6 sm:flex sm:items-center sm:gap-4">
-                <PrimaryBtn
-                  usecase="default"
-                  type="submit"
-                  customCSS="inline-block shrink-0 rounded-md border border-blue-600 bg-blue-600 px-12 py-3 text-sm font-medium text-white transition hover:bg-transparent hover:text-blue-600 focus:outline-none focus:ring active:text-blue-500"
-                >
-                  Create an account
-                </PrimaryBtn>
-
+                <Button variant="primary" type="submit" size="big">
+                  Sign up
+                </Button>
                 <p className="mt-4 text-sm text-gray-500 sm:mt-0">
                   Already have an account?{' '}
                   <Link to="/account/login" className="text-gray-700 underline">

@@ -14,7 +14,7 @@ module.exports = {
         mainBanner: 'url("/src/assets/img/parallaxImg.jpg")',
       },
       colors: {
-        primary: '#436de4',
+        primary: '#2563eb',
         primaryText: '#3F63BF',
         secondary: '#c4d3f3',
         accent: '#2d3b62',

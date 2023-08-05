@@ -1,6 +1,6 @@
 import { Fragment } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
-import PrimaryBtn from '../Btns/PrimaryBtn';
+import { Button } from '../Btns/Button';
 
 type CustomDialogTypes = {
   children: React.ReactNode;
@@ -101,21 +101,17 @@ export default function CustomDialog({
                   Press &quot;Try again&quot; to go back to form.
                 </Dialog.Description>
                 <div className="flex justify-end space-x-3">
-                  <PrimaryBtn
-                    type="button"
-                    usecase="default"
-                    onClick={changeHasFailedHandler}
+                  <Button
+                    variant="primary"
+                    onClick={() => changeHasFailedHandler()}
                   >
                     Try again
-                  </PrimaryBtn>
+                  </Button>
+
                   <div className="flex justify-center">
-                    <button
-                      type="button"
-                      onClick={changeIsOpen}
-                      className="border-red-500 bg-white px-4 py-2 text-red-500 hover:bg-red-500 hover:text-white focus:ring-red-200"
-                    >
+                    <Button variant="danger" onClick={() => changeIsOpen()}>
                       Close
-                    </button>
+                    </Button>
                   </div>
                 </div>
               </div>
@@ -124,13 +120,9 @@ export default function CustomDialog({
               <div>
                 <h5>Success!</h5>
                 <div className="flex justify-center">
-                  <button
-                    type="button"
-                    className="bg-red-200 text-red-600"
-                    onClick={changeIsOpen}
-                  >
+                  <Button variant="primary" onClick={() => changeIsOpen()}>
                     Close
-                  </button>
+                  </Button>
                 </div>
               </div>
             )}

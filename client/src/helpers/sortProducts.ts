@@ -1,5 +1,13 @@
 import { UnknownProductTypes } from '../types/interfaces';
 
+type SortProductsTypes =
+  | 'Date, DESC'
+  | 'Date, ASC'
+  | 'Title, DESC'
+  | 'Title, ASC'
+  | 'Price, DESC'
+  | 'Price, ASC';
+
 export const sortProductsTypes = {
   DATE_DESC: 'Date, DESC',
   DATE_ASC: 'Date, ASC',
@@ -14,7 +22,7 @@ export default function sortProducts({
   sortType,
 }: {
   products: UnknownProductTypes[];
-  sortType: string;
+  sortType: SortProductsTypes;
 }) {
   switch (sortType) {
     case sortProductsTypes.DATE_DESC:

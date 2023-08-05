@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import MainPageHeading from '../UI/MainPageHeading';
+import MainPageHeading from '../UI/SpecialElements/MainPageHeading';
 import PrimaryBtn from '../UI/Btns/PrimaryBtn';
 
 type CollectionCardTypes = {

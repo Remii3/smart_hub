@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { SwiperSlide } from 'swiper/react';
 import axios from 'axios';
-import PrimaryBtn from '../UI/Btns/PrimaryBtn';
-import MainPageHeading from '../UI/MainPageHeading';
+import MainPageHeading from '../UI/SpecialElements/MainPageHeading';
 import AuctionsSwiper from '../swiper/LongSwiper';
 import { AuctionProductTypes } from '../../types/interfaces';
 import AuctionCard from '../card/AuctionCard';
+import { buttonVariants } from '../UI/Btns/Button';
 
 export default function AllAuctionsSection() {
   const navigate = useNavigate();
@@ -48,15 +48,9 @@ export default function AllAuctionsSection() {
         </AuctionsSwiper>
       </div>
       <div className="w-full text-center">
-        <PrimaryBtn
-          type="button"
-          usecase="default"
-          onClick={() => {
-            navigate('/auctions');
-          }}
-        >
+        <Link to="/auctions" className={buttonVariants({ variant: 'primary' })}>
           See all auctions
-        </PrimaryBtn>
+        </Link>
       </div>
     </section>
   );

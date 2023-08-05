@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { ProductTypes } from '../../types/interfaces';
-import MainPageHeading from '../UI/MainPageHeading';
+import MainPageHeading from '../UI/SpecialElements/MainPageHeading';
 import CollectionCard from '../card/CollectionCard';
 
 export default function CollectionSection() {

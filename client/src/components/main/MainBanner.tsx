@@ -1,8 +1,8 @@
 import { useEffect, useRef } from 'react';
+import { Link } from 'react-router-dom';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import PrimaryBtn from '../UI/Btns/PrimaryBtn';
-import TertiaryBtn from '../UI/Btns/TertiaryBtn';
+import { buttonVariants } from '../UI/Btns/Button';
 
 export default function MainBanner() {
   const imgBg = useRef(null);
@@ -42,20 +42,6 @@ export default function MainBanner() {
               Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nesciunt
               illo tenetur fuga ducimus numquam ea!
             </p>
-
-            <div className="mt-8 flex flex-wrap justify-center gap-4">
-              <PrimaryBtn
-                type="button"
-                usecase="default"
-                asLink
-                linkPath="/asd"
-              >
-                Get started
-              </PrimaryBtn>
-              <TertiaryBtn usecase="light" type="button" asLink linkPath="/">
-                Learn More
-              </TertiaryBtn>
-            </div>
           </div>
           <div className="scroll-downs">
             <div className="mousey">

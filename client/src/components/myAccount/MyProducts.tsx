@@ -1,17 +1,33 @@
+import { useState } from 'react';
+import sortProducts from '../../helpers/sortProducts';
 import { UnknownProductTypes } from '../../types/interfaces';
 import AuctionCard from '../card/AuctionCard';
 import ShopCard from '../card/ShopCard';
+import { Button } from '../UI/Btns/Button';
+
+interface PropsTypes {
+  myProducts: UnknownProductTypes[];
+  quantity?: number;
+  unfold: boolean;
+}
+
+const defaultProps = {
+  quantity: 3,
+};
 
 export default function MyProducts({
   myProducts,
-}: {
-  myProducts: UnknownProductTypes[];
-}) {
-  const shortenedProducts = myProducts.slice(0, 3);
+  quantity,
+  unfold,
+}: PropsTypes) {
+  const [showMore, setShowMore] = useState(false);
+  const shortenedProducts = sortProducts({
+    products: myProducts,
+    sortType: 'Date, DESC',
+  }).slice(0, showMore ? myProducts.length : quantity);
   return (
     <div>
-      <p className="pb-2 pt-4 text-lg">Latest:</p>
-      <div className="grid h-full grid-cols-1 gap-4 overflow-hidden pb-4 transition-[max-height] duration-300 ease-in-out sm:grid-cols-2 xl:grid-cols-3">
+      <div className="grid h-full grid-cols-1 gap-4 overflow-hidden pb-4 transition-[max-height] duration-300 ease-in-out sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {shortenedProducts.map((product) => {
           return product.market_place === 'Shop' ? (
             <ShopCard
@@ -39,6 +55,17 @@ export default function MyProducts({
           );
         })}
       </div>
+      {unfold && quantity && myProducts.length > quantity && (
+        <div className="flex items-center justify-center">
+          <Button
+            variant="primary"
+            onClick={() => setShowMore((prevState) => !prevState)}
+          >
+            {showMore ? 'Show less' : 'Show more'}
+          </Button>
+        </div>
+      )}
     </div>
   );
 }
+MyProducts.defaultProps = defaultProps;

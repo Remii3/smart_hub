@@ -17,7 +17,6 @@ import CheckoutPage from './pages/CheckoutPage';
 import BlogPage from './pages/BlogPage';
 import MyProductsPage from './pages/MyProductsPage';
 import NoPage404 from './pages/NoPage404';
-import CategoriesPage from './pages/CategoriesPage';
 import ContactPage from './pages/ContactPage';
 import ProductPage from './pages/ProductPage';
 import SearchPage from './pages/SearchPage';
@@ -43,13 +42,10 @@ function WebRoutes() {
         <Route path="/" element={<MainPage />} />
         <Route path="/news" element={<NewsPage />} />
         <Route path="/shop" element={<ShopPage />} />
-        <Route path="/shop/:searchParam" element={<SearchPage />} />
-        <Route path="/shop/categories" element={<CategoriesPage />} />
         <Route path="/product/:id" element={<ProductPage />} />
         <Route path="/collections" element={<CollectionsPage />} />
         <Route path="/auctions" element={<AuctionsPage />} />
-        <Route path="/auctions/categories" element={<CategoriesPage />} />
-        <Route path="/auctions/:searchParam" element={<SearchPage />} />
+        <Route path="/search" element={<SearchPage />} />
         <Route path="/contact" element={<ContactPage />} />
         <Route path="/blog" element={<BlogPage />} />
         <Route path="/cart" element={<CartPage />} />

@@ -14,7 +14,8 @@ import ProductImage from '../components/product/ProductImage';
 import ProductPill from '../components/product/ProductPill';
 import StarRating from '../components/product/StarRating';
 import ProductForm from '../components/product/ProductForm';
-import PrimaryBtn from '../components/UI/Btns/PrimaryBtn';
+import { Button } from '../components/UI/Btns/Button';
+import LoadingCircle from '../components/UI/Loaders/LoadingCircle';
 
 export default function ProductPage() {
   const [isFetchingData, setIsFetchingData] = useState(false);
@@ -114,11 +115,12 @@ export default function ProductPage() {
 
   const addNewCommentHandler = async () => {
     setIsAddingComment(true);
-    await axios.post('/comment/add-comment', {
+    await axios.post('/comment/one', {
       userId: userData?._id,
       productId: prodId,
-      value: { rating: 2, comment: newComment },
+      value: { rating: 2, text: newComment },
     });
+    setNewComment('');
     setIsAddingComment(false);
     fetchProductData();
   };
@@ -202,27 +204,40 @@ export default function ProductPage() {
                     onChange={(e) => newDataChangeHandler(e)}
                   />
                 ) : (
-                  <h1 className="text-xl font-bold sm:text-2xl">
+                  <h1 className="text-xl font-bold sm:text-3xl">
                     {productData && productData.title}
                   </h1>
                 )}
                 <div>
                   {productData &&
                     productData.categories?.map((category) => (
-                      <span key={category._id}>{category.value}</span>
+                      <Link
+                        key={category._id}
+                        to={{
+                          pathname: '/search',
+                          search: `category=${category.label}`,
+                        }}
+                        className="pr-2"
+                      >
+                        {category.label}
+                      </Link>
                     ))}
                 </div>
-                <p className="text-xs">
+                <div>
                   Added: {productData && productData.created_at.slice(0, 10)}
-                </p>
-                <p className="text-xs">
-                  Authors:{' '}
+                </div>
+                <div>
+                  <p>Authors:</p>
                   {productData?.authors?.map((author) => (
-                    <Link key={author._id} to={`/account/${author._id}`}>
+                    <Link
+                      key={author._id}
+                      className="pr-4"
+                      to={`/account/${author._id}`}
+                    >
                       {author.author_info.pseudonim}
                     </Link>
                   ))}
-                </p>
+                </div>
                 <p className="text-sm">Highest Rated Product</p>
 
                 <StarRating />
@@ -236,7 +251,7 @@ export default function ProductPage() {
                   onChange={(e) => newDataChangeHandler(e)}
                 />
               ) : (
-                <p className="text-lg font-bold">
+                <p className="text-xl font-bold">
                   {productData?.shop_info && productData.shop_info.price}€
                 </p>
               )}
@@ -287,46 +302,66 @@ export default function ProductPage() {
             />
           </div>
         </div>
-        <div>
-          <h5>Comments</h5>
-          <section>
-            <div className="flex gap-5">
+        <div className="mt-8">
+          <h5 className="pb-2">Comments</h5>
+          <section className="mb-16">
+            <div className="flex flex-col-reverse gap-8 md:flex-row">
               <div>
-                <p>You</p>
-                <p>rating</p>
+                <p className="mb-3">rating</p>
+                <div className="flex gap-4">
+                  <img src="#" alt="profile_img" />
+                  <p>{userData?.username}</p>
+                </div>
               </div>
-              <div>
+              <div className="] w-full max-w-[580px] overflow-hidden rounded-lg border border-gray-200 shadow-sm focus-within:border-blue-600 focus-within:ring-1 focus-within:ring-blue-600">
                 <label htmlFor="newComment" className="sr-only">
                   New comment
                 </label>
-                <input
+                <textarea
                   id="newComment"
+                  className="w-full resize-none border-none align-top focus:ring-0 sm:text-sm"
                   name="newComment"
-                  type="text"
+                  rows={4}
+                  placeholder="Enter new comment..."
                   value={newComment}
                   onChange={(e) => setNewComment(e.target.value)}
                 />
+
+                <div className="flex items-center justify-end gap-2 bg-white p-3">
+                  <Button
+                    variant="primary"
+                    isDisabled={!userData?._id ? 'yes' : 'no'}
+                    disabled={!userData?._id}
+                    onClick={() => addNewCommentHandler()}
+                  >
+                    <LoadingCircle isLoading={isAddingComment}>
+                      Publish
+                    </LoadingCircle>
+                  </Button>
+                </div>
               </div>
             </div>
-            <PrimaryBtn
-              type="button"
-              usecase="action"
-              isLoading={isAddingComment}
-              onClick={addNewCommentHandler}
-              disabled={!userData?._id}
-            >
-              Publish
-            </PrimaryBtn>
           </section>
           <section>
             {productData?.comments.map((comment) => (
-              <div key={comment._id} className="flex gap-5">
+              <div
+                key={comment._id}
+                className="mb-8 flex w-full flex-col-reverse gap-8 rounded-md bg-gray-50 p-4 sm:flex-row"
+              >
                 <div>
-                  <p>{comment.user.user_info.credentials.full_name}</p>
-                  <p>{comment.value.rating}</p>
+                  <p className="mb-3">{comment.value.rating}</p>
+                  <div className="flex gap-4">
+                    <img src="#" alt="profile_img" />
+                    <p className="font-semibold">{comment.user.username}</p>
+                  </div>
                 </div>
-                <div>
-                  <p>{comment.value.comment}</p>
+                <div className="flex w-full flex-col gap-4">
+                  <div className="flex justify-end">
+                    <small className="text-sm">
+                      {comment.created_at.slice(0, 10)}
+                    </small>
+                  </div>
+                  <div>{comment.value.text}</div>
                 </div>
               </div>
             ))}

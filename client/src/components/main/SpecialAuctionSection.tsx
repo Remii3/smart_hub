@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { useState, useEffect } from 'react';
 import { SwiperSlide } from 'swiper/react';
-import MainPageHeading from '../UI/MainPageHeading';
+import MainPageHeading from '../UI/SpecialElements/MainPageHeading';
 import SpecialAuctionsSwiper from '../swiper/SpecialSwiper';
 import SpecialAuctionCard from '../card/SpecialAuctionCard';
 import { AuctionProductTypes } from '../../types/interfaces';

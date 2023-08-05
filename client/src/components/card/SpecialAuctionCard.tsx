@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import SecondaryBtn from '../UI/Btns/SecondaryBtn';
-import PrimaryBtn from '../UI/Btns/PrimaryBtn';
 import { ProductSpecialAuctionCardTypes } from '../../types/interfaces';
+import { Button, buttonVariants } from '../UI/Btns/Button';
 
 const defalutProps = {
   highBid: 0,
@@ -96,23 +95,36 @@ function SpecialAuctionCard({
                 </div>
               </div>
               <div className="flex flex-col justify-start gap-2">
-                <PrimaryBtn
+                <Link
+                  to={`/product/${_id}`}
+                  className={buttonVariants({ variant: 'primary' })}
+                >
+                  Enter live auction
+                </Link>
+                {/* <PrimaryBtn
                   type="button"
                   usecase="default"
                   asLink
                   linkPath={`/product/${_id}`}
                 >
                   Enter live auction
-                </PrimaryBtn>
+                </PrimaryBtn> */}
                 {description && (
-                  <SecondaryBtn
-                    type="button"
-                    usecase="toggle"
-                    onClick={showDesc}
-                    toggler={!descHidden}
+                  <Button
+                    variant="secondary"
+                    size="default"
+                    isToggled={descHidden ? 'yes' : 'no'}
                   >
                     {descHidden ? 'View details' : 'Hide details'}
-                  </SecondaryBtn>
+                  </Button>
+                  // <SecondaryBtn
+                  //   type="button"
+                  //   usecase="toggle"
+                  //   onClick={showDesc}
+                  //   toggler={!descHidden}
+                  // >
+                  //   {descHidden ? 'View details' : 'Hide details'}
+                  // </SecondaryBtn>
                 )}
               </div>
             </div>
