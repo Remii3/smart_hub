@@ -1,7 +1,8 @@
-import { ChangeEvent, useContext, useReducer } from 'react';
+import { ChangeEvent, useContext, useReducer, useState } from 'react';
 import axios from 'axios';
 import { UserContext } from '../../context/UserProvider';
 import CustomInput from '../UI/form/CustomInput';
+import CustomDialog from '../UI/headlessUI/CustomDialog';
 import { Button } from '../UI/Btns/Button';
 
 type NewDataNameTypes = 'email' | 'first_name' | 'last_name' | 'password';
@@ -69,6 +70,7 @@ type Action = {
 
 const changeDataHandler = (state: State, action: Action): State => {
   const { type, payload } = action;
+
   switch (type) {
     case ActionKind.ValueChange:
       if (payload === undefined || typeof payload.value !== 'string') {
@@ -95,6 +97,7 @@ const changeDataHandler = (state: State, action: Action): State => {
         visible: newVisibleState,
       };
     }
+
     case ActionKind.ErrorChange:
       if (payload === undefined || typeof payload.value !== 'string')
         return state;
@@ -102,6 +105,7 @@ const changeDataHandler = (state: State, action: Action): State => {
         ...state,
         errors: { ...state.errors, [payload.label]: payload.value },
       };
+
     case ActionKind.ClearData: {
       const newDataState = {} as StateDataTypes;
 
@@ -131,6 +135,10 @@ const changeDataHandler = (state: State, action: Action): State => {
 
 function EditUserData() {
   const { userData, changeUserData } = useContext(UserContext);
+  const [changingData, setChangingData] = useState({
+    isChanging: false,
+    name: '',
+  });
 
   const [newUserDatastate, dispatch] = useReducer(
     changeDataHandler,
@@ -188,8 +196,16 @@ function EditUserData() {
     }
   };
 
-  if (!userData) return <div>No data</div>;
+  const changeDataDialogHandler = (name?: NewDataNameTypes) => {
+    setChangingData((prevState) => {
+      return { isChanging: !prevState.isChanging, name: name ?? '' };
+    });
+    if (name) {
+      newDataSwitchHandler(name);
+    }
+  };
 
+  if (!userData) return <div>No data</div>;
   return (
     <div>
       <div className="flex flex-col gap-4">
@@ -202,31 +218,18 @@ function EditUserData() {
             labelValue="Email"
             placeholder="JohnDoe@gmail.com..."
             disabled={!newUserDatastate.visible.email}
-            hasError={!!newUserDatastate.errors.email}
-            errorValue={newUserDatastate.errors.email}
-            inputValue={
-              newUserDatastate.visible.email
-                ? newUserDatastate.data.email
-                : userData.email
-            }
+            hasError={false}
+            errorValue=""
+            inputValue={userData.email}
             onChange={(e) => newUserDataChangeHandler(e)}
           />
           <div className="flex justify-between gap-4">
             <button
               className="text-base text-primaryText"
-              onClick={() => newDataSwitchHandler('email')}
+              onClick={() => changeDataDialogHandler('email')}
               type="button"
             >
               Change email
-            </button>
-            <button
-              className={`${
-                newUserDatastate.visible.email ? 'opacity-100' : 'opacity-0'
-              } text-base text-green-600 transition-[opacity] ease-out`}
-              type="button"
-              onClick={() => uploadNewUserDataHandler('email')}
-            >
-              Accept
             </button>
           </div>
         </fieldset>
@@ -239,33 +242,18 @@ function EditUserData() {
               labelValue="First Name"
               placeholder="John..."
               disabled={!newUserDatastate.visible.first_name}
-              hasError={!!newUserDatastate.errors.first_name}
-              errorValue={newUserDatastate.errors.first_name}
-              inputValue={
-                newUserDatastate.visible.first_name
-                  ? newUserDatastate.data.first_name
-                  : userData.user_info.credentials.first_name
-              }
+              hasError={false}
+              errorValue=""
+              inputValue={userData.user_info.credentials.first_name}
               onChange={(e) => newUserDataChangeHandler(e)}
             />
             <div className="flex justify-between gap-4">
               <button
                 className="whitespace-nowrap text-base text-primaryText"
-                onClick={() => newDataSwitchHandler('first_name')}
+                onClick={() => changeDataDialogHandler('first_name')}
                 type="button"
               >
                 Change first name
-              </button>
-              <button
-                className={`${
-                  newUserDatastate.visible.first_name
-                    ? 'opacity-100'
-                    : 'opacity-0'
-                } text-base text-green-600 transition-[opacity] ease-out`}
-                type="button"
-                onClick={() => uploadNewUserDataHandler('first_name')}
-              >
-                Accept
               </button>
             </div>
           </fieldset>
@@ -348,6 +336,66 @@ function EditUserData() {
           </button>
         </div>
       </fieldset>
+      <CustomDialog
+        isOpen={changingData.isChanging}
+        changeIsOpen={() => changeDataDialogHandler()}
+        title="Change your account data"
+        description="Please provide a valid new data."
+      >
+        {newUserDatastate.visible.email && (
+          <div>
+            <form className="mb-4">
+              <CustomInput
+                autoComplete="email"
+                name="email"
+                type="email"
+                optional={false}
+                labelValue="Email"
+                placeholder="JohnDoe@gmail.com..."
+                hasError={!!newUserDatastate.errors.email}
+                errorValue={newUserDatastate.errors.email}
+                inputValue={newUserDatastate.data.email}
+                onChange={(e) => newUserDataChangeHandler(e)}
+              />
+            </form>
+            <div className="flex w-full justify-end">
+              <Button
+                variant="success"
+                size="default"
+                onClick={() => uploadNewUserDataHandler('email')}
+              >
+                Accept
+              </Button>
+            </div>
+          </div>
+        )}
+        {newUserDatastate.visible.first_name && (
+          <div>
+            <form className="mb-4">
+              <CustomInput
+                name="first_name"
+                type="text"
+                optional={false}
+                labelValue="First Name"
+                placeholder="John..."
+                hasError={!!newUserDatastate.errors.first_name}
+                errorValue={newUserDatastate.errors.first_name}
+                inputValue={newUserDatastate.data.first_name}
+                onChange={(e) => newUserDataChangeHandler(e)}
+              />
+            </form>
+            <div className="flex w-full justify-end">
+              <Button
+                variant="success"
+                size="default"
+                onClick={() => uploadNewUserDataHandler('first_name')}
+              >
+                Accept
+              </Button>
+            </div>
+          </div>
+        )}
+      </CustomDialog>
     </div>
   );
 }
