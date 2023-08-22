@@ -7,14 +7,15 @@ export default function CartPopupProdList() {
 
   let ProductsList = <div />;
 
-  if (cartState && cartState.cart?.products) {
+  if (cartState && cartState.products) {
     ProductsList = (
       <ul className="max-h-[396px] space-y-4 overflow-y-auto pr-2">
-        {cartState.cart.products.map((cartProduct) => (
+        {cartState.products.map((cartProduct) => (
           <CartPopupItem
             key={cartProduct.productData._id}
             productData={cartProduct.productData}
             inCartQuantity={cartProduct.inCartQuantity}
+            productsTotalPrice={cartProduct.productsTotalPrice}
           />
         ))}
       </ul>
@@ -23,7 +24,7 @@ export default function CartPopupProdList() {
   return (
     <div>
       {ProductsList}
-      {((cartState && cartState.cart && cartState.cart.products.length < 1) ||
+      {((cartState && cartState && cartState.products.length < 1) ||
         cartState === null) && <p>No products in cart yet!</p>}
     </div>
   );

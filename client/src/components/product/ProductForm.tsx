@@ -6,6 +6,7 @@ import { CartContext } from '../../context/CartProvider';
 type ProductFormType = {
   productId?: string;
   productQuantity?: number;
+  sold: boolean;
 };
 
 const defaultProps = {
@@ -16,6 +17,7 @@ const defaultProps = {
 export default function ProductForm({
   productId,
   productQuantity,
+  sold,
 }: ProductFormType) {
   const [selectedQuantity, setSelectedQuantity] = useState(1);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
@@ -26,7 +28,6 @@ export default function ProductForm({
 
   const addToCartHandler = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (cartState.cartIsLoading) return;
     if (productId) {
       setIsAddingToCart(true);
 
@@ -38,7 +39,6 @@ export default function ProductForm({
       setIsAddingToCart(false);
     }
   };
-
   const incrementQuantityHandler = () => {
     if (productQuantity! <= selectedQuantity) return;
     setSelectedQuantity((prevState) => (prevState += 1));
@@ -48,9 +48,9 @@ export default function ProductForm({
     setSelectedQuantity((prevState) => (prevState -= 1));
   };
 
-  const currentItem = cartState.cart?.products.find(
-    (product) => product.productData._id === productId
-  );
+  const currentItem = cartState.products.find((product) => {
+    return product.productData._id === productId;
+  });
 
   if (currentItem) {
     itemCapacity =
@@ -68,49 +68,52 @@ export default function ProductForm({
 
   return (
     <form className="mt-8" onSubmit={(e) => addToCartHandler(e)}>
-      <div className="mt-8 flex gap-4">
-        <div>
-          <button
-            type="button"
-            className={`${selectedQuantity <= 1 && 'text-gray-300'} px-2`}
-            disabled={selectedQuantity <= 1}
-            onClick={decrementQuantityHandler}
+      {sold && <h4 className="font-bold uppercase text-red-700">Sold out</h4>}
+      {!sold && (
+        <div className="mt-8 flex gap-4">
+          <div>
+            <button
+              type="button"
+              className={`${selectedQuantity <= 1 && 'text-gray-300'} px-2`}
+              disabled={selectedQuantity <= 1}
+              onClick={decrementQuantityHandler}
+            >
+              -
+            </button>
+            <label htmlFor="quantity" className="sr-only">
+              Qty
+            </label>
+            <input
+              type="number"
+              id="quantity"
+              min="1"
+              step="1"
+              max={productQuantity}
+              value={selectedQuantity}
+              disabled
+              className="w-12 rounded border-gray-200 py-3 text-center text-xs [-moz-appearance:_textfield] [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none"
+            />
+            <button
+              type="button"
+              className={`${itemCapacity && 'text-gray-300'} px-2`}
+              disabled={itemCapacity}
+              onClick={incrementQuantityHandler}
+            >
+              +
+            </button>
+          </div>
+          <PrimaryBtn
+            type="submit"
+            usecase="action"
+            textSize="text-sm"
+            disabled={isAddingToCart || itemBtnCapacity}
+            isLoading={isAddingToCart}
           >
-            -
-          </button>
-          <label htmlFor="quantity" className="sr-only">
-            Qty
-          </label>
-          <input
-            type="number"
-            id="quantity"
-            min="1"
-            step="1"
-            max={productQuantity}
-            value={selectedQuantity}
-            disabled
-            className="w-12 rounded border-gray-200 py-3 text-center text-xs [-moz-appearance:_textfield] [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none"
-          />
-          <button
-            type="button"
-            className={`${itemCapacity && 'text-gray-300'} px-2`}
-            disabled={itemCapacity}
-            onClick={incrementQuantityHandler}
-          >
-            +
-          </button>
+            Add to Cart
+            <ShoppingBagIcon className="ml-2 inline-block h-6 w-6" />
+          </PrimaryBtn>
         </div>
-        <PrimaryBtn
-          type="submit"
-          usecase="action"
-          textSize="text-sm"
-          disabled={isAddingToCart || itemBtnCapacity}
-          isLoading={isAddingToCart}
-        >
-          Add to Cart
-          <ShoppingBagIcon className="ml-2 inline-block h-6 w-6" />
-        </PrimaryBtn>
-      </div>
+      )}
     </form>
   );
 }

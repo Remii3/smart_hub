@@ -1,4 +1,4 @@
-import { ProductTypes } from '../types/interfaces';
+import { UnknownProductTypes } from '../types/interfaces';
 
 export const sortProductsTypes = {
   DATE_DESC: 'Date, DESC',
@@ -13,17 +13,17 @@ export default function sortProducts({
   products,
   sortType,
 }: {
-  products: ProductTypes[];
+  products: UnknownProductTypes[];
   sortType: string;
 }) {
   switch (sortType) {
     case sortProductsTypes.DATE_DESC:
       return products.sort((a, b) => {
-        return a.addedDate.getTime() > b.addedDate.getTime() ? -1 : 1;
+        return a.created_at > b.created_at ? -1 : 1;
       });
     case sortProductsTypes.DATE_ASC:
       return products.sort((a, b) => {
-        return b.addedDate.getTime() > a.addedDate.getTime() ? -1 : 1;
+        return b.created_at > a.created_at ? -1 : 1;
       });
     case sortProductsTypes.TITLE_DESC:
       return products.sort((a, b) => {
@@ -33,14 +33,24 @@ export default function sortProducts({
       return products.sort((a, b) => {
         return b.title > a.title ? -1 : 1;
       });
-    case sortProductsTypes.PRICE_DESC:
-      return products.sort((a, b) => {
-        return a.price > b.price ? -1 : 1;
+    case sortProductsTypes.PRICE_DESC: {
+      const filteredData = products.filter((product) => {
+        return product.shop_info;
       });
-    case sortProductsTypes.PRICE_ASC:
-      return products.sort((a, b) => {
-        return b.price > a.price ? -1 : 1;
+      return filteredData.sort((a, b) => {
+        return a.shop_info.price > b.shop_info.price ? -1 : 1;
       });
+    }
+
+    case sortProductsTypes.PRICE_ASC: {
+      const filteredData = products.filter(
+        (product) => product.shop_info.price
+      );
+
+      return filteredData.sort((a, b) => {
+        return b.shop_info.price > a.shop_info.price ? -1 : 1;
+      });
+    }
     default:
       return products;
   }

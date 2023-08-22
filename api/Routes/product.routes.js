@@ -6,7 +6,7 @@ const {
   getAllProducts,
   getAuctionProducts,
   getShopProducts,
-  getProduct,
+  getOneProduct,
   updateProduct,
   deleteProduct,
   getSearchedProducts,
@@ -15,7 +15,7 @@ const {
 router.get('/all', getAllProducts);
 router.get('/shop-products', getShopProducts);
 router.get('/auction-products', getAuctionProducts);
-router.get('/product', getProduct);
+router.get('/product', getOneProduct);
 router.get('/searched', getSearchedProducts);
 
 router.post('/product', addProduct);

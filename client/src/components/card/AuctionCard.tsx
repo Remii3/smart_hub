@@ -1,9 +1,10 @@
 import { Link } from 'react-router-dom';
 import PrimaryBtn from '../UI/Btns/PrimaryBtn';
-import { AuctionCardType } from '../../types/types';
+// import { AuctionCardType } from '../../types/types';
+import { ProductAuctionCardType } from '../../types/interfaces';
 
 const defaultProps = {
-  imgs: [],
+  img: [],
   deadline: null,
   authors: [],
   description: '',
@@ -12,11 +13,12 @@ function AuctionCard({
   _id,
   title,
   authors,
-  deadline,
   description,
-  price,
-  imgs,
-}: AuctionCardType) {
+  img,
+  auctionEndDate,
+  currentPrice,
+  startingPrice,
+}: ProductAuctionCardType) {
   let titleShortened = title;
 
   if (title.length >= 50) {
@@ -50,7 +52,7 @@ function AuctionCard({
                 <div className="line-clamp-1 h-[24px]">
                   {authors?.map((author, id) => (
                     <span key={id} className="mr-3">
-                      {author}
+                      {author.author_info && author.author_info.pseudonim}
                     </span>
                   ))}
                 </div>
@@ -59,7 +61,7 @@ function AuctionCard({
             <div className="flex flex-col gap-3 px-3 pb-3">
               <p className="line-clamp-4 min-h-[80px]">{description}</p>
               <div className="flex justify-between gap-3">
-                <h4 className="flex items-center">{price.value}€</h4>
+                <h4 className="flex items-center">{currentPrice}€</h4>
                 <div>
                   <div className="pb-3">stars</div>
                   <PrimaryBtn

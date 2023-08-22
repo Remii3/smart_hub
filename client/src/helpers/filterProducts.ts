@@ -1,5 +1,4 @@
-import { ProductTypes } from '../types/interfaces';
-import { MarketPlaceTypes } from '../types/types';
+import { UnknownProductTypes } from '../types/interfaces';
 
 export function filterProductsByPrice({
   minPrice,
@@ -8,7 +7,7 @@ export function filterProductsByPrice({
 }: {
   minPrice: number | string;
   maxPrice: number | string;
-  products: ProductTypes[];
+  products: UnknownProductTypes[];
 }) {
   if (minPrice === '' && maxPrice === '') {
     return products;
@@ -16,20 +15,20 @@ export function filterProductsByPrice({
 
   if (minPrice === '') {
     return products.filter(
-      (product) => product.price.value <= Number(maxPrice)
+      (product) => product.shop_info.price <= Number(maxPrice)
     );
   }
 
   if (maxPrice === '') {
     return products.filter(
-      (product) => product.price.value >= Number(minPrice)
+      (product) => product.shop_info.price >= Number(minPrice)
     );
   }
 
   return products.filter((product) => {
     return (
-      product.price.value >= Number(minPrice) &&
-      product.price.value <= Number(maxPrice)
+      product.shop_info.price >= Number(minPrice) &&
+      product.shop_info.price <= Number(maxPrice)
     );
   });
 }
@@ -50,7 +49,7 @@ export function filterProductsByMarketplace({
     name: string;
     isChecked: boolean;
   }[];
-  products: ProductTypes[];
+  products: UnknownProductTypes[];
 }) {
   const marketplaces = [] as string[];
   for (const type of selectedMarketplace) {
@@ -58,7 +57,7 @@ export function filterProductsByMarketplace({
       marketplaces.push(type.name.toLowerCase());
     }
   }
-  return products.filter((product) => {
-    return marketplaces.includes(product.marketPlace.toLowerCase());
+  return products.filter((product: UnknownProductTypes) => {
+    return marketplaces.includes(product.market_place.toLowerCase());
   });
 }

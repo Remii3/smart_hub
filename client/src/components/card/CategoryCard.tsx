@@ -1,7 +1,7 @@
 import { Link, useLocation } from 'react-router-dom';
-import { CategoryCardType } from '../../types/types';
+import { ProductCategories } from '../../types/interfaces';
 
-function CategoryCard({ _id, label, value, description }: CategoryCardType) {
+function CategoryCard({ _id, label, value, description }: ProductCategories) {
   const location = useLocation();
 
   const existingSearch = new URLSearchParams(location.search);

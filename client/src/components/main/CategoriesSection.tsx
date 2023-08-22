@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import PrimaryBtn from '../UI/Btns/PrimaryBtn';
 import MainPageHeading from '../UI/MainPageHeading';
 import CategoryCard from '../card/CategoryCard';
@@ -11,13 +11,9 @@ export default function CategoriesSection() {
 
   const navigate = useNavigate();
   useEffect(() => {
-    try {
-      axios.get('/category/all').then((res) => {
-        setShopList(res.data);
-      });
-    } catch (err) {
-      console.error(err);
-    }
+    axios.get('/category/all').then((res) => {
+      setShopList(res.data);
+    });
   }, []);
 
   return (
