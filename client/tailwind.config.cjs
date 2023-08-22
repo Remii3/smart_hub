@@ -16,9 +16,9 @@ module.exports = {
       colors: {
         primary: '#436de4',
         primaryText: '#3F63BF',
-        secondary: '#c4d3f3        ',
+        secondary: '#c4d3f3',
         accent: '#2d3b62',
-        pageBackground: '#0C223B  ',
+        pageBackground: '#0C223B',
         dark: '#161618',
         darkTint: '#1E1E20',
         gray500: '#90A4AE',

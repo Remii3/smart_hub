@@ -15,13 +15,13 @@ import AuctionsPage from './pages/AuctionsPage';
 import CartPage from './pages/CartPage';
 import CheckoutPage from './pages/CheckoutPage';
 import BlogPage from './pages/BlogPage';
-import ThankYouPage from './pages/ThankYouPage';
 import MyProductsPage from './pages/MyProductsPage';
 import NoPage404 from './pages/NoPage404';
 import CategoriesPage from './pages/CategoriesPage';
 import ContactPage from './pages/ContactPage';
 import ProductPage from './pages/ProductPage';
 import SearchPage from './pages/SearchPage';
+import OtherUserPage from './pages/OtherUserPage';
 
 function WebRoutes() {
   const { pathname } = useLocation();
@@ -53,7 +53,6 @@ function WebRoutes() {
         <Route path="/contact" element={<ContactPage />} />
         <Route path="/blog" element={<BlogPage />} />
         <Route path="/cart" element={<CartPage />} />
-        <Route path="/thankyou" element={<ThankYouPage />} />
         <Route path="/checkout" element={<CheckoutPage />} />
         <Route path="/account/register" element={<RegisterPage />} />
         <Route path="/account/login" element={<LoginPage />} />
@@ -61,6 +60,7 @@ function WebRoutes() {
           path="/account/my"
           element={userData ? <MyAccount /> : <RegisterPage />}
         />
+        <Route path="/account/:userId" element={<OtherUserPage />} />
         <Route
           path="/account/my/my-products"
           element={userData ? <MyProductsPage /> : <RegisterPage />}

@@ -7,7 +7,6 @@ import {
   useMemo,
   useState,
 } from 'react';
-import { ProductTypes } from '../types/interfaces';
 import { UserContext } from './UserProvider';
 import {
   postAddProductToCart,
@@ -17,27 +16,16 @@ import {
   postRemoveProductFromCart,
 } from '../helpers/cartFunctions';
 import getCookie from '../helpers/getCookie';
-
-type InitialStateType = {
-  cart: null | {
-    products:
-      | {
-          inCartQuantity: number;
-          productData: ProductTypes;
-          totalPrice: number;
-        }[];
-    cartPrice: number;
-  };
-  cartIsLoading: boolean;
-};
+import { CartTypes } from '../types/interfaces';
 
 const initialState = {
-  cart: null,
-  cartIsLoading: false,
+  products: [],
+  cartPrice: 0,
+  isLoading: false,
 };
 
 export const CartContext = createContext<{
-  cartState: InitialStateType;
+  cartState: CartTypes;
   fetchCartData: () => void;
   addProductToCart: ({
     productId,
@@ -59,7 +47,7 @@ export const CartContext = createContext<{
 });
 
 export default function CartProvider({ children }: { children: ReactNode }) {
-  const [cartState, setCart] = useState<InitialStateType>(initialState);
+  const [cartState, setCart] = useState<CartTypes>(initialState);
 
   const { userData } = useContext(UserContext);
   const userId = userData?._id || getCookie('guestToken');
@@ -68,7 +56,11 @@ export default function CartProvider({ children }: { children: ReactNode }) {
     if (userId) {
       const res = await getFetchCartData({ userId });
       setCart((prevState) => {
-        return { ...prevState, cart: res };
+        return {
+          ...prevState,
+          products: res.products,
+          cartPrice: res.cartPrice,
+        };
       });
     }
   }, [userId]);
@@ -82,14 +74,14 @@ export default function CartProvider({ children }: { children: ReactNode }) {
       productQuantity: number;
     }) => {
       setCart((prevState) => {
-        return { ...prevState, cartIsLoading: true };
+        return { ...prevState, isLoading: true };
       });
 
       postAddProductToCart({ userId, productId, productQuantity })
         .then(() => fetchCartData())
         .then(() => {
           setCart((prevState) => {
-            return { ...prevState, cartIsLoading: false };
+            return { ...prevState, isLoading: false };
           });
         });
     },
@@ -98,84 +90,79 @@ export default function CartProvider({ children }: { children: ReactNode }) {
 
   const incrementCartItem = useCallback(
     (productId: string) => {
-      if (!cartState.cart) return;
+      if (!cartState) return;
 
-      const newProducts = cartState.cart.products;
+      const newProducts = cartState.products;
 
-      const productIndex = cartState.cart.products.findIndex(
+      const productIndex = cartState.products.findIndex(
         (product) => product.productData._id === productId
       );
 
       newProducts[productIndex].inCartQuantity += 1;
 
       setCart((prevState) => {
-        return { ...prevState, cartIsLoading: true };
+        return { ...prevState, isLoading: true };
       });
 
       postIncrementCartItem({ userId, productId })
         .then(() => fetchCartData())
         .then(() => {
           setCart((prevState) => {
-            return { ...prevState, cartIsLoading: false };
+            return { ...prevState, isLoading: false };
           });
 
           setCart((prevState) => {
             return {
               ...prevState,
-              cart: {
-                cartPrice: prevState.cart?.cartPrice || 0,
-                products: newProducts,
-              },
+              cartPrice: prevState.cartPrice || 0,
+              products: newProducts,
             };
           });
         });
-
-      // eslint-disable-next-line consistent-return
     },
-    [cartState.cart, fetchCartData, userId]
+    [cartState, fetchCartData, userId]
   );
+
   const decrementCartItem = useCallback(
     (productId: string) => {
-      if (!cartState.cart) return;
+      if (!cartState) return;
 
-      const newProducts = cartState.cart.products;
+      const newProducts = cartState.products;
 
-      const productIndex = cartState.cart.products.findIndex(
+      const productIndex = cartState.products.findIndex(
         (product) => product.productData._id === productId
       );
 
       newProducts[productIndex].inCartQuantity -= 1;
 
       setCart((prevState) => {
-        return { ...prevState, cartIsLoading: true };
+        return { ...prevState, isLoading: true };
       });
 
       postDecrementCartItem({ userId, productId })
         .then(() => fetchCartData())
         .then(() => {
           setCart((prevState) => {
-            return { ...prevState, cartIsLoading: false };
+            return { ...prevState, isLoading: false };
           });
 
           setCart((prevState) => {
             return {
               ...prevState,
-              cart: {
-                cartPrice: prevState.cart?.cartPrice || 0,
-                products: newProducts,
-              },
+              cartPrice: prevState.cartPrice || 0,
+              products: newProducts,
             };
           });
         });
     },
-    [cartState.cart, fetchCartData, userId]
+    [cartState, fetchCartData, userId]
   );
 
   const removeProductFromCart = useCallback(
     (productId: string) => {
-      if (!cartState.cart) return;
+      if (!cartState) return;
 
-      const newProducts = cartState.cart?.products.filter(
+      const newProducts = cartState.products.filter(
         (product) => product.productData._id !== productId
       );
       postRemoveProductFromCart({ userId, productId })
@@ -184,15 +171,13 @@ export default function CartProvider({ children }: { children: ReactNode }) {
           setCart((prevState) => {
             return {
               ...prevState,
-              cart: {
-                cartPrice: prevState.cart?.cartPrice || 0,
-                products: newProducts,
-              },
+              cartPrice: prevState.cartPrice || 0,
+              products: newProducts,
             };
           });
         });
     },
-    [cartState.cart, fetchCartData, userId]
+    [cartState, fetchCartData, userId]
   );
 
   useEffect(() => {

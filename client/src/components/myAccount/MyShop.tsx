@@ -59,9 +59,16 @@ export default function MyShop() {
     hasFailed: false,
     isSuccess: false,
   });
-  const [newAuthor, setNewAuthor] = useState('');
+  const [authorState, setAuthorState] = useState<{
+    isLoading: boolean;
+    options: any;
+    value: [];
+  }>({
+    isLoading: false,
+    options: [],
+    value: [],
+  });
 
-  const [shownAllProducts, setShownAllProducts] = useState(false);
   const { userData, fetchUserData } = useContext(UserContext);
 
   const resetProductData = () => {
@@ -70,7 +77,9 @@ export default function MyShop() {
       setCategoryState((prevState) => {
         return { ...prevState, value: [] };
       });
-      setNewAuthor('');
+      setAuthorState((prevState) => {
+        return { ...prevState, value: [] };
+      });
     }, 200);
   };
 
@@ -79,7 +88,6 @@ export default function MyShop() {
       return { ...prevState, hasFailed: false };
     });
   };
-
   const changeIsOpen = () => {
     setIsOpen((prevState) => !prevState);
     resetProductData();
@@ -143,26 +151,37 @@ export default function MyShop() {
     });
   }, []);
 
+  const fetchAllAuthors = useCallback(async () => {
+    const res = await axios.get('/user/authors');
+    setAuthorState((prevState) => {
+      return { ...prevState, options: [...res.data] };
+    });
+  }, []);
+
+  const getAllData = useCallback(async () => {
+    fetchAllAuthors();
+    fetchAllCategories();
+  }, [fetchAllAuthors, fetchAllCategories]);
+
   const addProductHandler = async (e: React.FormEvent) => {
     e.preventDefault();
-
     const newProductData = {
-      userEmail: userData?.email,
+      user_id: userData?._id,
       title: productData.title.value,
       description: productData.description.value,
-      price: productData.price.value,
-      imgs: productData.imgs.value,
+      price: Number(productData.price.value),
+      img: productData.imgs.value,
       categories: categoryState.value,
-      authors: productData.authors.value,
+      authors: authorState.value,
       quantity: productData.quantity.value,
-      marketPlace: productData.marketPlace.value,
+      market_place: productData.marketPlace.value,
     };
 
     try {
       setStatus((prevState) => {
         return { ...prevState, isLoading: true };
       });
-      await axios.post('/product/product', newProductData);
+      await axios.post('/product/product', { newProductData });
       setStatus((prevState) => {
         return { ...prevState, isLoading: false };
       });
@@ -172,7 +191,7 @@ export default function MyShop() {
       setStatus((prevState) => {
         return { ...prevState, isSuccess: true };
       });
-      fetchAllCategories();
+      getAllData();
     } catch (err) {
       setStatus((prevState) => {
         return { ...prevState, isLoading: false, hasFailed: true };
@@ -180,37 +199,27 @@ export default function MyShop() {
     }
   };
 
-  const showAllHandler = () => {
-    setShownAllProducts((prevState) => !prevState);
-  };
-
-  const addAuthorHandler = () => {
-    setNewAuthor('');
-    setProductData((prevState) => {
-      return {
-        ...prevState,
-        authors: {
-          ...prevState.authors,
-          value: [...prevState.authors.value, newAuthor],
-        },
-      };
+  const filterColors = (inputValue: string) => {
+    return categoryState.options.filter((i: { label: string }) => {
+      return i.label.toLowerCase().includes(inputValue.toLowerCase());
     });
   };
-
-  const changeNewAuthorHandler = (e: ChangeEvent<HTMLInputElement>) => {
-    setNewAuthor(e.target.value);
+  const authorFilter = (inputValue: string) => {
+    return authorState.options.filter((i: { label: string }) => {
+      return i.label.toLowerCase().includes(inputValue.toLowerCase());
+    });
   };
-
-  const filterColors = (inputValue: string) => {
-    return categoryState.options.filter((i: { label: string }) =>
-      i.label.toLowerCase().includes(inputValue.toLowerCase())
-    );
-  };
-
   const promiseOptions = (inputValue: string) =>
     new Promise<any[]>((resolve) => {
       setTimeout(() => {
         resolve(filterColors(inputValue));
+      }, 1000);
+    });
+
+  const authorOptions = (inputValue: string) =>
+    new Promise<any[]>((resolve) => {
+      setTimeout(() => {
+        resolve(authorFilter(inputValue));
       }, 1000);
     });
 
@@ -220,9 +229,15 @@ export default function MyShop() {
     });
   };
 
+  const selectAuthorChange = (selectedOptions: any) => {
+    setAuthorState((prevState) => {
+      return { ...prevState, value: selectedOptions };
+    });
+  };
+
   useEffect(() => {
-    fetchAllCategories();
-  }, [fetchAllCategories]);
+    getAllData();
+  }, [getAllData]);
 
   return (
     <div>
@@ -230,22 +245,20 @@ export default function MyShop() {
         <div className="mb-8">
           <div className="flex justify-between align-bottom">
             <h3 className="mb-0">My products</h3>
-            {userData?.my_products && userData.my_products.length > 6 && (
-              <div className="flex items-end">
-                <Link to="/account/my/my-products" className="text-sm">
-                  Show all
-                </Link>
-              </div>
-            )}
+            {userData &&
+              userData.role !== 'User' &&
+              userData.author_info.my_products.length > 3 && (
+                <div className="flex items-end">
+                  <Link to="/account/my/my-products" className="text-sm">
+                    Show all
+                  </Link>
+                </div>
+              )}
           </div>
           {userData &&
-          userData.my_products &&
-          userData.my_products.length > 0 ? (
-            <MyProducts
-              myProducts={userData.my_products}
-              onClick={showAllHandler}
-              shownAllProducts={shownAllProducts}
-            />
+          userData.role !== 'User' &&
+          userData.author_info.my_products.length > 0 ? (
+            <MyProducts myProducts={userData.author_info.my_products} />
           ) : (
             'No products added.'
           )}
@@ -306,22 +319,14 @@ export default function MyShop() {
               >
                 Author
               </label>
-              <input
-                name="newAuthor"
-                id="newAuthor"
-                type="text"
-                placeholder="R.R. Martin..."
-                className="w-full rounded-md border-gray-200 shadow-sm sm:text-sm"
-                value={newAuthor}
-                onChange={(e) => changeNewAuthorHandler(e)}
+              <AsyncCreatableSelect
+                isMulti
+                cacheOptions
+                defaultOptions
+                loadOptions={authorOptions}
+                value={authorState.value}
+                onChange={selectAuthorChange}
               />
-              <button
-                className="w-1/4 border border-red-100"
-                type="button"
-                onClick={() => addAuthorHandler()}
-              >
-                +
-              </button>
             </div>
           </fieldset>
 

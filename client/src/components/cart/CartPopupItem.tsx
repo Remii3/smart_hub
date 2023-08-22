@@ -1,18 +1,14 @@
 import { Link } from 'react-router-dom';
 import { useContext, useState } from 'react';
 import { TrashIcon } from '../../assets/icons/Icons';
-import { ProductTypes } from '../../types/interfaces';
+import { CartProductTypes, ProductTypes } from '../../types/interfaces';
 import { CartContext } from '../../context/CartProvider';
-
-type CartPopupItemTypes = {
-  productData: ProductTypes;
-  inCartQuantity: number;
-};
 
 export default function CartPopupItem({
   productData,
   inCartQuantity,
-}: CartPopupItemTypes) {
+  productsTotalPrice,
+}: CartProductTypes) {
   const [localQuantity, setLocalQuantity] = useState(inCartQuantity);
   const { incrementCartItem, decrementCartItem, removeProductFromCart } =
     useContext(CartContext);
@@ -47,7 +43,7 @@ export default function CartPopupItem({
         <dl className="mt-0.5 space-y-px text-[10px] text-gray-600">
           <div>
             <dt className="inline">Price:</dt>
-            <dd className="inline"> €{productData.price}</dd>
+            <dd className="inline">{productData.shop_info.price}€</dd>
           </div>
         </dl>
       </div>

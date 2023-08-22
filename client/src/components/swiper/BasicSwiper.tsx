@@ -1,21 +1,22 @@
 import { ReactNode } from 'react';
 import { Swiper } from 'swiper/react';
-import { Navigation } from 'swiper';
+import { Navigation, Pagination } from 'swiper';
 import SuspenseComponent from '../UI/suspense/SuspenseComponent';
 import LoadingComponent from '../UI/Loaders/LoadingComponent';
-import 'swiper/swiper-bundle.min.css';
-import 'swiper/swiper.min.css';
 
 function BasicSwiper({ children }: { children: ReactNode }) {
   return (
     <Swiper
-      slidesPerView={4}
+      style={{ paddingBottom: '50px' }}
+      slidesPerView={3}
       slidesPerGroup={1}
-      spaceBetween={28}
+      spaceBetween={24}
       grabCursor
       allowTouchMove
       navigation
-      modules={[Navigation]}
+      pagination
+      modules={[Navigation, Pagination]}
+      watchOverflow
       breakpoints={{
         0: {
           slidesPerView: 1.2,

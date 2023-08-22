@@ -3,28 +3,45 @@ import {
   useElements,
   LinkAuthenticationElement,
   PaymentElement,
+  AddressElement,
 } from '@stripe/react-stripe-js';
 import {
   Layout,
   StripeLinkAuthenticationElementChangeEvent,
 } from '@stripe/stripe-js';
-import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useState, useEffect, useContext, FormEvent } from 'react';
 import { UserContext } from '../../context/UserProvider';
 import getCookie from '../../helpers/getCookie';
 import { CartContext } from '../../context/CartProvider';
 
-export default function CheckoutForm() {
+export default function CheckoutForm({ changeShowThankYouHandler }: any) {
   const stripe = useStripe();
   const elements = useElements();
   const { userData } = useContext(UserContext);
   const { fetchCartData, cartState } = useContext(CartContext);
-  const navigate = useNavigate();
 
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [buyerData, setBuyerData] = useState<{
+    name: string;
+    address:
+      | {
+          line1: string;
+          line2: string | null;
+          city: string;
+          state: string;
+          postal_code: string;
+          country: string;
+        }
+      | undefined;
+    phone: string | undefined;
+  }>({
+    name: '',
+    address: undefined,
+    phone: undefined,
+  });
 
   useEffect(() => {
     if (!stripe) {
@@ -67,7 +84,6 @@ export default function CheckoutForm() {
     }
 
     setIsLoading(true);
-
     const { error } = await stripe.confirmPayment({
       elements,
       confirmParams: {
@@ -83,13 +99,18 @@ export default function CheckoutForm() {
       }
     } else {
       const currentUserId = userData?._id || getCookie('guestToken');
-      await axios.post('/cart/cart-remove', {
+      await axios.post('/order/one', {
+        buyerId: currentUserId,
+        items: cartState.products,
+      });
+      await axios.post('/cart/remove-one', {
         userId: currentUserId,
         productId: 'all',
       });
-      fetchCartData();
 
-      navigate('/thankyou');
+      changeShowThankYouHandler(cartState);
+
+      fetchCartData();
     }
     setIsLoading(false);
   };
@@ -108,16 +129,32 @@ export default function CheckoutForm() {
         options={{ defaultValues: { email: userData?.email || email } }}
       />
       <PaymentElement id="payment-element" options={paymentElementOptions} />
-
+      <AddressElement
+        options={{
+          mode: 'shipping',
+          fields: { phone: 'always' },
+          blockPoBox: true,
+          validation: { phone: { required: 'auto' } },
+          display: { name: 'full' },
+        }}
+        onChange={(event) => {
+          if (event.complete) {
+            // Extract potentially complete address
+            const { name, address, phone } = event.value;
+            setBuyerData({ name, address, phone });
+          }
+        }}
+      />
       <button
         type="submit"
         disabled={
           isLoading ||
           !stripe ||
           !elements ||
-          (cartState.cart?.products && cartState.cart?.products.length < 1)
+          (cartState.products && cartState.products.length < 1)
         }
         id="submit"
+        style={{ marginTop: '1rem' }}
       >
         <span id="button-text">
           {isLoading ? <div className="spinner" id="spinner" /> : 'Pay now'}

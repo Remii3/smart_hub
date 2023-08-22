@@ -1,4 +1,4 @@
-import { ChangeEvent, Fragment, useState } from 'react';
+import { ChangeEvent, Fragment } from 'react';
 import { Popover, Transition } from '@headlessui/react';
 import { ChevronDownIcon } from '@heroicons/react/20/solid';
 
@@ -57,7 +57,7 @@ export default function PriceSelector({
                     <div className="bg-white">
                       <header className="flex  flex-wrap justify-between p-4">
                         <span className="text-sm text-gray-700">
-                          The highest price is {highestPrice}€
+                          The highest price is {highestPrice && highestPrice}€
                         </span>
 
                         <button
@@ -91,7 +91,7 @@ export default function PriceSelector({
                             <input
                               id={`${category}-Max-PriceSelector`}
                               type="number"
-                              placeholder={`To ${highestPrice}`}
+                              placeholder={`To ${highestPrice && highestPrice}`}
                               className="w-full rounded-md border-gray-200 shadow-sm sm:text-sm"
                               value={maxPrice}
                               onChange={(e) => maxPriceChangeHandler(e)}

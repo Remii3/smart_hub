@@ -1,48 +1,44 @@
-import { ProductTypes } from '../../types/interfaces';
-import DefaultCard from '../card/DefaultCard';
-import SecondaryBtn from '../UI/Btns/SecondaryBtn';
+import { UnknownProductTypes } from '../../types/interfaces';
+import AuctionCard from '../card/AuctionCard';
+import ShopCard from '../card/ShopCard';
 
 export default function MyProducts({
-  shownAllProducts,
   myProducts,
-  onClick,
 }: {
-  shownAllProducts: boolean;
-  myProducts: ProductTypes[];
-  onClick: () => void;
+  myProducts: UnknownProductTypes[];
 }) {
+  const shortenedProducts = myProducts.slice(0, 3);
   return (
     <div>
-      <div
-        className={`${
-          shownAllProducts ? 'max-h-fit' : 'max-h-[554px]'
-        } grid h-full grid-cols-1 gap-4 overflow-hidden py-4 transition-[max-height] duration-300 ease-in-out sm:grid-cols-2 xl:grid-cols-3`}
-      >
-        {myProducts.map((product, id) => (
-          <DefaultCard
-            key={id}
-            _id={product._id}
-            title={product.title}
-            price={product.price}
-          />
-        ))}
+      <p className="pb-2 pt-4 text-lg">Latest:</p>
+      <div className="grid h-full grid-cols-1 gap-4 overflow-hidden pb-4 transition-[max-height] duration-300 ease-in-out sm:grid-cols-2 xl:grid-cols-3">
+        {shortenedProducts.map((product) => {
+          return product.market_place === 'Shop' ? (
+            <ShopCard
+              key={product._id}
+              _id={product._id}
+              price={product.shop_info.price}
+              productQuantity={product.quantity}
+              title={product.title}
+              authors={product.authors}
+              description={product.description}
+              img={product.img}
+            />
+          ) : (
+            <AuctionCard
+              key={product._id}
+              _id={product._id}
+              title={product.title}
+              authors={product.authors}
+              description={product.description}
+              img={product.img}
+              startingPrice={product.auction_info.starting_price}
+              currentPrice={product.auction_info.current_price}
+              auctionEndDate={product.auction_info.auction_end_date}
+            />
+          );
+        })}
       </div>
-
-      {myProducts.length > 3 && (
-        <div className="mt-3 flex w-full justify-center">
-          <SecondaryBtn
-            text={shownAllProducts ? 'Hide more' : 'Show more'}
-            type="button"
-            usecase="outline"
-            onClick={onClick}
-            additionalStyles={`${
-              shownAllProducts
-                ? 'bg-gray-400 text-white'
-                : 'text-gray-600 bg-white'
-            } px-3 py-2`}
-          />
-        </div>
-      )}
     </div>
   );
 }

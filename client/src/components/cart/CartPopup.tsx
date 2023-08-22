@@ -29,7 +29,7 @@ function CartPopup() {
             to="/cart"
             className="block rounded border border-gray-600 px-5 py-3 text-sm text-gray-600 transition hover:ring-1 hover:ring-gray-400"
           >
-            View my cart ({cartState.cart?.products?.length || 0})
+            View my cart ({cartState.products?.length || 0})
           </Popover.Button>
           <Popover.Button
             as={Link}

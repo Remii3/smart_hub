@@ -8,13 +8,9 @@ export default function CollectionSection() {
   const [collection, setCollection] = useState<ProductTypes[]>([]);
 
   useEffect(() => {
-    try {
-      axios.get('/product/all').then((res) => {
-        setCollection(res.data);
-      });
-    } catch (err) {
-      console.error(err);
-    }
+    axios.get('/product/all').then((res) => {
+      setCollection(res.data);
+    });
   }, []);
 
   return (

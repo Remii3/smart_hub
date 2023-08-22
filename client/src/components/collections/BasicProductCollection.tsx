@@ -1,19 +1,22 @@
 import { Link } from 'react-router-dom';
 import { SwiperSlide } from 'swiper/react';
 import { ChangeEvent, useState } from 'react';
-import BasicSwiper from '../swiper/BasicSwiper';
-import { ProductTypes } from '../../types/interfaces';
+import { UnknownProductTypes } from '../../types/interfaces';
 import PriceSelector from '../UI/ProductCollectionHelpers/PriceSelector';
 import SortProducts from '../UI/ProductCollectionHelpers/SortProducts';
 import sortProducts, { sortProductsTypes } from '../../helpers/sortProducts';
 import { filterProductsByPrice } from '../../helpers/filterProducts';
+import ShopCard from '../card/ShopCard';
+import LongSwiper from '../swiper/LongSwiper';
+import AuctionCard from '../card/AuctionCard';
 
 type PropsTypes = {
   title: string;
   subTitle?: string | null;
   showMore?: boolean;
-  allProducts: ProductTypes[];
+  allProducts: UnknownProductTypes[];
   category: string;
+  marketPlace: 'Shop' | 'Auction';
 };
 
 const defaultProps = {
@@ -27,16 +30,16 @@ export default function BasicProductCollection({
   subTitle,
   showMore,
   category,
+  marketPlace,
 }: PropsTypes) {
   const [sortOption, setSortOption] = useState('');
   const [minPrice, setMinPrice] = useState<string | number>('');
   const [maxPrice, setMaxPrice] = useState<string | number>('');
   let finalProducts = allProducts;
-  const highestPrice =
-    sortProducts({
-      products: allProducts,
-      sortType: sortProductsTypes.PRICE_DESC,
-    })[0] || 0;
+  const highestPrice = sortProducts({
+    products: allProducts,
+    sortType: sortProductsTypes.PRICE_DESC,
+  })[0];
 
   const sortOptionChangeHandler = (e: ChangeEvent<HTMLSelectElement>) => {
     setSortOption(e.target.value);
@@ -68,6 +71,12 @@ export default function BasicProductCollection({
     maxPrice,
   });
 
+  const noProducts =
+    allProducts.length < 1 ? (
+      <p className="pl-4">Empty collection </p>
+    ) : (
+      <p className="pl-4">No products found</p>
+    );
   return (
     <section>
       <header className="px-4">
@@ -87,7 +96,7 @@ export default function BasicProductCollection({
       <div className="mt-8 flex items-center justify-between px-4">
         <div className="flex flex-grow gap-4">
           <PriceSelector
-            highestPrice={highestPrice.price}
+            highestPrice={highestPrice ? highestPrice.shop_info.price : 0}
             category={category}
             minPrice={minPrice}
             maxPrice={maxPrice}
@@ -106,40 +115,38 @@ export default function BasicProductCollection({
       </div>
       <div className="mt-4">
         {finalProducts && finalProducts.length > 0 ? (
-          <BasicSwiper>
+          <LongSwiper swiperCategory={category}>
             {finalProducts.map((product, id) => (
               <SwiperSlide key={id}>
                 <div>
-                  <Link
-                    to={`/product/${product._id}`}
-                    className="group block overflow-hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-                  >
-                    <img
-                      src="https://images.unsplash.com/photo-1523381210434-271e8be1f52b?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80"
-                      alt=""
-                      className="h-[350px] w-full object-cover transition duration-500 group-hover:scale-105 sm:h-[450px]"
+                  {marketPlace === 'Shop' ? (
+                    <ShopCard
+                      _id={product._id}
+                      price={product.shop_info.price}
+                      productQuantity={product.quantity}
+                      title={product.title}
+                      authors={product.authors}
+                      description={product.description}
+                      img={product.img}
                     />
-
-                    <div className="relative bg-white pt-3">
-                      <h3 className="mt-4 text-lg text-gray-700 group-hover:underline group-hover:underline-offset-4">
-                        {product.title}
-                      </h3>
-
-                      <p className="mt-2">
-                        <span className="sr-only"> Regular Price </span>
-
-                        <span className="tracking-wider text-gray-900">
-                          €{product.price}
-                        </span>
-                      </p>
-                    </div>
-                  </Link>
+                  ) : (
+                    <AuctionCard
+                      _id={product._id}
+                      title={product.title}
+                      authors={product.authors}
+                      description={product.description}
+                      img={product.img}
+                      startingPrice={product.auction_info.starting_price}
+                      currentPrice={product.auction_info.current_price}
+                      auctionEndDate={product.auction_info.auction_end_date}
+                    />
+                  )}
                 </div>
               </SwiperSlide>
             ))}
-          </BasicSwiper>
+          </LongSwiper>
         ) : (
-          <h6 className="pl-4">No products found</h6>
+          noProducts
         )}
       </div>
     </section>
