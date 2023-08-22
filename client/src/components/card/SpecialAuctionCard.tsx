@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import SecondaryBtn from '../UI/Btns/SecondaryBtn';
 import PrimaryBtn from '../UI/Btns/PrimaryBtn';
-import { SepcialAuctionCardType } from '../../types/types';
+import { ProductSpecialAuctionCardTypes } from '../../types/interfaces';
 
 const defalutProps = {
   highBid: 0,
@@ -13,13 +13,14 @@ const defalutProps = {
 function SpecialAuctionCard({
   _id,
   title,
-  deadline,
   description,
-  highBid,
-  price,
-  imgs,
   swipedFlag,
-}: SepcialAuctionCardType) {
+  auctionEndDate,
+  authors,
+  currentPrice,
+  startingPrice,
+  img,
+}: ProductSpecialAuctionCardTypes) {
   const [descHidden, setDescHidden] = useState(true);
 
   const showDesc = () => {
@@ -40,7 +41,6 @@ function SpecialAuctionCard({
     );
     titleShortened = `${titleShortened}...`;
   }
-  console.log(description);
   return (
     <div
       id={`${_id}`}
@@ -49,7 +49,7 @@ function SpecialAuctionCard({
       <div className="rounded-2xl bg-white px-3 py-3">
         <div className="flex flex-col gap-3 xl:flex-row">
           <div className="mx-auto w-full max-w-xs basis-1/2 overflow-hidden rounded-md lg:block">
-            {imgs && (
+            {img && (
               <Link to={`/product/${_id}`}>
                 <img
                   alt="Les Paul"
@@ -68,16 +68,17 @@ function SpecialAuctionCard({
                 <div className="flex w-full flex-col gap-3">
                   <p className="flex justify-between sm:text-lg">
                     <span className="text-gray600"> Highest bid:</span>
-                    <span className="text-darkTint">{highBid}€</span>
+                    <span className="text-darkTint">{currentPrice}€</span>
                   </p>
                   <p className="flex justify-between  sm:text-lg">
                     <span className="text-gray600"> Min bid:</span>
-                    <span className="text-darkTint">{price.value}€</span>
+                    <span className="text-darkTint">{startingPrice}€</span>
                   </p>
                   <p className="flex justify-between sm:text-lg">
                     <span className="text-gray600"> Deadline:</span>
                     <span className="text-darkTint">
-                      {deadline?.toISOString().slice(0, 10) || 'Unlimited'}
+                      {auctionEndDate?.toISOString().slice(0, 10) ||
+                        'Unlimited'}
                     </span>
                   </p>
                   <p

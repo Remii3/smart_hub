@@ -1,9 +1,15 @@
 const mongoose = require('mongoose');
 
 const CategorySchema = mongoose.Schema({
-  value: { type: String },
-  label: { type: String },
-  description: { type: String },
+  categories: [
+    {
+      type: {
+        value: { type: String, required: true },
+        label: { type: String, required: true },
+        description: { type: String },
+      },
+    },
+  ],
 });
 
 const CategoryModel = mongoose.model('Category', CategorySchema);

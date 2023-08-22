@@ -43,7 +43,7 @@ export default function LoginPage() {
         password,
       });
 
-      axios.get('/user/profile').then((res) => changeUserData(res.data));
+      axios.get('/user/myProfile').then((res) => changeUserData(res.data));
 
       navigate('/');
     } catch (err: any) {

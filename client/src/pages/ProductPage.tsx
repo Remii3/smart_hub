@@ -7,33 +7,30 @@ import {
 } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { ProductTypes } from '../types/interfaces';
+import { UnknownProductTypes } from '../types/interfaces';
 import { UserContext } from '../context/UserProvider';
 import CustomDialog from '../components/UI/headlessUI/CustomDialog';
 import ProductImage from '../components/product/ProductImage';
 import ProductPill from '../components/product/ProductPill';
 import StarRating from '../components/product/StarRating';
 import ProductForm from '../components/product/ProductForm';
+import PrimaryBtn from '../components/UI/Btns/PrimaryBtn';
 
 export default function ProductPage() {
   const [isFetchingData, setIsFetchingData] = useState(false);
   const [isMyProduct, setIsMyProduct] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [productData, setProductData] = useState<ProductTypes | null>(null);
+  const [productData, setProductData] = useState<UnknownProductTypes>();
   const [newData, setNewData] = useState({
     newTitle: productData?.title,
-    newPrice: productData?.price.value,
+    newPrice: productData?.shop_info?.price,
     newDescription: productData?.description,
     newQuantity: productData?.quantity,
   });
-
   const { userData } = useContext(UserContext);
-
-  const creatorPath =
-    productData?.userProp.id === userData?._id
-      ? 'my'
-      : productData?.userProp.id;
+  const [newComment, setNewComment] = useState('');
+  const [isAddingComment, setIsAddingComment] = useState(false);
 
   const navigate = useNavigate();
   const path = useLocation();
@@ -63,7 +60,13 @@ export default function ProductPage() {
   }, [fetchProductData]);
 
   useEffect(() => {
-    if (userData?.my_products.find((item) => item._id === productData?._id)) {
+    if (
+      userData &&
+      userData.role !== 'User' &&
+      userData.author_info.my_products.find(
+        (product: UnknownProductTypes) => product._id === productData?._id
+      )
+    ) {
       setIsMyProduct(true);
     }
   }, [userData, productData]);
@@ -108,6 +111,18 @@ export default function ProductPage() {
   if (productData === undefined && isFetchingData) return <p>Loading</p>;
   if (productData === undefined) return <p> No data</p>;
   const DUMMYIMGS = [{ id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }];
+
+  const addNewCommentHandler = async () => {
+    setIsAddingComment(true);
+    await axios.post('/comment/add-comment', {
+      userId: userData?._id,
+      productId: prodId,
+      value: { rating: 2, comment: newComment },
+    });
+    setIsAddingComment(false);
+    fetchProductData();
+  };
+
   return (
     <section className="relative">
       <div className="relative mx-auto max-w-screen-xl px-4 py-8">
@@ -125,7 +140,7 @@ export default function ProductPage() {
 
           <div className="sticky top-24">
             <div className="relative mb-3 w-full">
-              <ProductPill text={productData && productData.marketPlace} />
+              <ProductPill text={productData && productData.market_place} />
               {isMyProduct && (
                 <div className="absolute right-0 top-0 flex gap-3">
                   <CustomDialog
@@ -198,13 +213,15 @@ export default function ProductPage() {
                     ))}
                 </div>
                 <p className="text-xs">
-                  Added: {productData && productData.addedDate.slice(0, 10)}
+                  Added: {productData && productData.created_at.slice(0, 10)}
                 </p>
                 <p className="text-xs">
-                  by:{' '}
-                  <Link to={`/account/${creatorPath}`}>
-                    {productData?.userProp.email}
-                  </Link>
+                  Authors:{' '}
+                  {productData?.authors?.map((author) => (
+                    <Link key={author._id} to={`/account/${author._id}`}>
+                      {author.author_info.pseudonim}
+                    </Link>
+                  ))}
                 </p>
                 <p className="text-sm">Highest Rated Product</p>
 
@@ -220,7 +237,7 @@ export default function ProductPage() {
                 />
               ) : (
                 <p className="text-lg font-bold">
-                  {productData && productData.price.value}€
+                  {productData?.shop_info && productData.shop_info.price}€
                 </p>
               )}
             </div>
@@ -262,11 +279,58 @@ export default function ProductPage() {
                   </button>
                 )}
             </div>
+
             <ProductForm
               productId={productData?._id}
               productQuantity={productData?.quantity}
+              sold={productData.sold}
             />
           </div>
+        </div>
+        <div>
+          <h5>Comments</h5>
+          <section>
+            <div className="flex gap-5">
+              <div>
+                <p>You</p>
+                <p>rating</p>
+              </div>
+              <div>
+                <label htmlFor="newComment" className="sr-only">
+                  New comment
+                </label>
+                <input
+                  id="newComment"
+                  name="newComment"
+                  type="text"
+                  value={newComment}
+                  onChange={(e) => setNewComment(e.target.value)}
+                />
+              </div>
+            </div>
+            <PrimaryBtn
+              type="button"
+              usecase="action"
+              isLoading={isAddingComment}
+              onClick={addNewCommentHandler}
+              disabled={!userData?._id}
+            >
+              Publish
+            </PrimaryBtn>
+          </section>
+          <section>
+            {productData?.comments.map((comment) => (
+              <div key={comment._id} className="flex gap-5">
+                <div>
+                  <p>{comment.user.user_info.credentials.full_name}</p>
+                  <p>{comment.value.rating}</p>
+                </div>
+                <div>
+                  <p>{comment.value.comment}</p>
+                </div>
+              </div>
+            ))}
+          </section>
         </div>
       </div>
     </section>

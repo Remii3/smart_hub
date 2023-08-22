@@ -23,7 +23,7 @@ export default function CartPage() {
                 <dl className="space-y-0.5 text-sm text-gray-700">
                   <div className="flex justify-between">
                     <dt>Subtotal</dt>
-                    <dd>{cartState && cartState.cart?.cartPrice}</dd>
+                    <dd>{cartState && cartState.cartPrice}</dd>
                   </div>
 
                   {false && (
@@ -42,7 +42,7 @@ export default function CartPage() {
 
                   <div className="flex justify-between !text-base font-medium">
                     <dt>Total</dt>
-                    <dd>{cartState && cartState.cart?.cartPrice}</dd>
+                    <dd>{cartState && cartState.cartPrice}</dd>
                   </div>
                 </dl>
 
