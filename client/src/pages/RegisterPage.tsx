@@ -15,6 +15,7 @@ export default function RegisterPage() {
     data: {
       credentials: { firstName: '', lastName: '' },
       email: '',
+      username: '',
       password: '',
       passwordConfirmation: '',
     },
@@ -22,6 +23,7 @@ export default function RegisterPage() {
     errors: {
       credentials: { firstName: null, lastName: null },
       email: null,
+      username: null,
       password: null,
       passwordConfirmation: null,
     },
@@ -80,18 +82,19 @@ export default function RegisterPage() {
   const signUpHandler = async (e: FormEvent) => {
     e.preventDefault();
 
-    const { credentials, email, password, passwordConfirmation } =
+    const { credentials, email, username, password, passwordConfirmation } =
       regUserData.data;
 
     try {
       await axios.post('/user/register', {
         credentials,
         email,
+        username,
         password,
         passwordConfirmation,
       });
 
-      axios.get('/user/profile').then((res) => changeUserData(res.data));
+      axios.get('/user/myProfile').then((res) => changeUserData(res.data));
 
       navigate('/');
     } catch (err: any) {
@@ -237,6 +240,20 @@ export default function RegisterPage() {
                   onChange={(e) => registerChangeHandler(e)}
                   optional={false}
                   type="email"
+                />
+              </div>
+
+              <div className="col-span-6">
+                <CustomInput
+                  autoComplete="username"
+                  hasError={regUserData.errors.username}
+                  errorValue={regUserData.errors.username}
+                  inputValue={regUserData.data.username}
+                  labelValue="Username"
+                  name="username"
+                  onChange={(e) => registerChangeHandler(e)}
+                  optional={false}
+                  type="text"
                 />
               </div>
 

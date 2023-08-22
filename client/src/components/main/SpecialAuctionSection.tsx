@@ -4,21 +4,19 @@ import { SwiperSlide } from 'swiper/react';
 import MainPageHeading from '../UI/MainPageHeading';
 import SpecialAuctionsSwiper from '../swiper/SpecialSwiper';
 import SpecialAuctionCard from '../card/SpecialAuctionCard';
-import { ProductTypes } from '../../types/interfaces';
+import { AuctionProductTypes } from '../../types/interfaces';
 
 export default function SpecialAuctionSection() {
-  const [specialAuctions, setSpecialAuctions] = useState<ProductTypes[]>([]);
+  const [specialAuctions, setSpecialAuctions] = useState<AuctionProductTypes[]>(
+    []
+  );
 
   const [bestAuctionCardFlag, setBestAuctionCardFlag] = useState(true);
 
   useEffect(() => {
-    try {
-      axios.get('/product/auction-products').then((res) => {
-        setSpecialAuctions(res.data.slice(0, 6));
-      });
-    } catch (err) {
-      console.error(err);
-    }
+    axios.get('/product/auction-products').then((res) => {
+      setSpecialAuctions(res.data.slice(0, 6));
+    });
   }, []);
 
   const swiperHandler = () => {
@@ -54,10 +52,13 @@ export default function SpecialAuctionSection() {
                 <SpecialAuctionCard
                   _id={product._id}
                   title={product.title}
-                  price={product.price}
                   swipedFlag={bestAuctionCardFlag}
-                  deadline={new Date()}
                   description={product.description}
+                  auctionEndDate={product.auction_info.auction_end_date}
+                  authors={product.authors}
+                  currentPrice={product.auction_info.current_price}
+                  startingPrice={product.auction_info.starting_price}
+                  img={product.img}
                 />
               </SwiperSlide>
             ))}

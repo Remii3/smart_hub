@@ -3,7 +3,7 @@ import { Popover, Transition } from '@headlessui/react';
 import { ChevronDownIcon } from '@heroicons/react/20/solid';
 
 type PriceSelectorPropsTypes = {
-  highestPrice: { value: number; currency: string };
+  highestPrice: number;
   category: string;
   minPrice: string | number;
   maxPrice: string | number;
@@ -21,7 +21,6 @@ export default function PriceSelector({
   minPriceChangeHandler,
   maxPriceChangeHandler,
 }: PriceSelectorPropsTypes) {
-  console.log(highestPrice);
   return (
     <div className="flex-grow sm:relative" id={`${category}-PriceSelector`}>
       <Popover>
@@ -58,11 +57,7 @@ export default function PriceSelector({
                     <div className="bg-white">
                       <header className="flex  flex-wrap justify-between p-4">
                         <span className="text-sm text-gray-700">
-                          The highest price is{' '}
-                          {highestPrice &&
-                            highestPrice.value &&
-                            highestPrice.value}
-                          €
+                          The highest price is {highestPrice && highestPrice}€
                         </span>
 
                         <button
@@ -96,11 +91,7 @@ export default function PriceSelector({
                             <input
                               id={`${category}-Max-PriceSelector`}
                               type="number"
-                              placeholder={`To ${
-                                highestPrice &&
-                                highestPrice.value &&
-                                highestPrice.value
-                              }`}
+                              placeholder={`To ${highestPrice && highestPrice}`}
                               className="w-full rounded-md border-gray-200 shadow-sm sm:text-sm"
                               value={maxPrice}
                               onChange={(e) => maxPriceChangeHandler(e)}

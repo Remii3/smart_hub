@@ -4,7 +4,7 @@ import { loadStripe } from '@stripe/stripe-js';
 import { useState, useEffect } from 'react';
 import CheckoutForm from '../components/checkout/CheckoutForm';
 import CheckoutProdList from '../components/checkout/CheckoutProdList';
-import { InitialStateType, SimpleFetchDataTypes } from '../types/interfaces';
+import { CartTypes, SimpleFetchDataTypes } from '../types/interfaces';
 import CheckoutItem from '../components/checkout/CheckoutItem';
 import PrimaryBtn from '../components/UI/Btns/PrimaryBtn';
 
@@ -23,7 +23,7 @@ export default function CheckoutPage() {
     hasError: null,
   });
   const [showThankYou, setShowThankYou] = useState(false);
-  const [lastCartState, setLastCartState] = useState<InitialStateType>();
+  const [lastCartState, setLastCartState] = useState<CartTypes>();
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -57,7 +57,7 @@ export default function CheckoutPage() {
     appearance,
   };
 
-  const changeShowThankYouHandler = (lastCartStateData: InitialStateType) => {
+  const changeShowThankYouHandler = (lastCartStateData: CartTypes) => {
     setLastCartState(lastCartStateData);
     setShowThankYou((prevState) => !prevState);
   };
@@ -71,11 +71,12 @@ export default function CheckoutPage() {
           <p className="py-3">You&apos;ve bought:</p>
           <div className="py-3">
             {lastCartState &&
-              lastCartState.cart?.products.map((item) => (
+              lastCartState.products.map((item) => (
                 <CheckoutItem
                   key={item.productData._id}
                   productData={item.productData}
                   inCartQuantity={item.inCartQuantity}
+                  productsTotalPrice={item.productsTotalPrice}
                 />
               ))}
           </div>

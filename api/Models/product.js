@@ -1,20 +1,36 @@
 const mongoose = require('mongoose');
 
-const ProductSchema = mongoose.Schema({
-  userProp: { type: { email: String, id: String }, required: true },
+const ShopDataSchema = mongoose.Schema({
   title: { type: String, required: true },
   description: { type: String },
-  price: { type: { value: Number, currency: String }, required: true },
-  imgs: [{ type: String }],
-  categories: [{ type: { value: String, label: String }, ref: 'Category' }],
-  authors: [{ type: String, ref: 'Author' }],
+  img: { type: Buffer },
+  img_type: { type: String },
+  categories: [
+    {
+      type: {
+        _id: mongoose.Types.ObjectId,
+      },
+      ref: 'Category',
+    },
+  ],
+  authors: [{ type: mongoose.Types.ObjectId, ref: 'User' }],
   rating: { type: Number },
-  quantity: { type: Number },
-  marketPlace: { type: String, required: true },
-  addedDate: { type: Date, required: true },
+  quantity: { type: Number, required: true },
+  market_place: { type: String, enum: ['Shop', 'Auction'], required: true },
+  created_at: { type: Date, required: true, default: Date.now },
   comments: [{ type: mongoose.Types.ObjectId, ref: 'Comment' }],
+  sold: { type: Boolean, default: false },
+  currency: { type: String, default: 'EUR' },
+  shop_info: {
+    price: { type: mongoose.Types.Decimal128 },
+  },
+  auction_info: {
+    starting_price: { type: mongoose.Types.Decimal128 },
+    current_price: { type: mongoose.Types.Decimal128 },
+    auction_end_date: { type: Date },
+  },
 });
 
-const ProductModel = mongoose.model('Product', ProductSchema);
+const ShopDataModel = mongoose.model('Product', ShopDataSchema);
 
-module.exports = ProductModel;
+module.exports = ShopDataModel;

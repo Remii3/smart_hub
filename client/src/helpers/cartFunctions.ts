@@ -8,7 +8,7 @@ type CartItemTypes = {
 
 export const getFetchCartData = async ({ userId }: CartItemTypes) => {
   if (userId) {
-    const res = await axios.get('/cart/cart', {
+    const res = await axios.get('/cart/all', {
       params: { userId },
     });
     return res.data;
@@ -21,7 +21,7 @@ export const postAddProductToCart = async ({
   productId,
   productQuantity,
 }: CartItemTypes) => {
-  await axios.post('/cart/cart', {
+  await axios.post('/cart/add', {
     userId,
     productId,
     productQuantity,
@@ -32,7 +32,7 @@ export const postIncrementCartItem = async ({
   userId,
   productId,
 }: CartItemTypes) => {
-  await axios.post('cart/cartItem-increment', {
+  await axios.post('cart/increment-one', {
     userId,
     productId,
   });
@@ -42,7 +42,7 @@ export const postDecrementCartItem = async ({
   userId,
   productId,
 }: CartItemTypes) => {
-  await axios.post('cart/cartItem-decrement', {
+  await axios.post('cart/decrement-one', {
     userId,
     productId,
   });
@@ -52,7 +52,7 @@ export const postRemoveProductFromCart = async ({
   userId,
   productId,
 }: CartItemTypes) => {
-  await axios.post('/cart/cart-remove', {
+  await axios.post('/cart/remove-one', {
     userId,
     productId,
   });

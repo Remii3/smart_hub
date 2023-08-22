@@ -11,13 +11,9 @@ export default function CategoriesSection() {
 
   const navigate = useNavigate();
   useEffect(() => {
-    try {
-      axios.get('/category/all').then((res) => {
-        setShopList(res.data);
-      });
-    } catch (err) {
-      console.error(err);
-    }
+    axios.get('/category/all').then((res) => {
+      setShopList(res.data);
+    });
   }, []);
 
   return (

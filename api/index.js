@@ -7,6 +7,7 @@ const product_routes = require('./Routes/product.routes');
 const cart_routes = require('./Routes/cart.routes');
 const category_routes = require('./Routes/category.routes');
 const comment_routes = require('./Routes/comment.routes');
+const order_routes = require('./Routes/order.routes');
 const app = express();
 
 require('dotenv').config();
@@ -35,6 +36,7 @@ mongoose
     app.use('/cart', cart_routes);
     app.use('/category', category_routes);
     app.use('/comment', comment_routes);
+    app.use('/order', order_routes);
   })
   .catch(err => {
     console.log(err);

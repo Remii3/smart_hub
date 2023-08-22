@@ -7,7 +7,7 @@ import {
 } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { ProductTypes } from '../types/interfaces';
+import { UnknownProductTypes } from '../types/interfaces';
 import { UserContext } from '../context/UserProvider';
 import CustomDialog from '../components/UI/headlessUI/CustomDialog';
 import ProductImage from '../components/product/ProductImage';
@@ -21,20 +21,16 @@ export default function ProductPage() {
   const [isMyProduct, setIsMyProduct] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [productData, setProductData] = useState<ProductTypes | null>(null);
+  const [productData, setProductData] = useState<UnknownProductTypes>();
   const [newData, setNewData] = useState({
     newTitle: productData?.title,
-    newPrice: productData?.price.value,
+    newPrice: productData?.shop_info?.price,
     newDescription: productData?.description,
     newQuantity: productData?.quantity,
   });
   const { userData } = useContext(UserContext);
   const [newComment, setNewComment] = useState('');
   const [isAddingComment, setIsAddingComment] = useState(false);
-  const creatorPath =
-    productData?.userProp.id === userData?._id
-      ? 'my'
-      : productData?.userProp.id;
 
   const navigate = useNavigate();
   const path = useLocation();
@@ -42,7 +38,7 @@ export default function ProductPage() {
   let prodId: string | any[] | null = null;
   prodId = path.pathname.split('/');
   prodId = prodId[prodId.length - 1];
-  console.log(userData?._id);
+
   const fetchProductData = useCallback(() => {
     setIsFetchingData(true);
     axios
@@ -64,7 +60,13 @@ export default function ProductPage() {
   }, [fetchProductData]);
 
   useEffect(() => {
-    if (userData?.my_products.find((item) => item._id === productData?._id)) {
+    if (
+      userData &&
+      userData.role !== 'User' &&
+      userData.author_info.my_products.find(
+        (product: UnknownProductTypes) => product._id === productData?._id
+      )
+    ) {
       setIsMyProduct(true);
     }
   }, [userData, productData]);
@@ -109,6 +111,7 @@ export default function ProductPage() {
   if (productData === undefined && isFetchingData) return <p>Loading</p>;
   if (productData === undefined) return <p> No data</p>;
   const DUMMYIMGS = [{ id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }];
+
   const addNewCommentHandler = async () => {
     setIsAddingComment(true);
     await axios.post('/comment/add-comment', {
@@ -119,6 +122,7 @@ export default function ProductPage() {
     setIsAddingComment(false);
     fetchProductData();
   };
+
   return (
     <section className="relative">
       <div className="relative mx-auto max-w-screen-xl px-4 py-8">
@@ -136,7 +140,7 @@ export default function ProductPage() {
 
           <div className="sticky top-24">
             <div className="relative mb-3 w-full">
-              <ProductPill text={productData && productData.marketPlace} />
+              <ProductPill text={productData && productData.market_place} />
               {isMyProduct && (
                 <div className="absolute right-0 top-0 flex gap-3">
                   <CustomDialog
@@ -209,13 +213,15 @@ export default function ProductPage() {
                     ))}
                 </div>
                 <p className="text-xs">
-                  Added: {productData && productData.addedDate.slice(0, 10)}
+                  Added: {productData && productData.created_at.slice(0, 10)}
                 </p>
                 <p className="text-xs">
-                  by:{' '}
-                  <Link to={`/account/${creatorPath}`}>
-                    {productData?.userProp.email}
-                  </Link>
+                  Authors:{' '}
+                  {productData?.authors?.map((author) => (
+                    <Link key={author._id} to={`/account/${author._id}`}>
+                      {author.author_info.pseudonim}
+                    </Link>
+                  ))}
                 </p>
                 <p className="text-sm">Highest Rated Product</p>
 
@@ -231,7 +237,7 @@ export default function ProductPage() {
                 />
               ) : (
                 <p className="text-lg font-bold">
-                  {productData && productData.price.value}€
+                  {productData?.shop_info && productData.shop_info.price}€
                 </p>
               )}
             </div>
@@ -273,9 +279,11 @@ export default function ProductPage() {
                   </button>
                 )}
             </div>
+
             <ProductForm
               productId={productData?._id}
               productQuantity={productData?.quantity}
+              sold={productData.sold}
             />
           </div>
         </div>
@@ -314,10 +322,7 @@ export default function ProductPage() {
             {productData?.comments.map((comment) => (
               <div key={comment._id} className="flex gap-5">
                 <div>
-                  <p>
-                    {comment.user.credentials.firstName}{' '}
-                    {comment.user.credentials.lastName}
-                  </p>
+                  <p>{comment.user.user_info.credentials.full_name}</p>
                   <p>{comment.value.rating}</p>
                 </div>
                 <div>

@@ -1,12 +1,12 @@
 import { Link } from 'react-router-dom';
 import { SwiperSlide } from 'swiper/react';
 import { ChangeEvent, useState } from 'react';
-import { ProductTypes } from '../../types/interfaces';
+import { UnknownProductTypes } from '../../types/interfaces';
 import PriceSelector from '../UI/ProductCollectionHelpers/PriceSelector';
 import SortProducts from '../UI/ProductCollectionHelpers/SortProducts';
 import sortProducts, { sortProductsTypes } from '../../helpers/sortProducts';
 import { filterProductsByPrice } from '../../helpers/filterProducts';
-import ProductCard from '../card/ProductCard';
+import ShopCard from '../card/ShopCard';
 import LongSwiper from '../swiper/LongSwiper';
 import AuctionCard from '../card/AuctionCard';
 
@@ -14,9 +14,9 @@ type PropsTypes = {
   title: string;
   subTitle?: string | null;
   showMore?: boolean;
-  allProducts: ProductTypes[];
+  allProducts: UnknownProductTypes[];
   category: string;
-  marketPlace: 'Product' | 'Auction';
+  marketPlace: 'Shop' | 'Auction';
 };
 
 const defaultProps = {
@@ -36,11 +36,10 @@ export default function BasicProductCollection({
   const [minPrice, setMinPrice] = useState<string | number>('');
   const [maxPrice, setMaxPrice] = useState<string | number>('');
   let finalProducts = allProducts;
-  const highestPrice =
-    sortProducts({
-      products: allProducts,
-      sortType: sortProductsTypes.PRICE_DESC,
-    })[0] || 0;
+  const highestPrice = sortProducts({
+    products: allProducts,
+    sortType: sortProductsTypes.PRICE_DESC,
+  })[0];
 
   const sortOptionChangeHandler = (e: ChangeEvent<HTMLSelectElement>) => {
     setSortOption(e.target.value);
@@ -72,7 +71,6 @@ export default function BasicProductCollection({
     maxPrice,
   });
 
-  // if (allProducts.length < 1) return <div />;
   const noProducts =
     allProducts.length < 1 ? (
       <p className="pl-4">Empty collection </p>
@@ -98,7 +96,7 @@ export default function BasicProductCollection({
       <div className="mt-8 flex items-center justify-between px-4">
         <div className="flex flex-grow gap-4">
           <PriceSelector
-            highestPrice={highestPrice.price}
+            highestPrice={highestPrice ? highestPrice.shop_info.price : 0}
             category={category}
             minPrice={minPrice}
             maxPrice={maxPrice}
@@ -121,24 +119,26 @@ export default function BasicProductCollection({
             {finalProducts.map((product, id) => (
               <SwiperSlide key={id}>
                 <div>
-                  {marketPlace === 'Product' ? (
-                    <ProductCard
+                  {marketPlace === 'Shop' ? (
+                    <ShopCard
                       _id={product._id}
-                      price={product.price}
+                      price={product.shop_info.price}
                       productQuantity={product.quantity}
                       title={product.title}
                       authors={product.authors}
                       description={product.description}
-                      imgs={product.imgs}
+                      img={product.img}
                     />
                   ) : (
                     <AuctionCard
                       _id={product._id}
-                      price={product.price}
                       title={product.title}
                       authors={product.authors}
                       description={product.description}
-                      imgs={product.imgs}
+                      img={product.img}
+                      startingPrice={product.auction_info.starting_price}
+                      currentPrice={product.auction_info.current_price}
+                      auctionEndDate={product.auction_info.auction_end_date}
                     />
                   )}
                 </div>

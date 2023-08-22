@@ -5,21 +5,17 @@ import axios from 'axios';
 import PrimaryBtn from '../UI/Btns/PrimaryBtn';
 import MainPageHeading from '../UI/MainPageHeading';
 import AuctionsSwiper from '../swiper/LongSwiper';
-import { ProductTypes } from '../../types/interfaces';
+import { AuctionProductTypes } from '../../types/interfaces';
 import AuctionCard from '../card/AuctionCard';
 
 export default function AllAuctionsSection() {
   const navigate = useNavigate();
-  const [auctions, setAuctions] = useState<ProductTypes[]>([]);
+  const [auctions, setAuctions] = useState<AuctionProductTypes[]>([]);
 
   useEffect(() => {
-    try {
-      axios.get('/product/auction-products').then((res) => {
-        setAuctions(res.data);
-      });
-    } catch (err) {
-      console.error(err);
-    }
+    axios.get('/product/auction-products').then((res) => {
+      setAuctions(res.data);
+    });
   }, []);
 
   if (auctions.length < 1) return <div />;
@@ -40,10 +36,12 @@ export default function AllAuctionsSection() {
               <AuctionCard
                 _id={product._id}
                 title={product.title}
-                price={product.price}
                 authors={product.authors}
                 description={product.description}
-                imgs={product.imgs}
+                img={product.img}
+                auctionEndDate={product.auction_info.auction_end_date}
+                currentPrice={product.auction_info.current_price}
+                startingPrice={product.auction_info.starting_price}
               />
             </SwiperSlide>
           ))}
