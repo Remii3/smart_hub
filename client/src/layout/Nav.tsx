@@ -78,7 +78,7 @@ export default function Nav() {
   return (
     <nav>
       <div className="relative mx-auto flex h-[64px] max-w-[1480px] flex-row items-center justify-between px-4 py-3 sm:px-10">
-        <div className="z-30 flex items-end">
+        <div className="z-30 flex items-center">
           <Link
             to="/"
             className=" block text-blue-600"
@@ -111,14 +111,14 @@ export default function Nav() {
             ))}
           </ul>
         </div>
-        <div className="hidden items-center lg:flex">
+        <div className="hidden basis-full items-center lg:flex">
           <form
             onSubmit={(e) => searchHandler(e)}
-            className="relative mx-auto  text-gray-600 "
+            className="relative mx-auto me-4 flex w-full justify-end text-gray-600"
           >
             <input
-              className="h-full rounded-full border-none bg-white pe-10 ps-4 text-sm shadow-sm focus:outline-none sm:w-56"
-              type="search"
+              className="border-1 h-full max-w-[24rem] rounded-lg border-gray-300 bg-white pl-3 pr-12 text-sm transition-[width] duration-200 ease-in-out focus:w-full focus:outline-none sm:w-56"
+              type="text"
               name="search"
               placeholder="Search"
               value={searchbarValue}
@@ -126,23 +126,10 @@ export default function Nav() {
             />
             <button
               type="submit"
-              className="absolute end-1 top-1/2 -translate-y-1/2 rounded-full bg-gray-50 px-2 text-gray-600 transition hover:text-gray-700"
+              className="absolute right-0 top-1/2 h-[98%] -translate-y-1/2 transform rounded-e-xl border-0 bg-transparent px-2 text-gray-600 transition"
             >
               <span className="sr-only">Search</span>
-              <svg
-                className="h-4 w-4 fill-current text-gray-600"
-                xmlns="http://www.w3.org/2000/svg"
-                version="1.1"
-                id="Capa_1"
-                x="0px"
-                y="0px"
-                viewBox="0 0 56.966 56.966"
-                xmlSpace="preserve"
-                width="512px"
-                height="512px"
-              >
-                <path d="M55.146,51.887L41.588,37.786c3.486-4.144,5.396-9.358,5.396-14.786c0-12.682-10.318-23-23-23s-23,10.318-23,23  s10.318,23,23,23c4.761,0,9.298-1.436,13.177-4.162l13.661,14.208c0.571,0.593,1.339,0.92,2.162,0.92  c0.779,0,1.518-0.297,2.079-0.837C56.255,54.982,56.293,53.08,55.146,51.887z M23.984,6c9.374,0,17,7.626,17,17s-7.626,17-17,17  s-17-7.626-17-17S14.61,6,23.984,6z" />
-              </svg>
+              <MagnifyingGlassIcon className="h-6 w-6 fill-current font-bold text-gray-600" />
             </button>
           </form>
           <Popover className="relative">
@@ -304,15 +291,15 @@ export default function Nav() {
                   leaveFrom="opacity-100 translate-y-0"
                   leaveTo="opacity-0 translate-y-1"
                 >
-                  <Popover.Panel className="absolute right-0 z-10 mt-[10px] w-full origin-top-right transform  pl-0">
-                    <div className="overflow-hidden rounded-lg px-4 shadow-lg ring-1 ring-black ring-opacity-5 sm:px-10">
+                  <Popover.Panel className="absolute right-0 z-10 mt-[10px] w-full origin-top-right transform bg-white pl-0">
+                    <div className="overflow-hidden rounded-lg px-4 py-2 shadow-lg ring-1 ring-black ring-opacity-5 sm:px-10">
                       <form
                         onSubmit={(e) => searchHandler(e)}
-                        className="relative mx-auto  text-gray-600 "
+                        className="relative mx-auto text-gray-600 "
                       >
                         <input
-                          className="h-full w-full rounded-lg border-2 border-gray-300 bg-white px-5 pr-16 text-sm focus:outline-none"
-                          type="search"
+                          className="h-full w-full rounded-lg border-2 border-gray-300 bg-white px-3 pr-16 text-sm focus:outline-none"
+                          type="text"
                           name="search"
                           placeholder="Search"
                           value={searchbarValue}
@@ -320,22 +307,10 @@ export default function Nav() {
                         />
                         <Popover.Button
                           type="submit"
-                          className="absolute right-0 top-0 mr-3 mt-3"
+                          className="absolute right-0 top-1/2 h-full -translate-y-1/2 rounded-e-lg border-b-2 border-r-2 border-t-2 border-transparent bg-transparent px-2 text-gray-600 transition"
                         >
-                          <svg
-                            className="h-4 w-4 fill-current text-gray-600"
-                            xmlns="http://www.w3.org/2000/svg"
-                            version="1.1"
-                            id="Capa_1"
-                            x="0px"
-                            y="0px"
-                            viewBox="0 0 56.966 56.966"
-                            xmlSpace="preserve"
-                            width="512px"
-                            height="512px"
-                          >
-                            <path d="M55.146,51.887L41.588,37.786c3.486-4.144,5.396-9.358,5.396-14.786c0-12.682-10.318-23-23-23s-23,10.318-23,23  s10.318,23,23,23c4.761,0,9.298-1.436,13.177-4.162l13.661,14.208c0.571,0.593,1.339,0.92,2.162,0.92  c0.779,0,1.518-0.297,2.079-0.837C56.255,54.982,56.293,53.08,55.146,51.887z M23.984,6c9.374,0,17,7.626,17,17s-7.626,17-17,17  s-17-7.626-17-17S14.61,6,23.984,6z" />
-                          </svg>
+                          <span className="sr-only">Search</span>
+                          <MagnifyingGlassIcon className="h-4 w-4 fill-current font-bold text-gray-600" />
                         </Popover.Button>
                       </form>
                     </div>
@@ -467,13 +442,13 @@ export default function Nav() {
                 >
                   Logout
                 </button> */}
-                <li>
+                <div>
                   <strong className="block text-xs font-medium uppercase text-gray-400">
                     Profile
                   </strong>
 
                   <ul className="mt-2 space-y-1">
-                    <li>
+                    {/* <li>
                       <a
                         href=""
                         className="block rounded-lg px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-700"
@@ -489,7 +464,7 @@ export default function Nav() {
                       >
                         Subscription
                       </a>
-                    </li>
+                    </li> */}
 
                     <li>
                       <form action="/logout">
@@ -502,7 +477,7 @@ export default function Nav() {
                       </form>
                     </li>
                   </ul>
-                </li>
+                </div>
               </div>
             )}
           </li>

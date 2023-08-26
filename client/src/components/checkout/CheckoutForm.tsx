@@ -12,7 +12,7 @@ import {
 import axios from 'axios';
 import { useState, useEffect, useContext, FormEvent } from 'react';
 import { UserContext } from '../../context/UserProvider';
-import getCookie from '../../helpers/getCookie';
+import { getCookie } from '../../helpers/utils';
 import { CartContext } from '../../context/CartProvider';
 
 export default function CheckoutForm({ changeShowThankYouHandler }: any) {

@@ -4,11 +4,13 @@ import { ChangeEvent, useState } from 'react';
 import { UnknownProductTypes } from '../../types/interfaces';
 import PriceSelector from '../UI/ProductCollectionHelpers/PriceSelector';
 import SortProducts from '../UI/ProductCollectionHelpers/SortProducts';
-import sortProducts, { sortProductsTypes } from '../../helpers/sortProducts';
-import { filterProductsByPrice } from '../../helpers/filterProducts';
 import ShopCard from '../card/ShopCard';
 import LongSwiper from '../swiper/LongSwiper';
 import AuctionCard from '../card/AuctionCard';
+import useSortProducts, {
+  sortProductsTypes,
+} from '../../hooks/useSortProducts';
+import useFilterProducts from '../../hooks/useFilterProducts';
 
 type PropsTypes = {
   title: string;
@@ -35,12 +37,13 @@ export default function BasicProductCollection({
   const [sortOption, setSortOption] = useState('');
   const [minPrice, setMinPrice] = useState<string | number>('');
   const [maxPrice, setMaxPrice] = useState<string | number>('');
-  let finalProducts = allProducts;
-  const highestPrice = sortProducts({
-    products: allProducts,
-    sortType: sortProductsTypes.PRICE_DESC,
-  })[0];
 
+  const { sortedProducts } = useSortProducts({
+    sortType: sortProductsTypes.PRICE_DESC,
+    products: allProducts,
+  });
+
+  const highestPrice = sortedProducts[0];
   const sortOptionChangeHandler = (e: ChangeEvent<HTMLSelectElement>) => {
     setSortOption(e.target.value);
   };
@@ -58,17 +61,9 @@ export default function BasicProductCollection({
     setMaxPrice(Number(e.target.value));
   };
 
-  if (sortOption) {
-    finalProducts = sortProducts({
-      products: allProducts,
-      sortType: sortOption,
-    });
-  }
-
-  finalProducts = filterProductsByPrice({
-    products: finalProducts,
-    minPrice,
-    maxPrice,
+  const { filteredProducts } = useFilterProducts({
+    products: sortedProducts,
+    filterData: { filterType: 'Price', filterValues: { minPrice, maxPrice } },
   });
 
   const noProducts =
@@ -114,9 +109,9 @@ export default function BasicProductCollection({
         </div>
       </div>
       <div className="mt-4">
-        {finalProducts && finalProducts.length > 0 ? (
+        {filteredProducts && filteredProducts.length > 0 ? (
           <LongSwiper swiperCategory={category}>
-            {finalProducts.map((product, id) => (
+            {filteredProducts.map((product, id) => (
               <SwiperSlide key={id}>
                 <div>
                   {marketPlace === 'Shop' ? (

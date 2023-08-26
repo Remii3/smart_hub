@@ -79,25 +79,103 @@ const getOneProduct = async (req, res) => {
 };
 
 const getSearchedProducts = async (req, res) => {
-  const { phrase } = req.query;
+  let { phrase, page, pageSize, filtersData, sortOption } = req.query;
+  if (!page) page = 1;
+  if (!pageSize) pageSize = 10;
+  let sort = {};
+  switch (sortOption) {
+    case 'Date, ASC':
+      sort.created_at = 1;
+      break;
+    case 'Date, DESC':
+      sort.created_at = -1;
+      break;
+
+    case 'Title, ASC':
+      sort.title = 1;
+      break;
+
+    case 'Title, DESC':
+      sort.title = -1;
+      break;
+
+    case 'Price, DESC':
+      sort['shop_info.price'] = -1;
+      break;
+
+    case 'Price, ASC':
+      sort['shop_info.price'] = 1;
+      break;
+  }
+  const skip = (page - 1) * pageSize;
+
   const searchParams = new URLSearchParams(phrase);
   const finalQuery = {};
   const finalRawData = {};
-
   for (const [key, value] of searchParams.entries()) {
     if (key === 'phrase') {
       finalQuery['$text'] = { $search: `${value}` };
       finalRawData[key] = value;
     }
     if (key === 'category') {
-      const category = await Category.findOne({ label: value });
+      const category = await Category.findOne({ value: value });
       finalQuery['categories'] = category._id;
       finalRawData[key] = value;
     }
   }
 
+  const marketplaces = filtersData.marketplace.filter(item => {
+    return item.isChecked === 'true';
+  });
+
+  const names = [];
+  marketplaces.forEach(item => {
+    names.push(item.name.charAt(0).toUpperCase() + item.name.slice(1));
+  });
+
+  finalQuery['market_place'] = { $in: names };
+
+  if (
+    filtersData.price.minPrice !== '' &&
+    filtersData.price.minPrice >= 1 &&
+    filtersData.price.maxPrice !== '' &&
+    filtersData.price.maxPrice >= 1
+  ) {
+    finalQuery['shop_info.price'] = {
+      $gte: Number(filtersData.price.minPrice),
+      $lte: Number(filtersData.price.maxPrice),
+    };
+  } else if (
+    filtersData.price.minPrice !== '' &&
+    filtersData.price.minPrice >= 1
+  ) {
+    finalQuery['shop_info.price'] = {
+      $gte: Number(filtersData.price.minPrice),
+    };
+  } else if (
+    filtersData.price.maxPrice !== '' &&
+    filtersData.price.maxPrice >= 1
+  ) {
+    finalQuery['shop_info.price'] = {
+      $lte: Number(filtersData.price.maxPrice),
+    };
+  }
+
   try {
-    const products = await Product.find(finalQuery).sort({ _id: 1 }).limit(20);
+    const products = await Product.find(finalQuery)
+      .sort(sort)
+      .skip(skip)
+      .limit(pageSize);
+
+    const highestPrice = await Product.find({})
+      .sort({ 'shop_info.price': -1 })
+      .limit(1);
+    const totalDocuments = await Product.find(finalQuery).countDocuments();
+    const totalPages = Math.ceil(totalDocuments / pageSize);
+    finalRawData.totalPages = totalPages;
+    finalRawData.totalProducts = totalDocuments;
+    finalRawData.highestPrice = Number(highestPrice[0].shop_info.price);
+
     const preparedProducts = [];
     for (let product of products) {
       preparedProducts.push(prepareProductObject(product));

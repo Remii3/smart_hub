@@ -5,14 +5,13 @@ const OrderSchema = mongoose.Schema({
   products: [
     {
       type: {
-        product: mongoose.Types.ObjectId,
+        product: { type: mongoose.Types.ObjectId, ref: 'Product' },
         in_cart_quantity: Number,
         total_price: Number,
       },
-      ref: 'Product',
     },
   ],
-  created_at: { type: Date },
+  created_at: { type: Date, default: Date.now },
 });
 
 const OrderModel = mongoose.model('Order', OrderSchema);

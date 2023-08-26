@@ -1,7 +1,6 @@
 const express = require('express');
 
 const router = express.Router();
-
 const checkAuth = require('../Middleware/checkAuth.middleware');
 const {
   signIn,
@@ -13,6 +12,7 @@ const {
   addFollow,
   removeFollow,
   getAllAuthors,
+  changeSecurityPermissions,
 } = require('../Controllers/user.controller');
 const checkSignUpData = require('../Middleware/checkSignUpData.middleware');
 const checkSignInData = require('../Middleware/checkSignInData.middleware');
@@ -27,5 +27,6 @@ router.post('/login', checkSignInData, signIn);
 router.post('/newData', newData);
 router.post('/add-follow', addFollow);
 router.post('/remove-follow', removeFollow);
+router.post('/security-permission', changeSecurityPermissions);
 
 module.exports = router;

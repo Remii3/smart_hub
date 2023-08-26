@@ -44,6 +44,10 @@
 @tailwind components;
 @tailwind utilities;
 
+html {
+  padding-right: 0 !important;
+}
+
 .hidden {
   display: none;
 }

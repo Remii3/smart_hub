@@ -1,13 +1,12 @@
 const User = require('../Models/user');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const Product = require('../Models/product');
 const mongoose = require('mongoose');
 const Cart = require('../Models/cart');
 const getRandomString = require('../helpers/getRandomString');
 const { verifyNewUserData } = require('../helpers/verify');
 const prepareProductObject = require('../helpers/prepareProductObject');
-
+const imageMimeTypes = ['image/jpeg', 'image/png', 'images/gif'];
 const salt = bcrypt.genSaltSync(12);
 
 const signIn = async (req, res) => {
@@ -87,7 +86,7 @@ const signUp = async (req, res) => {
         avg_products_grade: 0,
         sold_books_quantity: 0,
         my_products: [],
-        followers: 0,
+        followers: [],
       },
     });
 
@@ -120,6 +119,7 @@ const signUp = async (req, res) => {
         message: Object.values(responseObject)[0] + ` already exists`,
       });
     }
+    console.log(err);
     res.status(500).json({ message: 'Failed to register' });
   }
 };
@@ -135,12 +135,25 @@ const myProfile = async (req, res) => {
       orders,
       role,
       author_info,
+      security_settings,
     } = await User.findOne(
       {
         _id: req.user.user_id,
       },
       { password: 0 },
-    ).populate('author_info.my_products');
+    ).populate([
+      {
+        path: 'author_info',
+        populate: { path: 'my_products' },
+      },
+      {
+        path: 'orders',
+      },
+      {
+        path: 'orders',
+        populate: { path: 'products.product' },
+      },
+    ]);
 
     const cartData = await Cart.findOne({
       user_id: _id,
@@ -181,6 +194,7 @@ const myProfile = async (req, res) => {
       orders,
       cart: cartData,
       role,
+      security_settings,
     };
 
     if (role !== 'User') {
@@ -195,26 +209,50 @@ const myProfile = async (req, res) => {
 const newData = async (req, res) => {
   let { userEmail, fieldKey, newValue } = req.body;
   const errors = verifyNewUserData(fieldKey, newValue);
-
   if (errors.length > 0) {
     return res.status(422).json(errors[0]);
   }
-
   let fieldPath = fieldKey;
 
   if (fieldKey === 'first_name' || fieldKey === 'last_name') {
     fieldPath = `user_info.credentials.${fieldKey}`;
   }
 
+  if (fieldKey === 'address') {
+    fieldPath = `user_info.${fieldKey}`;
+  }
   if (fieldKey === 'password') {
     newValue = bcrypt.hashSync(newValue, salt);
   }
 
+  console.log(fieldKey, newValue, userEmail);
+
   try {
-    await User.updateOne(
-      { email: userEmail },
-      { $set: { [fieldPath]: newValue } },
-    );
+    if (fieldKey === 'address') {
+      await User.updateOne(
+        { email: userEmail },
+        { $set: { [fieldPath]: { ...newValue } } },
+      );
+    } else if (fieldKey === 'profile_img') {
+      if (newValue == null) return;
+      if (cover != null && imageMimeTypes.includes(cover.type)) {
+        const test = await User.updateOne(
+          { email: userEmail },
+          {
+            $set: {
+              'user_info.profile_img': new Buffer.from(cover.data, 'base64'),
+              'user_info.profile_img_type': cover.type,
+            },
+          },
+        );
+        console.log(test);
+      }
+    } else {
+      await User.updateOne(
+        { email: userEmail },
+        { $set: { [`${fieldPath}`]: newValue } },
+      );
+    }
     res.status(200).json({ message: 'Successfully updated data' });
   } catch (err) {
     if (err.code === 11000) {
@@ -223,7 +261,8 @@ const newData = async (req, res) => {
         message: Object.values(responseObject)[0] + ` already exists`,
       });
     } else {
-      res.status(500).json({ message: 'Failed to update data', err });
+      console.log(err);
+      res.status(500).json({ message: 'Failed to update data' });
     }
   }
 };
@@ -290,6 +329,7 @@ const otherUserData = async (req, res) => {
         email,
         username,
         user_info,
+        role,
       });
     }
   } catch (err) {
@@ -307,7 +347,7 @@ const addFollow = async (req, res) => {
     );
     await User.updateOne(
       { _id: followReceiverId },
-      { $addToSet: { followers: followGiverId } },
+      { $addToSet: { 'author_info.followers': followGiverId } },
     );
     res.status(200).json('success');
   } catch (err) {
@@ -324,7 +364,7 @@ const removeFollow = async (req, res) => {
     );
     await User.updateOne(
       { _id: followReceiverId },
-      { $pull: { followers: followGiverId } },
+      { $pull: { 'author_info.followers': followGiverId } },
     );
     res.status(200).json('success');
   } catch (err) {
@@ -350,6 +390,14 @@ const getAllAuthors = async (req, res) => {
   }
 };
 
+const changeSecurityPermissions = async (req, res) => {
+  const { userEmail, fieldKey, fieldValue } = req.body;
+  await User.updateOne(
+    { email: userEmail },
+    { [`security_settings.${fieldKey}`]: fieldValue },
+  );
+};
+
 module.exports = {
   signIn,
   signUp,
@@ -360,4 +408,5 @@ module.exports = {
   addFollow,
   removeFollow,
   getAllAuthors,
+  changeSecurityPermissions,
 };

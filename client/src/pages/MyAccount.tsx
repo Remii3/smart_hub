@@ -18,12 +18,16 @@ import MarketplaceBadge from '../components/UI/badges/MarketplaceBadge';
 import testImg from '../assets/img/avataaars.svg';
 import { Button } from '../components/UI/Btns/Button';
 import CustomDialog from '../components/UI/headlessUI/CustomDialog';
+import SecurityPermissions from '../components/myAccount/SecurityPermissions';
+import OrderHistory from '../components/myAccount/OrderHistory';
+import Admin from '../components/myAccount/Admin';
 
 const tabNames = {
   MY_DATA: 'myData',
   SECURITY_PERMISSIONS: 'securityPermissions',
   HISTORY: 'history',
   MY_PRODUCTS: 'myProducts',
+  ADMIN: 'admin',
 };
 
 type ProductDataTypes = {
@@ -73,6 +77,10 @@ export default function MyAccount() {
       text: 'My products',
       name: tabNames.MY_PRODUCTS,
       icon: <Square2StackIcon height={20} width={20} />,
+    },
+    {
+      text: 'Admin',
+      name: tabNames.ADMIN,
     },
   ];
   const [selectedtab, setSelectedtab] = useState(tabsArray[0].name);
@@ -334,40 +342,52 @@ export default function MyAccount() {
                   id="Tab"
                   className="w-full rounded-md border-gray-200"
                   onChange={(e) => setSelectedtab(e.target.value)}
+                  value={selectedtab}
                 >
-                  {tabsArray.map((tab) => (
-                    <option key={tab.name} value={tab.name}>
-                      {tab.text}
-                    </option>
-                  ))}
+                  {tabsArray.map((tab) => {
+                    return tab.name === 'admin' &&
+                      userData?.role !== 'Admin' ? null : (
+                      <option key={tab.name} value={tab.name}>
+                        {tab.text}
+                      </option>
+                    );
+                  })}
                 </select>
               </div>
 
               <div className="hidden sm:block">
                 <div className="border-b border-gray-200">
                   <nav className="-mb-px flex gap-6" aria-label="Tabs">
-                    {tabsArray.map((option) => (
-                      <a
-                        href="#"
-                        key={option.name}
-                        onClick={() => setSelectedtab(option.name)}
-                        className={`${
-                          selectedtab === option.name
-                            ? 'border-sky-500 text-sky-600'
-                            : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
-                        } ease inline-flex shrink-0 items-center gap-2 border-b-2 px-1 pb-4 text-sm font-medium transition duration-200`}
-                      >
-                        {option.icon}
-                        {option.text}
-                      </a>
-                    ))}
+                    {tabsArray.map((option) => {
+                      return option.name === 'admin' &&
+                        userData?.role !== 'Admin' ? null : (
+                        <a
+                          href="#"
+                          key={option.name}
+                          onClick={() => setSelectedtab(option.name)}
+                          className={`${
+                            selectedtab === option.name
+                              ? 'border-sky-500 text-sky-600'
+                              : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                          } ease inline-flex shrink-0 items-center gap-2 border-b-2 px-1 pb-4 text-sm font-medium transition duration-200`}
+                        >
+                          {option.icon}
+                          {option.text}
+                        </a>
+                      );
+                    })}
                   </nav>
                 </div>
               </div>
             </div>
             <div className="mt-8 flex w-full flex-col justify-start gap-8 px-4 lg:flex-row">
               {selectedtab === tabNames.MY_DATA && <EditUserData />}
+              {selectedtab === tabNames.SECURITY_PERMISSIONS && (
+                <SecurityPermissions />
+              )}
+              {selectedtab === tabNames.HISTORY && <OrderHistory />}
               {selectedtab === tabNames.MY_PRODUCTS && <MyShop />}
+              {selectedtab === tabNames.ADMIN && <Admin />}
             </div>
           </div>
         </MainContainer>

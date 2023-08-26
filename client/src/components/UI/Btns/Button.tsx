@@ -28,6 +28,7 @@ const buttonVariants = cva(
         big: 'px-12 py-3',
         default: 'px-5 py-3',
         sm: 'px-4 py-2',
+        none: 'p-0',
       },
       isDisabled: {
         yes: 'pointer-events-none opacity-70',

@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "ESNext",
+    "target": "ES6",
     "useDefineForClassFields": true,
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "allowJs": false,
@@ -21,10 +21,16 @@
       "~/*": ["src/*"]
     },
     "baseUrl": ".",
-    "typeRoots": ["src/ts", "node_modules/@types"],
-
+    "typeRoots": ["src/ts", "node_modules/@types"]
   },
-  "include": ["src", ".eslintrc.json", ".prettierrc.json", "tailwind.config.cjs", "postcss.config.cjs", "vite.config.ts"],
+  "include": [
+    "src",
+    ".eslintrc.json",
+    ".prettierrc.json",
+    "tailwind.config.cjs",
+    "postcss.config.cjs",
+    "vite.config.ts"
+  ],
   "references": [{ "path": "./tsconfig.node.json" }],
   "exclude": ["node_modules"]
 }

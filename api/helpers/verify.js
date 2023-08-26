@@ -14,19 +14,19 @@ function verifyNewUserData(fieldKey, value) {
       const emailErrors = checkEmail(value);
       errors.push(...emailErrors);
       break;
-    case 'name':
+    case 'first_name':
       if (value.trim() === '') {
-        errors.push({ name: 'firstName', message: 'No value provided.' });
+        errors.push({ name: fieldKey, message: 'No value provided.' });
       }
       break;
-    case 'surname':
+    case 'last_name':
       if (value.trim() === '') {
-        errors.push({ name: 'lastName', message: 'No value provided.' });
+        errors.push({ name: fieldKey, message: 'No value provided.' });
       }
       break;
     case 'password':
       if (value.trim() === '') {
-        errors.push({ name: 'password', message: 'No value provided' });
+        errors.push({ name: fieldKey, message: 'No value provided' });
       }
 
       if (value.trim().length < 3) {

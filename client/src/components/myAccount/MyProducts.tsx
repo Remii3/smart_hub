@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import sortProducts from '../../helpers/sortProducts';
 import { UnknownProductTypes } from '../../types/interfaces';
 import AuctionCard from '../card/AuctionCard';
 import ShopCard from '../card/ShopCard';
 import { Button } from '../UI/Btns/Button';
+import useSortProducts from '../../hooks/useSortProducts';
 
 interface PropsTypes {
   myProducts: UnknownProductTypes[];
@@ -21,14 +21,20 @@ export default function MyProducts({
   unfold,
 }: PropsTypes) {
   const [showMore, setShowMore] = useState(false);
-  const shortenedProducts = sortProducts({
+
+  let { sortedProducts } = useSortProducts({
     products: myProducts,
     sortType: 'Date, DESC',
-  }).slice(0, showMore ? myProducts.length : quantity);
+  });
+  sortedProducts = sortedProducts.slice(
+    0,
+    showMore ? myProducts.length : quantity
+  );
+
   return (
     <div>
       <div className="grid h-full grid-cols-1 gap-4 overflow-hidden pb-4 transition-[max-height] duration-300 ease-in-out sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {shortenedProducts.map((product) => {
+        {sortedProducts.map((product) => {
           return product.market_place === 'Shop' ? (
             <ShopCard
               key={product._id}

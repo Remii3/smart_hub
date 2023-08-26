@@ -1,5 +1,5 @@
 // eslint-disable-next-line import/no-cycle
-import { MarketPlaceTypes, UserRoleTypes } from './types';
+import { MarketPlaceTypes, UserRoleType } from './types';
 
 // * Product types
 
@@ -73,9 +73,12 @@ export interface UserTypes {
     phone: string;
   };
   cart_data: { products: UnknownProductTypes[]; _id: string };
-  following: AuthorTypes[];
+  following: string[];
   orders: OrderTypes[];
-  role: UserRoleTypes;
+  role: UserRoleType | string;
+  security_settings: {
+    hide_private_information: boolean;
+  };
 }
 
 export interface AuthorTypes extends UserTypes {
@@ -103,7 +106,11 @@ export interface TransactionHistoryTypes {
 export interface OrderTypes {
   _id: string;
   buyer_id: string;
-  items: UnknownProductTypes[];
+  products: {
+    product: UnknownProductTypes;
+    in_cart_quantity: number;
+    total_price: number;
+  }[];
   created_at: string;
 }
 

@@ -30,7 +30,7 @@ function Header({ currentPathname }: HeaderTypes) {
   }, [changeHeaderBgHandler, isMainPage]);
 
   return (
-    <header className="fixed top-0 z-20 w-full ">
+    <header className="sticky top-0 z-20 w-full ">
       <div
         ref={headerElement}
         className={`${

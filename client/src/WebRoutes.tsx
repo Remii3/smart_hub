@@ -21,6 +21,7 @@ import ContactPage from './pages/ContactPage';
 import ProductPage from './pages/ProductPage';
 import SearchPage from './pages/SearchPage';
 import OtherUserPage from './pages/OtherUserPage';
+import OrderPage from './pages/OrderPage';
 
 function WebRoutes() {
   const { pathname } = useLocation();
@@ -52,6 +53,7 @@ function WebRoutes() {
         <Route path="/checkout" element={<CheckoutPage />} />
         <Route path="/account/register" element={<RegisterPage />} />
         <Route path="/account/login" element={<LoginPage />} />
+        <Route path="/account/my/order/:id" element={<OrderPage />} />
         <Route
           path="/account/my"
           element={userData ? <MyAccount /> : <RegisterPage />}

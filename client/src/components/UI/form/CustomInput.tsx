@@ -73,7 +73,7 @@ export default function CustomInput({
           className={`${
             hasError &&
             'bg-red-1 00 border-red-600 text-red-600 focus:border-red-600 focus:ring-red-600'
-          }  mt-1 w-full rounded-md border-gray-200 shadow-sm disabled:border-slate-200 disabled:bg-slate-50 disabled:text-slate-500 disabled:shadow-none sm:text-sm`}
+          } mt-1 w-full rounded-md border-gray-200 shadow-sm disabled:border-slate-200 disabled:bg-slate-50 disabled:text-slate-500 disabled:shadow-none sm:text-sm`}
           value={inputValue}
           onChange={(e) => onChangeHandler(e)}
         />

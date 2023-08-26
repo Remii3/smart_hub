@@ -17,7 +17,7 @@ function LongSwiper({
   swiperCategory: string;
 }) {
   return (
-    <div className="relative">
+    <div className="relative md:px-5">
       <Swiper
         pagination
         navigation={{
@@ -62,8 +62,8 @@ function LongSwiper({
         }}
         style={{
           paddingBottom: '40px',
-          paddingLeft: '10px',
-          paddingRight: '10px',
+          paddingLeft: '22px',
+          paddingRight: '22px',
         }}
       >
         <SuspenseComponent fallback={<LoadingComponent />}>
@@ -72,10 +72,10 @@ function LongSwiper({
       </Swiper>
       <div className="hidden md:block">
         <button type="button" className={`${swiperCategory}-prev`}>
-          <ChevronLeftIcon className="absolute -left-2 top-1/2 h-11 w-11 -translate-y-10 text-primary transition duration-150 ease-out hover:text-blue-700 active:text-blue-800" />
+          <ChevronLeftIcon className="absolute -left-1 top-1/2 z-10 h-11 w-11 -translate-y-10 text-primary transition duration-150 ease-out hover:text-blue-700 active:text-blue-800" />
         </button>
         <button type="button" className={`${swiperCategory}-next`}>
-          <ChevronRightIcon className="absolute -right-2 top-1/2 h-11 w-11 -translate-y-10 text-primary transition duration-150 ease-out hover:text-blue-700 active:text-blue-800" />
+          <ChevronRightIcon className="absolute -right-1 top-1/2 z-10 h-11 w-11 -translate-y-10 text-primary transition duration-150 ease-out hover:text-blue-700 active:text-blue-800" />
         </button>
       </div>
     </div>

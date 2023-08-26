@@ -15,7 +15,7 @@ import {
   getFetchCartData,
   postRemoveProductFromCart,
 } from '../helpers/cartFunctions';
-import getCookie from '../helpers/getCookie';
+import { getCookie } from '../helpers/utils';
 import { CartTypes } from '../types/interfaces';
 
 const initialState = {
