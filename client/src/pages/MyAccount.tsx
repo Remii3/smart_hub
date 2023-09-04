@@ -1,5 +1,6 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import { useCallback, useContext, useEffect, useState } from 'react';
+import { io } from 'socket.io-client';
 import {
   UserIcon,
   ArchiveBoxIcon,
@@ -21,7 +22,11 @@ import CustomDialog from '../components/UI/headlessUI/CustomDialog';
 import SecurityPermissions from '../components/myAccount/SecurityPermissions';
 import OrderHistory from '../components/myAccount/OrderHistory';
 import Admin from '../components/myAccount/Admin';
+import { MarketPlaceTypes, UserRoleTypes } from '../types/types';
+import { Input } from '../components/UI/input';
+import { DatePicker } from '../components/UI/datePicker';
 
+const socket = io('ws://localhost:8080');
 const tabNames = {
   MY_DATA: 'myData',
   SECURITY_PERMISSIONS: 'securityPermissions',
@@ -40,6 +45,7 @@ type ProductDataTypes = {
   quantity: { value: number; hasError: boolean };
   price: { value: number; hasError: boolean };
   marketPlace: { value: string; hasError: boolean };
+  startingPrice: { value: number; hasError: boolean };
 };
 
 const initialProductData = {
@@ -51,12 +57,14 @@ const initialProductData = {
   imgs: { value: [], hasError: false },
   quantity: { value: 1, hasError: false },
   price: { value: 1, hasError: false },
-  marketPlace: { value: '', hasError: false },
+  marketPlace: { value: MarketPlaceTypes.SHOP, hasError: false },
+  startingPrice: { value: 1, hasError: false },
 };
 
 export default function MyAccount() {
   const { userData, fetchUserData } = useContext(UserContext);
   const [isOpen, setIsOpen] = useState(false);
+  const [finishAuctionDate, setFinishAuctionDate] = useState<Date>();
   const tabsArray = [
     {
       text: 'My data',
@@ -217,6 +225,8 @@ export default function MyAccount() {
       authors: authorState.value,
       quantity: productData.quantity.value,
       market_place: productData.marketPlace.value,
+      auction_end_date: finishAuctionDate,
+      starting_price: Number(productData.startingPrice.value),
     };
 
     try {
@@ -281,6 +291,11 @@ export default function MyAccount() {
     getAllData();
   }, [getAllData]);
 
+  const handleSubmit = (e: any) => {
+    e.preventDefault();
+    socket.emit('message', { test: 'Hello world' });
+  };
+
   return (
     <div className="relative mb-16 min-h-screen">
       <div>
@@ -320,14 +335,16 @@ export default function MyAccount() {
                   </div>
                 </div>
 
-                <div className="mt-4 flex flex-col sm:mt-0 sm:flex-row sm:items-center">
-                  <Button
-                    variant="primary"
-                    onClick={() => setIsOpen((prevState) => !prevState)}
-                  >
-                    Add new book
-                  </Button>
-                </div>
+                {userData?.role !== UserRoleTypes.USER && (
+                  <div className="mt-4 flex flex-col sm:mt-0 sm:flex-row sm:items-center">
+                    <Button
+                      variant="primary"
+                      onClick={() => setIsOpen((prevState) => !prevState)}
+                    >
+                      Add new book
+                    </Button>
+                  </div>
+                )}
               </div>
             </div>
           </header>
@@ -345,8 +362,18 @@ export default function MyAccount() {
                   value={selectedtab}
                 >
                   {tabsArray.map((tab) => {
-                    return tab.name === 'admin' &&
-                      userData?.role !== 'Admin' ? null : (
+                    if (
+                      tab.name === 'admin' &&
+                      userData?.role !== UserRoleTypes.ADMIN
+                    )
+                      return null;
+                    if (
+                      tab.name === 'myProducts' &&
+                      userData?.role !== UserRoleTypes.ADMIN &&
+                      userData?.role !== UserRoleTypes.AUTHOR
+                    )
+                      return null;
+                    return (
                       <option key={tab.name} value={tab.name}>
                         {tab.text}
                       </option>
@@ -359,8 +386,21 @@ export default function MyAccount() {
                 <div className="border-b border-gray-200">
                   <nav className="-mb-px flex gap-6" aria-label="Tabs">
                     {tabsArray.map((option) => {
-                      return option.name === 'admin' &&
-                        userData?.role !== 'Admin' ? null : (
+                      if (
+                        option.name === 'admin' &&
+                        userData?.role !== UserRoleTypes.ADMIN
+                      ) {
+                        return null;
+                      }
+                      if (
+                        option.name === 'myProducts' &&
+                        userData?.role !== UserRoleTypes.ADMIN &&
+                        userData?.role !== UserRoleTypes.AUTHOR
+                      ) {
+                        return null;
+                      }
+
+                      return (
                         <a
                           href="#"
                           key={option.name}
@@ -493,28 +533,25 @@ export default function MyAccount() {
           </fieldset>
 
           <fieldset className="relative mb-2 max-w-full space-y-1 break-all">
-            <div className="rounded-md border-gray-200 shadow-sm">
-              <label
-                htmlFor="imgs"
-                className="absolute block text-sm font-medium text-gray-700  "
-              >
-                Imgs
-              </label>
+            <label
+              htmlFor="imgs"
+              className="block text-sm font-medium text-gray-700  "
+            >
+              Imgs
+            </label>
 
-              <input
-                name="imgs"
-                id="imgs"
-                type="file"
-                className="opacity-0"
-                onChange={(e) => productDataChangeHandler(e)}
-                multiple
-                accept="application/pdf, image/png"
-              />
-            </div>
+            <Input
+              type="file"
+              name="imgs"
+              id="imgs"
+              onChange={(e) => productDataChangeHandler(e)}
+              accept="application/pdf, image/png"
+            />
+
             {productData.imgs.value.length > 0 &&
               productData.imgs.value.map((img, id) => {
                 return (
-                  <p className="text-xs" key={id}>
+                  <p className="text-xs" key={id} id={id.toString()}>
                     {img.slice(0, 60)}...
                   </p>
                 );
@@ -542,25 +579,6 @@ export default function MyAccount() {
             />
           </fieldset>
 
-          <fieldset className="mb-2 space-y-1">
-            <label
-              htmlFor="price"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Price
-            </label>
-            <input
-              name="price"
-              id="price"
-              type="number"
-              placeholder="$1..."
-              min={0.1}
-              step={0.1}
-              className="w-full rounded-md border-gray-200 shadow-sm sm:text-sm"
-              value={productData.price.value}
-              onChange={(e) => productDataChangeHandler(e)}
-            />
-          </fieldset>
           <fieldset className="mb-2 space-y-1">
             <span className="block text-sm font-medium text-gray-700">
               Marketplace
@@ -658,6 +676,57 @@ export default function MyAccount() {
               </div>
             </RadioGroup>
           </fieldset>
+
+          {productData.marketPlace.value === MarketPlaceTypes.SHOP ? (
+            <fieldset className="mb-2 space-y-1">
+              <label
+                htmlFor="price"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Price
+              </label>
+              <input
+                name="price"
+                id="price"
+                type="number"
+                placeholder="$1..."
+                min={0.1}
+                step={0.1}
+                className="w-full rounded-md border-gray-200 shadow-sm sm:text-sm"
+                value={productData.price.value}
+                onChange={(e) => productDataChangeHandler(e)}
+              />
+            </fieldset>
+          ) : (
+            <div>
+              <fieldset className="mb-2 space-y-1">
+                <label
+                  htmlFor="price"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Starting Price
+                </label>
+                <input
+                  name="startingPrice"
+                  id="startingPrice"
+                  type="number"
+                  placeholder="$1..."
+                  min={0.1}
+                  step={0.1}
+                  className="w-full rounded-md border-gray-200 shadow-sm sm:text-sm"
+                  value={productData.startingPrice.value}
+                  onChange={(e) => productDataChangeHandler(e)}
+                />
+              </fieldset>
+              <DatePicker
+                date={finishAuctionDate}
+                setDate={setFinishAuctionDate}
+              />
+              <button type="button" onClick={handleSubmit}>
+                Test Socket
+              </button>
+            </div>
+          )}
 
           <div className="mb-2 mt-4 flex justify-end">
             <Button variant="success" type="submit">

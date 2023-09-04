@@ -9,7 +9,7 @@ import ShortSwiper from '../components/swiper/ShortSwiper';
 import { UserContext } from '../context/UserProvider';
 import { Button } from '../components/UI/Btns/Button';
 import { MarketPlaceTypes, UserRoleTypes } from '../types/types';
-import { Skeleton } from '../../@/components/ui/skeleton';
+import { Skeleton } from '../components/UI/skeleton';
 
 export default function OtherUserPage() {
   const [otherUserData, setOtherUserData] = useState<AuthorTypes>();

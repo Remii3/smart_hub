@@ -201,7 +201,6 @@ const addProduct = async (req, res) => {
     market_place,
     created_at,
     starting_price,
-    current_price,
     auction_end_date,
   } = req.body.newProductData;
   try {
@@ -220,6 +219,7 @@ const addProduct = async (req, res) => {
   }
   try {
     const _id = new mongoose.Types.ObjectId();
+
     if (market_place === 'Shop') {
       if (typeof price !== 'number') {
         return res.status(400).json({ message: 'Price is required' });
@@ -246,11 +246,7 @@ const addProduct = async (req, res) => {
         return res.status(500).json({ message: 'Failed creating new product' });
       }
     } else {
-      if (
-        typeof starting_price !== Number ||
-        typeof currency !== String ||
-        typeof auction_end_date !== Date
-      ) {
+      if (typeof starting_price !== 'number') {
         return res.status(400).json({
           message: 'starting price, currency and auction end date are required',
         });
@@ -271,7 +267,6 @@ const addProduct = async (req, res) => {
           comments: [],
           auction_info: {
             starting_price,
-            current_price,
             auction_end_date,
           },
         });

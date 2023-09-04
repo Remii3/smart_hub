@@ -24,8 +24,7 @@ const ShopDataSchema = mongoose.Schema({
   },
   auction_info: {
     starting_price: { type: mongoose.Types.Decimal128 },
-    current_price: { type: mongoose.Types.Decimal128 },
-    auction_end_date: { type: Date },
+    auction_end_date: { type: String },
   },
 });
 

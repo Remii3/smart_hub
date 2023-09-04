@@ -1,5 +1,3 @@
-/* eslint-disable react/jsx-props-no-spreading */
-/* eslint-disable import/prefer-default-export */
 import { cn } from '../../lib/utils';
 
 function Skeleton({

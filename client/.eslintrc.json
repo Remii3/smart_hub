@@ -37,6 +37,8 @@
     "no-restricted-syntax": "off",
     "no-return-assign": "off",
     "no-param-reassign": "off",
-    "@typescript-eslint/no-non-null-assertion": "off"
+    "@typescript-eslint/no-non-null-assertion": "off",
+    "import/prefer-default-export": "off",
+    "react/jsx-props-no-spreading": "off"
   }
 }

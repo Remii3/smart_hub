@@ -10,9 +10,22 @@ const comment_routes = require('./Routes/comment.routes');
 const order_routes = require('./Routes/order.routes');
 const admin_routes = require('./Routes/admin.routes');
 const app = express();
+const server = require('http').createServer(app);
+const io = require('socket.io')(server, {
+  cors: {
+    origin: ['http://localhost:5173', 'https://smarthub-jb8g.onrender.com'],
+  },
+});
+
+io.on('connection', socket => {
+  console.log('first');
+  socket.on('message', message => {
+    console.log(message);
+  });
+});
 
 require('dotenv').config();
-
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.static('public'));
@@ -22,6 +35,7 @@ app.use(
     origin: ['http://localhost:5173', 'https://smarthub-jb8g.onrender.com'],
   }),
 );
+server.listen(8080, () => console.log('listening on http://localhost:8080'));
 mongoose
   .connect(process.env.MONGODB_CONNECTIONURL, {
     useNewUrlParser: true,

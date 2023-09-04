@@ -7,6 +7,7 @@ const defaultProps = {
   deadline: null,
   authors: [],
   description: '',
+  socket: any,
 };
 function AuctionCard({
   _id,
@@ -17,6 +18,7 @@ function AuctionCard({
   auctionEndDate,
   currentPrice,
   startingPrice,
+  socket,
 }: ProductAuctionCardType) {
   let titleShortened = title;
 
@@ -28,6 +30,11 @@ function AuctionCard({
     );
     titleShortened = `${titleShortened}...`;
   }
+
+  const joinRoomHandler = (e: any) => {
+    e.preventDefault();
+    socket.emit('message', { test: 'Hello world' });
+  };
 
   return (
     <div id={`${_id}`} className="mx-auto h-full w-full max-w-[400px]">
@@ -58,23 +65,16 @@ function AuctionCard({
         <div className="flex flex-col gap-3 px-3 pb-3">
           <p className="line-clamp-4 min-h-[80px]">{description}</p>
           <div className="flex justify-between gap-3">
-            <h4 className="flex items-center">{currentPrice}€</h4>
+            <h4 className="flex items-center">{}€</h4>
             <div>
               <div className="pb-3">stars</div>
               <Link
                 to={`/product/${_id}`}
+                onClick={joinRoomHandler}
                 className={buttonVariants({ variant: 'primary' })}
               >
-                Show more
+                Join bidding
               </Link>
-              {/* <PrimaryBtn
-                type="submit"
-                usecase="default"
-                asLink
-                linkPath={`/product/${_id}`}
-              >
-                Show more
-              </PrimaryBtn> */}
             </div>
           </div>
         </div>

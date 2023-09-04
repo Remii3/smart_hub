@@ -9,11 +9,11 @@ export default function MyShop() {
     <div>
       <div>
         <div className="mb-8">
+          <h5 className="pb-2 text-lg">Latest:</h5>
           {userData &&
           userData.role !== 'User' &&
           userData.author_info.my_products.length > 0 ? (
             <div>
-              <p className="pb-2 text-lg">Latest:</p>
               <MyProducts
                 myProducts={userData.author_info.my_products}
                 quantity={4}
@@ -25,11 +25,11 @@ export default function MyShop() {
           )}
         </div>
 
+        <h5 className="pb-2 text-lg">All:</h5>
         {userData &&
         userData.role !== 'User' &&
         userData.author_info.my_products.length > 0 ? (
           <div>
-            <p className="pb-2 text-lg">All:</p>
             <MyProducts
               myProducts={userData.author_info.my_products}
               quantity={8}
