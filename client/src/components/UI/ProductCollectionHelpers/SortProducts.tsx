@@ -1,15 +1,17 @@
-import React, { ChangeEvent, useState } from 'react';
+import { ChangeEvent } from 'react';
+import { sortProductsTypes } from '../../../helpers/sortProducts';
 
-type SortProductsTypes = {
+type SortProductsPropsTypes = {
   category: string;
+  sortOption: string;
+  sortOptionChangeHandler: (e: ChangeEvent<HTMLSelectElement>) => void;
 };
 
-function SortProducts({ category }: SortProductsTypes) {
-  const [sortOption, setSortOption] = useState('');
-  const sortOptionChangeHandler = (e: ChangeEvent<HTMLSelectElement>) => {
-    setSortOption(e.target.value);
-  };
-
+export default function SortProducts({
+  category,
+  sortOption,
+  sortOptionChangeHandler,
+}: SortProductsPropsTypes) {
   return (
     <div>
       <label htmlFor={`${category}-SortProducts`} className="sr-only">
@@ -19,16 +21,16 @@ function SortProducts({ category }: SortProductsTypes) {
         id={`${category}-SortProducts`}
         value={sortOption}
         onChange={(e) => sortOptionChangeHandler(e)}
-        className="h-10 rounded border-gray-300 text-sm"
+        className="h-10 cursor-pointer rounded border-gray-300 text-sm"
       >
-        <option>Sort By</option>
-        <option value="Title, DESC">Title, DESC</option>
-        <option value="Title, ASC">Title, ASC</option>
-        <option value="Price, DESC">Price, DESC</option>
-        <option value="Price, ASC">Price, ASC</option>
+        <option hidden>Sort By</option>
+        <option value={sortProductsTypes.DATE_DESC}>Date, DESC</option>
+        <option value={sortProductsTypes.DATE_ASC}>Date, ASC</option>
+        <option value={sortProductsTypes.TITLE_DESC}>Title, DESC</option>
+        <option value={sortProductsTypes.TITLE_ASC}>Title, ASC</option>
+        <option value={sortProductsTypes.PRICE_DESC}>Price, DESC</option>
+        <option value={sortProductsTypes.PRICE_ASC}>Price, ASC</option>
       </select>
     </div>
   );
 }
-
-export default SortProducts;

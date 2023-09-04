@@ -26,7 +26,7 @@ const defaultProps = {
   autoComplete: undefined,
 };
 
-function CustomPasswordInput({
+export default function CustomPasswordInput({
   labelValue,
   optional,
   name,
@@ -146,4 +146,3 @@ function CustomPasswordInput({
 }
 
 CustomPasswordInput.defaultProps = defaultProps;
-export default CustomPasswordInput;

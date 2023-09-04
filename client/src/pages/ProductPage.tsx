@@ -1,51 +1,43 @@
 import {
   ChangeEvent,
-  FormEvent,
   useEffect,
   useState,
   useContext,
   useCallback,
 } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { ProductTypes } from '../types/interfaces';
+import { UnknownProductTypes } from '../types/interfaces';
 import { UserContext } from '../context/UserProvider';
-import { CartContext } from '../context/CartProvider';
-import getCookie from '../helpers/getCookie';
-import CustomDialog from '../components/dialog/CustomDialog';
-import ProductImage from '../components/productParts/ProductImage';
-import ProductPill from '../components/productParts/ProductPill';
-import StarRating from '../components/productParts/StarRating';
+import CustomDialog from '../components/UI/headlessUI/CustomDialog';
+import ProductImage from '../components/product/ProductImage';
+import ProductPill from '../components/product/ProductPill';
+import StarRating from '../components/product/StarRating';
+import ProductForm from '../components/product/ProductForm';
 import PrimaryBtn from '../components/UI/Btns/PrimaryBtn';
 
-function ProductPage() {
-  const [isAddingToCart, setIsAddingToCart] = useState(false);
+export default function ProductPage() {
   const [isFetchingData, setIsFetchingData] = useState(false);
   const [isMyProduct, setIsMyProduct] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [productData, setProductData] = useState<ProductTypes>();
+  const [productData, setProductData] = useState<UnknownProductTypes>();
   const [newData, setNewData] = useState({
     newTitle: productData?.title,
-    newPrice: productData?.price,
+    newPrice: productData?.shop_info?.price,
     newDescription: productData?.description,
+    newQuantity: productData?.quantity,
   });
-  const [selectedQuantity, setSelectedQuantity] = useState(1);
-
   const { userData } = useContext(UserContext);
-  const { fetchCartData } = useContext(CartContext);
+  const [newComment, setNewComment] = useState('');
+  const [isAddingComment, setIsAddingComment] = useState(false);
 
   const navigate = useNavigate();
-
   const path = useLocation();
 
   let prodId: string | any[] | null = null;
   prodId = path.pathname.split('/');
   prodId = prodId[prodId.length - 1];
-
-  const quantityChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {
-    setSelectedQuantity(Number(e.target.value));
-  };
 
   const fetchProductData = useCallback(() => {
     setIsFetchingData(true);
@@ -56,6 +48,7 @@ function ProductPage() {
           newDescription: res.data.description,
           newPrice: res.data.price,
           newTitle: res.data.title,
+          newQuantity: res.data.quantity,
         });
         setProductData(res.data);
       });
@@ -66,24 +59,14 @@ function ProductPage() {
     fetchProductData();
   }, [fetchProductData]);
 
-  const addToCartHandler = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const currentUserId = userData?._id || getCookie('guestToken');
-
-    if (productData) {
-      setIsAddingToCart(true);
-      await axios.post('/cart/cart', {
-        userId: currentUserId,
-        productId: productData._id,
-        productQuantity: productData.quantity,
-      });
-      fetchCartData();
-      setIsAddingToCart(false);
-    }
-  };
-
   useEffect(() => {
-    if (userData?.my_products.find((item) => item._id === productData?._id)) {
+    if (
+      userData &&
+      userData.role !== 'User' &&
+      userData.author_info.my_products.find(
+        (product: UnknownProductTypes) => product._id === productData?._id
+      )
+    ) {
       setIsMyProduct(true);
     }
   }, [userData, productData]);
@@ -103,6 +86,7 @@ function ProductPage() {
       title: newData.newTitle,
       price: newData.newPrice,
       description: newData.newDescription,
+      quantity: newData.newQuantity,
     });
     fetchProductData();
     setIsEditing(false);
@@ -126,11 +110,21 @@ function ProductPage() {
 
   if (productData === undefined && isFetchingData) return <p>Loading</p>;
   if (productData === undefined) return <p> No data</p>;
-
   const DUMMYIMGS = [{ id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }];
 
+  const addNewCommentHandler = async () => {
+    setIsAddingComment(true);
+    await axios.post('/comment/add-comment', {
+      userId: userData?._id,
+      productId: prodId,
+      value: { rating: 2, comment: newComment },
+    });
+    setIsAddingComment(false);
+    fetchProductData();
+  };
+
   return (
-    <section>
+    <section className="relative">
       <div className="relative mx-auto max-w-screen-xl px-4 py-8">
         <div className="grid grid-cols-1 items-start gap-8 md:grid-cols-2">
           <div className="space-y-4">
@@ -144,9 +138,9 @@ function ProductPage() {
             </div>
           </div>
 
-          <div className="sticky top-0">
-            <div className="relative w-full">
-              <ProductPill text={productData.marketPlace} />
+          <div className="sticky top-24">
+            <div className="relative mb-3 w-full">
+              <ProductPill text={productData && productData.market_place} />
               {isMyProduct && (
                 <div className="absolute right-0 top-0 flex gap-3">
                   <CustomDialog
@@ -209,10 +203,26 @@ function ProductPage() {
                   />
                 ) : (
                   <h1 className="text-xl font-bold sm:text-2xl">
-                    {productData.title}
+                    {productData && productData.title}
                   </h1>
                 )}
-
+                <div>
+                  {productData &&
+                    productData.categories?.map((category) => (
+                      <span key={category._id}>{category.value}</span>
+                    ))}
+                </div>
+                <p className="text-xs">
+                  Added: {productData && productData.created_at.slice(0, 10)}
+                </p>
+                <p className="text-xs">
+                  Authors:{' '}
+                  {productData?.authors?.map((author) => (
+                    <Link key={author._id} to={`/account/${author._id}`}>
+                      {author.author_info.pseudonim}
+                    </Link>
+                  ))}
+                </p>
                 <p className="text-sm">Highest Rated Product</p>
 
                 <StarRating />
@@ -226,11 +236,25 @@ function ProductPage() {
                   onChange={(e) => newDataChangeHandler(e)}
                 />
               ) : (
-                <p className="text-lg font-bold">€{productData.price}</p>
+                <p className="text-lg font-bold">
+                  {productData?.shop_info && productData.shop_info.price}€
+                </p>
               )}
             </div>
 
             <div className="mt-4">
+              <div className="max-w-none">
+                <span>Available: </span>
+                {isEditing ? (
+                  <input
+                    name="newQuantity"
+                    value={newData.newQuantity}
+                    onChange={(e) => newDataChangeHandler(e)}
+                  />
+                ) : (
+                  <span>{productData && productData.quantity}</span>
+                )}
+              </div>
               <div className="prose max-w-none">
                 {isEditing ? (
                   <textarea
@@ -240,11 +264,12 @@ function ProductPage() {
                     onChange={(e) => newDataChangeHandler(e)}
                   />
                 ) : (
-                  <p>{productData.description}</p>
+                  <p>{productData && productData.description}</p>
                 )}
               </div>
 
-              {productData.description &&
+              {productData &&
+                productData.description &&
                 productData.description.length > 600 && (
                   <button
                     type="button"
@@ -255,47 +280,59 @@ function ProductPage() {
                 )}
             </div>
 
-            <form className="mt-8" onSubmit={(e) => addToCartHandler(e)}>
-              <div className="mt-8 flex gap-4">
-                <div>
-                  <label htmlFor="quantity" className="sr-only">
-                    Qty
-                  </label>
-
-                  <input
-                    type="number"
-                    id="quantity"
-                    min="1"
-                    step="1"
-                    value={selectedQuantity}
-                    onChange={(e) => quantityChangeHandler(e)}
-                    className="w-12 rounded border-gray-200 py-3 text-center text-xs [-moz-appearance:_textfield] [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none"
-                  />
-                </div>
-                <PrimaryBtn type="button" usecase="action">
-                  Hello
-                </PrimaryBtn>
-                <button
-                  className={`
-                   block rounded bg-[#5469d4] px-5 py-3 text-xs font-medium text-white`}
-                  type="submit"
-                  disabled={isAddingToCart}
-                >
-                  <span id="button-text">
-                    {isAddingToCart ? (
-                      <div className="spinner" id="spinner" />
-                    ) : (
-                      'Add to Cart'
-                    )}
-                  </span>
-                </button>
-              </div>
-            </form>
+            <ProductForm
+              productId={productData?._id}
+              productQuantity={productData?.quantity}
+              sold={productData.sold}
+            />
           </div>
+        </div>
+        <div>
+          <h5>Comments</h5>
+          <section>
+            <div className="flex gap-5">
+              <div>
+                <p>You</p>
+                <p>rating</p>
+              </div>
+              <div>
+                <label htmlFor="newComment" className="sr-only">
+                  New comment
+                </label>
+                <input
+                  id="newComment"
+                  name="newComment"
+                  type="text"
+                  value={newComment}
+                  onChange={(e) => setNewComment(e.target.value)}
+                />
+              </div>
+            </div>
+            <PrimaryBtn
+              type="button"
+              usecase="action"
+              isLoading={isAddingComment}
+              onClick={addNewCommentHandler}
+              disabled={!userData?._id}
+            >
+              Publish
+            </PrimaryBtn>
+          </section>
+          <section>
+            {productData?.comments.map((comment) => (
+              <div key={comment._id} className="flex gap-5">
+                <div>
+                  <p>{comment.user.user_info.credentials.full_name}</p>
+                  <p>{comment.value.rating}</p>
+                </div>
+                <div>
+                  <p>{comment.value.comment}</p>
+                </div>
+              </div>
+            ))}
+          </section>
         </div>
       </div>
     </section>
   );
 }
-
-export default ProductPage;

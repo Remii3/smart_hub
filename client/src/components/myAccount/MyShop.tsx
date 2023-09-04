@@ -1,119 +1,101 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, {
+  ChangeEvent,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
 import { RadioGroup } from '@headlessui/react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
+import AsyncCreatableSelect from 'react-select/async-creatable';
 import PrimaryBtn from '../UI/Btns/PrimaryBtn';
-import CustomDialog from '../dialog/CustomDialog';
-import { ProductCategories, ProductTypes } from '../../types/interfaces';
-import DefaultCard from '../card/DefaultCard';
-import SecondaryBtn from '../UI/Btns/SecondaryBtn';
+import CustomDialog from '../UI/headlessUI/CustomDialog';
 import { UserContext } from '../../context/UserProvider';
 import { CheckIcon } from '../../assets/icons/Icons';
+import MyProducts from './MyProducts';
 
 type ProductDataTypes = {
   title: { value: string; hasError: boolean };
-  author: { value: string; hasError: boolean };
-  category: { value: string; hasError: boolean };
+  authors: { value: string[]; hasError: boolean };
+  categories: { value: string[]; hasError: boolean };
   otherCategory: { value: string; hasError: boolean };
   description: { value: string; hasError: boolean };
   imgs: { value: string[]; hasError: boolean };
   quantity: { value: number; hasError: boolean };
   price: { value: number; hasError: boolean };
   marketPlace: { value: string; hasError: boolean };
-  height: { value: number; hasError: boolean };
-  width: { value: number; hasError: boolean };
-  depth: { value: number; hasError: boolean };
 };
 
 const initialProductData = {
   title: { value: '', hasError: false },
-  author: { value: '', hasError: false },
-  category: { value: '', hasError: false },
+  authors: { value: [], hasError: false },
+  categories: { value: [], hasError: false },
   otherCategory: { value: '', hasError: false },
   description: { value: '', hasError: false },
   imgs: { value: [], hasError: false },
   quantity: { value: 1, hasError: false },
   price: { value: 1, hasError: false },
   marketPlace: { value: '', hasError: false },
-  height: { value: 1, hasError: false },
-  width: { value: 1, hasError: false },
-  depth: { value: 1, hasError: false },
 };
 
-function MyProducts({
-  shownAllProducts,
-  myProducts,
-  onClick,
-}: {
-  shownAllProducts: boolean;
-  myProducts: ProductTypes[];
-  onClick: () => void;
-}) {
-  return (
-    <div>
-      <div
-        className={`${
-          shownAllProducts ? 'max-h-[556px]' : 'max-h-[278px]'
-        } grid grid-cols-1 gap-4 overflow-hidden p-4 transition-[max-height] duration-300 ease-in-out sm:grid-cols-2 xl:grid-cols-3`}
-      >
-        {myProducts.map((product, id) => (
-          <DefaultCard
-            key={id}
-            _id={product._id}
-            title={product.title}
-            marketPlace={product.marketPlace}
-            price={product.price}
-          />
-        ))}
-      </div>
-
-      {myProducts.length > 3 && (
-        <div className="flex w-full justify-center">
-          <SecondaryBtn
-            text={shownAllProducts ? 'Hide more' : 'Show more'}
-            type="button"
-            usecase="outline"
-            onClick={onClick}
-            additionalStyles={`${
-              shownAllProducts
-                ? 'bg-gray-400 text-white'
-                : 'text-gray-600 bg-white'
-            } px-3 py-2`}
-          />
-        </div>
-      )}
-    </div>
-  );
-}
-
-function MyShop() {
+export default function MyShop() {
   const [isOpen, setIsOpen] = useState(false);
   const [productData, setProductData] =
     useState<ProductDataTypes>(initialProductData);
-  const [isLoading, setIsLoading] = useState(false);
-  const [hasFailed, setHasFailed] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
-  const [categories, setCategories] = useState<ProductCategories[]>();
-  const [shownAllProducts, setShownAllProducts] = useState(false);
+
+  const [categoryState, setCategoryState] = useState<{
+    isLoading: boolean;
+    options: any;
+    value: [];
+  }>({
+    isLoading: false,
+    options: [],
+    value: [],
+  });
+
+  const [status, setStatus] = useState({
+    isLoading: false,
+    hasFailed: false,
+    isSuccess: false,
+  });
+  const [authorState, setAuthorState] = useState<{
+    isLoading: boolean;
+    options: any;
+    value: [];
+  }>({
+    isLoading: false,
+    options: [],
+    value: [],
+  });
 
   const { userData, fetchUserData } = useContext(UserContext);
 
   const resetProductData = () => {
     setTimeout(() => {
       setProductData(initialProductData);
+      setCategoryState((prevState) => {
+        return { ...prevState, value: [] };
+      });
+      setAuthorState((prevState) => {
+        return { ...prevState, value: [] };
+      });
     }, 200);
   };
 
   const resetHasFailed = () => {
-    setHasFailed(false);
+    setStatus((prevState) => {
+      return { ...prevState, hasFailed: false };
+    });
   };
-
   const changeIsOpen = () => {
     setIsOpen((prevState) => !prevState);
     resetProductData();
     setTimeout(() => {
       resetHasFailed();
-      setIsSuccess(false);
+      setStatus((prevState) => {
+        return { ...prevState, isSuccess: false };
+      });
     }, 200);
   };
 
@@ -142,6 +124,16 @@ function MyShop() {
           },
         };
       });
+    } else if (e.target.name === 'authors') {
+      setProductData((prevState) => {
+        return {
+          ...prevState,
+          authors: {
+            value: [...prevState.imgs.value, e.target.value],
+            hasError: false,
+          },
+        };
+      });
     } else {
       setProductData((prevState) => {
         return {
@@ -152,81 +144,121 @@ function MyShop() {
     }
   };
 
+  const fetchAllCategories = useCallback(async () => {
+    const res = await axios.get('/category/all');
+    setCategoryState((prevState) => {
+      return { ...prevState, options: [...res.data] };
+    });
+  }, []);
+
+  const fetchAllAuthors = useCallback(async () => {
+    const res = await axios.get('/user/authors');
+    setAuthorState((prevState) => {
+      return { ...prevState, options: [...res.data] };
+    });
+  }, []);
+
+  const getAllData = useCallback(async () => {
+    fetchAllAuthors();
+    fetchAllCategories();
+  }, [fetchAllAuthors, fetchAllCategories]);
+
   const addProductHandler = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    let currentCategory = productData.category.value;
-    if (productData.category.value === 'Other') {
-      currentCategory = productData.otherCategory.value;
-    }
     const newProductData = {
-      userEmail: userData?.email,
+      user_id: userData?._id,
       title: productData.title.value,
-      author: productData.author.value,
-      category: currentCategory,
       description: productData.description.value,
-      imgs: productData.imgs.value,
+      price: Number(productData.price.value),
+      img: productData.imgs.value,
+      categories: categoryState.value,
+      authors: authorState.value,
       quantity: productData.quantity.value,
-      price: productData.price.value,
-      marketPlace: productData.marketPlace.value,
-      height: productData.height.value,
-      width: productData.width.value,
-      depth: productData.depth.value,
+      market_place: productData.marketPlace.value,
     };
 
     try {
-      setIsLoading(true);
-      await axios.post('/product/product', newProductData);
-      setIsLoading(false);
+      setStatus((prevState) => {
+        return { ...prevState, isLoading: true };
+      });
+      await axios.post('/product/product', { newProductData });
+      setStatus((prevState) => {
+        return { ...prevState, isLoading: false };
+      });
       fetchUserData();
       resetProductData();
 
-      setIsSuccess(true);
+      setStatus((prevState) => {
+        return { ...prevState, isSuccess: true };
+      });
+      getAllData();
     } catch (err) {
-      setIsLoading(false);
-      setHasFailed(true);
+      setStatus((prevState) => {
+        return { ...prevState, isLoading: false, hasFailed: true };
+      });
     }
+  };
+
+  const filterColors = (inputValue: string) => {
+    return categoryState.options.filter((i: { label: string }) => {
+      return i.label.toLowerCase().includes(inputValue.toLowerCase());
+    });
+  };
+  const authorFilter = (inputValue: string) => {
+    return authorState.options.filter((i: { label: string }) => {
+      return i.label.toLowerCase().includes(inputValue.toLowerCase());
+    });
+  };
+  const promiseOptions = (inputValue: string) =>
+    new Promise<any[]>((resolve) => {
+      setTimeout(() => {
+        resolve(filterColors(inputValue));
+      }, 1000);
+    });
+
+  const authorOptions = (inputValue: string) =>
+    new Promise<any[]>((resolve) => {
+      setTimeout(() => {
+        resolve(authorFilter(inputValue));
+      }, 1000);
+    });
+
+  const slectedChangetest = (selectedOptions: any) => {
+    setCategoryState((prevState) => {
+      return { ...prevState, value: selectedOptions };
+    });
+  };
+
+  const selectAuthorChange = (selectedOptions: any) => {
+    setAuthorState((prevState) => {
+      return { ...prevState, value: selectedOptions };
+    });
   };
 
   useEffect(() => {
-    if (productData.category.value === '') {
-      axios.get('/category/all').then((res) => {
-        setCategories(res.data);
-        setProductData((prevState) => {
-          return {
-            ...prevState,
-            category: { value: res.data[0].name, hasError: false },
-          };
-        });
-      });
-    }
-  }, [productData.category.value]);
+    getAllData();
+  }, [getAllData]);
 
-  const showAllHandler = () => {
-    setShownAllProducts((prevState) => !prevState);
-  };
   return (
     <div>
       <div>
         <div className="mb-8">
           <div className="flex justify-between align-bottom">
-            <h2 className="mb-0">My products</h2>
-            {userData?.my_products && (
-              <div className="flex items-end">
-                <Link to="/account/my/my-products" className="text-sm">
-                  Show all
-                </Link>
-              </div>
-            )}
+            <h3 className="mb-0">My products</h3>
+            {userData &&
+              userData.role !== 'User' &&
+              userData.author_info.my_products.length > 3 && (
+                <div className="flex items-end">
+                  <Link to="/account/my/my-products" className="text-sm">
+                    Show all
+                  </Link>
+                </div>
+              )}
           </div>
           {userData &&
-          userData.my_products &&
-          userData.my_products.length > 0 ? (
-            <MyProducts
-              myProducts={userData.my_products}
-              onClick={showAllHandler}
-              shownAllProducts={shownAllProducts}
-            />
+          userData.role !== 'User' &&
+          userData.author_info.my_products.length > 0 ? (
+            <MyProducts myProducts={userData.author_info.my_products} />
           ) : (
             'No products added.'
           )}
@@ -248,10 +280,10 @@ function MyShop() {
         description={
           "Fill in your product data. Click the 'add' button when you're done."
         }
-        isLoading={isLoading}
-        hasFailed={hasFailed}
+        isLoading={status.isLoading}
+        hasFailed={status.hasFailed}
         changeHasFailed={resetHasFailed}
-        isSuccess={isSuccess}
+        isSuccess={status.isSuccess}
       >
         <form onSubmit={(e) => addProductHandler(e)} className="w-full">
           <fieldset className="mb-2 space-y-1">
@@ -274,55 +306,53 @@ function MyShop() {
           </fieldset>
 
           <fieldset className="mb-2 space-y-1">
-            <label
-              htmlFor="author"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Author
-            </label>
-
-            <input
-              name="author"
-              id="author"
-              type="text"
-              placeholder="R.R. Martin..."
-              className="w-full rounded-md border-gray-200 shadow-sm sm:text-sm"
-              value={productData.author.value}
-              onChange={(e) => productDataChangeHandler(e)}
-            />
+            <p className="block text-sm font-medium text-gray-700">Authors</p>
+            <div>
+              {productData.authors.value.map((author) => (
+                <span key={author}>{author}</span>
+              ))}
+            </div>
+            <div className="flex">
+              <label
+                htmlFor="newAuthor"
+                className="sr-only block text-sm font-medium text-gray-700"
+              >
+                Author
+              </label>
+              <AsyncCreatableSelect
+                isMulti
+                cacheOptions
+                defaultOptions
+                loadOptions={authorOptions}
+                value={authorState.value}
+                onChange={selectAuthorChange}
+              />
+            </div>
           </fieldset>
 
           <fieldset className="mb-2 space-y-1">
-            <label
-              htmlFor="category"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Category
-            </label>
-            <select
-              name="category"
-              id="category"
-              value={productData.category.value}
-              onChange={(e) => productDataChangeHandler(e)}
-            >
-              {categories?.map((item) => (
-                <option key={item._id} value={item.name}>
-                  {item.name[0].toUpperCase()}
-                  {item.name.slice(1)}
-                </option>
-              ))}
-              <option value="Other">Other</option>
-            </select>
-            {productData.category.value === 'Other' && (
-              <input
-                id="otherCategory"
-                name="otherCategory"
-                type="text"
-                placeholder="Fantasy..."
-                value={productData.otherCategory.value}
-                onChange={(e) => productDataChangeHandler(e)}
+            <p className="block text-sm font-medium text-gray-700">
+              Categories
+            </p>
+            {productData.categories.value.map((category) => (
+              <span key={category}>{category}</span>
+            ))}
+            <div>
+              <label
+                htmlFor="newCategory"
+                className="sr-only block text-sm font-medium text-gray-700"
+              >
+                Category
+              </label>
+              <AsyncCreatableSelect
+                isMulti
+                cacheOptions
+                defaultOptions
+                loadOptions={promiseOptions}
+                value={categoryState.value}
+                onChange={slectedChangetest}
               />
-            )}
+            </div>
           </fieldset>
 
           <fieldset className="mb-2 space-y-1">
@@ -510,67 +540,6 @@ function MyShop() {
             </RadioGroup>
           </fieldset>
 
-          <div className="flex flex-col sm:flex-row sm:space-x-1">
-            <fieldset className="mb-2 space-y-1">
-              <label
-                htmlFor="height"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Height
-              </label>
-
-              <input
-                name="height"
-                id="height"
-                type="number"
-                placeholder="1cm..."
-                min={1}
-                className="w-full rounded-md border-gray-200 shadow-sm sm:text-sm"
-                value={productData.height.value}
-                onChange={(e) => productDataChangeHandler(e)}
-              />
-            </fieldset>
-
-            <fieldset className="mb-2 space-y-1">
-              <label
-                htmlFor="width"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Width
-              </label>
-
-              <input
-                name="width"
-                id="width"
-                type="number"
-                placeholder="1cm..."
-                min={1}
-                className="w-full rounded-md border-gray-200 shadow-sm sm:text-sm"
-                value={productData.width.value}
-                onChange={(e) => productDataChangeHandler(e)}
-              />
-            </fieldset>
-
-            <fieldset className="mb-2 space-y-1">
-              <label
-                htmlFor="depth"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Depth
-              </label>
-
-              <input
-                name="depth"
-                id="depth"
-                type="number"
-                placeholder="1cm..."
-                min={1}
-                className="w-full rounded-md border-gray-200 shadow-sm sm:text-sm"
-                value={productData.depth.value}
-                onChange={(e) => productDataChangeHandler(e)}
-              />
-            </fieldset>
-          </div>
           <div className="mb-2 mt-4 flex justify-end">
             <PrimaryBtn
               type="submit"
@@ -585,5 +554,3 @@ function MyShop() {
     </div>
   );
 }
-
-export default MyShop;

@@ -1,81 +1,98 @@
 /* eslint-disable react/button-has-type */
-import { ReactNode } from 'react';
+import { Link } from 'react-router-dom';
 
 type PropsTypes = {
   usecase: 'default' | 'action' | '';
   type: 'button' | 'submit';
   onClick?: (e: any) => void;
   customCSS?: string;
-  additionalStyles?: string;
-  children: ReactNode;
+  children: any;
   disabled?: boolean;
-  isLoading?: false;
+  isLoading?: boolean;
   size?: string;
+  asLink?: boolean;
+  linkPath?: string;
+  textSize?: 'text-sm' | 'text-xs' | 'text-md';
 };
 
 const defaultProps = {
   onClick: () => {},
   customCSS: '',
-  additionalStyles: '',
   disabled: false,
   isLoading: false,
   size: null,
+  asLink: false,
+  linkPath: '',
+  textSize: 'text-sm',
 };
 
-function PrimaryBtn({
+export default function PrimaryBtn({
   usecase,
   onClick,
   customCSS,
   type,
-  additionalStyles,
   children,
   disabled,
   isLoading,
   size,
+  asLink,
+  linkPath,
+  textSize,
 }: PropsTypes) {
   const clickHandler = (e: any) => {
     if (onClick) {
       onClick(e);
     }
   };
-  // bg-[#5469d4]
-  const defaultClasses = `block font-medium rounded text-white border shadow-sm transition ease-out focus:ring ${
+  const defaultClasses = `focus:ring-blue-300 visible-focus:ring-blue-300 text-center inline-block font-medium rounded shadow-sm transition duration-150 ease-out focus:ring ${
     size || 'px-5 py-3'
   }`;
-  const primaryClasses = 'border-primary bg-primary focus:ring-blue-300';
+  const colorsClasses = 'bg-primary text-white';
+
+  const disabledClasses = 'pointer-events-none opacity-70';
+  const interactionColor = 'hover:bg-blue-600 active:bg-blue-700';
+
   switch (usecase) {
     case 'action':
       return (
         <button
-          className={`
-           text-xs ${defaultClasses} ${primaryClasses}`}
-          onClick={(e) => clickHandler(e)}
           type={type}
+          className={`
+           ${textSize} ${customCSS} ${defaultClasses} ${colorsClasses} ${
+            disabled ? disabledClasses : interactionColor
+          }`}
+          onClick={(e) => clickHandler(e)}
           disabled={disabled}
         >
-          {isLoading && (
-            <span id="button-text">
-              {isLoading ? <div className="spinner" id="spinner" /> : children}
-            </span>
-          )}
+          <span id="button-text">
+            {isLoading ? <div className="spinner" id="spinner" /> : children}
+          </span>
         </button>
       );
-    default:
-      return (
+    default: {
+      return asLink ? (
+        <Link
+          to={linkPath || ''}
+          className={`text-sm ${customCSS} ${defaultClasses} ${colorsClasses} ${
+            disabled ? disabledClasses : interactionColor
+          }`}
+        >
+          {children}
+        </Link>
+      ) : (
         <button
           type={type}
-          className={`${customCSS || 'px-12 py-3 text-sm font-medium '} ${
-            !disabled && ': hover:bg-blue-700 '
-          } ${defaultClasses} ${primaryClasses} `}
+          className={`text-sm ${customCSS} ${defaultClasses} ${colorsClasses} ${
+            disabled ? disabledClasses : interactionColor
+          }`}
           onClick={(e) => clickHandler(e)}
           disabled={disabled}
         >
           {children}
         </button>
       );
+    }
   }
 }
 
 PrimaryBtn.defaultProps = defaultProps;
-
-export default PrimaryBtn;

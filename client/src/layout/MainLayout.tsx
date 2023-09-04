@@ -8,15 +8,20 @@ type PropsType = {
 
 function MainLayout({ children }: PropsType) {
   const [currentPathname, setCurrentPathname] = useState('');
+  const isMainPage = currentPathname === '/';
 
   useEffect(() => {
     setCurrentPathname(window.location.pathname);
   }, [children]);
 
   return (
-    <div id="mainContainer" className="relative overflow-hidden bg-white">
+    <div id="mainContainer" className="relative overflow-clip bg-white">
       <Header currentPathname={currentPathname} />
-      <main className="mt-16 h-full min-h-[calc(100vh-64px-284px)] w-full">
+      <main
+        className={`${
+          isMainPage ? '' : 'mt-16'
+        } h-full min-h-[calc(100vh-64px-284px)] w-full`}
+      >
         {children}
       </main>
       <Footer />

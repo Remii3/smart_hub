@@ -1,11 +1,11 @@
 import axios from 'axios';
 import { createContext, ReactNode, useEffect, useMemo, useState } from 'react';
 
-import { UserDataTypes } from '../types/interfaces';
+import { AuthorTypes } from '../types/interfaces';
 
 type ContextTypes = {
-  userData: null | UserDataTypes;
-  changeUserData: (data: null | UserDataTypes) => void;
+  userData: null | AuthorTypes;
+  changeUserData: (data: null | AuthorTypes) => void;
   fetchUserData: () => void;
 };
 
@@ -15,15 +15,14 @@ export const UserContext = createContext<ContextTypes>({
   fetchUserData() {},
 });
 
-function UserProvider({ children }: { children: ReactNode }) {
-  const [userData, setUserData] = useState<null | UserDataTypes>(null);
-
+export default function UserProvider({ children }: { children: ReactNode }) {
+  const [userData, setUserData] = useState<null | AuthorTypes>(null);
   const fetchUserData = async () => {
-    const res = await axios.get('/user/profile');
+    const res = await axios.get('/user/myProfile');
     setUserData(res.data);
   };
 
-  const changeUserData = (data: UserDataTypes | null) => {
+  const changeUserData = (data: AuthorTypes | null) => {
     setUserData(data);
   };
 
@@ -48,5 +47,3 @@ function UserProvider({ children }: { children: ReactNode }) {
     <UserContext.Provider value={userValues}>{children}</UserContext.Provider>
   );
 }
-
-export default UserProvider;

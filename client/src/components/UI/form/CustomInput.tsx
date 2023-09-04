@@ -27,7 +27,7 @@ const defaultProps = {
   autoComplete: undefined,
 };
 
-function CustomInput({
+export default function CustomInput({
   labelValue,
   optional,
   name,
@@ -86,4 +86,3 @@ function CustomInput({
 }
 
 CustomInput.defaultProps = defaultProps;
-export default CustomInput;

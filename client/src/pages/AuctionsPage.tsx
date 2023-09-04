@@ -1,10 +1,12 @@
 import axios from 'axios';
 import { useEffect, useState } from 'react';
-import BasicProductCollection from '../components/productCollection/BasicProductCollection';
-import { ProductTypes } from '../types/interfaces';
+import BasicProductCollection from '../components/collections/BasicProductCollection';
+import { UnknownProductTypes } from '../types/interfaces';
 
-function AuctionsPage() {
-  const [auctionProducts, setAuctionProducts] = useState<ProductTypes[]>([]);
+export default function AuctionsPage() {
+  const [auctionProducts, setAuctionProducts] = useState<UnknownProductTypes[]>(
+    []
+  );
 
   useEffect(() => {
     axios
@@ -21,6 +23,7 @@ function AuctionsPage() {
             category="adventure"
             title="New collection"
             allProducts={auctionProducts}
+            marketPlace="Auction"
           />
         )}
         {auctionProducts && (
@@ -30,6 +33,7 @@ function AuctionsPage() {
             showMore
             subTitle="adsasd asdasd"
             allProducts={auctionProducts}
+            marketPlace="Auction"
           />
         )}
         {auctionProducts && (
@@ -44,11 +48,10 @@ function AuctionsPage() {
           neque beatae.
         "
             allProducts={auctionProducts}
+            marketPlace="Auction"
           />
         )}
       </div>
     </div>
   );
 }
-
-export default AuctionsPage;

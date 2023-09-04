@@ -1,4 +1,4 @@
-function getCookie(name: string) {
+export default function getCookie(name: string) {
   const cookie = {} as any;
   document.cookie.split(';').forEach((el) => {
     const [k, v] = el.split('=');
@@ -6,5 +6,3 @@ function getCookie(name: string) {
   });
   return cookie[name];
 }
-
-export default getCookie;

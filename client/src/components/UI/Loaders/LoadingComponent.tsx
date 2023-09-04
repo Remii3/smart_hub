@@ -1,5 +1,3 @@
-function LoadingComponent() {
+export default function LoadingComponent() {
   return <div>Loading...</div>;
 }
-
-export default LoadingComponent;

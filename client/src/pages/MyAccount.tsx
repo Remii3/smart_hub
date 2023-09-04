@@ -1,12 +1,12 @@
-import EditUserData from '../components/accountTabs/EditUserData';
-import MyShop from '../components/accountTabs/MyShop';
+import EditUserData from '../components/myAccount/EditUserData';
+import MyShop from '../components/myAccount/MyShop';
 
-function MyAccount() {
+export default function MyAccount() {
   return (
     <div className="relative mb-16 min-h-screen">
       <div>
         <section>
-          <div className="mx-auto flex flex-col justify-center gap-8 px-4 lg:flex-row">
+          <div className="mx-auto flex max-w-7xl flex-col justify-center gap-8 px-2 lg:flex-row">
             <MyShop />
             <EditUserData />
           </div>
@@ -15,5 +15,3 @@ function MyAccount() {
     </div>
   );
 }
-
-export default MyAccount;

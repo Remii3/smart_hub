@@ -5,7 +5,12 @@ type PropsTypes = {
   color: 'white' | 'dark';
 };
 
-function MainPageHeading({ mainTitle, subTitle, usecase, color }: PropsTypes) {
+export default function MainPageHeading({
+  mainTitle,
+  subTitle,
+  usecase,
+  color,
+}: PropsTypes) {
   return (
     <div
       className={`${
@@ -27,5 +32,3 @@ function MainPageHeading({ mainTitle, subTitle, usecase, color }: PropsTypes) {
     </div>
   );
 }
-
-export default MainPageHeading;
