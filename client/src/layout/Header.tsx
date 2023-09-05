@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import Nav from './Nav';
 
 type HeaderTypes = {
@@ -6,36 +6,38 @@ type HeaderTypes = {
 };
 
 function Header({ currentPathname }: HeaderTypes) {
-  const headerElement = useRef(null);
-  const mainPageTitle = document.getElementById('mainPageTitle');
   const [isTransparent, setIsTransparent] = useState(false);
-  const isMainPage = currentPathname === '/';
 
   const changeHeaderBgHandler = useCallback(() => {
+    const mainPageTitle = document.getElementById('mainPageTitle');
     if (mainPageTitle && mainPageTitle?.getBoundingClientRect().top < 0) {
       setIsTransparent(false);
     } else {
       setIsTransparent(true);
     }
-  }, [mainPageTitle]);
+  }, []);
 
   useEffect(() => {
-    if (isMainPage) {
+    if (currentPathname === '/') {
       setIsTransparent(true);
       window.addEventListener('scroll', changeHeaderBgHandler);
+    } else {
+      setIsTransparent(false);
     }
     return () => {
       window.removeEventListener('scroll', changeHeaderBgHandler);
     };
-  }, [changeHeaderBgHandler, isMainPage]);
+  }, [changeHeaderBgHandler, currentPathname]);
 
+  const flagTest = currentPathname === '/' ? isTransparent : false;
   return (
     <header className="sticky top-0 z-20 w-full ">
       <div
-        ref={headerElement}
-        className={`${
-          isMainPage && isTransparent ? 'opacity-0' : 'opacity-100'
-        } absolute left-0 top-0 h-full w-full bg-pageBackground transition-[opacity] duration-300 ease-in-out`}
+        className={`${flagTest ? 'opacity-0' : 'opacity-100'} ${
+          currentPathname === '/' &&
+          'transition-opacity duration-200 ease-in-out'
+        } 
+        absolute left-0 top-0 h-full w-full bg-pageBackground`}
       />
       <Nav />
     </header>

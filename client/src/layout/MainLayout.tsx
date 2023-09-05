@@ -1,27 +1,35 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
+import axios from 'axios';
+import { useLocation } from 'react-router-dom';
 import Footer from './Footer';
 import Header from './Header';
+import WebRoutes from '../router/WebRoutes';
 
-type PropsType = {
-  children: React.ReactNode;
-};
+export default function MainLayout() {
+  const { pathname } = useLocation();
 
-function MainLayout({ children }: PropsType) {
-  const [currentPathname, setCurrentPathname] = useState('');
+  window.onunload = () => {
+    window.scrollTo(0, 0);
+  };
 
   useEffect(() => {
-    setCurrentPathname(window.location.pathname);
-  }, [children]);
+    window.scrollTo(0, 0);
+
+    if (
+      !document.cookie.match('token') &&
+      !document.cookie.match('guestToken')
+    ) {
+      axios.get('/user/guest');
+    }
+  }, [pathname]);
 
   return (
     <div id="mainContainer" className="relative overflow-clip bg-white">
-      <Header currentPathname={currentPathname} />
-      <main className={` h-full min-h-[calc(100vh-64px-284px)] w-full`}>
-        {children}
+      <Header currentPathname={pathname} />
+      <main className="h-full min-h-[calc(100vh-64px-284px)] w-full">
+        <WebRoutes />
       </main>
       <Footer />
     </div>
   );
 }
-
-export default MainLayout;
