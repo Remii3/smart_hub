@@ -171,3 +171,12 @@ export interface ProductAuctionCardType extends ProductCardTypes {
   currentPrice: number;
   auctionEndDate: Date;
 }
+
+// * news types
+
+export interface NewsTypes {
+  id: string;
+  title: string;
+  shortDescription?: string;
+  content: string;
+}

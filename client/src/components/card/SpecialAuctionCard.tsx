@@ -40,6 +40,7 @@ function SpecialAuctionCard({
     );
     titleShortened = `${titleShortened}...`;
   }
+
   return (
     <div
       id={`${_id}`}
@@ -75,10 +76,7 @@ function SpecialAuctionCard({
                   </p>
                   <p className="flex justify-between sm:text-lg">
                     <span className="text-gray600"> Deadline:</span>
-                    <span className="text-darkTint">
-                      {auctionEndDate?.toISOString().slice(0, 10) ||
-                        'Unlimited'}
-                    </span>
+                    <span className="text-darkTint"></span>
                   </p>
                   <p
                     className={`${

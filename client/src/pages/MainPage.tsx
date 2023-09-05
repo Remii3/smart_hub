@@ -12,8 +12,8 @@ export default function MainPage() {
       <div className="flex min-h-screen w-full flex-col items-center justify-center bg-white ">
         <CategoriesSection />
         <CollectionSection />
-        <SpecialAuctionSection />
-        <AllAuctionsSection />
+        {/* <SpecialAuctionSection /> */}
+        {/* <AllAuctionsSection /> */}
       </div>
     </div>
   );

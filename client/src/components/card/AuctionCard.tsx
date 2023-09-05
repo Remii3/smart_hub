@@ -7,7 +7,6 @@ const defaultProps = {
   deadline: null,
   authors: [],
   description: '',
-  socket: any,
 };
 function AuctionCard({
   _id,
@@ -18,7 +17,6 @@ function AuctionCard({
   auctionEndDate,
   currentPrice,
   startingPrice,
-  socket,
 }: ProductAuctionCardType) {
   let titleShortened = title;
 
@@ -30,11 +28,6 @@ function AuctionCard({
     );
     titleShortened = `${titleShortened}...`;
   }
-
-  const joinRoomHandler = (e: any) => {
-    e.preventDefault();
-    socket.emit('message', { test: 'Hello world' });
-  };
 
   return (
     <div id={`${_id}`} className="mx-auto h-full w-full max-w-[400px]">
@@ -70,7 +63,6 @@ function AuctionCard({
               <div className="pb-3">stars</div>
               <Link
                 to={`/product/${_id}`}
-                onClick={joinRoomHandler}
                 className={buttonVariants({ variant: 'primary' })}
               >
                 Join bidding

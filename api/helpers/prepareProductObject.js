@@ -39,7 +39,7 @@ const prepareProductObject = product => {
 
   if (auction_info) {
     preparedObject.auction_info = {
-      starting_price: auction_info.starting_price,
+      starting_price: parseFloat(auction_info.starting_price),
       current_price: auction_info.current_price,
       auction_end_date: auction_info.auction_end_date,
     };
