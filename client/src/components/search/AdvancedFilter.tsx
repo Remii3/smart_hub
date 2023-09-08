@@ -1,5 +1,5 @@
 // import TertiaryBtn from '../UI/Btns/TertiaryBtn';
-import { Button } from '../UI/Btns/Button';
+import { Button } from '../UI/button';
 import MarketplaceSelector from './MarketplaceSelector';
 
 type AdvancedFilterTypes = {
@@ -40,7 +40,7 @@ export default function AdvancedFilter({
       <div>
         <p>Advanced filter</p>
         <Button
-          variant="tertiary"
+          variant="link"
           size="default"
           onClick={() => clearAllSelectors()}
         >
@@ -50,11 +50,7 @@ export default function AdvancedFilter({
       <div>
         <div>
           <h6>Type of offer</h6>
-          <Button
-            variant="tertiary"
-            size="default"
-            onClick={onMarketplaceReset}
-          >
+          <Button variant="link" size="default" onClick={onMarketplaceReset}>
             Clear
           </Button>
         </div>
@@ -67,7 +63,7 @@ export default function AdvancedFilter({
         {/* <div className="relative grid gap-8 bg-white p-7 lg:grid-cols-2"> */}
         <div className="relative bg-white">
           <div className="bg-white">
-            <Button variant="tertiary" size="default" onClick={onPriceReset}>
+            <Button variant="link" size="default" onClick={onPriceReset}>
               Clear
             </Button>
 

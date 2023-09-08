@@ -2,13 +2,29 @@ import React, { Fragment, useContext, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import gsap from 'gsap';
 import axios from 'axios';
-import { Menu, Popover, Transition } from '@headlessui/react';
-import { ShoppingBagIcon } from '@heroicons/react/24/outline';
+// import { Menu, Popover, Transition } from '@headlessui/react';
+import {
+  ShoppingBagIcon,
+  UserCircleIcon as OutlinedUserIcon,
+} from '@heroicons/react/24/outline';
 import { MagnifyingGlassIcon, UserCircleIcon } from '@heroicons/react/24/solid';
+import { PopoverClose } from '@radix-ui/react-popover';
 import { UserContext } from '../context/UserProvider';
-import { CartIcon, OutlineAccountImg } from '../assets/icons/Icons';
 import CartPopup from '../components/cart/CartPopup';
 import { CartContext } from '../context/CartProvider';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
+} from '../components/UI/dropdown-menu';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '../components/UI/popover';
 
 export default function Nav() {
   const [openedBurger, setOpenedBurger] = useState(false);
@@ -132,228 +148,113 @@ export default function Nav() {
               <MagnifyingGlassIcon className="h-6 w-6 fill-current font-bold text-gray-600" />
             </button>
           </form>
-          <Popover className="relative">
-            {({ open }) => (
-              <>
-                <div>
-                  <Popover.Button
-                    className={`
-                ${open ? 'bg-opacity-20' : 'bg-opacity-0 text-opacity-90'}
-                group inline-flex w-full justify-center rounded-md bg-black px-4 py-2 text-sm font-medium text-white transition-all ease-in-out hover:bg-opacity-30 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75`}
-                  >
-                    <ShoppingBagIcon height={30} width={30} />
-                    {cartState && cartState.products.length > 0 && (
-                      <span className="absolute bottom-0 right-2 flex h-5 w-5 items-center justify-center rounded-full bg-pageBackground">
-                        {cartState.products.length}
-                      </span>
-                    )}
-                  </Popover.Button>
-                </div>
-                <Transition
-                  as={Fragment}
-                  enter="transition ease-out duration-200"
-                  enterFrom="opacity-0 translate-y-1"
-                  enterTo="opacity-100 translate-y-0"
-                  leave="transition ease-in duration-150"
-                  leaveFrom="opacity-100 translate-y-0"
-                  leaveTo="opacity-0 translate-y-1"
+        </div>
+
+        <div className="block lg:hidden">
+          <Popover>
+            <PopoverTrigger>
+              <MagnifyingGlassIcon width={30} height={30} />
+            </PopoverTrigger>
+            <PopoverContent className="mt-4 block w-screen bg-white lg:hidden">
+              <form
+                onSubmit={(e) => searchHandler(e)}
+                className="relative mx-auto w-full max-w-xl text-gray-600"
+              >
+                <input
+                  className="h-full w-full rounded-lg border-2 border-gray-300 bg-white px-3 pr-16 text-sm focus:outline-none"
+                  type="text"
+                  name="search"
+                  placeholder="Search"
+                  value={searchbarValue}
+                  onChange={(e) => searchbarValueChangeHandler(e)}
+                />
+                <PopoverClose
+                  type="submit"
+                  className="absolute right-0 top-1/2 h-full -translate-y-1/2 rounded-e-lg border-b-2 border-r-2 border-t-2 border-transparent bg-transparent px-2 text-gray-600 transition"
                 >
-                  <Popover.Panel className="absolute right-0 z-10 mt-[10px] origin-top-right transform px-4 sm:px-0 lg:max-w-3xl">
-                    <div className="overflow-hidden rounded-lg shadow-lg ring-1 ring-black ring-opacity-5">
-                      <CartPopup />
-                    </div>
-                  </Popover.Panel>
-                </Transition>
-              </>
-            )}
+                  <span className="sr-only">Search</span>
+                  <MagnifyingGlassIcon className="h-4 w-4 fill-current font-bold text-gray-600" />
+                </PopoverClose>
+              </form>
+            </PopoverContent>
           </Popover>
-          <Menu>
-            {({ open }) => (
-              <div className="relative ml-1 inline-block text-left">
-                <div>
-                  <Menu.Button
-                    className={`${
-                      open ? 'bg-opacity-20' : 'bg-opacity-0'
-                    } inline-flex w-full justify-center rounded-md bg-black px-4 py-2 text-sm font-medium text-white transition-all ease-in-out hover:bg-opacity-30 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75`}
-                  >
-                    {userData ? (
-                      <UserCircleIcon className="" height={30} width={30} />
-                    ) : (
-                      <OutlineAccountImg />
-                    )}
-                  </Menu.Button>
-                </div>
-                <Transition
-                  as={Fragment}
-                  enter="transition ease-out duration-100"
-                  enterFrom="transform opacity-0 scale-95"
-                  enterTo="transform opacity-100 scale-100"
-                  leave="transition ease-in duration-75"
-                  leaveFrom="transform opacity-100 scale-100"
-                  leaveTo="transform opacity-0 scale-95"
-                >
-                  <Menu.Items className="absolute right-0 mt-[11px] w-28 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                    <div className="p-1">
-                      {!userData && (
-                        <>
-                          <Menu.Item>
-                            {({ active }) => (
-                              <Link
-                                to={{ pathname: '/account/login' }}
-                                className={`${
-                                  active
-                                    ? 'bg-primary text-white'
-                                    : 'bg-white text-gray-900'
-                                } group flex w-full items-center rounded-md px-2 py-2 text-sm transition ease-out`}
-                              >
-                                Sign in
-                              </Link>
-                            )}
-                          </Menu.Item>
-                          <Menu.Item>
-                            {({ active }) => (
-                              <Link
-                                to={{
-                                  pathname: '/account/register',
-                                }}
-                                className={`${
-                                  active
-                                    ? 'bg-primary text-white'
-                                    : 'bg-white text-gray-900'
-                                } group flex w-full items-center rounded-md px-2 py-2 text-sm transition ease-out`}
-                              >
-                                Sign up
-                              </Link>
-                            )}
-                          </Menu.Item>
-                        </>
-                      )}
-                      {userData && (
-                        <>
-                          <Menu.Item>
-                            {({ active }) => (
-                              <Link
-                                to="/account/my"
-                                className={`${
-                                  active
-                                    ? 'bg-primary text-white'
-                                    : 'bg-white text-gray-900'
-                                } group flex w-full items-center rounded-md px-2 py-2 text-sm transition ease-out`}
-                              >
-                                Account
-                              </Link>
-                            )}
-                          </Menu.Item>
-                          <Menu.Item>
-                            {({ active }) => (
-                              <button
-                                type="button"
-                                onClick={logoutHandler}
-                                className={`${
-                                  active
-                                    ? 'bg-primary text-white'
-                                    : 'bg-white text-gray-900'
-                                } group flex w-full items-center rounded-md px-2 py-2 text-sm transition ease-out`}
-                              >
-                                Logout
-                              </button>
-                            )}
-                          </Menu.Item>
-                        </>
-                      )}
-                    </div>
-                  </Menu.Items>
-                </Transition>
-              </div>
-            )}
-          </Menu>
+        </div>
+
+        <div>
+          <Popover>
+            <PopoverTrigger className="relative">
+              <ShoppingBagIcon className="h-6 w-6" />
+              {cartState && cartState.products.length > 0 && (
+                <span className="absolute bottom-0 right-2 flex h-5 w-5 items-center justify-center rounded-full bg-pageBackground">
+                  {cartState.products.length}
+                </span>
+              )}
+            </PopoverTrigger>
+            <PopoverContent className="relative mt-4 w-screen max-w-full bg-white px-6 py-8 sm:px-6 md:max-w-sm lg:px-6">
+              <CartPopup />
+            </PopoverContent>
+          </Popover>
+          <div className="hidden lg:block">
+            <DropdownMenu>
+              <DropdownMenuTrigger>
+                {userData ? (
+                  <UserCircleIcon className="" height={30} width={30} />
+                ) : (
+                  <OutlinedUserIcon className="h-6 w-6" />
+                )}
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="mt-3">
+                <DropdownMenuGroup>
+                  {!userData && (
+                    <>
+                      <DropdownMenuItem asChild>
+                        <Link
+                          to={{ pathname: '/account/login' }}
+                          className="group flex w-full items-center rounded-md px-2 py-2 text-sm transition ease-out"
+                        >
+                          Sign in
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link
+                          to={{
+                            pathname: '/account/register',
+                          }}
+                          className={` group flex w-full items-center rounded-md px-2 py-2 text-sm transition ease-out`}
+                        >
+                          Sign up
+                        </Link>
+                      </DropdownMenuItem>
+                    </>
+                  )}
+                  {userData && (
+                    <>
+                      <DropdownMenuItem asChild>
+                        <Link
+                          to="/account/my"
+                          className={` group flex w-full items-center rounded-md px-2 py-2 text-sm transition ease-out`}
+                        >
+                          Account
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <button
+                          type="button"
+                          onClick={logoutHandler}
+                          className="group flex w-full items-center rounded-md px-2 py-2 text-sm transition ease-out"
+                        >
+                          Logout
+                        </button>
+                      </DropdownMenuItem>
+                    </>
+                  )}
+                </DropdownMenuGroup>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
 
         <div className="flex lg:hidden">
-          <Popover className="z-30 mx-1">
-            {({ open }) => (
-              <>
-                <div>
-                  <Popover.Button
-                    className={`
-                ${open ? 'bg-opacity-20' : 'bg-opacity-0 text-opacity-90'}
-                group relative inline-flex w-full justify-center rounded-md bg-black px-2 py-2 text-sm font-medium text-white transition-all ease-in-out hover:bg-opacity-30 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75`}
-                  >
-                    <MagnifyingGlassIcon width={30} height={30} />
-                  </Popover.Button>
-                </div>
-                <Transition
-                  as={Fragment}
-                  enter="transition ease-out duration-200"
-                  enterFrom="opacity-0 translate-y-1"
-                  enterTo="opacity-100 translate-y-0"
-                  leave="transition ease-in duration-150"
-                  leaveFrom="opacity-100 translate-y-0"
-                  leaveTo="opacity-0 translate-y-1"
-                >
-                  <Popover.Panel className="absolute right-0 z-10 mt-[10px] w-full origin-top-right transform bg-white pl-0">
-                    <div className="overflow-hidden rounded-lg px-4 py-2 shadow-lg ring-1 ring-black ring-opacity-5 sm:px-10">
-                      <form
-                        onSubmit={(e) => searchHandler(e)}
-                        className="relative mx-auto text-gray-600 "
-                      >
-                        <input
-                          className="h-full w-full rounded-lg border-2 border-gray-300 bg-white px-3 pr-16 text-sm focus:outline-none"
-                          type="text"
-                          name="search"
-                          placeholder="Search"
-                          value={searchbarValue}
-                          onChange={(e) => searchbarValueChangeHandler(e)}
-                        />
-                        <Popover.Button
-                          type="submit"
-                          className="absolute right-0 top-1/2 h-full -translate-y-1/2 rounded-e-lg border-b-2 border-r-2 border-t-2 border-transparent bg-transparent px-2 text-gray-600 transition"
-                        >
-                          <span className="sr-only">Search</span>
-                          <MagnifyingGlassIcon className="h-4 w-4 fill-current font-bold text-gray-600" />
-                        </Popover.Button>
-                      </form>
-                    </div>
-                  </Popover.Panel>
-                </Transition>
-              </>
-            )}
-          </Popover>
-          <Popover className="z-30 mx-1">
-            {({ open }) => (
-              <>
-                <div>
-                  <Popover.Button
-                    className={`
-                ${open ? 'bg-opacity-20' : 'bg-opacity-0 text-opacity-90'}
-                group relative inline-flex w-full justify-center rounded-md bg-black px-4 py-2 text-sm font-medium text-white transition-all ease-in-out hover:bg-opacity-30 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75`}
-                  >
-                    <CartIcon height={7} width={7} />
-                    {cartState && cartState.products.length > 0 && (
-                      <span className="absolute bottom-0 right-2 flex h-5 w-5 items-center justify-center rounded-full bg-pageBackground">
-                        {cartState.products.length}
-                      </span>
-                    )}
-                  </Popover.Button>
-                </div>
-                <Transition
-                  as={Fragment}
-                  enter="transition ease-out duration-200"
-                  enterFrom="opacity-0 translate-y-1"
-                  enterTo="opacity-100 translate-y-0"
-                  leave="transition ease-in duration-150"
-                  leaveFrom="opacity-100 translate-y-0"
-                  leaveTo="opacity-0 translate-y-1"
-                >
-                  <Popover.Panel className="absolute right-0 z-10 mt-[10px] w-full origin-top-right transform pl-0">
-                    <div className="overflow-hidden rounded-lg shadow-lg ring-1 ring-black ring-opacity-5">
-                      <CartPopup />
-                    </div>
-                  </Popover.Panel>
-                </Transition>
-              </>
-            )}
-          </Popover>
           <button
             type="button"
             className={`${

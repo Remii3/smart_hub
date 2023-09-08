@@ -2,8 +2,8 @@ import { FormEvent, useContext, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { CartContext } from '../../context/CartProvider';
 import { CartProductTypes, ProductShopCardType } from '../../types/interfaces';
-import { Button } from '../UI/Btns/Button';
 import LoadingCircle from '../UI/Loaders/LoadingCircle';
+import { Button } from '../UI/button';
 
 const defaultProps = {
   img: [],
@@ -97,8 +97,7 @@ export default function ShopCard({
               <div className="pb-3">stars</div>
               <Button
                 type="submit"
-                variant="primary"
-                isDisabled={isAddingToCart || itemBtnCapacity ? 'yes' : 'no'}
+                variant="default"
                 disabled={isAddingToCart || itemBtnCapacity}
               >
                 <LoadingCircle isLoading={isAddingToCart}>

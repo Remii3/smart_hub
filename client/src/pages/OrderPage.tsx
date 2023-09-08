@@ -1,7 +1,7 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
-import MainContainer from '../components/UI/SpecialElements/MainContainer';
+import MainContainer from '../containers/MainContainer';
 import { UserContext } from '../context/UserProvider';
 import { OrderTypes } from '../types/interfaces';
 

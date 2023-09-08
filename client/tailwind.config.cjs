@@ -56,6 +56,19 @@ module.exports = {
           '75%': { backgroundPosition: '0 100%' },
           '100%': { backgroundPosition: '0 100%' },
         },
+        'scroll-down':{
+          '0%': {
+            opacity: 0
+          },
+          '10%' :{
+            transform: 'translateY(0)',
+            opacity: 1,
+          },
+          '100%' :{
+            transform: 'translateY(15px)',
+            opacity: 0,
+          }
+        },
         'accordion-down': {
           from: { height: 0 },
           to: { height: 'var(--radix-accordion-content-height)' },
@@ -69,10 +82,9 @@ module.exports = {
         overlayShow: 'overlayShow 150ms cubic-bezier(0.16, 1, 0.3, 1)',
         contentShow: 'contentShow 150ms cubic-bezier(0.16, 1, 0.3, 1)',
         animateTextBackground: 'animateTextBackground 10s ease-in-out infinite',
-        animation: {
-          'accordion-down': 'accordion-down 0.2s ease-out',
-          'accordion-up': 'accordion-up 0.2s ease-out',
-        },
+        'accordion-down': 'accordion-down 0.2s ease-out',
+        'accordion-up': 'accordion-up 0.2s ease-out',
+        'scroll-down': 'scroll-down 2.2s cubic-bezier(0.15, 0.41, 0.69, 0.94) infinite'
       },
 
       fontFamily: {

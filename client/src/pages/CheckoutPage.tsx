@@ -7,7 +7,7 @@ import CheckoutForm from '../components/checkout/CheckoutForm';
 import CheckoutProdList from '../components/checkout/CheckoutProdList';
 import { CartTypes, SimpleFetchDataTypes } from '../types/interfaces';
 import CheckoutItem from '../components/checkout/CheckoutItem';
-import { buttonVariants } from '../components/UI/Btns/Button';
+import { buttonVariants } from '../components/UI/button';
 
 interface ClientSecretTypes extends SimpleFetchDataTypes {
   data: string;
@@ -84,7 +84,7 @@ export default function CheckoutPage() {
           <p className="py-3">
             Please check your email for further information.
           </p>
-          <Link to="/" className={buttonVariants({ variant: 'primary' })}>
+          <Link to="/" className={buttonVariants({ variant: 'default' })}>
             Return to main page
           </Link>
         </div>

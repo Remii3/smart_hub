@@ -9,13 +9,21 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { UnknownProductTypes } from '../types/interfaces';
 import { UserContext } from '../context/UserProvider';
-import CustomDialog from '../components/UI/headlessUI/CustomDialog';
 import ProductImage from '../components/product/ProductImage';
 import ProductPill from '../components/product/ProductPill';
 import StarRating from '../components/product/StarRating';
 import ProductForm from '../components/product/ProductForm';
-import { Button } from '../components/UI/Btns/Button';
+import { Button } from '../components/UI/button';
 import LoadingCircle from '../components/UI/Loaders/LoadingCircle';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '../components/UI/dialog';
 
 export default function ProductPage() {
   const [isFetchingData, setIsFetchingData] = useState(false);
@@ -145,34 +153,38 @@ export default function ProductPage() {
               <ProductPill text={productData && productData.market_place} />
               {isMyProduct && (
                 <div className="absolute right-0 top-0 flex gap-3">
-                  <CustomDialog
-                    isOpen={showDeleteDialog}
-                    changeIsOpen={() => setShowDeleteDialog(false)}
-                    title="Are you sure?"
-                    description="Deleting this will permamently remove the item from the
-                    database."
-                  >
-                    <div className="flex w-full justify-end gap-3">
-                      <button type="button" onClick={() => deleteItemHandler()}>
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <button type="button" className="text-red-400">
                         Delete
                       </button>
-                      <button
-                        type="button"
-                        className="rounded-md bg-red-500 px-3 py-1 text-white"
-                        onClick={() => setShowDeleteDialog(false)}
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  </CustomDialog>
-
-                  <button
-                    type="button"
-                    onClick={() => setShowDeleteDialog(true)}
-                    className="text-red-400"
-                  >
-                    Delete
-                  </button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Are you sure?</DialogTitle>
+                        <DialogDescription>
+                          Deleting this will permamently remove the item from
+                          the database.
+                        </DialogDescription>
+                      </DialogHeader>
+                      <DialogFooter>
+                        <button
+                          type="button"
+                          onClick={() => deleteItemHandler()}
+                        >
+                          Delete
+                        </button>
+                        <DialogTrigger asChild>
+                          <button
+                            type="button"
+                            className="rounded-md bg-red-500 px-3 py-1 text-white"
+                          >
+                            Cancel
+                          </button>
+                        </DialogTrigger>
+                      </DialogFooter>
+                    </DialogContent>
+                  </Dialog>
                   <button
                     type="button"
                     className="inline-block rounded-md border border-gray-300 px-2"
@@ -329,8 +341,7 @@ export default function ProductPage() {
 
                 <div className="flex items-center justify-end gap-2 bg-white p-3">
                   <Button
-                    variant="primary"
-                    isDisabled={!userData?._id ? 'yes' : 'no'}
+                    variant="default"
                     disabled={!userData?._id}
                     onClick={() => addNewCommentHandler()}
                   >

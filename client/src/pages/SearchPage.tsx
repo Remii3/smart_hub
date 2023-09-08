@@ -5,7 +5,7 @@ import AdvancedFilter from '../components/search/AdvancedFilter';
 import { UnknownProductTypes } from '../types/interfaces';
 import ShopCard from '../components/card/ShopCard';
 import AuctionCard from '../components/card/AuctionCard';
-import MainContainer from '../components/UI/SpecialElements/MainContainer';
+import MainContainer from '../containers/MainContainer';
 import Pagination from '../components/UI/paginations/Pagination';
 import SortProducts from '../components/UI/ProductCollectionHelpers/SortProducts';
 import { sortProductsTypes } from '../hooks/useSortProducts';

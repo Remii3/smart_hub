@@ -5,7 +5,7 @@ import { SunRiseIcon } from '../assets/icons/Icons';
 import CustomInput from '../components/UI/form/CustomInput';
 import { UserContext } from '../context/UserProvider';
 import PasswordInput from '../components/UI/form/CustomPasswordInput';
-import { Button } from '../components/UI/Btns/Button';
+import { Button } from '../components/UI/button';
 
 export default function RegisterPage() {
   const navigate = useNavigate();
@@ -298,7 +298,7 @@ export default function RegisterPage() {
               </div>
 
               <div className="col-span-6 sm:flex sm:items-center sm:gap-4">
-                <Button variant="primary" type="submit" size="big">
+                <Button variant="default" type="submit" size="default">
                   Sign up
                 </Button>
                 <p className="mt-4 text-sm text-gray-500 sm:mt-0">

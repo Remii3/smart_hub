@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
-import MainContainer from '../components/UI/SpecialElements/MainContainer';
+import MainContainer from '../containers/MainContainer';
 import { Button } from '../components/UI/button';
 import { NewsTypes } from '../types/interfaces';
 import {

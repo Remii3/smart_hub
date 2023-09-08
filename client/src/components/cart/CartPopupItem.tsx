@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useContext, useState } from 'react';
-import { TrashIcon } from '../../assets/icons/Icons';
-import { CartProductTypes, ProductTypes } from '../../types/interfaces';
+import { TrashIcon } from '@heroicons/react/24/outline';
+import { CartProductTypes } from '../../types/interfaces';
 import { CartContext } from '../../context/CartProvider';
 
 export default function CartPopupItem({
@@ -92,7 +92,7 @@ export default function CartPopupItem({
         >
           <span className="sr-only">Remove item</span>
 
-          <TrashIcon height={4} width={4} />
+          <TrashIcon className="h-1 w-1" />
         </button>
       </div>
     </li>

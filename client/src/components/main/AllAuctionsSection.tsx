@@ -6,7 +6,7 @@ import MainPageHeading from '../UI/SpecialElements/MainPageHeading';
 import AuctionsSwiper from '../swiper/LongSwiper';
 import { AuctionProductTypes } from '../../types/interfaces';
 import AuctionCard from '../card/AuctionCard';
-import { buttonVariants } from '../UI/Btns/Button';
+import { buttonVariants } from '../UI/button';
 
 export default function AllAuctionsSection() {
   const navigate = useNavigate();
@@ -48,7 +48,7 @@ export default function AllAuctionsSection() {
         </AuctionsSwiper>
       </div>
       <div className="w-full text-center">
-        <Link to="/auctions" className={buttonVariants({ variant: 'primary' })}>
+        <Link to="/auctions" className={buttonVariants({ variant: 'default' })}>
           See all auctions
         </Link>
       </div>

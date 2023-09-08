@@ -1,8 +1,6 @@
 import { useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { buttonVariants } from '../UI/Btns/Button';
 
 export default function MainBanner() {
   const imgBg = useRef(null);
@@ -43,9 +41,9 @@ export default function MainBanner() {
               illo tenetur fuga ducimus numquam ea!
             </p>
           </div>
-          <div className="scroll-downs">
-            <div className="mousey">
-              <div className="scroller" />
+          <div className="absolute inset-0 m-auto h-14 w-8 translate-y-96">
+            <div className="mousey box-content h-9 w-1 rounded-3xl border-2 border-solid border-white px-4 py-3 opacity-75">
+              <div className="h-3 w-1 animate-scroll-down rounded-[25%] bg-white" />
             </div>
           </div>
         </div>

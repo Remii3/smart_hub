@@ -1,7 +1,7 @@
 import { FormEvent, useContext, useState } from 'react';
 import { ShoppingBagIcon } from '@heroicons/react/24/solid';
 import { CartContext } from '../../context/CartProvider';
-import { Button } from '../UI/Btns/Button';
+import { Button } from '../UI/button';
 import LoadingCircle from '../UI/Loaders/LoadingCircle';
 
 type ProductFormType = {
@@ -104,7 +104,7 @@ export default function ProductForm({
             </button>
           </div>
           <Button
-            variant="primary"
+            variant="default"
             type="submit"
             isDisabled={isAddingToCart || itemBtnCapacity ? 'yes' : 'no'}
             disabled={isAddingToCart || itemBtnCapacity}

@@ -7,7 +7,7 @@ import ShopCard from '../components/card/ShopCard';
 import AuctionCard from '../components/card/AuctionCard';
 import ShortSwiper from '../components/swiper/ShortSwiper';
 import { UserContext } from '../context/UserProvider';
-import { Button } from '../components/UI/Btns/Button';
+import { Button } from '../components/UI/button';
 import { MarketPlaceTypes, UserRoleTypes } from '../types/types';
 import { Skeleton } from '../components/UI/skeleton';
 
@@ -123,8 +123,7 @@ export default function OtherUserPage() {
           </div>
           <div>
             <Button
-              variant="primary"
-              isDisabled={userData === null ? 'yes' : 'no'}
+              variant="default"
               disabled={userData === null}
               onClick={() => followHandler()}
             >

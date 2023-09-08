@@ -1,3 +1,10 @@
+import MainContainer from '../containers/MainContainer';
+import SuccessAlert from '../components/UI/alerts/SuccessAlert';
+
 export default function CollectionsPage() {
-  return <div>CollectionsPage</div>;
+  return (
+    <MainContainer>
+      <SuccessAlert message="test message" />
+    </MainContainer>
+  );
 }

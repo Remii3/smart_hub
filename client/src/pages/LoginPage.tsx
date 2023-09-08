@@ -5,7 +5,7 @@ import { SunRiseIcon } from '../assets/icons/Icons';
 import { UserContext } from '../context/UserProvider';
 import CustomInput from '../components/UI/form/CustomInput';
 import CustomPasswordInput from '../components/UI/form/CustomPasswordInput';
-import { Button } from '../components/UI/Btns/Button';
+import { Button } from '../components/UI/button';
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -157,7 +157,7 @@ export default function LoginPage() {
               </div>
 
               <div className="col-span-6 sm:flex sm:items-center sm:gap-4">
-                <Button variant="primary" type="submit" size="big">
+                <Button variant="default" type="submit" size="default">
                   Sign in
                 </Button>
 

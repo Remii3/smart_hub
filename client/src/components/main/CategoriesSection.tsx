@@ -5,7 +5,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import MainPageHeading from '../UI/SpecialElements/MainPageHeading';
 import CategoryCard from '../card/CategoryCard';
 import { ProductCategories } from '../../types/interfaces';
-import { buttonVariants } from '../UI/Btns/Button';
+import { buttonVariants } from '../UI/button';
 
 export default function CategoriesSection() {
   const [shopList, setShopList] = useState<ProductCategories[]>([]);
@@ -44,7 +44,7 @@ export default function CategoriesSection() {
       <div className="w-full text-center">
         <Link
           to="/shop/categories"
-          className={buttonVariants({ variant: 'primary' })}
+          className={buttonVariants({ variant: 'default' })}
         >
           Show more
         </Link>

@@ -8,23 +8,32 @@ import {
   Square2StackIcon,
   CheckIcon,
 } from '@heroicons/react/24/outline';
-import { RadioGroup } from '@headlessui/react';
 import axios from 'axios';
 import AsyncCreatableSelect from 'react-select/async-creatable';
-import MainContainer from '../components/UI/SpecialElements/MainContainer';
+import MainContainer from '../containers/MainContainer';
 import EditUserData from '../components/myAccount/EditUserData';
 import MyShop from '../components/myAccount/MyShop';
 import { UserContext } from '../context/UserProvider';
 import MarketplaceBadge from '../components/UI/badges/MarketplaceBadge';
 import testImg from '../assets/img/avataaars.svg';
-import { Button } from '../components/UI/Btns/Button';
-import CustomDialog from '../components/UI/headlessUI/CustomDialog';
+import { Button } from '../components/UI/button';
 import SecurityPermissions from '../components/myAccount/SecurityPermissions';
 import OrderHistory from '../components/myAccount/OrderHistory';
 import Admin from '../components/myAccount/Admin';
 import { MarketPlaceTypes, UserRoleTypes } from '../types/types';
 import { Input } from '../components/UI/input';
 import { DatePicker } from '../components/UI/datePicker';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '../components/UI/dialog';
+import { RadioGroup, RadioGroupItem } from '../components/UI/radio-group';
+import { Label } from '../components/UI/label';
 
 const socket = io('ws://localhost:8080');
 const tabNames = {
@@ -337,12 +346,356 @@ export default function MyAccount() {
 
                 {userData?.role !== UserRoleTypes.USER && (
                   <div className="mt-4 flex flex-col sm:mt-0 sm:flex-row sm:items-center">
-                    <Button
-                      variant="primary"
-                      onClick={() => setIsOpen((prevState) => !prevState)}
-                    >
-                      Add new book
-                    </Button>
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button variant="default">Add new book</Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>Add product</DialogTitle>
+                          <DialogDescription>
+                            Fill in your product data. Click the &apos;add&apos;
+                            button when you&apos;re done.
+                          </DialogDescription>
+                        </DialogHeader>
+                        <form
+                          onSubmit={(e) => addProductHandler(e)}
+                          className="w-full"
+                        >
+                          <fieldset className="mb-2 space-y-1">
+                            <label
+                              htmlFor="title"
+                              className="block text-sm font-medium text-gray-700"
+                            >
+                              Title
+                            </label>
+
+                            <input
+                              name="title"
+                              id="title"
+                              type="text"
+                              placeholder="Harry Potter..."
+                              className="w-full rounded-md border-gray-200 shadow-sm sm:text-sm"
+                              value={productData.title.value}
+                              onChange={(e) => productDataChangeHandler(e)}
+                            />
+                          </fieldset>
+
+                          <fieldset className="mb-2 space-y-1">
+                            <p className="block text-sm font-medium text-gray-700">
+                              Authors
+                            </p>
+                            <div>
+                              {productData.authors.value.map((author) => (
+                                <span key={author}>{author}</span>
+                              ))}
+                            </div>
+                            <div className="flex">
+                              <label
+                                htmlFor="newAuthor"
+                                className="sr-only block text-sm font-medium text-gray-700"
+                              >
+                                Author
+                              </label>
+                              <AsyncCreatableSelect
+                                isMulti
+                                cacheOptions
+                                defaultOptions
+                                loadOptions={authorOptions}
+                                value={authorState.value}
+                                onChange={selectAuthorChange}
+                              />
+                            </div>
+                          </fieldset>
+
+                          <fieldset className="mb-2 space-y-1">
+                            <p className="block text-sm font-medium text-gray-700">
+                              Categories
+                            </p>
+                            {productData.categories.value.map((category) => (
+                              <span key={category}>{category}</span>
+                            ))}
+                            <div>
+                              <label
+                                htmlFor="newCategory"
+                                className="sr-only block text-sm font-medium text-gray-700"
+                              >
+                                Category
+                              </label>
+                              <AsyncCreatableSelect
+                                isMulti
+                                cacheOptions
+                                defaultOptions
+                                loadOptions={promiseOptions}
+                                value={categoryState.value}
+                                onChange={slectedChangetest}
+                              />
+                            </div>
+                          </fieldset>
+
+                          <fieldset className="mb-2 space-y-1">
+                            <label
+                              htmlFor="description"
+                              className="block text-sm font-medium text-gray-700"
+                            >
+                              Description
+                            </label>
+
+                            <textarea
+                              name="description"
+                              id="description"
+                              placeholder="Few words..."
+                              className="mt-1 w-full resize-none rounded-md border-gray-200 shadow-sm sm:text-sm"
+                              value={productData.description.value}
+                              onChange={(e) => productDataChangeHandler(e)}
+                            />
+                          </fieldset>
+
+                          <fieldset className="relative mb-2 max-w-full space-y-1 break-all">
+                            <label
+                              htmlFor="imgs"
+                              className="block text-sm font-medium text-gray-700  "
+                            >
+                              Imgs
+                            </label>
+
+                            <Input
+                              type="file"
+                              name="imgs"
+                              id="imgs"
+                              onChange={(e) => productDataChangeHandler(e)}
+                              accept="application/pdf, image/png"
+                            />
+
+                            {productData.imgs.value.length > 0 &&
+                              productData.imgs.value.map((img, id) => {
+                                return (
+                                  <p
+                                    className="text-xs"
+                                    key={id}
+                                    id={id.toString()}
+                                  >
+                                    {img.slice(0, 60)}...
+                                  </p>
+                                );
+                              })}
+                          </fieldset>
+
+                          <fieldset className="mb-2 space-y-1">
+                            <label
+                              htmlFor="quantity"
+                              className="block text-sm font-medium text-gray-700"
+                            >
+                              Amount
+                            </label>
+
+                            <input
+                              name="quantity"
+                              id="quantity"
+                              type="number"
+                              placeholder="1..."
+                              min={1}
+                              max={100}
+                              className="w-full rounded-md border-gray-200 shadow-sm sm:text-sm"
+                              value={productData.quantity.value}
+                              onChange={(e) => productDataChangeHandler(e)}
+                            />
+                          </fieldset>
+
+                          <fieldset className="mb-2 space-y-1">
+                            <span className="block text-sm font-medium text-gray-700">
+                              Marketplace
+                            </span>
+                            <RadioGroup
+                              defaultValue={MarketPlaceTypes.SHOP}
+                              // onChange={(value) =>
+                              //   productDataChangeHandler(null, value)
+                              // }
+                            >
+                              <div>
+                                <RadioGroupItem
+                                  value={MarketPlaceTypes.SHOP}
+                                  id={MarketPlaceTypes.SHOP}
+                                />
+                                <Label htmlFor={MarketPlaceTypes.SHOP}>
+                                  {MarketPlaceTypes.SHOP}
+                                </Label>
+                              </div>
+                              <div>
+                                <RadioGroupItem
+                                  value={MarketPlaceTypes.AUCTION}
+                                  id={MarketPlaceTypes.AUCTION}
+                                />
+                                <Label htmlFor={MarketPlaceTypes.AUCTION}>
+                                  {MarketPlaceTypes.AUCTION}
+                                </Label>
+                              </div>
+                            </RadioGroup>
+                            {/* <RadioGroup
+                              value={productData.marketPlace.value}
+                              onChange={(value) =>
+                                productDataChangeHandler(null, value)
+                              }
+                            >
+                              <div className="space-y-2">
+                                <RadioGroup.Option
+                                  value="Shop"
+                                  className={({ active, checked }) =>
+                                    `
+                  ${
+                    checked ? 'bg-primary bg-opacity-95 text-white' : 'bg-white'
+                  }
+                  relative flex
+                    cursor-pointer rounded-lg px-5 py-4 shadow-md focus:ring focus:ring-blue-300`
+                                  }
+                                >
+                                  {({ active, checked }) => (
+                                    <div className="flex w-full items-center justify-between">
+                                      <div className="flex items-center">
+                                        <div className="text-sm">
+                                          <RadioGroup.Label
+                                            as="p"
+                                            className={`font-medium  ${
+                                              checked
+                                                ? 'text-white'
+                                                : 'text-gray-900'
+                                            }`}
+                                          >
+                                            Shop
+                                          </RadioGroup.Label>
+                                          <RadioGroup.Description
+                                            as="span"
+                                            className={`inline ${
+                                              checked
+                                                ? 'text-sky-100'
+                                                : 'text-gray-500'
+                                            }`}
+                                          >
+                                            <span>
+                                              Adds the product to the Shop
+                                              marketplace
+                                            </span>
+                                          </RadioGroup.Description>
+                                        </div>
+                                      </div>
+                                      {checked && (
+                                        <div className="shrink-0 text-white">
+                                          <CheckIcon height={6} width={6} />
+                                        </div>
+                                      )}
+                                    </div>
+                                  )}
+                                </RadioGroup.Option>
+                                <RadioGroup.Option
+                                  value="Auction"
+                                  className={({ active, checked }) =>
+                                    `
+                  ${
+                    checked ? 'bg-primary bg-opacity-95 text-white' : 'bg-white'
+                  }
+                    relative flex cursor-pointer rounded-lg px-5 py-4 shadow-md focus:ring focus:ring-blue-300`
+                                  }
+                                >
+                                  {({ active, checked }) => (
+                                    <div className="flex w-full items-center justify-between">
+                                      <div className="flex items-center">
+                                        <div className="text-sm">
+                                          <RadioGroup.Label
+                                            as="p"
+                                            className={`font-medium  ${
+                                              checked
+                                                ? 'text-white'
+                                                : 'text-gray-900'
+                                            }`}
+                                          >
+                                            Auction
+                                          </RadioGroup.Label>
+                                          <RadioGroup.Description
+                                            as="span"
+                                            className={`inline ${
+                                              checked
+                                                ? 'text-sky-100'
+                                                : 'text-gray-500'
+                                            }`}
+                                          >
+                                            <span>
+                                              Adds the product to the Auction
+                                              marketplace
+                                            </span>
+                                          </RadioGroup.Description>
+                                        </div>
+                                      </div>
+                                      {checked && (
+                                        <div className="shrink-0 text-white">
+                                          <CheckIcon height={6} width={6} />
+                                        </div>
+                                      )}
+                                    </div>
+                                  )}
+                                </RadioGroup.Option>
+                              </div>
+                            </RadioGroup> */}
+                          </fieldset>
+
+                          {productData.marketPlace.value ===
+                          MarketPlaceTypes.SHOP ? (
+                            <fieldset className="mb-2 space-y-1">
+                              <label
+                                htmlFor="price"
+                                className="block text-sm font-medium text-gray-700"
+                              >
+                                Price
+                              </label>
+                              <input
+                                name="price"
+                                id="price"
+                                type="number"
+                                placeholder="$1..."
+                                min={0.1}
+                                step={0.1}
+                                className="w-full rounded-md border-gray-200 shadow-sm sm:text-sm"
+                                value={productData.price.value}
+                                onChange={(e) => productDataChangeHandler(e)}
+                              />
+                            </fieldset>
+                          ) : (
+                            <div>
+                              <fieldset className="mb-2 space-y-1">
+                                <label
+                                  htmlFor="price"
+                                  className="block text-sm font-medium text-gray-700"
+                                >
+                                  Starting Price
+                                </label>
+                                <input
+                                  name="startingPrice"
+                                  id="startingPrice"
+                                  type="number"
+                                  placeholder="$1..."
+                                  min={0.1}
+                                  step={0.1}
+                                  className="w-full rounded-md border-gray-200 shadow-sm sm:text-sm"
+                                  value={productData.startingPrice.value}
+                                  onChange={(e) => productDataChangeHandler(e)}
+                                />
+                              </fieldset>
+                              <DatePicker
+                                date={finishAuctionDate}
+                                setDate={setFinishAuctionDate}
+                              />
+                              <button type="button" onClick={handleSubmit}>
+                                Test Socket
+                              </button>
+                            </div>
+                          )}
+                        </form>
+                        <DialogFooter>
+                          <Button variant="default" type="submit">
+                            Add
+                          </Button>
+                        </DialogFooter>
+                      </DialogContent>
+                    </Dialog>
                   </div>
                 )}
               </div>
@@ -432,309 +785,6 @@ export default function MyAccount() {
           </div>
         </MainContainer>
       </div>
-      <CustomDialog
-        isOpen={isOpen}
-        changeIsOpen={changeIsOpen}
-        title="Add product"
-        description={
-          "Fill in your product data. Click the 'add' button when you're done."
-        }
-        isLoading={status.isLoading}
-        hasFailed={status.hasFailed}
-        changeHasFailed={resetHasFailed}
-        isSuccess={status.isSuccess}
-      >
-        <form onSubmit={(e) => addProductHandler(e)} className="w-full">
-          <fieldset className="mb-2 space-y-1">
-            <label
-              htmlFor="title"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Title
-            </label>
-
-            <input
-              name="title"
-              id="title"
-              type="text"
-              placeholder="Harry Potter..."
-              className="w-full rounded-md border-gray-200 shadow-sm sm:text-sm"
-              value={productData.title.value}
-              onChange={(e) => productDataChangeHandler(e)}
-            />
-          </fieldset>
-
-          <fieldset className="mb-2 space-y-1">
-            <p className="block text-sm font-medium text-gray-700">Authors</p>
-            <div>
-              {productData.authors.value.map((author) => (
-                <span key={author}>{author}</span>
-              ))}
-            </div>
-            <div className="flex">
-              <label
-                htmlFor="newAuthor"
-                className="sr-only block text-sm font-medium text-gray-700"
-              >
-                Author
-              </label>
-              <AsyncCreatableSelect
-                isMulti
-                cacheOptions
-                defaultOptions
-                loadOptions={authorOptions}
-                value={authorState.value}
-                onChange={selectAuthorChange}
-              />
-            </div>
-          </fieldset>
-
-          <fieldset className="mb-2 space-y-1">
-            <p className="block text-sm font-medium text-gray-700">
-              Categories
-            </p>
-            {productData.categories.value.map((category) => (
-              <span key={category}>{category}</span>
-            ))}
-            <div>
-              <label
-                htmlFor="newCategory"
-                className="sr-only block text-sm font-medium text-gray-700"
-              >
-                Category
-              </label>
-              <AsyncCreatableSelect
-                isMulti
-                cacheOptions
-                defaultOptions
-                loadOptions={promiseOptions}
-                value={categoryState.value}
-                onChange={slectedChangetest}
-              />
-            </div>
-          </fieldset>
-
-          <fieldset className="mb-2 space-y-1">
-            <label
-              htmlFor="description"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Description
-            </label>
-
-            <textarea
-              name="description"
-              id="description"
-              placeholder="Few words..."
-              className="mt-1 w-full resize-none rounded-md border-gray-200 shadow-sm sm:text-sm"
-              value={productData.description.value}
-              onChange={(e) => productDataChangeHandler(e)}
-            />
-          </fieldset>
-
-          <fieldset className="relative mb-2 max-w-full space-y-1 break-all">
-            <label
-              htmlFor="imgs"
-              className="block text-sm font-medium text-gray-700  "
-            >
-              Imgs
-            </label>
-
-            <Input
-              type="file"
-              name="imgs"
-              id="imgs"
-              onChange={(e) => productDataChangeHandler(e)}
-              accept="application/pdf, image/png"
-            />
-
-            {productData.imgs.value.length > 0 &&
-              productData.imgs.value.map((img, id) => {
-                return (
-                  <p className="text-xs" key={id} id={id.toString()}>
-                    {img.slice(0, 60)}...
-                  </p>
-                );
-              })}
-          </fieldset>
-
-          <fieldset className="mb-2 space-y-1">
-            <label
-              htmlFor="quantity"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Amount
-            </label>
-
-            <input
-              name="quantity"
-              id="quantity"
-              type="number"
-              placeholder="1..."
-              min={1}
-              max={100}
-              className="w-full rounded-md border-gray-200 shadow-sm sm:text-sm"
-              value={productData.quantity.value}
-              onChange={(e) => productDataChangeHandler(e)}
-            />
-          </fieldset>
-
-          <fieldset className="mb-2 space-y-1">
-            <span className="block text-sm font-medium text-gray-700">
-              Marketplace
-            </span>
-            <RadioGroup
-              value={productData.marketPlace.value}
-              onChange={(value) => productDataChangeHandler(null, value)}
-            >
-              <div className="space-y-2">
-                <RadioGroup.Option
-                  value="Shop"
-                  className={({ active, checked }) =>
-                    `
-                  ${
-                    checked ? 'bg-primary bg-opacity-95 text-white' : 'bg-white'
-                  }
-                  relative flex
-                    cursor-pointer rounded-lg px-5 py-4 shadow-md focus:ring focus:ring-blue-300`
-                  }
-                >
-                  {({ active, checked }) => (
-                    <div className="flex w-full items-center justify-between">
-                      <div className="flex items-center">
-                        <div className="text-sm">
-                          <RadioGroup.Label
-                            as="p"
-                            className={`font-medium  ${
-                              checked ? 'text-white' : 'text-gray-900'
-                            }`}
-                          >
-                            Shop
-                          </RadioGroup.Label>
-                          <RadioGroup.Description
-                            as="span"
-                            className={`inline ${
-                              checked ? 'text-sky-100' : 'text-gray-500'
-                            }`}
-                          >
-                            <span>
-                              Adds the product to the Shop marketplace
-                            </span>
-                          </RadioGroup.Description>
-                        </div>
-                      </div>
-                      {checked && (
-                        <div className="shrink-0 text-white">
-                          <CheckIcon height={6} width={6} />
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </RadioGroup.Option>
-                <RadioGroup.Option
-                  value="Auction"
-                  className={({ active, checked }) =>
-                    `
-                  ${
-                    checked ? 'bg-primary bg-opacity-95 text-white' : 'bg-white'
-                  }
-                    relative flex cursor-pointer rounded-lg px-5 py-4 shadow-md focus:ring focus:ring-blue-300`
-                  }
-                >
-                  {({ active, checked }) => (
-                    <div className="flex w-full items-center justify-between">
-                      <div className="flex items-center">
-                        <div className="text-sm">
-                          <RadioGroup.Label
-                            as="p"
-                            className={`font-medium  ${
-                              checked ? 'text-white' : 'text-gray-900'
-                            }`}
-                          >
-                            Auction
-                          </RadioGroup.Label>
-                          <RadioGroup.Description
-                            as="span"
-                            className={`inline ${
-                              checked ? 'text-sky-100' : 'text-gray-500'
-                            }`}
-                          >
-                            <span>
-                              Adds the product to the Auction marketplace
-                            </span>
-                          </RadioGroup.Description>
-                        </div>
-                      </div>
-                      {checked && (
-                        <div className="shrink-0 text-white">
-                          <CheckIcon height={6} width={6} />
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </RadioGroup.Option>
-              </div>
-            </RadioGroup>
-          </fieldset>
-
-          {productData.marketPlace.value === MarketPlaceTypes.SHOP ? (
-            <fieldset className="mb-2 space-y-1">
-              <label
-                htmlFor="price"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Price
-              </label>
-              <input
-                name="price"
-                id="price"
-                type="number"
-                placeholder="$1..."
-                min={0.1}
-                step={0.1}
-                className="w-full rounded-md border-gray-200 shadow-sm sm:text-sm"
-                value={productData.price.value}
-                onChange={(e) => productDataChangeHandler(e)}
-              />
-            </fieldset>
-          ) : (
-            <div>
-              <fieldset className="mb-2 space-y-1">
-                <label
-                  htmlFor="price"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Starting Price
-                </label>
-                <input
-                  name="startingPrice"
-                  id="startingPrice"
-                  type="number"
-                  placeholder="$1..."
-                  min={0.1}
-                  step={0.1}
-                  className="w-full rounded-md border-gray-200 shadow-sm sm:text-sm"
-                  value={productData.startingPrice.value}
-                  onChange={(e) => productDataChangeHandler(e)}
-                />
-              </fieldset>
-              <DatePicker
-                date={finishAuctionDate}
-                setDate={setFinishAuctionDate}
-              />
-              <button type="button" onClick={handleSubmit}>
-                Test Socket
-              </button>
-            </div>
-          )}
-
-          <div className="mb-2 mt-4 flex justify-end">
-            <Button variant="success" type="submit">
-              Add
-            </Button>
-          </div>
-        </form>
-      </CustomDialog>
     </div>
   );
 }

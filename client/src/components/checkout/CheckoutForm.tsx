@@ -12,7 +12,7 @@ import {
 import axios from 'axios';
 import { useState, useEffect, useContext, FormEvent } from 'react';
 import { UserContext } from '../../context/UserProvider';
-import { getCookie } from '../../helpers/utils';
+import { getCookie } from '../../lib/utils';
 import { CartContext } from '../../context/CartProvider';
 
 export default function CheckoutForm({ changeShowThankYouHandler }: any) {
@@ -128,7 +128,11 @@ export default function CheckoutForm({ changeShowThankYouHandler }: any) {
         }
         options={{ defaultValues: { email: userData?.email || email } }}
       />
-      <PaymentElement id="payment-element" options={paymentElementOptions} />
+      <PaymentElement
+        id="payment-element"
+        className="mb-6"
+        options={paymentElementOptions}
+      />
       <AddressElement
         options={{
           mode: 'shipping',
@@ -139,7 +143,6 @@ export default function CheckoutForm({ changeShowThankYouHandler }: any) {
         }}
         onChange={(event) => {
           if (event.complete) {
-            // Extract potentially complete address
             const { name, address, phone } = event.value;
             setBuyerData({ name, address, phone });
           }
@@ -155,12 +158,27 @@ export default function CheckoutForm({ changeShowThankYouHandler }: any) {
         }
         id="submit"
         style={{ marginTop: '1rem' }}
+        className="block w-full rounded-md border-0 bg-primary px-4 py-3 font-semibold text-white transition-colors duration-200 ease-out disabled:cursor-auto disabled:opacity-50"
       >
         <span id="button-text">
-          {isLoading ? <div className="spinner" id="spinner" /> : 'Pay now'}
+          {isLoading ? (
+            <div
+              className="mx-auto block h-6 w-6 animate-spin rounded-full border-[3px] border-current border-t-primary text-white"
+              role="status"
+              aria-label="loading"
+            >
+              <span className="sr-only">Loading...</span>
+            </div>
+          ) : (
+            'Pay now'
+          )}
         </span>
       </button>
-      {message && <div id="payment-message">{message}</div>}
+      {message && (
+        <div id="payment-message" className="pt-3 text-center text-slate-500">
+          {message}
+        </div>
+      )}
     </form>
   );
 }

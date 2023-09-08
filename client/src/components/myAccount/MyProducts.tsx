@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { UnknownProductTypes } from '../../types/interfaces';
 import AuctionCard from '../card/AuctionCard';
 import ShopCard from '../card/ShopCard';
-import { Button } from '../UI/Btns/Button';
+import { Button } from '../UI/button';
 import useSortProducts from '../../hooks/useSortProducts';
 
 interface PropsTypes {
@@ -64,7 +64,7 @@ export default function MyProducts({
       {unfold && quantity && myProducts.length > quantity && (
         <div className="flex items-center justify-center">
           <Button
-            variant="primary"
+            variant="default"
             onClick={() => setShowMore((prevState) => !prevState)}
           >
             {showMore ? 'Show less' : 'Show more'}

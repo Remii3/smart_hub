@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { ProductAuctionCardType } from '../../types/interfaces';
-import { buttonVariants } from '../UI/Btns/Button';
+import { buttonVariants } from '../UI/button';
 
 const defaultProps = {
   img: [],
@@ -63,7 +63,7 @@ function AuctionCard({
               <div className="pb-3">stars</div>
               <Link
                 to={`/product/${_id}`}
-                className={buttonVariants({ variant: 'primary' })}
+                className={buttonVariants({ variant: 'default' })}
               >
                 Join bidding
               </Link>
