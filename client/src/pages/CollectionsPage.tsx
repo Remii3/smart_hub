@@ -1,5 +1,5 @@
-import MainContainer from '../containers/MainContainer';
-import SuccessAlert from '../components/UI/alerts/SuccessAlert';
+import MainContainer from '@layout/MainContainer';
+import SuccessAlert from '@components/UI/alerts/SuccessAlert';
 
 export default function CollectionsPage() {
   return (

@@ -2,14 +2,14 @@ import axios from 'axios';
 import { useEffect, useState, useContext, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 import { SwiperSlide } from 'swiper/react';
-import { AuthorTypes } from '../types/interfaces';
-import ShopCard from '../components/card/ShopCard';
-import AuctionCard from '../components/card/AuctionCard';
-import ShortSwiper from '../components/swiper/ShortSwiper';
-import { UserContext } from '../context/UserProvider';
-import { Button } from '../components/UI/button';
-import { MarketPlaceTypes, UserRoleTypes } from '../types/types';
-import { Skeleton } from '../components/UI/skeleton';
+import { AuthorTypes } from '@customTypes/interfaces';
+import ShopCard from '@components/cards/ShopCard';
+import AuctionCard from '@components/cards/AuctionCard';
+import ShortSwiper from '@components/swiper/ShortSwiper';
+import { UserContext } from '@context/UserProvider';
+import { Button } from '@components/UI/button';
+import { MarketPlaceTypes, UserRoleTypes } from '@customTypes/types';
+import { Skeleton } from '@components/UI/skeleton';
 
 export default function OtherUserPage() {
   const [otherUserData, setOtherUserData] = useState<AuthorTypes>();

@@ -1,9 +1,9 @@
-import '../assets/styles/swiper.css';
-import CategoriesSection from '../components/main/CategoriesSection';
-import CollectionSection from '../components/main/CollectionSection';
-import SpecialAuctionSection from '../components/main/SpecialAuctionSection';
-import AllAuctionsSection from '../components/main/AllAuctionsSection';
-import MainBanner from '../components/main/MainBanner';
+import '@assets/styles/swiper.css';
+import CategoriesSection from '@features/adSections/CategoriesSection';
+import CollectionSection from '@features/adSections/CollectionSection';
+import SpecialAuctionSection from '@features/adSections/SpecialAuctionSection';
+import AllAuctionsSection from '@features/adSections/AllAuctionsSection';
+import MainBanner from '@features/adSections/MainBanner';
 
 export default function MainPage() {
   return (

@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useLocation } from 'react-router-dom';
 import Footer from './Footer';
 import Header from './Header';
-import WebRoutes from '../router/WebRoutes';
+import AppRoutes from '../AppRoutes';
 
 export default function MainLayout() {
   const { pathname } = useLocation();
@@ -27,7 +27,7 @@ export default function MainLayout() {
     <div id="mainContainer" className="relative overflow-clip bg-white">
       <Header currentPathname={pathname} />
       <main className="h-full min-h-[calc(100vh-64px-284px)] w-full">
-        <WebRoutes />
+        <AppRoutes />
       </main>
       <Footer />
     </div>

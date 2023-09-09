@@ -1,4 +1,4 @@
-import { UnknownProductTypes } from '../types/interfaces';
+import { UnknownProductTypes } from '@customTypes/interfaces';
 
 interface SortProductsTypes {
   DATE_DESC: 'Date, DESC';
@@ -76,7 +76,6 @@ export default function useSortProducts({
       sortedProducts = filteredData.sort((a, b) => {
         return b.shop_info.price > a.shop_info.price ? -1 : 1;
       });
-      console.log(sortedProducts);
       break;
     }
     default:

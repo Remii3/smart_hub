@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { useEffect, useState } from 'react';
-import { UnknownProductTypes } from '../types/interfaces';
-import BasicProductCollection from '../components/collections/BasicProductCollection';
+import { UnknownProductTypes } from '@customTypes/interfaces';
+import BasicProductCollection from '@features/productCollections/BasicProductCollection';
 
 export default function ShopPage() {
   const [shopProducts, setShopProducts] = useState<UnknownProductTypes[]>([]);

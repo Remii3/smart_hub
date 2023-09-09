@@ -1,11 +1,11 @@
 import { ChangeEvent, FormEvent, useContext, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { SunRiseIcon } from '../assets/icons/Icons';
-import CustomInput from '../components/UI/form/CustomInput';
-import { UserContext } from '../context/UserProvider';
-import PasswordInput from '../components/UI/form/CustomPasswordInput';
-import { Button } from '../components/UI/button';
+import { SunRiseIcon } from '@assets/icons/Icons';
+import CustomInput from '@components/form/CustomInput';
+import { UserContext } from '@context/UserProvider';
+import PasswordInput from '@components/form/CustomPasswordInput';
+import { Button } from '@components/UI/button';
 
 export default function RegisterPage() {
   const navigate = useNavigate();

@@ -1,11 +1,11 @@
 import axios from 'axios';
 import { ChangeEvent, FormEvent, useContext, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { SunRiseIcon } from '../assets/icons/Icons';
-import { UserContext } from '../context/UserProvider';
-import CustomInput from '../components/UI/form/CustomInput';
-import CustomPasswordInput from '../components/UI/form/CustomPasswordInput';
-import { Button } from '../components/UI/button';
+import { SunRiseIcon } from '@assets/icons/Icons';
+import { UserContext } from '@context/UserProvider';
+import CustomInput from '@components/form/CustomInput';
+import CustomPasswordInput from '@components/form/CustomPasswordInput';
+import { Button } from '@components/UI/button';
 
 export default function LoginPage() {
   const navigate = useNavigate();

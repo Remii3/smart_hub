@@ -1,9 +1,6 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
-import MainContainer from '../containers/MainContainer';
-import { Button } from '../components/UI/button';
-import { NewsTypes } from '../types/interfaces';
 import {
   Dialog,
   DialogContent,
@@ -12,7 +9,10 @@ import {
   DialogHeader,
   DialogTrigger,
   DialogTitle,
-} from '../components/UI/dialog';
+} from '@components/UI/dialog';
+import MainContainer from '@layout/MainContainer';
+import { Button } from '@components/UI/button';
+import { NewsTypes } from '@customTypes/interfaces';
 
 export default function NewsPage() {
   const [newsList, setNewsList] = useState<null | NewsTypes[]>(null);

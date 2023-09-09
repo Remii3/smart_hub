@@ -1,5 +1,3 @@
-import React from 'react';
-
 export default function ErrorBadge({ message }: { message: string }) {
   return (
     <span className="inline-flex items-center justify-center rounded-full bg-red-100 px-2.5 py-0.5 text-red-700">

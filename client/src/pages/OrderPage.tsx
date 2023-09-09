@@ -1,9 +1,9 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
-import MainContainer from '../containers/MainContainer';
-import { UserContext } from '../context/UserProvider';
-import { OrderTypes } from '../types/interfaces';
+import MainContainer from '@layout/MainContainer';
+import { UserContext } from '@context/UserProvider';
+import { OrderTypes } from '@customTypes/interfaces';
 
 export default function OrderPage() {
   const [orderData, setOrderData] = useState<OrderTypes | null>(null);

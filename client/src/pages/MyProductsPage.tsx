@@ -1,7 +1,7 @@
 import { useContext } from 'react';
-import { UserContext } from '../context/UserProvider';
-import ShopCard from '../components/card/ShopCard';
-import AuctionCard from '../components/card/AuctionCard';
+import { UserContext } from '@context/UserProvider';
+import ShopCard from '@components/cards/ShopCard';
+import AuctionCard from '@components/cards/AuctionCard';
 
 export default function MyProductsPage() {
   const { userData } = useContext(UserContext);

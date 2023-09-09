@@ -1,8 +1,8 @@
 import { ReactNode } from 'react';
 import { Swiper } from 'swiper/react';
 import { Navigation, Pagination } from 'swiper';
-import SuspenseComponent from '../UI/suspense/SuspenseComponent';
-import LoadingComponent from '../UI/Loaders/LoadingComponent';
+import SuspenseComponent from '@components/suspense/SuspenseComponent';
+import LoadingCircle from '@components/Loaders/LoadingCircle';
 
 function BasicSwiper({ children }: { children: ReactNode }) {
   return (
@@ -40,7 +40,7 @@ function BasicSwiper({ children }: { children: ReactNode }) {
         },
       }}
     >
-      <SuspenseComponent fallback={<LoadingComponent />}>
+      <SuspenseComponent fallback={<LoadingCircle isLoading />}>
         {children}
       </SuspenseComponent>
     </Swiper>

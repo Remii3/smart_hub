@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { useEffect, useState } from 'react';
-import BasicProductCollection from '../components/collections/BasicProductCollection';
-import { UnknownProductTypes } from '../types/interfaces';
+import BasicProductCollection from '@features/productCollections/BasicProductCollection';
+import { UnknownProductTypes } from '@customTypes/interfaces';
 
 export default function AuctionsPage() {
   const [auctionProducts, setAuctionProducts] = useState<UnknownProductTypes[]>(

@@ -3,11 +3,11 @@ import axios from 'axios';
 import { loadStripe } from '@stripe/stripe-js';
 import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import CheckoutForm from '../components/checkout/CheckoutForm';
-import CheckoutProdList from '../components/checkout/CheckoutProdList';
-import { CartTypes, SimpleFetchDataTypes } from '../types/interfaces';
-import CheckoutItem from '../components/checkout/CheckoutItem';
-import { buttonVariants } from '../components/UI/button';
+import CheckoutForm from '@features/checkout/CheckoutForm';
+import CheckoutProdList from '@features/checkout/CheckoutProdList';
+import { CartTypes, SimpleFetchDataTypes } from '@customTypes/interfaces';
+import CheckoutItem from '@features/checkout/CheckoutItem';
+import { buttonVariants } from '@components/UI/button';
 
 interface ClientSecretTypes extends SimpleFetchDataTypes {
   data: string;

@@ -2,29 +2,27 @@ import React, { Fragment, useContext, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import gsap from 'gsap';
 import axios from 'axios';
-// import { Menu, Popover, Transition } from '@headlessui/react';
 import {
   ShoppingBagIcon,
   UserCircleIcon as OutlinedUserIcon,
 } from '@heroicons/react/24/outline';
 import { MagnifyingGlassIcon, UserCircleIcon } from '@heroicons/react/24/solid';
 import { PopoverClose } from '@radix-ui/react-popover';
-import { UserContext } from '../context/UserProvider';
-import CartPopup from '../components/cart/CartPopup';
-import { CartContext } from '../context/CartProvider';
+import { UserContext } from '@context/UserProvider';
+import CartPopup from '@features/cart/CartPopup';
+import { CartContext } from '@context/CartProvider';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
-  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
-} from '../components/UI/dropdown-menu';
+} from '@components/UI/dropdown-menu';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from '../components/UI/popover';
+} from '@components/UI/popover';
 
 export default function Nav() {
   const [openedBurger, setOpenedBurger] = useState(false);

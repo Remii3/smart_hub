@@ -7,14 +7,14 @@ import {
 } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { UnknownProductTypes } from '../types/interfaces';
-import { UserContext } from '../context/UserProvider';
-import ProductImage from '../components/product/ProductImage';
-import ProductPill from '../components/product/ProductPill';
-import StarRating from '../components/product/StarRating';
-import ProductForm from '../components/product/ProductForm';
-import { Button } from '../components/UI/button';
-import LoadingCircle from '../components/UI/Loaders/LoadingCircle';
+import { UnknownProductTypes } from '@customTypes/interfaces';
+import { UserContext } from '@context/UserProvider';
+import ProductImage from '@features/product/ProductImage';
+import ProductPill from '@features/product/ProductPill';
+import StarRating from '@features/product/StarRating';
+import ProductForm from '@features/product/ProductForm';
+import { Button } from '@components/UI/button';
+import LoadingCircle from '@components/Loaders/LoadingCircle';
 import {
   Dialog,
   DialogContent,
@@ -23,7 +23,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '../components/UI/dialog';
+} from '@components/UI/dialog';
 
 export default function ProductPage() {
   const [isFetchingData, setIsFetchingData] = useState(false);

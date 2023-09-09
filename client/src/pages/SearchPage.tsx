@@ -1,14 +1,14 @@
 import { useState, useEffect, ChangeEvent } from 'react';
 import axios from 'axios';
 import { useLocation, useNavigate } from 'react-router-dom';
-import AdvancedFilter from '../components/search/AdvancedFilter';
-import { UnknownProductTypes } from '../types/interfaces';
-import ShopCard from '../components/card/ShopCard';
-import AuctionCard from '../components/card/AuctionCard';
-import MainContainer from '../containers/MainContainer';
-import Pagination from '../components/UI/paginations/Pagination';
-import SortProducts from '../components/UI/ProductCollectionHelpers/SortProducts';
-import { sortProductsTypes } from '../hooks/useSortProducts';
+import AdvancedFilter from '@features/search/AdvancedFilter';
+import { UnknownProductTypes } from '@customTypes/interfaces';
+import ShopCard from '@components/cards/ShopCard';
+import AuctionCard from '@components/cards/AuctionCard';
+import MainContainer from '@layout/MainContainer';
+import Pagination from '@components/paginations/Pagination';
+import SortProducts from '@features/productCollections/SortProducts';
+import { sortProductsTypes } from '@hooks/useSortProducts';
 
 interface SearchedProductsDataTypes {
   products: UnknownProductTypes[];

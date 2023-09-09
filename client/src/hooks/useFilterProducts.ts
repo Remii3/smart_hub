@@ -1,4 +1,4 @@
-import { UnknownProductTypes } from '../types/interfaces';
+import { UnknownProductTypes } from '@customTypes/interfaces';
 
 type FilterTypes = 'Marketplace' | 'Price';
 

@@ -1,9 +1,9 @@
 import { Swiper } from 'swiper/react';
 import { Autoplay, Pagination } from 'swiper';
-import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/solid';
 import { ReactNode } from 'react';
-import SuspenseComponent from '../UI/suspense/SuspenseComponent';
-import LoadingComponent from '../UI/Loaders/LoadingComponent';
+import SuspenseComponent from '@components/suspense/SuspenseComponent';
+import LoadingCircle from '@components/Loaders/LoadingCircle';
+
 import 'swiper/css';
 import 'swiper/css/pagination';
 
@@ -58,7 +58,7 @@ function SpecialSwiper({
         },
       }}
     >
-      <SuspenseComponent fallback={<LoadingComponent />}>
+      <SuspenseComponent fallback={<LoadingCircle isLoading />}>
         {children}
       </SuspenseComponent>
     </Swiper>

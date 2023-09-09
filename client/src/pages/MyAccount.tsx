@@ -1,28 +1,25 @@
-/* eslint-disable jsx-a11y/anchor-is-valid */
 import { useCallback, useContext, useEffect, useState } from 'react';
-import { io } from 'socket.io-client';
 import {
   UserIcon,
   ArchiveBoxIcon,
   LockClosedIcon,
   Square2StackIcon,
-  CheckIcon,
 } from '@heroicons/react/24/outline';
 import axios from 'axios';
 import AsyncCreatableSelect from 'react-select/async-creatable';
-import MainContainer from '../containers/MainContainer';
-import EditUserData from '../components/myAccount/EditUserData';
-import MyShop from '../components/myAccount/MyShop';
-import { UserContext } from '../context/UserProvider';
-import MarketplaceBadge from '../components/UI/badges/MarketplaceBadge';
-import testImg from '../assets/img/avataaars.svg';
-import { Button } from '../components/UI/button';
-import SecurityPermissions from '../components/myAccount/SecurityPermissions';
-import OrderHistory from '../components/myAccount/OrderHistory';
-import Admin from '../components/myAccount/Admin';
-import { MarketPlaceTypes, UserRoleTypes } from '../types/types';
-import { Input } from '../components/UI/input';
-import { DatePicker } from '../components/UI/datePicker';
+import MainContainer from '@layout/MainContainer';
+import EditUserData from '@features/myAccount/EditUserData';
+import MyShop from '@features/myAccount/MyShop';
+import { UserContext } from '@context/UserProvider';
+import MarketplaceBadge from '@components/UI/badges/MarketplaceBadge';
+import testImg from '@assets/img/avataaars.svg';
+import { Button } from '@components/UI/button';
+import SecurityPermissions from '@features/myAccount/SecurityPermissions';
+import OrderHistory from '@features/myAccount/OrderHistory';
+import Admin from '@features/myAccount/Admin';
+import { MarketPlaceTypes, UserRoleTypes } from '@customTypes/types';
+import { Input } from '@components/UI/input';
+import { DatePickerDemo } from '@components/UI/datePicker';
 import {
   Dialog,
   DialogContent,
@@ -31,11 +28,10 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '../components/UI/dialog';
-import { RadioGroup, RadioGroupItem } from '../components/UI/radio-group';
-import { Label } from '../components/UI/label';
+} from '@components/UI/dialog';
+import { RadioGroup, RadioGroupItem } from '@components/UI/radio-group';
+import { Label } from '@components/UI/label';
 
-const socket = io('ws://localhost:8080');
 const tabNames = {
   MY_DATA: 'myData',
   SECURITY_PERMISSIONS: 'securityPermissions',
@@ -299,11 +295,6 @@ export default function MyAccount() {
   useEffect(() => {
     getAllData();
   }, [getAllData]);
-
-  const handleSubmit = (e: any) => {
-    e.preventDefault();
-    socket.emit('message', { test: 'Hello world' });
-  };
 
   return (
     <div className="relative mb-16 min-h-screen">
@@ -679,13 +670,10 @@ export default function MyAccount() {
                                   onChange={(e) => productDataChangeHandler(e)}
                                 />
                               </fieldset>
-                              <DatePicker
+                              <DatePickerDemo
                                 date={finishAuctionDate}
                                 setDate={setFinishAuctionDate}
                               />
-                              <button type="button" onClick={handleSubmit}>
-                                Test Socket
-                              </button>
                             </div>
                           )}
                         </form>

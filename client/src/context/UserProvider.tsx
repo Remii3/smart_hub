@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { createContext, ReactNode, useEffect, useMemo, useState } from 'react';
 
-import { AuthorTypes } from '../types/interfaces';
+import { AuthorTypes } from '@customTypes/interfaces';
 
 type ContextTypes = {
   userData: null | AuthorTypes;

@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useContext } from 'react';
-import { CartContext } from '../context/CartProvider';
-import CartProdList from '../components/cart/CartProdList';
+import { CartContext } from '@context/CartProvider';
+import CartProdList from '@features/cart/CartProdList';
 import { TicketIcon } from '@heroicons/react/24/outline';
 
 export default function CartPage() {
