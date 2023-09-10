@@ -13,12 +13,12 @@ const {
 } = require('../Controllers/product.controller');
 
 router.get('/all', getAllProducts);
-router.get('/shop-products', getShopProducts);
-router.get('/auction-products', getAuctionProducts);
-router.get('/product', getOneProduct);
+router.get("/shop", getShopProducts);
+router.get("/auction", getAuctionProducts);
+router.get("/one", getOneProduct);
 router.get('/searched', getSearchedProducts);
 
-router.post('/product', addProduct);
+router.post("/one", addProduct);
 router.post('/update', updateProduct);
 router.post('/delete', deleteProduct);
 module.exports = router;
