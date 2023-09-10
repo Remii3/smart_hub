@@ -10,6 +10,11 @@ import { UserContext } from '@context/UserProvider';
 import { Button } from '@components/UI/button';
 import { MarketPlaceTypes, UserRoleTypes } from '@customTypes/types';
 import { Skeleton } from '@components/UI/skeleton';
+import {
+  useGetAccessDatabase,
+  usePostAccessDatabase,
+} from '../hooks/useAaccessDatabase';
+import { DATABASE_ENDPOINTS } from '../data/endpoints';
 
 export default function OtherUserPage() {
   const [otherUserData, setOtherUserData] = useState<AuthorTypes>();
@@ -27,13 +32,15 @@ export default function OtherUserPage() {
   );
 
   const getOtherUserData = useCallback(async () => {
-    const response = await axios.get('/user/otherUser', { params: { userId } });
-    setOtherUserData(response.data);
-    if (response) {
+    const { data } = await useGetAccessDatabase({
+      url: DATABASE_ENDPOINTS.USER_OTHER_PROFILE,
+      params: { userId },
+    });
+    setOtherUserData(data);
+    if (data) {
       setIsFollowing(
-        response.data.author_info.followers.some(
-          (id: string) => id === userData?._id
-        ) || false
+        data.author_info.followers.some((id: string) => id === userData?._id) ||
+          false
       );
     }
   }, [userData?._id, userId]);
@@ -63,26 +70,27 @@ export default function OtherUserPage() {
       ]
     : null;
 
-  const followHandler = () => {
+  const followHandler = async () => {
     if (userData === null) return;
     if (isFollowing) {
-      axios
-        .post('/user/remove-follow', {
+      await usePostAccessDatabase({
+        url: DATABASE_ENDPOINTS.USER_FOLLOW_REMOVE,
+        body: {
           followReceiverId: userId,
           followGiverId: userData._id,
-        })
-        .then(() => {
-          getOtherUserData();
-        });
+        },
+      });
+
+      await getOtherUserData();
     } else {
-      axios
-        .post('/user/add-follow', {
+      await usePostAccessDatabase({
+        url: DATABASE_ENDPOINTS.USER_FOLLOW_ADD,
+        body: {
           followReceiverId: userId,
           followGiverId: userData._id,
-        })
-        .then(() => {
-          getOtherUserData();
-        });
+        },
+      });
+      await getOtherUserData();
     }
   };
 

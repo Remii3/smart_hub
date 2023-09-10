@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { SwiperSlide } from 'swiper/react';
 import axios from 'axios';
@@ -7,16 +7,22 @@ import AuctionsSwiper from '@components/swiper/LongSwiper';
 import { AuctionProductTypes } from '@customTypes/interfaces';
 import AuctionCard from '@components/cards/AuctionCard';
 import { buttonVariants } from '@components/UI/button';
+import { useGetAccessDatabase } from '../../hooks/useAaccessDatabase';
+import { DATABASE_ENDPOINTS } from '../../data/endpoints';
 
 export default function AllAuctionsSection() {
-  const navigate = useNavigate();
   const [auctions, setAuctions] = useState<AuctionProductTypes[]>([]);
 
-  useEffect(() => {
-    axios.get('/product/auction-products').then((res) => {
-      setAuctions(res.data);
+  const fetchData = useCallback(async () => {
+    const { data } = await useGetAccessDatabase({
+      url: DATABASE_ENDPOINTS.PRODUCT_AUCTION_ALL,
     });
+    setAuctions(data);
   }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   if (auctions.length < 1) return <div />;
   return (

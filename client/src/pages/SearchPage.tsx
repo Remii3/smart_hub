@@ -1,4 +1,4 @@
-import { useState, useEffect, ChangeEvent } from 'react';
+import { useState, useEffect, ChangeEvent, useCallback } from 'react';
 import axios from 'axios';
 import { useLocation, useNavigate } from 'react-router-dom';
 import AdvancedFilter from '@features/search/AdvancedFilter';
@@ -9,6 +9,8 @@ import MainContainer from '@layout/MainContainer';
 import Pagination from '@components/paginations/Pagination';
 import SortProducts from '@features/productCollections/SortProducts';
 import { sortProductsTypes } from '@hooks/useSortProducts';
+import { useGetAccessDatabase } from '../hooks/useAaccessDatabase';
+import { DATABASE_ENDPOINTS } from '../data/endpoints';
 
 interface SearchedProductsDataTypes {
   products: UnknownProductTypes[];
@@ -73,24 +75,26 @@ export default function SearchPage() {
   const updatedQuery = searchQuery.search.slice(1);
   const navigate = useNavigate();
 
+  const fetchData = useCallback(async () => {
+    const { data } = await useGetAccessDatabase({
+      url: DATABASE_ENDPOINTS.PRODUCT_SEARCHED,
+      params: {
+        phrase: updatedQuery,
+        page: pagesData.currentPage,
+        pageSize: pagesData.pageIteration,
+        filtersData,
+        sortOption,
+      },
+    });
+    setSearchedProductsData({
+      products: data.products,
+      rawData: data.finalRawData,
+    });
+  }, []);
+
   useEffect(() => {
-    axios
-      .get('/product/searched', {
-        params: {
-          phrase: updatedQuery,
-          page: pagesData.currentPage,
-          pageSize: pagesData.pageIteration,
-          filtersData,
-          sortOption,
-        },
-      })
-      .then((res) => {
-        setSearchedProductsData({
-          products: res.data.products,
-          rawData: res.data.finalRawData,
-        });
-      });
-  }, [updatedQuery, pagesData, sortOption, filtersData]);
+    fetchData();
+  }, [fetchData]);
 
   const changePriceHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFiltersData((prevState) => {

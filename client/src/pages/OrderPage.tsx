@@ -1,9 +1,11 @@
 import { Link, useLocation } from 'react-router-dom';
-import { useEffect, useState, useContext } from 'react';
+import { useEffect, useState, useContext, useCallback } from 'react';
 import axios from 'axios';
 import MainContainer from '@layout/MainContainer';
 import { UserContext } from '@context/UserProvider';
 import { OrderTypes } from '@customTypes/interfaces';
+import { useGetAccessDatabase } from '../hooks/useAaccessDatabase';
+import { DATABASE_ENDPOINTS } from '../data/endpoints';
 
 export default function OrderPage() {
   const [orderData, setOrderData] = useState<OrderTypes | null>(null);
@@ -15,18 +17,21 @@ export default function OrderPage() {
   orderId = path.pathname.split('/');
   orderId = orderId[orderId.length - 1];
 
+  const fetchData = useCallback(async () => {
+    const { data } = await useGetAccessDatabase({
+      url: DATABASE_ENDPOINTS.ORDER_ONE,
+      params: { userId: userData?._id, orderId },
+    });
+    setOrderData(data);
+  }, []);
+
   useEffect(() => {
     setFetchingState(true);
     if (userData?._id && orderId) {
-      axios
-        .get('/order/one', { params: { userId: userData?._id, orderId } })
-        .then((res) => {
-          setOrderData(res.data);
-          setFetchingState(false);
-        })
-        .catch(() => setFetchingState(false));
+      fetchData();
+      setFetchingState(false);
     }
-  }, [orderId, userData?._id]);
+  }, [orderId, fetchData, userData?._id]);
 
   if (!orderData && fetchingState) return <div>Loading</div>;
 

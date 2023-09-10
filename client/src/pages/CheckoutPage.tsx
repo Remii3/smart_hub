@@ -8,6 +8,8 @@ import CheckoutProdList from '@features/checkout/CheckoutProdList';
 import { CartTypes, SimpleFetchDataTypes } from '@customTypes/interfaces';
 import CheckoutItem from '@features/checkout/CheckoutItem';
 import { buttonVariants } from '@components/UI/button';
+import { usePostAccessDatabase } from '../hooks/useAaccessDatabase';
+import { DATABASE_ENDPOINTS } from '../data/endpoints';
 
 interface ClientSecretTypes extends SimpleFetchDataTypes {
   data: string;
@@ -32,7 +34,10 @@ export default function CheckoutPage() {
           return { ...prevState, isLoading: true };
         });
 
-        const { data } = await axios.post('/cart/create-payment-intent');
+        const { data } = await usePostAccessDatabase({
+          url: DATABASE_ENDPOINTS.CART_PAYMENT_INTENT,
+          body: {},
+        });
         setClientSecret((prevState) => {
           return { ...prevState, data: data.clientSecret };
         });

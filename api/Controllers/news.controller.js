@@ -1,10 +1,31 @@
-const addNews = async (req, res) => {
-  res.status(201).json({ message: 'Success' });
-};
-const getAllNews = async (req, res) => {
-  res.status(200).json({ message: 'Success' });
+const allNews = async (req, res) => {
+  try {
+    res.status(200).json([]);
+  } catch (err) {
+    res.status(500).json({
+      message: 'Failed fetching news',
+    });
+  }
 };
 
-const getOneNews = async (req, res) => {
-  res.status(200).json({ message: 'Success' });
+const oneNews = async (req, res) => {
+  try {
+    res.status(200).json({});
+  } catch (err) {
+    res.status(500).json({
+      message: 'Failed fetching news',
+    });
+  }
 };
+
+const addNews = async (req, res) => {
+  try {
+    res.status(201).json({ message: 'Success' });
+  } catch (err) {
+    res.status(500).json({
+      message: 'Failed adding news',
+    });
+  }
+};
+
+module.exports = { allNews, oneNews, addNews };

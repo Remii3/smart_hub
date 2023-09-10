@@ -6,6 +6,11 @@ import CustomInput from '@components/form/CustomInput';
 import { UserContext } from '@context/UserProvider';
 import PasswordInput from '@components/form/CustomPasswordInput';
 import { Button } from '@components/UI/button';
+import {
+  useGetAccessDatabase,
+  usePostAccessDatabase,
+} from '../hooks/useAaccessDatabase';
+import { DATABASE_ENDPOINTS } from '../data/endpoints';
 
 export default function RegisterPage() {
   const navigate = useNavigate();
@@ -86,15 +91,20 @@ export default function RegisterPage() {
       regUserData.data;
 
     try {
-      await axios.post('/user/register', {
-        credentials,
-        email,
-        username,
-        password,
-        passwordConfirmation,
+      await usePostAccessDatabase({
+        url: DATABASE_ENDPOINTS.USER_REGISTER,
+        body: {
+          credentials,
+          email,
+          username,
+          password,
+          passwordConfirmation,
+        },
       });
-
-      axios.get('/user/myProfile').then((res) => changeUserData(res.data));
+      const { data } = await useGetAccessDatabase({
+        url: DATABASE_ENDPOINTS.USER_PROFILE,
+      });
+      changeUserData(data);
 
       navigate('/');
     } catch (err: any) {

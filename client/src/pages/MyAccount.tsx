@@ -31,6 +31,11 @@ import {
 } from '@components/UI/dialog';
 import { RadioGroup, RadioGroupItem } from '@components/UI/radio-group';
 import { Label } from '@components/UI/label';
+import {
+  useGetAccessDatabase,
+  usePostAccessDatabase,
+} from '../hooks/useAaccessDatabase';
+import { DATABASE_ENDPOINTS } from '../data/endpoints';
 
 const tabNames = {
   MY_DATA: 'myData',
@@ -200,16 +205,20 @@ export default function MyAccount() {
   };
 
   const fetchAllCategories = useCallback(async () => {
-    const res = await axios.get('/category/all');
+    const { data } = await useGetAccessDatabase({
+      url: DATABASE_ENDPOINTS.CATEGORY_ALL,
+    });
     setCategoryState((prevState) => {
-      return { ...prevState, options: [...res.data] };
+      return { ...prevState, options: [...data] };
     });
   }, []);
 
   const fetchAllAuthors = useCallback(async () => {
-    const res = await axios.get('/user/authors');
+    const { data } = await useGetAccessDatabase({
+      url: DATABASE_ENDPOINTS.USER_AUTHORS,
+    });
     setAuthorState((prevState) => {
-      return { ...prevState, options: [...res.data] };
+      return { ...prevState, options: [...data] };
     });
   }, []);
 
@@ -238,7 +247,11 @@ export default function MyAccount() {
       setStatus((prevState) => {
         return { ...prevState, isLoading: true };
       });
-      await axios.post('/product/product', { newProductData });
+
+      await usePostAccessDatabase({
+        url: DATABASE_ENDPOINTS.PRODUCT_ONE,
+        body: { newProductData },
+      });
       setStatus((prevState) => {
         return { ...prevState, isLoading: false };
       });

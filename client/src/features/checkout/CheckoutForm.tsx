@@ -14,6 +14,8 @@ import { useState, useEffect, useContext, FormEvent } from 'react';
 import { UserContext } from '@context/UserProvider';
 import { getCookie } from '@lib/utils';
 import { CartContext } from '@context/CartProvider';
+import { usePostAccessDatabase } from '../../hooks/useAaccessDatabase';
+import { DATABASE_ENDPOINTS } from '../../data/endpoints';
 
 export default function CheckoutForm({ changeShowThankYouHandler }: any) {
   const stripe = useStripe();
@@ -99,13 +101,19 @@ export default function CheckoutForm({ changeShowThankYouHandler }: any) {
       }
     } else {
       const currentUserId = userData?._id || getCookie('guestToken');
-      await axios.post('/order/one', {
-        buyerId: currentUserId,
-        items: cartState.products,
+      await usePostAccessDatabase({
+        url: DATABASE_ENDPOINTS.ORDER_ONE,
+        body: {
+          buyerId: currentUserId,
+          items: cartState.products,
+        },
       });
-      await axios.post('/cart/remove-one', {
-        userId: currentUserId,
-        productId: 'all',
+      await usePostAccessDatabase({
+        url: DATABASE_ENDPOINTS.CART_REMOVE,
+        body: {
+          userId: currentUserId,
+          productId: 'all',
+        },
       });
 
       changeShowThankYouHandler(cartState);

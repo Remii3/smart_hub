@@ -53,7 +53,8 @@ export default function CartProvider({ children }: { children: ReactNode }) {
   const fetchCartData = useCallback(async () => {
     if (userId) {
       const { data } = await useGetAccessDatabase({
-        url: DATABASE_ENDPOINTS.CART_ALL_ITEMS,
+        url: DATABASE_ENDPOINTS.CART_ALL,
+        params: { userId },
       });
       setCart((prevState) => {
         return {
@@ -78,7 +79,7 @@ export default function CartProvider({ children }: { children: ReactNode }) {
       });
 
       await usePostAccessDatabase({
-        url: DATABASE_ENDPOINTS.CART_ADD_ITEM,
+        url: DATABASE_ENDPOINTS.CART_ADD,
         body: { userId, productId, productQuantity },
       });
 
@@ -172,7 +173,7 @@ export default function CartProvider({ children }: { children: ReactNode }) {
       );
 
       await usePostAccessDatabase({
-        url: DATABASE_ENDPOINTS.CART_REMOVE_ITEM,
+        url: DATABASE_ENDPOINTS.CART_REMOVE,
         body: { userId, productId },
       });
 

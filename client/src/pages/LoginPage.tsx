@@ -6,6 +6,11 @@ import { UserContext } from '@context/UserProvider';
 import CustomInput from '@components/form/CustomInput';
 import CustomPasswordInput from '@components/form/CustomPasswordInput';
 import { Button } from '@components/UI/button';
+import {
+  useGetAccessDatabase,
+  usePostAccessDatabase,
+} from '../hooks/useAaccessDatabase';
+import { DATABASE_ENDPOINTS } from '../data/endpoints';
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -38,12 +43,17 @@ export default function LoginPage() {
     const { email, password } = logUserData.data;
 
     try {
-      await axios.post('/user/login', {
-        email,
-        password,
+      await usePostAccessDatabase({
+        url: DATABASE_ENDPOINTS.USER_LOGIN,
+        body: {
+          email,
+          password,
+        },
       });
-
-      axios.get('/user/myProfile').then((res) => changeUserData(res.data));
+      const { data } = await useGetAccessDatabase({
+        url: DATABASE_ENDPOINTS.USER_PROFILE,
+      });
+      changeUserData(data);
 
       navigate('/');
     } catch (err: any) {

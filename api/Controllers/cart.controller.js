@@ -7,7 +7,7 @@ const stripe = require('stripe')(
   'sk_test_51NDZ0zHqBBlAtOOFMShIrv9OwdfC6958wOWqZa1X59kOeyY4hNtZ80ANZ6WYv67v4a8FOFguc04SCV84QKEf6nFf005r6tKBO6',
 );
 
-const addToCart = async (req, res) => {
+const addItemToCart = async (req, res) => {
   const { userId, productId, productQuantity } = req.body;
   if (!userId) {
     return res.status(422).json({ message: 'User id is required!' });
@@ -58,7 +58,7 @@ const addToCart = async (req, res) => {
   }
 };
 
-const removeFromCart = async (req, res) => {
+const removeItemFromCart = async (req, res) => {
   const { userId, productId } = req.body;
 
   if (!userId) res.status(422).json({ message: 'User id is required!' });
@@ -80,7 +80,7 @@ const removeFromCart = async (req, res) => {
   }
 };
 
-const getCart = async (req, res) => {
+const allCartItems = async (req, res) => {
   const { userId } = req.query;
   if (!userId) return res.status(422).json({ message: 'User id is required!' });
 
@@ -197,9 +197,9 @@ const initiatePayment = async (req, res) => {
 };
 
 module.exports = {
-  addToCart,
-  removeFromCart,
-  getCart,
+  addItemToCart,
+  removeItemFromCart,
+  allCartItems,
   cartItemIncrement,
   cartItemDecrement,
   initiatePayment,

@@ -1,6 +1,8 @@
 import axios from 'axios';
 import { useContext, useState, ChangeEvent } from 'react';
 import { UserContext } from '@context/UserProvider';
+import { usePostAccessDatabase } from '../../hooks/useAaccessDatabase';
+import { DATABASE_ENDPOINTS } from '../../data/endpoints';
 
 export default function SecurityPermissions() {
   const { userData } = useContext(UserContext);
@@ -33,10 +35,14 @@ export default function SecurityPermissions() {
         ],
       };
     });
-    await axios.post('/user/security-permission', {
-      userEmail: userData?.email,
-      fieldKey: currentItem.name,
-      fieldValue: currentItem.value,
+
+    await usePostAccessDatabase({
+      url: DATABASE_ENDPOINTS.USER_UPDATE,
+      body: {
+        userEmail: userData?.email,
+        fieldKey: currentItem.name,
+        fieldValue: currentItem.value,
+      },
     });
   };
   return (

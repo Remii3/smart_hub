@@ -2,6 +2,11 @@ import axios from 'axios';
 import { ChangeEvent } from 'react';
 import { AuthorTypes } from '@customTypes/interfaces';
 import { UserRoleType } from '@customTypes/types';
+import {
+  useGetAccessDatabase,
+  usePostAccessDatabase,
+} from './useAaccessDatabase';
+import { DATABASE_ENDPOINTS } from '../data/endpoints';
 
 export enum UpdateNewDataType {
   Username = 'username',
@@ -22,61 +27,6 @@ interface UserNewDataEditTypes {
   newValue: string | UserRoleType;
   user: AuthorTypes;
   updatedField: UpdateNewDataType;
-}
-
-export async function useUploadUserData({
-  userEmail,
-  e,
-  updatedField,
-}: UseUserNewDataTypes) {
-  try {
-    switch (updatedField) {
-      case UpdateNewDataType.Email: {
-        await axios.post('/user/newData', {
-          userEmail,
-          fieldKey: updatedField,
-          newValue: e.target.value,
-        });
-        break;
-      }
-      case UpdateNewDataType.Username:
-        await axios.post('/user/newData', {
-          userEmail,
-          fieldKey: updatedField,
-          newValue: e.target.value,
-        });
-        break;
-      case UpdateNewDataType.Role:
-        await axios.post('/user/newData', {
-          userEmail,
-          fieldKey: updatedField,
-          newValue: e.target.value,
-        });
-        break;
-      case UpdateNewDataType.Pseudonim:
-        await axios.post('/user/newData', {
-          userEmail,
-          fieldKey: `author_info.${updatedField}`,
-          newValue: e.target.value,
-        });
-        break;
-      case UpdateNewDataType.ShortDescription:
-        await axios.post('/user/newData', {
-          userEmail,
-          fieldKey: `author_info.${updatedField}`,
-          newValue: e.target.value,
-        });
-        break;
-      default:
-        break;
-    }
-
-    const response = await axios.get('/admin/users');
-
-    return { updatedUserData: response.data, error: null };
-  } catch (err: unknown) {
-    return { updatedUserData: null, error: err.response.data };
-  }
 }
 
 export function useEditUserData({

@@ -24,6 +24,11 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@components/UI/dialog';
+import {
+  useGetAccessDatabase,
+  usePostAccessDatabase,
+} from '../hooks/useAaccessDatabase';
+import { DATABASE_ENDPOINTS } from '../data/endpoints';
 
 export default function ProductPage() {
   const [isFetchingData, setIsFetchingData] = useState(false);
@@ -48,19 +53,20 @@ export default function ProductPage() {
   prodId = path.pathname.split('/');
   prodId = prodId[prodId.length - 1];
 
-  const fetchProductData = useCallback(() => {
+  const fetchProductData = useCallback(async () => {
     setIsFetchingData(true);
-    axios
-      .get('/product/product', { params: { productId: prodId } })
-      .then((res) => {
-        setNewData({
-          newDescription: res.data.description,
-          newPrice: res.data.price,
-          newTitle: res.data.title,
-          newQuantity: res.data.quantity,
-        });
-        setProductData(res.data);
-      });
+    const { data } = await useGetAccessDatabase({
+      url: DATABASE_ENDPOINTS.PRODUCT_ONE,
+      params: { productId: prodId },
+    });
+    setNewData({
+      newDescription: data.description,
+      newPrice: data.price,
+      newTitle: data.title,
+      newQuantity: data.quantity,
+    });
+    setProductData(data);
+
     setIsFetchingData(false);
   }, [prodId]);
 
@@ -90,12 +96,15 @@ export default function ProductPage() {
   };
 
   const updateProductData = async () => {
-    await axios.post('/product/update', {
-      _id: productData?._id,
-      title: newData.newTitle,
-      price: newData.newPrice,
-      description: newData.newDescription,
-      quantity: newData.newQuantity,
+    await usePostAccessDatabase({
+      url: DATABASE_ENDPOINTS.PRODUCT_UPDATE,
+      body: {
+        _id: productData?._id,
+        title: newData.newTitle,
+        price: newData.newPrice,
+        description: newData.newDescription,
+        quantity: newData.newQuantity,
+      },
     });
     fetchProductData();
     setIsEditing(false);
@@ -111,7 +120,10 @@ export default function ProductPage() {
   };
 
   const deleteItemHandler = async () => {
-    await axios.post('/product/delete', { _id: productData?._id });
+    await usePostAccessDatabase({
+      url: DATABASE_ENDPOINTS.PRODUCT_DELETE,
+      body: { _id: productData?._id },
+    });
     setShowDeleteDialog(false);
     fetchProductData();
     navigate('/');
@@ -123,10 +135,14 @@ export default function ProductPage() {
 
   const addNewCommentHandler = async () => {
     setIsAddingComment(true);
-    await axios.post('/comment/one', {
-      userId: userData?._id,
-      productId: prodId,
-      value: { rating: 2, text: newComment },
+
+    await usePostAccessDatabase({
+      url: DATABASE_ENDPOINTS.COMMENT_ONE,
+      body: {
+        userId: userData?._id,
+        productId: prodId,
+        value: { rating: 2, text: newComment },
+      },
     });
     setNewComment('');
     setIsAddingComment(false);

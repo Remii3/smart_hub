@@ -1,6 +1,6 @@
 const Category = require('../Models/category');
 
-const getAllCategories = async (req, res) => {
+const allCategories = async (req, res) => {
   try {
     const categories = await Category.find();
     res.status(200).json(categories);
@@ -8,6 +8,8 @@ const getAllCategories = async (req, res) => {
     res.status(500).json({ error: 'Failed fatching categories', err });
   }
 };
+
+const oneCategory = async (req, res) => {};
 
 const addCategory = async (req, res) => {
   try {
@@ -20,4 +22,4 @@ const addCategory = async (req, res) => {
   }
 };
 
-module.exports = { getAllCategories, addCategory };
+module.exports = { allCategories, oneCategory, addCategory };

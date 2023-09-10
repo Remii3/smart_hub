@@ -1,6 +1,6 @@
 const User = require('../Models/user');
 
-const users = async (req, res) => {
+const allUsers = async (req, res) => {
   try {
     const users = await User.find({});
     res.status(200).json(users);
@@ -9,7 +9,7 @@ const users = async (req, res) => {
   }
 };
 
-const user = async (req, res) => {
+const oneUser = async (req, res) => {
   const { email } = req.body;
   try {
     const user = await User.findOne({ email });
@@ -19,4 +19,4 @@ const user = async (req, res) => {
   }
 };
 
-module.exports = { users, user };
+module.exports = { allUsers, oneUser };

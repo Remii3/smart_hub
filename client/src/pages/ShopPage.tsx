@@ -1,16 +1,23 @@
 import axios from 'axios';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { UnknownProductTypes } from '@customTypes/interfaces';
 import BasicProductCollection from '@features/productCollections/BasicProductCollection';
+import { useGetAccessDatabase } from '../hooks/useAaccessDatabase';
+import { DATABASE_ENDPOINTS } from '../data/endpoints';
 
 export default function ShopPage() {
   const [shopProducts, setShopProducts] = useState<UnknownProductTypes[]>([]);
 
-  useEffect(() => {
-    axios
-      .get('/product/shop-products')
-      .then((res) => setShopProducts(res.data));
+  const fetchData = useCallback(async () => {
+    const { data } = await useGetAccessDatabase({
+      url: DATABASE_ENDPOINTS.PRODUCT_SHOP_ALL,
+    });
+    setShopProducts(data);
   }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   return (
     <div className="min-h-screen">

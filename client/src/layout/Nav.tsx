@@ -23,6 +23,8 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@components/UI/popover';
+import { useGetAccessDatabase } from '../hooks/useAaccessDatabase';
+import { DATABASE_ENDPOINTS } from '../data/endpoints';
 
 export default function Nav() {
   const [openedBurger, setOpenedBurger] = useState(false);
@@ -56,7 +58,7 @@ export default function Nav() {
     setTimeout(async () => {
       document.cookie =
         'token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-      await axios.get('/user/guest');
+      await useGetAccessDatabase({ url: DATABASE_ENDPOINTS.USER_GUEST });
       changeUserData(null);
       navigate('/');
     }, timeoutTimer);

@@ -3,7 +3,7 @@ const Order = require('../Models/order');
 const Product = require('../Models/product');
 const User = require('../Models/user');
 
-const getOrders = async (req, res) => {
+const allOrders = async (req, res) => {
   const { userId } = req.body;
   try {
     const orders = await Order.find({ buyerId: userId }).populate(
@@ -18,7 +18,7 @@ const getOrders = async (req, res) => {
   }
 };
 
-const getOneOrder = async (req, res) => {
+const oneOrder = async (req, res) => {
   const { userId, orderId } = req.query;
   try {
     const order = await Order.findOne({
@@ -83,4 +83,4 @@ const addOrder = async (req, res) => {
   }
 };
 
-module.exports = { getOrders, addOrder, getOneOrder };
+module.exports = { allOrders, oneOrder, addOrder };

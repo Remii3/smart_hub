@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 
 interface AccessTypes {
   url: string;
@@ -11,11 +11,21 @@ interface PostTypes extends AccessTypes {
 }
 
 const useGetAccessDatabase = async ({ url, params }: GetTypes) => {
-  const { data } = await axios.get(url, { params });
-  return { data };
+  try {
+    const { data } = await axios.get(url, { params });
+    return { data, error: null };
+  } catch (err) {
+    const error = err as AxiosError;
+    return { data: null, error };
+  }
 };
 const usePostAccessDatabase = async ({ url, body }: PostTypes) => {
-  const { data } = await axios.post(url, body);
-  return { data };
+  try {
+    const { data } = await axios.post(url, body);
+    return { data, error: null };
+  } catch (err) {
+    const error = err as AxiosError;
+    return { data: null, error };
+  }
 };
 export { useGetAccessDatabase, usePostAccessDatabase };

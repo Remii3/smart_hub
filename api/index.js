@@ -9,20 +9,9 @@ const category_routes = require('./Routes/category.routes');
 const comment_routes = require('./Routes/comment.routes');
 const order_routes = require('./Routes/order.routes');
 const admin_routes = require('./Routes/admin.routes');
+const news_routes = require('./Routes/news.routes');
 const app = express();
 const server = require('http').createServer(app);
-const io = require('socket.io')(server, {
-  cors: {
-    origin: ['http://localhost:5173', 'https://smarthub-jb8g.onrender.com'],
-  },
-});
-
-io.on('connection', socket => {
-  console.log('first');
-  socket.on('message', message => {
-    console.log(message);
-  });
-});
 
 require('dotenv').config();
 app.use(express.urlencoded({ extended: true }));
@@ -53,6 +42,7 @@ mongoose
     app.use('/comment', comment_routes);
     app.use('/order', order_routes);
     app.use('/admin', admin_routes);
+    app.use('/news', news_routes);
   })
   .catch(err => {
     console.log(err);

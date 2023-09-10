@@ -3,12 +3,12 @@ const express = require('express');
 const router = express.Router();
 const {
   addOrder,
-  getOrders,
-  getOneOrder,
+  allOrders,
+  oneOrder,
 } = require('../Controllers/order.controller');
 
-router.get('/all', getOrders);
-router.get('/one', getOneOrder);
+router.get('/all', allOrders);
+router.get('/one', oneOrder);
 
 router.post('/one', addOrder);
 

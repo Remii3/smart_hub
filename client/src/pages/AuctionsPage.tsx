@@ -1,18 +1,24 @@
-import axios from 'axios';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import BasicProductCollection from '@features/productCollections/BasicProductCollection';
 import { UnknownProductTypes } from '@customTypes/interfaces';
+import { useGetAccessDatabase } from '../hooks/useAaccessDatabase';
+import { DATABASE_ENDPOINTS } from '../data/endpoints';
 
 export default function AuctionsPage() {
   const [auctionProducts, setAuctionProducts] = useState<UnknownProductTypes[]>(
     []
   );
 
-  useEffect(() => {
-    axios
-      .get('/product/auction-products')
-      .then((res) => setAuctionProducts(res.data));
+  const fetchData = useCallback(async () => {
+    const { data } = await useGetAccessDatabase({
+      url: DATABASE_ENDPOINTS.PRODUCT_AUCTION_ALL,
+    });
+    setAuctionProducts(data);
   }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   return (
     <div className="min-h-screen">

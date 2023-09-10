@@ -6,6 +6,11 @@ import CustomInput from '@components/form/CustomInput';
 import { Button } from '@components/UI/button';
 import { Input } from '@components/UI/input';
 import { Dialog, DialogContent, DialogTrigger } from '@components/UI/dialog';
+import {
+  useGetAccessDatabase,
+  usePostAccessDatabase,
+} from '../../hooks/useAaccessDatabase';
+import { DATABASE_ENDPOINTS } from '../../data/endpoints';
 
 type NewDataNameTypes =
   | 'email'
@@ -267,14 +272,18 @@ export default function EditUserData() {
         type: ActionKind.ClearError,
         payload: { label: name, value: null },
       });
-      await axios.post('/user/newData', {
-        userEmail: userData.email,
-        fieldKey: name,
-        newValue: newUserDatastate.data[name],
+      await usePostAccessDatabase({
+        url: DATABASE_ENDPOINTS.USER_UPDATE,
+        body: {
+          userEmail: userData.email,
+          fieldKey: name,
+          fieldValue: newUserDatastate.data[name],
+        },
       });
-      await axios.get('/user/myProfile').then((res) => {
-        changeUserData(res.data);
+      const { data } = await useGetAccessDatabase({
+        url: DATABASE_ENDPOINTS.USER_PROFILE,
       });
+      changeUserData(data);
       setChangingData(() => {
         return {
           isChanging: false,

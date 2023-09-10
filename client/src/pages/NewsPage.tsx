@@ -13,18 +13,22 @@ import {
 import MainContainer from '@layout/MainContainer';
 import { Button } from '@components/UI/button';
 import { NewsTypes } from '@customTypes/interfaces';
+import { useGetAccessDatabase } from '../hooks/useAaccessDatabase';
+import { DATABASE_ENDPOINTS } from '../data/endpoints';
 
 export default function NewsPage() {
   const [newsList, setNewsList] = useState<null | NewsTypes[]>(null);
 
   const fetchData = async () => {
-    const res = await axios.get('/news/all');
-    setNewsList(res.data);
+    const { data } = await useGetAccessDatabase({
+      url: DATABASE_ENDPOINTS.NEWS_ALL,
+    });
+    setNewsList(data);
   };
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [fetchData]);
 
   const addNewNewsHandler = () => {};
   return (

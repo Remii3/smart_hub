@@ -1,17 +1,24 @@
 import axios from 'axios';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { ProductTypes } from '@customTypes/interfaces';
 import MainPageHeading from '@features/headings/MainPageHeading';
 import CollectionCard from '@components/cards/CollectionCard';
+import { useGetAccessDatabase } from '../../hooks/useAaccessDatabase';
+import { DATABASE_ENDPOINTS } from '../../data/endpoints';
 
 export default function CollectionSection() {
   const [collection, setCollection] = useState<ProductTypes[]>([]);
 
-  useEffect(() => {
-    axios.get('/product/all').then((res) => {
-      setCollection(res.data);
+  const fetchData = useCallback(async () => {
+    const { data } = await useGetAccessDatabase({
+      url: DATABASE_ENDPOINTS.PRODUCT_ALL,
     });
+    setCollection(data);
   }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   return (
     <section className="relative flex w-full flex-col items-center gap-12 pb-16">

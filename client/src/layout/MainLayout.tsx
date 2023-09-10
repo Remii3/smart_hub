@@ -4,6 +4,8 @@ import { useLocation } from 'react-router-dom';
 import Footer from './Footer';
 import Header from './Header';
 import AppRoutes from '../AppRoutes';
+import { useGetAccessDatabase } from '../hooks/useAaccessDatabase';
+import { DATABASE_ENDPOINTS } from '../data/endpoints';
 
 export default function MainLayout() {
   const { pathname } = useLocation();
@@ -19,7 +21,7 @@ export default function MainLayout() {
       !document.cookie.match('token') &&
       !document.cookie.match('guestToken')
     ) {
-      axios.get('/user/guest');
+      useGetAccessDatabase({ url: DATABASE_ENDPOINTS.USER_GUEST });
     }
   }, [pathname]);
 

@@ -4,11 +4,12 @@ const router = express.Router();
 
 const {
   addComment,
-  getComments,
+  allComments,
+  oneComment,
 } = require('../Controllers/comment.controller');
 
-router.get('/all', getComments);
-router.get('/one');
+router.get('/all', allComments);
+router.get('/one', oneComment);
 
 router.post('/one', addComment);
 

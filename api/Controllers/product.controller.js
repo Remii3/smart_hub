@@ -4,7 +4,7 @@ const User = require('../Models/user');
 const Category = require('../Models/category');
 const prepareProductObject = require('../helpers/prepareProductObject');
 
-const getAllProducts = async (req, res) => {
+const allProducts = async (req, res) => {
   try {
     const products = await Product.find();
 
@@ -19,7 +19,7 @@ const getAllProducts = async (req, res) => {
   }
 };
 
-const getShopProducts = async (req, res) => {
+const shopProducts = async (req, res) => {
   try {
     const products = await Product.find({ market_place: 'Shop' });
 
@@ -34,7 +34,7 @@ const getShopProducts = async (req, res) => {
   }
 };
 
-const getAuctionProducts = async (req, res) => {
+const auctionProducts = async (req, res) => {
   try {
     const products = await Product.find({ market_place: 'Auction' });
 
@@ -49,7 +49,7 @@ const getAuctionProducts = async (req, res) => {
   }
 };
 
-const getOneProduct = async (req, res) => {
+const oneProduct = async (req, res) => {
   const { productId } = req.query;
 
   if (!productId) res.status(422).json({ message: 'Product id is requried' });
@@ -78,7 +78,7 @@ const getOneProduct = async (req, res) => {
   }
 };
 
-const getSearchedProducts = async (req, res) => {
+const searchedProducts = async (req, res) => {
   let { phrase, page, pageSize, filtersData, sortOption } = req.query;
   if (!page) page = 1;
   if (!pageSize) pageSize = 10;
@@ -358,12 +358,12 @@ const deleteProduct = async (req, res) => {
 };
 
 module.exports = {
-  getAllProducts,
-  getShopProducts,
-  getAuctionProducts,
-  getOneProduct,
+  allProducts,
+  shopProducts,
+  auctionProducts,
+  oneProduct,
   addProduct,
   updateProduct,
   deleteProduct,
-  getSearchedProducts,
+  searchedProducts,
 };

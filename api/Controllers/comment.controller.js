@@ -2,7 +2,7 @@ const { default: mongoose } = require('mongoose');
 const Comment = require('../Models/comment');
 const Product = require('../Models/product');
 
-const getComments = (req, res) => {
+const allComments = (req, res) => {
   const { productId } = req.query;
   Comment.findAll({ productId })
     .then(res => res.status(200).json(res.data))
@@ -10,6 +10,8 @@ const getComments = (req, res) => {
       return res.status(500).json({ message: 'Failed fetching comments' });
     });
 };
+
+const oneComment = (req, res) => {};
 
 const addComment = async (req, res) => {
   const { userId, productId, value } = req.body;
@@ -31,4 +33,4 @@ const addComment = async (req, res) => {
   }
 };
 
-module.exports = { getComments, addComment };
+module.exports = { allComments, oneComment, addComment };

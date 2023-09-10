@@ -4,12 +4,10 @@ const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
 const Cart = require('../Models/cart');
 const getRandomString = require('../helpers/getRandomString');
-const { verifyNewUserData } = require('../helpers/verify');
 const prepareProductObject = require('../helpers/prepareProductObject');
-const imageMimeTypes = ['image/jpeg', 'image/png', 'images/gif'];
 const salt = bcrypt.genSaltSync(12);
 
-const signIn = async (req, res) => {
+const login = async (req, res) => {
   const { email, password } = req.body;
 
   const userDoc = await User.findOne({ email });
@@ -43,7 +41,7 @@ const signIn = async (req, res) => {
   }
 };
 
-const signUp = async (req, res) => {
+const register = async (req, res) => {
   let { credentials, email, username, password } = req.body;
 
   try {
@@ -206,84 +204,7 @@ const myProfile = async (req, res) => {
   }
 };
 
-const newData = async (req, res) => {
-  let { userEmail, fieldKey, newValue } = req.body;
-  const errors = verifyNewUserData(fieldKey, newValue);
-  if (errors.length > 0) {
-    return res.status(422).json(errors[0]);
-  }
-  let fieldPath = fieldKey;
-
-  if (fieldKey === 'first_name' || fieldKey === 'last_name') {
-    fieldPath = `user_info.credentials.${fieldKey}`;
-  }
-
-  if (fieldKey === 'address') {
-    fieldPath = `user_info.${fieldKey}`;
-  }
-  if (fieldKey === 'password') {
-    newValue = bcrypt.hashSync(newValue, salt);
-  }
-
-  console.log(fieldKey, newValue, userEmail);
-
-  try {
-    if (fieldKey === 'address') {
-      await User.updateOne(
-        { email: userEmail },
-        { $set: { [fieldPath]: { ...newValue } } },
-      );
-    } else if (fieldKey === 'profile_img') {
-      if (newValue == null) return;
-      if (cover != null && imageMimeTypes.includes(cover.type)) {
-        const test = await User.updateOne(
-          { email: userEmail },
-          {
-            $set: {
-              'user_info.profile_img': new Buffer.from(cover.data, 'base64'),
-              'user_info.profile_img_type': cover.type,
-            },
-          },
-        );
-        console.log(test);
-      }
-    } else {
-      await User.updateOne(
-        { email: userEmail },
-        { $set: { [`${fieldPath}`]: newValue } },
-      );
-    }
-    res.status(200).json({ message: 'Successfully updated data' });
-  } catch (err) {
-    if (err.code === 11000) {
-      return res.status(422).json({
-        name: Object.keys(responseObject)[0],
-        message: Object.values(responseObject)[0] + ` already exists`,
-      });
-    } else {
-      console.log(err);
-      res.status(500).json({ message: 'Failed to update data' });
-    }
-  }
-};
-
-const guestData = async (req, res) => {
-  jwt.sign(
-    {
-      email: getRandomString(10),
-      user_id: getRandomString(15),
-    },
-    getRandomString(40),
-    {},
-    (err, token) => {
-      if (err) res.status(500).json({ message: 'Failed to fetch guest Data' });
-      token = token.slice(token.length - 12, token.length);
-      res.status(200).cookie('guestToken', token).json('Success');
-    },
-  );
-};
-
-const otherUserData = async (req, res) => {
+const otherProfile = async (req, res) => {
   const { userId } = req.query;
   try {
     const { role, email, username, user_info, author_info } =
@@ -337,6 +258,58 @@ const otherUserData = async (req, res) => {
   }
 };
 
+const guestProfile = async (req, res) => {
+  jwt.sign(
+    {
+      email: getRandomString(10),
+      user_id: getRandomString(15),
+    },
+    getRandomString(40),
+    {},
+    (err, token) => {
+      if (err) res.status(500).json({ message: 'Failed to fetch guest Data' });
+      token = token.slice(token.length - 12, token.length);
+      res.status(200).cookie('guestToken', token).json('Success');
+    },
+  );
+};
+
+const allAuthors = async (req, res) => {
+  try {
+    const authors = await User.find({ role: 'Author' });
+    const authorsData = [];
+    for (const author of authors) {
+      authorsData.push({
+        label: author.author_info.pseudonim,
+        value: author.author_info.pseudonim,
+        _id: author._id,
+      });
+    }
+
+    res.status(200).json(authorsData);
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to fetch authors' });
+  }
+};
+
+const allAdmins = async (req, res) => {
+  try {
+    const admins = await User.find({ role: 'Admin' });
+    const adminData = [];
+    for (const admin of admins) {
+      adminData.push({
+        label: admin.author_info.pseudonim,
+        value: admin.admin_info.pseudonim,
+        _id: admin._id,
+      });
+    }
+
+    res.status(200).json(adminData);
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to fetch authors' });
+  }
+};
+
 const addFollow = async (req, res) => {
   const { followGiverId, followReceiverId } = req.body;
 
@@ -354,6 +327,7 @@ const addFollow = async (req, res) => {
     res.status(500).json({ message: 'Failed adding follow' });
   }
 };
+
 const removeFollow = async (req, res) => {
   const { followGiverId, followReceiverId } = req.body;
 
@@ -372,41 +346,46 @@ const removeFollow = async (req, res) => {
   }
 };
 
-const getAllAuthors = async (req, res) => {
+const updateUser = async (req, res) => {
+  const { userEmail, fieldValue } = req.body;
+  const { fieldPath } = req;
+
   try {
-    const authors = await User.find({ role: 'Author' });
-    const authorsData = [];
-    for (const author of authors) {
-      authorsData.push({
-        label: author.author_info.pseudonim,
-        value: author.author_info.pseudonim,
-        _id: author._id,
-      });
+    if (typeof fieldValue == 'object') {
+      await User.updateOne(
+        { email: userEmail },
+        { $set: { [fieldPath]: { ...fieldValue } } },
+      );
+    } else {
+      await User.updateOne(
+        { email: userEmail },
+        { $set: { [fieldPath]: fieldValue } },
+      );
     }
 
-    res.status(200).json(authorsData);
+    res.status(200).json({ message: 'Successfully updated data' });
   } catch (err) {
-    res.status(500).json({ message: 'Failed to fetch authors' });
+    if (err.code === 11000) {
+      return res.status(422).json({
+        name: Object.keys(responseObject)[0],
+        message: Object.values(responseObject)[0] + ` already exists`,
+      });
+    } else {
+      console.log(err);
+      res.status(500).json({ message: 'Failed to update data' });
+    }
   }
 };
 
-const changeSecurityPermissions = async (req, res) => {
-  const { userEmail, fieldKey, fieldValue } = req.body;
-  await User.updateOne(
-    { email: userEmail },
-    { [`security_settings.${fieldKey}`]: fieldValue },
-  );
-};
-
 module.exports = {
-  signIn,
-  signUp,
+  login,
+  register,
   myProfile,
-  newData,
-  guestData,
-  otherUserData,
+  otherProfile,
+  guestProfile,
+  allAuthors,
+  allAdmins,
   addFollow,
   removeFollow,
-  getAllAuthors,
-  changeSecurityPermissions,
+  updateUser,
 };

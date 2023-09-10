@@ -17,11 +17,12 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@components/UI/accordion';
+import { UpdateNewDataType, useEditUserData } from '@hooks/useUpdateUserData';
 import {
-  UpdateNewDataType,
-  useEditUserData,
-  useUploadUserData,
-} from '@hooks/useUpdateUserData';
+  useGetAccessDatabase,
+  usePostAccessDatabase,
+} from '../../hooks/useAaccessDatabase';
+import { DATABASE_ENDPOINTS } from '../../data/endpoints';
 
 interface AdminUsersTypes {
   users: AuthorTypes[] | null;
@@ -47,13 +48,15 @@ export default function Admin() {
   const { userData } = useContext(UserContext);
 
   const fetchData = useCallback(async () => {
-    const res = await axios.get('/admin/users');
+    const { data } = await useGetAccessDatabase({
+      url: DATABASE_ENDPOINTS.ADMIN_ALL_USERS,
+    });
     setNewDataAllUsers({
-      users: res.data,
+      users: data,
       error: null,
       fetchingStatus: false,
     });
-    setOriginalData({ users: res.data, fetchingStatus: false });
+    setOriginalData({ users: data, fetchingStatus: false });
   }, []);
 
   useEffect(() => {
@@ -69,12 +72,19 @@ export default function Admin() {
     userEmail: string;
     updatedField: UpdateNewDataType;
   }) => {
-    const { updatedUserData, error } = await useUploadUserData({
-      e,
-      userEmail,
-      updatedField,
+    await usePostAccessDatabase({
+      url: DATABASE_ENDPOINTS.USER_UPDATE,
+      body: {
+        userEmail,
+        fieldKey: updatedField,
+        newValue: e.target.value,
+      },
     });
-    return { updatedUserData, error };
+
+    const { data, error } = await useGetAccessDatabase({
+      url: DATABASE_ENDPOINTS.ADMIN_ALL_USERS,
+    });
+    return { updatedUserData: data, error };
   };
 
   const newUserDataEditHandler = async ({
