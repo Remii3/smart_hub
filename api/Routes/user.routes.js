@@ -16,7 +16,7 @@ const {
 } = require('../Controllers/user.controller');
 const checkSignUpData = require('../Middleware/checkSignUpData.middleware');
 const checkSignInData = require('../Middleware/checkSignInData.middleware');
-const userPathUpdate = require('../Middleware/userPathUpdatemiddleware');
+const userPathUpdate = require('../Middleware/userPathUpdate.middleware');
 
 router.get('/profile', checkAuth, myProfile);
 router.get('/other-profile', otherProfile);

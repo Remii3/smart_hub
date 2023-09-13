@@ -39,8 +39,8 @@ export default function PriceSelector({
             />
           </summary>
         </PopoverTrigger>
-        <PopoverContent>
-          <div className="relative bg-white">
+        <PopoverContent className="relative bg-white">
+          <div>
             <div className="bg-white">
               <header className="flex  flex-wrap justify-between p-4">
                 <span className="text-sm text-gray-700">
@@ -56,7 +56,7 @@ export default function PriceSelector({
                 </button>
               </header>
 
-              <div className="border-t border-gray-200 p-4">
+              <div className="border-t border-gray-200 px-2 py-4">
                 <div className="flex flex-wrap justify-between gap-4 sm:flex-nowrap">
                   <label className="flex w-full items-center gap-2">
                     <span className="text-sm text-gray-600">€</span>

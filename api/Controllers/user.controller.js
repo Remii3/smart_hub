@@ -347,6 +347,7 @@ const removeFollow = async (req, res) => {
 };
 
 const updateUser = async (req, res) => {
+  console.log(req);
   const { userEmail, fieldValue } = req.body;
   const { fieldPath } = req;
 

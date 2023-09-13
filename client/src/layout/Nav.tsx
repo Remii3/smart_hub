@@ -25,13 +25,16 @@ import {
 } from '@components/UI/popover';
 import { useGetAccessDatabase } from '../hooks/useAaccessDatabase';
 import { DATABASE_ENDPOINTS } from '../data/endpoints';
+import { Separator } from '@components/UI/separator';
+import { Button } from '@components/UI/button';
 
-export default function Nav() {
+export default function Nav({ scrollFlag }: { scrollFlag: boolean }) {
   const [openedBurger, setOpenedBurger] = useState(false);
   const [searchbarValue, setSearchbarValue] = useState('');
   const location = useLocation();
 
   const navMobile = useRef(null);
+
   const navigate = useNavigate();
   const navLinkList = [
     { to: '/news', text: 'news' },
@@ -45,6 +48,8 @@ export default function Nav() {
   gsap.registerPlugin();
 
   const showMobileOverlay = () => {
+    document.querySelector('body')?.classList.toggle('overflow-hidden');
+    document.querySelector('body')?.classList.toggle('mr-[17px]');
     setOpenedBurger((prevState) => !prevState);
   };
 
@@ -90,7 +95,11 @@ export default function Nav() {
   ) => {
     setSearchbarValue(e.target.value);
   };
-
+  const burgerColor = openedBurger
+    ? 'bg-dark'
+    : scrollFlag
+    ? 'bg-white'
+    : 'bg-dark';
   return (
     <nav>
       <div className="relative mx-auto flex h-[64px] max-w-[1480px] flex-row items-center justify-between px-4 py-3 sm:px-10">
@@ -113,7 +122,7 @@ export default function Nav() {
               />
             </svg>
           </Link>
-          <ul className="hidden flex-row items-center px-8 text-white lg:flex">
+          <ul className={`hidden flex-row items-center px-8 lg:flex`}>
             {navLinkList.map((navLink, id) => (
               <li key={id}>
                 <Link
@@ -149,137 +158,139 @@ export default function Nav() {
             </button>
           </form>
         </div>
-
-        <div className="block lg:hidden">
-          <Popover>
-            <PopoverTrigger>
-              <MagnifyingGlassIcon width={30} height={30} />
-            </PopoverTrigger>
-            <PopoverContent className="mt-4 block w-screen bg-white lg:hidden">
-              <form
-                onSubmit={(e) => searchHandler(e)}
-                className="relative mx-auto w-full max-w-xl text-gray-600"
-              >
-                <input
-                  className="h-full w-full rounded-lg border-2 border-gray-300 bg-white px-3 pr-16 text-sm focus:outline-none"
-                  type="text"
-                  name="search"
-                  placeholder="Search"
-                  value={searchbarValue}
-                  onChange={(e) => searchbarValueChangeHandler(e)}
-                />
-                <PopoverClose
-                  type="submit"
-                  className="absolute right-0 top-1/2 h-full -translate-y-1/2 rounded-e-lg border-b-2 border-r-2 border-t-2 border-transparent bg-transparent px-2 text-gray-600 transition"
+        <div className="flex max-h-[32px] gap-4">
+          <div className="block lg:hidden">
+            <Popover>
+              <PopoverTrigger>
+                <MagnifyingGlassIcon className={` h-8 w-8`} />
+              </PopoverTrigger>
+              <PopoverContent className="mt-3 block w-screen rounded-t-none bg-white lg:hidden">
+                <form
+                  onSubmit={(e) => searchHandler(e)}
+                  className="relative mx-auto w-full max-w-xl text-gray-600"
                 >
-                  <span className="sr-only">Search</span>
-                  <MagnifyingGlassIcon className="h-4 w-4 fill-current font-bold text-gray-600" />
-                </PopoverClose>
-              </form>
-            </PopoverContent>
-          </Popover>
-        </div>
-
-        <div>
-          <Popover>
-            <PopoverTrigger className="relative">
-              <ShoppingBagIcon className="h-6 w-6" />
-              {cartState && cartState.products.length > 0 && (
-                <span className="absolute bottom-0 right-2 flex h-5 w-5 items-center justify-center rounded-full bg-pageBackground">
-                  {cartState.products.length}
-                </span>
-              )}
-            </PopoverTrigger>
-            <PopoverContent className="relative mt-4 w-screen max-w-full bg-white px-6 py-8 sm:px-6 md:max-w-sm lg:px-6">
-              <CartPopup />
-            </PopoverContent>
-          </Popover>
-          <div className="hidden lg:block">
-            <DropdownMenu>
-              <DropdownMenuTrigger>
-                {userData ? (
-                  <UserCircleIcon className="" height={30} width={30} />
-                ) : (
-                  <OutlinedUserIcon className="h-6 w-6" />
-                )}
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="mt-3">
-                <DropdownMenuGroup>
-                  {!userData && (
-                    <>
-                      <DropdownMenuItem asChild>
-                        <Link
-                          to={{ pathname: '/account/login' }}
-                          className="group flex w-full items-center rounded-md px-2 py-2 text-sm transition ease-out"
-                        >
-                          Sign in
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
-                        <Link
-                          to={{
-                            pathname: '/account/register',
-                          }}
-                          className={` group flex w-full items-center rounded-md px-2 py-2 text-sm transition ease-out`}
-                        >
-                          Sign up
-                        </Link>
-                      </DropdownMenuItem>
-                    </>
-                  )}
-                  {userData && (
-                    <>
-                      <DropdownMenuItem asChild>
-                        <Link
-                          to="/account/my"
-                          className={` group flex w-full items-center rounded-md px-2 py-2 text-sm transition ease-out`}
-                        >
-                          Account
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
-                        <button
-                          type="button"
-                          onClick={logoutHandler}
-                          className="group flex w-full items-center rounded-md px-2 py-2 text-sm transition ease-out"
-                        >
-                          Logout
-                        </button>
-                      </DropdownMenuItem>
-                    </>
-                  )}
-                </DropdownMenuGroup>
-              </DropdownMenuContent>
-            </DropdownMenu>
+                  <input
+                    className="h-full w-full rounded-lg border-2 border-gray-300 bg-white px-3 pr-16 text-sm focus:outline-none"
+                    type="text"
+                    name="search"
+                    placeholder="Search"
+                    value={searchbarValue}
+                    onChange={(e) => searchbarValueChangeHandler(e)}
+                  />
+                  <PopoverClose
+                    type="submit"
+                    className="absolute right-0 top-1/2 h-full -translate-y-1/2 rounded-e-lg border-b-2 border-r-2 border-t-2 border-transparent bg-transparent px-2 text-gray-600 transition"
+                  >
+                    <span className="sr-only">Search</span>
+                    <MagnifyingGlassIcon className="h-4 w-4 fill-current font-bold text-gray-600" />
+                  </PopoverClose>
+                </form>
+              </PopoverContent>
+            </Popover>
           </div>
-        </div>
 
-        <div className="flex lg:hidden">
-          <button
-            type="button"
-            className={`${
-              openedBurger ? 'open bg-opacity-20' : 'bg-opacity-0'
-            } relative z-30 min-w-[44px] rounded-md bg-black   text-white transition-all ease-in-out hover:bg-opacity-30 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75`}
-            onClick={showMobileOverlay}
-          >
-            <span
+          <div className="flex gap-4">
+            <Popover>
+              <PopoverTrigger className="relative">
+                <ShoppingBagIcon className={` h-7 w-7`} />
+                {cartState && cartState.products.length > 0 && (
+                  <span
+                    className={`${
+                      scrollFlag
+                        ? 'bg-dark/95 text-white'
+                        : 'bg-white text-dark'
+                    } absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full transition-colors duration-200 ease-in-out`}
+                  >
+                    {cartState.products.length}
+                  </span>
+                )}
+              </PopoverTrigger>
+              <PopoverContent className="relative mt-3 w-screen max-w-full rounded-t-none bg-white px-6 py-8 sm:px-6 md:max-w-sm lg:px-6">
+                <CartPopup />
+              </PopoverContent>
+            </Popover>
+            <div className="hidden items-center lg:flex">
+              <Popover>
+                <PopoverTrigger>
+                  {userData ? (
+                    <UserCircleIcon className={`$ h-8 w-8`} />
+                  ) : (
+                    <OutlinedUserIcon className={`h-8 w-8`} />
+                  )}
+                </PopoverTrigger>
+                <PopoverContent className="mt-3 w-auto rounded-t-none bg-white p-0">
+                  <ul>
+                    {!userData && (
+                      <>
+                        <li>
+                          <PopoverClose asChild>
+                            <Link
+                              to={{ pathname: '/account/login' }}
+                              className="flex w-full items-center justify-center rounded-t-none px-5 pb-2 pt-3 text-sm transition-colors duration-200 ease-out hover:bg-slate-400/25 hover:text-primary"
+                            >
+                              Sign in
+                            </Link>
+                          </PopoverClose>
+                        </li>
+                        <li>
+                          <PopoverClose asChild>
+                            <Link
+                              to={{
+                                pathname: '/account/register',
+                              }}
+                              className="flex w-full items-center justify-center rounded-b-md px-5 pb-3 pt-2 text-sm transition-colors duration-200 ease-out hover:bg-slate-400/25 hover:text-primary"
+                            >
+                              Sign up
+                            </Link>
+                          </PopoverClose>
+                        </li>
+                      </>
+                    )}
+                    {userData && (
+                      <>
+                        <li>
+                          <PopoverClose asChild>
+                            <Link
+                              to="/account/my"
+                              className="flex w-full items-center justify-center rounded-t-none px-5 pb-2 pt-3 text-sm transition-colors duration-200 ease-out hover:bg-slate-400/25 hover:text-primary"
+                            >
+                              Account
+                            </Link>
+                          </PopoverClose>
+                        </li>
+                        <li>
+                          <PopoverClose asChild>
+                            <button
+                              type="button"
+                              onClick={logoutHandler}
+                              className="flex w-full items-center justify-center rounded-b-md px-5 pb-3 pt-2 text-sm text-red-500 transition-colors duration-200 ease-out hover:bg-red-400/25 "
+                            >
+                              Logout
+                            </button>
+                          </PopoverClose>
+                        </li>
+                      </>
+                    )}
+                  </ul>
+                </PopoverContent>
+              </Popover>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-center lg:hidden">
+            <div
               className={`${
-                openedBurger ? 'translate-y-1 rotate-45' : '-translate-y-1.5'
-              } absolute left-1/2 
-               top-[40%] block h-1 w-7 origin-center -translate-x-1/2 transform rounded-lg bg-white transition duration-200 ease-in-out`}
-            />
-            <span
-              className={`${
-                openedBurger ? 'left-1/3 opacity-0' : 'left-1/2 opacity-100'
-              } absolute block h-1 w-5 -translate-x-1/2 transform rounded-lg bg-white transition-[left,opacity] duration-200 ease-in-out`}
-            />
-            <span
-              className={`${
-                openedBurger ? '-translate-y-1 -rotate-45' : 'translate-y-1.5'
-              } absolute left-1/2 top-[60%] 
-              block h-1 w-7 origin-center -translate-x-1/2 transform rounded-lg bg-white transition duration-200 ease-in-out`}
-            />
-          </button>
+                openedBurger && 'tham-active'
+              } tham-e-squeeze tham tham-w-8 relative z-30 duration-300 ease-in-out hover:bg-opacity-30 `}
+              onClick={showMobileOverlay}
+            >
+              <div className="tham-box">
+                <div
+                  className={`${burgerColor} tham-inner transition-colors duration-200 ease-in-out`}
+                />
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -287,15 +298,14 @@ export default function Nav() {
         ref={navMobile}
         className={`${
           openedBurger ? 'left-0 opacity-100' : 'left-[100vw] opacity-0'
-        } mobile-overlay absolute top-[0] z-10 h-screen w-full transform bg-pageBackground pt-16 transition-[left,opacity] duration-500 ease-in-out lg:hidden`}
+        } mobile-overlay absolute top-[0] z-10 h-screen w-full transform overflow-auto bg-white pt-16 transition-[left,opacity] duration-500 ease-in-out lg:hidden`}
       >
-        <ul className="flex flex-col text-white">
+        <ul className="flex flex-col text-dark">
           {navLinkList.map((navLink, id) => (
-            // eslint-disable-next-line react/no-array-index-key
             <li key={id}>
               <Link
                 to={navLink.to}
-                className="block w-full py-3 text-center text-lg transition-[color] duration-200 ease-out hover:text-primaryText"
+                className="mx-auto block w-1/3 py-3 text-center text-lg transition-[color] duration-200 ease-out hover:text-primaryText"
                 onClick={showMobileOverlay}
               >
                 {navLink.text[0].toLocaleUpperCase()}
@@ -303,23 +313,20 @@ export default function Nav() {
               </Link>
             </li>
           ))}
-          <div
-            className="mx-auto my-4 h-[1px] w-3/4 rounded-lg bg-white"
-            aria-hidden="true"
-          />
-          <li className="w-full bg-pageBackground">
+          <Separator className="mx-auto my-4 w-3/4 bg-slate-300" />
+          <li>
             {!userData ? (
               <div className="flex-col">
                 <Link
                   to={{ pathname: '/account/login' }}
-                  className="block w-full py-3 text-center text-lg transition-[color] duration-200 ease-out hover:text-primaryText"
+                  className="mx-auto block w-1/3 py-3 text-center text-lg transition-[color] duration-200 ease-out hover:text-primaryText"
                   onClick={showMobileOverlay}
                 >
                   Sign in
                 </Link>
                 <Link
                   to={{ pathname: '/account/register' }}
-                  className="block w-full py-3 text-center text-lg transition-[color] duration-200 ease-out hover:text-primaryText"
+                  className="mx-auto block w-1/3 py-3 text-center text-lg transition-[color] duration-200 ease-out hover:text-primaryText"
                   onClick={showMobileOverlay}
                 >
                   Sign up
@@ -327,58 +334,21 @@ export default function Nav() {
               </div>
             ) : (
               <div className="flex-col">
-                {/* <Link
+                <Link
                   to="/account/my"
-                  className="block w-full py-3 text-center text-lg transition-[color] duration-200 ease-out hover:text-primaryText"
-                  onClick={showMobileOverlay}
+                  className="mx-auto block w-1/3 py-3 text-center text-lg transition-[color] duration-200 ease-out hover:text-primaryText"
                 >
-                  Account
+                  Profile
                 </Link>
-                <button
-                  type="button"
-                  className="block w-full py-3 text-center text-lg transition-[color] duration-200 ease-out hover:text-primaryText"
-                  onClick={() => {
-                    logoutHandler();
-                  }}
+
+                <Button
+                  type="submit"
+                  variant={'link'}
+                  className="mx-auto block w-1/3 py-3 text-center text-lg text-red-600 transition-[filter] duration-200 ease-out hover:brightness-90"
+                  onClick={logoutHandler}
                 >
                   Logout
-                </button> */}
-                <div>
-                  <strong className="block text-xs font-medium uppercase text-gray-400">
-                    Profile
-                  </strong>
-
-                  <ul className="mt-2 space-y-1">
-                    {/* <li>
-                      <a
-                        href=""
-                        className="block rounded-lg px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-700"
-                      >
-                        Details
-                      </a>
-                    </li>
-
-                    <li>
-                      <a
-                        href=""
-                        className="block rounded-lg px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-700"
-                      >
-                        Subscription
-                      </a>
-                    </li> */}
-
-                    <li>
-                      <form action="/logout">
-                        <button
-                          type="submit"
-                          className="block w-full rounded-lg px-4 py-2 text-sm font-medium text-gray-500 [text-align:_inherit] hover:bg-gray-100 hover:text-gray-700"
-                        >
-                          Logout
-                        </button>
-                      </form>
-                    </li>
-                  </ul>
-                </div>
+                </Button>
               </div>
             )}
           </li>

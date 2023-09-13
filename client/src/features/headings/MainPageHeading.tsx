@@ -1,6 +1,6 @@
 type PropsTypes = {
   mainTitle: string;
-  subTitle: string;
+  subTitle?: string;
   usecase: 'main' | 'sub';
   color: 'white' | 'dark';
 };

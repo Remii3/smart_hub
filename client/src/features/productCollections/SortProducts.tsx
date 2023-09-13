@@ -1,5 +1,5 @@
 import { ChangeEvent } from 'react';
-import { sortProductsTypes } from '@hooks/useSortProducts';
+import { sortOptionsArray } from '@hooks/useSortProducts';
 
 type SortProductsPropsTypes = {
   category: string;
@@ -23,25 +23,11 @@ export default function SortProducts({
         onChange={(e) => sortOptionChangeHandler(e)}
         className="h-10 cursor-pointer rounded border-gray-300 text-sm"
       >
-        <option hidden>Sort By</option>
-        <option value={sortProductsTypes.DATE_DESC}>
-          {sortProductsTypes.DATE_DESC}
-        </option>
-        <option value={sortProductsTypes.DATE_ASC}>
-          {sortProductsTypes.DATE_ASC}
-        </option>
-        <option value={sortProductsTypes.TITLE_DESC}>
-          {sortProductsTypes.TITLE_DESC}
-        </option>
-        <option value={sortProductsTypes.TITLE_ASC}>
-          {sortProductsTypes.TITLE_ASC}
-        </option>
-        <option value={sortProductsTypes.PRICE_DESC}>
-          {sortProductsTypes.PRICE_DESC}
-        </option>
-        <option value={sortProductsTypes.PRICE_ASC}>
-          {sortProductsTypes.PRICE_ASC}
-        </option>
+        {sortOptionsArray.map((option) => (
+          <option key={option.key} value={option.value}>
+            {option.value}
+          </option>
+        ))}
       </select>
     </div>
   );

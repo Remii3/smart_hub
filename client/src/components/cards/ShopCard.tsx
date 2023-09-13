@@ -4,11 +4,30 @@ import { CartContext } from '@context/CartProvider';
 import { CartProductTypes, ProductShopCardType } from '@customTypes/interfaces';
 import LoadingCircle from '@components/Loaders/LoadingCircle';
 import { Button } from '@components/UI/button';
+import { Skeleton } from '@components/UI/skeleton';
 
 const defaultProps = {
   img: [],
   authors: [],
   description: '',
+};
+export const SkeletonShopCard = ({
+  width,
+  height,
+}: {
+  width: string;
+  height: string;
+}) => {
+  return (
+    <Skeleton className={`${width} ${height} flex flex-col gap-8 p-3`}>
+      <Skeleton className="h-3/5 w-full" />
+      <div className="flex flex-col gap-2">
+        <Skeleton className="h-3 w-3/4 md:w-1/2" />
+        <Skeleton className="h-3 w-1/2 md:w-1/3" />
+        <Skeleton className="h-3 w-1/3 md:w-1/4" />
+      </div>
+    </Skeleton>
+  );
 };
 export default function ShopCard({
   _id,

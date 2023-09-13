@@ -155,11 +155,6 @@ export default function Admin() {
             <AccordionItem value="test1">
               <AccordionTrigger className="mt-3 flex w-full justify-between rounded-t-md bg-gray-200 px-3 py-2 first:mt-0">
                 {user.username}
-                <ChevronRightIcon
-                  width={24}
-                  height={24}
-                  className="transition-[transform] duration-200 ease-in-out"
-                />
               </AccordionTrigger>
               <AccordionContent>
                 <section className="space-y-2">

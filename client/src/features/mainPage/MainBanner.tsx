@@ -1,6 +1,8 @@
 import { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { Button } from '@components/UI/button';
+import { Link } from 'react-router-dom';
 
 export default function MainBanner() {
   const imgBg = useRef(null);
@@ -37,9 +39,17 @@ export default function MainBanner() {
             </h1>
 
             <p className="mt-4 text-white sm:text-xl/relaxed">
-              Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nesciunt
-              illo tenetur fuga ducimus numquam ea!
+              Dive into the world of books and unleash your imagination! Browse
+              through our vast collection and find your next literary escape.
             </p>
+            <div className="mt-8 space-x-4">
+              <Link to={{ pathname: 'search' }}>
+                <Button variant={'secondary'}>Explore books</Button>
+              </Link>
+              <Link to={{ pathname: 'search', search: 'special=bestseller' }}>
+                <Button variant={'default'}>Best Sellers</Button>
+              </Link>
+            </div>
           </div>
           <div className="absolute inset-0 m-auto h-14 w-8 translate-y-96">
             <div className="mousey box-content h-9 w-1 rounded-3xl border-2 border-solid border-white px-4 py-3 opacity-75">

@@ -25,17 +25,12 @@ function LongSwiper({
           nextEl: `.${swiperCategory}-next`,
           prevEl: `.${swiperCategory}-prev`,
         }}
-        modules={[Navigation, Pagination, Autoplay]}
+        modules={[Navigation, Pagination]}
         spaceBetween={24}
         slidesPerView={1}
         setWrapperSize
         grabCursor
         watchOverflow
-        autoplay={{
-          delay: 5000,
-          disableOnInteraction: false,
-          pauseOnMouseEnter: true,
-        }}
         breakpoints={{
           388: {
             slidesPerView: 1,

@@ -37,9 +37,9 @@ export default function CategoriesSection() {
 
   return (
     <section className="relative flex w-full flex-col items-center gap-12 pb-16">
-      <div className="relative -top-4 left-0 w-full bg-pageBackground">
+      <div className="relative left-0 top-0 w-full ">
         <MainPageHeading
-          color="white"
+          color="dark"
           usecase="main"
           mainTitle="Reading with us is easy"
           subTitle="Offering a diverse array of book genres to choose from, for

@@ -17,10 +17,10 @@ function CategoryCard({ _id, label, value, description }: ProductCategories) {
     <div id={_id}>
       <Link
         to={{ pathname: `/search`, search: finalQuery }}
-        className="relative flex h-full cursor-pointer flex-col gap-4 rounded-lg bg-gray900 px-10 py-12 shadow transition-[transform,box-shadow] duration-300 ease-out hover:scale-105 hover:shadow-lg active:scale-100"
+        className="relative flex h-full cursor-pointer flex-col gap-4 rounded-lg bg-gray900 px-10 py-12 shadow-sm transition duration-300 ease-in-out hover:scale-[1.02] hover:shadow-md active:scale-100"
       >
         <h4 className="text-dark">{label}</h4>
-        <p className="line-clamp-2  text-darkTint sm:text-lg lg:text-xl">
+        <p className="line-clamp-2 text-darkTint sm:text-lg lg:text-xl">
           {description}
         </p>
         <svg

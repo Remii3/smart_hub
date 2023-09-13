@@ -2,7 +2,6 @@ const { verifyNewUserData } = require('../helpers/verify');
 
 const userPathUpdate = (req, res, next) => {
   let { fieldKey, fieldValue } = req.body;
-
   const errors = verifyNewUserData(fieldKey, fieldValue);
 
   if (errors.length > 0) {

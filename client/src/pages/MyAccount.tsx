@@ -510,12 +510,7 @@ export default function MyAccount() {
                             <span className="block text-sm font-medium text-gray-700">
                               Marketplace
                             </span>
-                            <RadioGroup
-                              defaultValue={MarketPlaceTypes.SHOP}
-                              // onChange={(value) =>
-                              //   productDataChangeHandler(null, value)
-                              // }
-                            >
+                            <RadioGroup defaultValue={MarketPlaceTypes.SHOP}>
                               <div>
                                 <RadioGroupItem
                                   value={MarketPlaceTypes.SHOP}
@@ -535,110 +530,6 @@ export default function MyAccount() {
                                 </Label>
                               </div>
                             </RadioGroup>
-                            {/* <RadioGroup
-                              value={productData.marketPlace.value}
-                              onChange={(value) =>
-                                productDataChangeHandler(null, value)
-                              }
-                            >
-                              <div className="space-y-2">
-                                <RadioGroup.Option
-                                  value="Shop"
-                                  className={({ active, checked }) =>
-                                    `
-                  ${
-                    checked ? 'bg-primary bg-opacity-95 text-white' : 'bg-white'
-                  }
-                  relative flex
-                    cursor-pointer rounded-lg px-5 py-4 shadow-md focus:ring focus:ring-blue-300`
-                                  }
-                                >
-                                  {({ active, checked }) => (
-                                    <div className="flex w-full items-center justify-between">
-                                      <div className="flex items-center">
-                                        <div className="text-sm">
-                                          <RadioGroup.Label
-                                            as="p"
-                                            className={`font-medium  ${
-                                              checked
-                                                ? 'text-white'
-                                                : 'text-gray-900'
-                                            }`}
-                                          >
-                                            Shop
-                                          </RadioGroup.Label>
-                                          <RadioGroup.Description
-                                            as="span"
-                                            className={`inline ${
-                                              checked
-                                                ? 'text-sky-100'
-                                                : 'text-gray-500'
-                                            }`}
-                                          >
-                                            <span>
-                                              Adds the product to the Shop
-                                              marketplace
-                                            </span>
-                                          </RadioGroup.Description>
-                                        </div>
-                                      </div>
-                                      {checked && (
-                                        <div className="shrink-0 text-white">
-                                          <CheckIcon height={6} width={6} />
-                                        </div>
-                                      )}
-                                    </div>
-                                  )}
-                                </RadioGroup.Option>
-                                <RadioGroup.Option
-                                  value="Auction"
-                                  className={({ active, checked }) =>
-                                    `
-                  ${
-                    checked ? 'bg-primary bg-opacity-95 text-white' : 'bg-white'
-                  }
-                    relative flex cursor-pointer rounded-lg px-5 py-4 shadow-md focus:ring focus:ring-blue-300`
-                                  }
-                                >
-                                  {({ active, checked }) => (
-                                    <div className="flex w-full items-center justify-between">
-                                      <div className="flex items-center">
-                                        <div className="text-sm">
-                                          <RadioGroup.Label
-                                            as="p"
-                                            className={`font-medium  ${
-                                              checked
-                                                ? 'text-white'
-                                                : 'text-gray-900'
-                                            }`}
-                                          >
-                                            Auction
-                                          </RadioGroup.Label>
-                                          <RadioGroup.Description
-                                            as="span"
-                                            className={`inline ${
-                                              checked
-                                                ? 'text-sky-100'
-                                                : 'text-gray-500'
-                                            }`}
-                                          >
-                                            <span>
-                                              Adds the product to the Auction
-                                              marketplace
-                                            </span>
-                                          </RadioGroup.Description>
-                                        </div>
-                                      </div>
-                                      {checked && (
-                                        <div className="shrink-0 text-white">
-                                          <CheckIcon height={6} width={6} />
-                                        </div>
-                                      )}
-                                    </div>
-                                  )}
-                                </RadioGroup.Option>
-                              </div>
-                            </RadioGroup> */}
                           </fieldset>
 
                           {productData.marketPlace.value ===
@@ -774,7 +665,7 @@ export default function MyAccount() {
                 </div>
               </div>
             </div>
-            <div className="mt-8 flex w-full flex-col justify-start gap-8 px-4 lg:flex-row">
+            <div className="mt-8 flex w-full flex-col gap-8 px-4 sm:flex-row">
               {selectedtab === tabNames.MY_DATA && <EditUserData />}
               {selectedtab === tabNames.SECURITY_PERMISSIONS && (
                 <SecurityPermissions />

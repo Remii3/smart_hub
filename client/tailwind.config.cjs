@@ -56,18 +56,18 @@ module.exports = {
           '75%': { backgroundPosition: '0 100%' },
           '100%': { backgroundPosition: '0 100%' },
         },
-        'scroll-down':{
+        'scroll-down': {
           '0%': {
-            opacity: 0
+            opacity: 0,
           },
-          '10%' :{
+          '10%': {
             transform: 'translateY(0)',
             opacity: 1,
           },
-          '100%' :{
+          '100%': {
             transform: 'translateY(15px)',
             opacity: 0,
-          }
+          },
         },
         'accordion-down': {
           from: { height: 0 },
@@ -84,7 +84,8 @@ module.exports = {
         animateTextBackground: 'animateTextBackground 10s ease-in-out infinite',
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
-        'scroll-down': 'scroll-down 2.2s cubic-bezier(0.15, 0.41, 0.69, 0.94) infinite'
+        'scroll-down':
+          'scroll-down 2.2s cubic-bezier(0.15, 0.41, 0.69, 0.94) infinite',
       },
 
       fontFamily: {
@@ -93,5 +94,9 @@ module.exports = {
       },
     },
   },
-  plugins: [require('@tailwindcss/forms'), require('tailwindcss-animate')],
+  plugins: [
+    require('@tailwindcss/forms'),
+    require('tailwindcss-animate'),
+    require('tailwind-hamburgers'),
+  ],
 };

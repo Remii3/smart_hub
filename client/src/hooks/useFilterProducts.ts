@@ -36,7 +36,7 @@ export default function useFilterProducts({
     });
   }
 
-  if (filterData.filterType === 'Price' && maxPrice && minPrice) {
+  if (filterData.filterType === 'Price') {
     if (minPrice === '' && maxPrice === '') {
       filteredProducts = products;
     } else if (minPrice === '') {

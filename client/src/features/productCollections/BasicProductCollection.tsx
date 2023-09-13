@@ -1,20 +1,26 @@
 import { Link } from 'react-router-dom';
 import { SwiperSlide } from 'swiper/react';
-import { ChangeEvent, useState } from 'react';
+import { ChangeEvent, useCallback, useEffect, useState } from 'react';
 import { UnknownProductTypes } from '@customTypes/interfaces';
 import PriceSelector from './PriceSelector';
 import SortProducts from './SortProducts';
-import ShopCard from '@components/cards/ShopCard';
+import ShopCard, { SkeletonShopCard } from '@components/cards/ShopCard';
 import LongSwiper from '@components/swiper/LongSwiper';
 import AuctionCard from '@components/cards/AuctionCard';
-import useSortProducts, { sortProductsTypes } from '@hooks/useSortProducts';
+import useSortProducts, {
+  SortType,
+  sortOptions,
+  sortOptionsArray,
+} from '@hooks/useSortProducts';
 import useFilterProducts from '@hooks/useFilterProducts';
+import { useGetAccessDatabase } from '@hooks/useAaccessDatabase';
+import { DATABASE_ENDPOINTS } from '@data/endpoints';
+import { Skeleton } from '@components/UI/skeleton';
 
 type PropsTypes = {
   title: string;
   subTitle?: string | null;
   showMore?: boolean;
-  allProducts: UnknownProductTypes[];
   category: string;
   marketPlace: 'Shop' | 'Auction';
 };
@@ -24,26 +30,87 @@ const defaultProps = {
   subTitle: null,
 };
 
+type ProductsType = {
+  originalData: UnknownProductTypes[] | null;
+  filteredData: UnknownProductTypes[] | null;
+  isLoading: boolean;
+};
+
 export default function BasicProductCollection({
-  allProducts,
   title,
   subTitle,
   showMore,
   category,
   marketPlace,
 }: PropsTypes) {
-  const [sortOption, setSortOption] = useState('');
+  const [selectedSortOption, setSelectedSortOption] = useState<SortType>(
+    sortOptions.DATE_DESC
+  );
   const [minPrice, setMinPrice] = useState<string | number>('');
   const [maxPrice, setMaxPrice] = useState<string | number>('');
-
-  const { sortedProducts } = useSortProducts({
-    sortType: sortProductsTypes.PRICE_DESC,
-    products: allProducts,
+  const [products, setProducts] = useState<ProductsType>({
+    filteredData: null,
+    isLoading: true,
+    originalData: null,
   });
 
-  const highestPrice = sortedProducts[0];
+  let highestPrice =
+    products &&
+    products.originalData &&
+    [...products.originalData].sort((a, b) =>
+      a.shop_info.price > b.shop_info.price ? -1 : 1
+    )[0].shop_info.price;
+
+  const fetchData = useCallback(async () => {
+    setProducts((prevState) => {
+      return { ...prevState, isLoading: true };
+    });
+
+    const { data } = await useGetAccessDatabase({
+      url: DATABASE_ENDPOINTS.PRODUCT_SHOP_ALL,
+      params: {
+        category,
+        minPrice,
+        maxPrice,
+      },
+    });
+
+    setTimeout(() => {
+      setProducts({ originalData: data, filteredData: data, isLoading: false });
+    }, 100);
+  }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  useEffect(() => {
+    const { sortedProducts } = useSortProducts({
+      sortType: selectedSortOption,
+      products: (products?.originalData && [...products?.originalData]) || [],
+    });
+    const { filteredProducts } = useFilterProducts({
+      products: [...sortedProducts],
+      filterData: { filterType: 'Price', filterValues: { minPrice, maxPrice } },
+    });
+
+    setProducts((prevState) => {
+      return {
+        ...prevState,
+        originalData: prevState.originalData,
+        filteredData: filteredProducts,
+      };
+    });
+  }, [minPrice, maxPrice, selectedSortOption]);
+
   const sortOptionChangeHandler = (e: ChangeEvent<HTMLSelectElement>) => {
-    setSortOption(e.target.value);
+    const selectedValue = e.target.value;
+    const selectedSortOption = sortOptionsArray.find(
+      (sortOption) => sortOption.value === selectedValue
+    );
+    if (selectedSortOption) {
+      setSelectedSortOption(selectedSortOption.value);
+    }
   };
 
   const resetPriceRange = () => {
@@ -59,17 +126,6 @@ export default function BasicProductCollection({
     setMaxPrice(Number(e.target.value));
   };
 
-  const { filteredProducts } = useFilterProducts({
-    products: sortedProducts,
-    filterData: { filterType: 'Price', filterValues: { minPrice, maxPrice } },
-  });
-
-  const noProducts =
-    allProducts.length < 1 ? (
-      <p className="pl-4">Empty collection </p>
-    ) : (
-      <p className="pl-4">No products found</p>
-    );
   return (
     <section>
       <header className="px-4">
@@ -89,7 +145,7 @@ export default function BasicProductCollection({
       <div className="mt-8 flex items-center justify-between px-4">
         <div className="flex flex-grow gap-4">
           <PriceSelector
-            highestPrice={highestPrice ? highestPrice.shop_info.price : 0}
+            highestPrice={highestPrice || 0}
             category={category}
             minPrice={minPrice}
             maxPrice={maxPrice}
@@ -101,15 +157,26 @@ export default function BasicProductCollection({
         <div className="block">
           <SortProducts
             category={category}
-            sortOption={sortOption}
+            sortOption={selectedSortOption}
             sortOptionChangeHandler={sortOptionChangeHandler}
           />
         </div>
       </div>
       <div className="mt-4">
-        {filteredProducts && filteredProducts.length > 0 ? (
+        {products.isLoading && (
+          <div className="mx-8 flex flex-col items-center gap-4 sm:flex-row">
+            {[...Array(3)].map((el, index) => (
+              <SkeletonShopCard
+                key={index}
+                height="h-[330px]"
+                width="w-[280px]"
+              />
+            ))}
+          </div>
+        )}
+        {!products.isLoading && products?.filteredData ? (
           <LongSwiper swiperCategory={category}>
-            {filteredProducts.map((product, id) => (
+            {products.filteredData.map((product, id) => (
               <SwiperSlide key={id}>
                 <div>
                   {marketPlace === 'Shop' ? (
@@ -139,7 +206,7 @@ export default function BasicProductCollection({
             ))}
           </LongSwiper>
         ) : (
-          noProducts
+          <p className="mx-8">No products</p>
         )}
       </div>
     </section>

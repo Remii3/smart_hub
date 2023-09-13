@@ -2,12 +2,18 @@ const { default: mongoose } = require('mongoose');
 const Product = require('../Models/product');
 const User = require('../Models/user');
 const Category = require('../Models/category');
+const Order = require('../Models/order');
 const prepareProductObject = require('../helpers/prepareProductObject');
 
 const allProducts = async (req, res) => {
+  const { category } = req.params;
   try {
-    const products = await Product.find();
-
+    let products = null;
+    if (category) {
+      products = await Product.find({});
+    } else {
+      products = await Product.find();
+    }
     const preparedProducts = [];
     for (let product of products) {
       preparedProducts.push(prepareProductObject(product));
@@ -79,106 +85,93 @@ const oneProduct = async (req, res) => {
 };
 
 const searchedProducts = async (req, res) => {
-  let { phrase, page, pageSize, filtersData, sortOption } = req.query;
-  if (!page) page = 1;
-  if (!pageSize) pageSize = 10;
-  let sort = {};
-  switch (sortOption) {
-    case 'Date, ASC':
-      sort.created_at = 1;
-      break;
-    case 'Date, DESC':
-      sort.created_at = -1;
-      break;
-
-    case 'Title, ASC':
-      sort.title = 1;
-      break;
-
-    case 'Title, DESC':
-      sort.title = -1;
-      break;
-
-    case 'Price, DESC':
-      sort['shop_info.price'] = -1;
-      break;
-
-    case 'Price, ASC':
-      sort['shop_info.price'] = 1;
-      break;
-  }
-  const skip = (page - 1) * pageSize;
-
-  const searchParams = new URLSearchParams(phrase);
-  const finalQuery = {};
-  const finalRawData = {};
-  for (const [key, value] of searchParams.entries()) {
-    if (key === 'phrase') {
-      finalQuery['$text'] = { $search: `${value}` };
-      finalRawData[key] = value;
-    }
-    if (key === 'category') {
-      const category = await Category.findOne({ value: value });
-      finalQuery['categories'] = category._id;
-      finalRawData[key] = value;
-    }
-  }
-
-  const marketplaces = filtersData.marketplace.filter(item => {
-    return item.isChecked === 'true';
-  });
-
-  const names = [];
-  marketplaces.forEach(item => {
-    names.push(item.name.charAt(0).toUpperCase() + item.name.slice(1));
-  });
-
-  finalQuery['market_place'] = { $in: names };
-
-  if (
-    filtersData.price.minPrice !== '' &&
-    filtersData.price.minPrice >= 1 &&
-    filtersData.price.maxPrice !== '' &&
-    filtersData.price.maxPrice >= 1
-  ) {
-    finalQuery['shop_info.price'] = {
-      $gte: Number(filtersData.price.minPrice),
-      $lte: Number(filtersData.price.maxPrice),
-    };
-  } else if (
-    filtersData.price.minPrice !== '' &&
-    filtersData.price.minPrice >= 1
-  ) {
-    finalQuery['shop_info.price'] = {
-      $gte: Number(filtersData.price.minPrice),
-    };
-  } else if (
-    filtersData.price.maxPrice !== '' &&
-    filtersData.price.maxPrice >= 1
-  ) {
-    finalQuery['shop_info.price'] = {
-      $lte: Number(filtersData.price.maxPrice),
-    };
-  }
+  let {
+    finalRawData,
+    searchQuery,
+    sortMetod,
+    skipPages,
+    limitPages,
+    pageSize,
+    specialQuery,
+  } = req.finalSearchData;
 
   try {
-    const products = await Product.find(finalQuery)
-      .sort(sort)
-      .skip(skip)
-      .limit(pageSize);
-
-    const highestPrice = await Product.find({})
-      .sort({ 'shop_info.price': -1 })
-      .limit(1);
-    const totalDocuments = await Product.find(finalQuery).countDocuments();
-    const totalPages = Math.ceil(totalDocuments / pageSize);
+    let products = null;
+    let highestPrice = null;
+    let totalDocuments = null;
+    let totalPages = null;
+    if (specialQuery) {
+      switch (specialQuery) {
+        case 'bestseller':
+          {
+            const top_selling_products = await Order.aggregate([
+              { $unwind: '$products' },
+              {
+                $lookup: {
+                  from: 'products',
+                  localField: 'products.product',
+                  foreignField: '_id',
+                  as: 'product_doc',
+                },
+              },
+              { $unwind: '$product_doc' },
+              {
+                $group: {
+                  _id: '$product_doc._id',
+                  sum: { $sum: '$products.in_cart_quantity' },
+                },
+              },
+              { $sort: { sum: -1 } },
+              { $limit: 6 },
+              {
+                $group: {
+                  _id: null,
+                  top_selling_products: {
+                    $push: '$_id',
+                  },
+                },
+              },
+            ]);
+            searchQuery._id = {
+              $in: top_selling_products[0].top_selling_products,
+            };
+            products = await Product.find(searchQuery).sort(sortMetod);
+            const products_copy = [...products];
+            highestPrice =
+              products_copy.length >= 1
+                ? products_copy.sort(
+                    (a, b) =>
+                      Number(b.shop_info.price) - Number(a.shop_info.price),
+                  )
+                : null;
+            totalDocuments = products.length;
+            totalPages = Math.ceil(totalDocuments / pageSize);
+          }
+          break;
+      }
+    } else {
+      products = await Product.find(searchQuery)
+        .sort(sortMetod)
+        .skip(skipPages)
+        .limit(limitPages);
+      highestPrice = await Product.find({})
+        .sort({ 'shop_info.price': -1 })
+        .limit(1);
+      totalDocuments = await Product.find(searchQuery).countDocuments();
+      totalPages = Math.ceil(totalDocuments / pageSize);
+    }
     finalRawData.totalPages = totalPages;
     finalRawData.totalProducts = totalDocuments;
-    finalRawData.highestPrice = Number(highestPrice[0].shop_info.price);
+
+    finalRawData.highestPrice = highestPrice
+      ? Number(highestPrice[0].shop_info.price)
+      : 0;
 
     const preparedProducts = [];
-    for (let product of products) {
-      preparedProducts.push(prepareProductObject(product));
+    if (products.length >= 1) {
+      for (let product of products) {
+        preparedProducts.push(prepareProductObject(product));
+      }
     }
     res.status(200).json({
       products: preparedProducts,
@@ -285,7 +278,6 @@ const addProduct = async (req, res) => {
         );
       }
     } catch (err) {
-      console.log(err);
       return res.status(500).json({ message: 'Failed updating user data' });
     }
 

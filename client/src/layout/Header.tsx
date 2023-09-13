@@ -29,17 +29,23 @@ function Header({ currentPathname }: HeaderTypes) {
     };
   }, [changeHeaderBgHandler, currentPathname]);
 
-  const flagTest = currentPathname === '/' ? isTransparent : false;
+  const scrollFlag = currentPathname === '/' ? isTransparent : false;
   return (
     <header className="sticky top-0 z-20 w-full ">
       <div
-        className={`${flagTest ? 'opacity-0' : 'opacity-100'} ${
+        className={`${scrollFlag ? 'opacity-0' : 'opacity-100'} ${
           currentPathname === '/' &&
           'transition-opacity duration-200 ease-in-out'
         } 
-        absolute left-0 top-0 h-full w-full bg-pageBackground`}
+        absolute left-0 top-0 h-full w-full bg-white shadow-sm`}
       />
-      <Nav />
+      <div
+        className={`${
+          scrollFlag ? 'text-white' : 'text-black'
+        } transition duration-100 ease-out`}
+      >
+        <Nav scrollFlag={scrollFlag} />
+      </div>
     </header>
   );
 }

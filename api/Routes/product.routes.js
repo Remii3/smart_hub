@@ -11,12 +11,13 @@ const {
   oneProduct,
   searchedProducts,
 } = require('../Controllers/product.controller');
+const productSearchVerification = require('../Middleware/productSearchVerification.middleaware');
 
 router.get('/all', allProducts);
 router.get('/shop', shopProducts);
 router.get('/auction', auctionProducts);
 router.get('/one', oneProduct);
-router.get('/searched', searchedProducts);
+router.get('/searched', productSearchVerification, searchedProducts);
 
 router.post('/one', addProduct);
 router.post('/update', updateProduct);

@@ -318,109 +318,51 @@ export default function EditUserData() {
   if (!userData) return <div>No data</div>;
 
   return (
-    <div>
-      <h5 className="mb-4">User information</h5>
-      <div className="flex flex-col gap-4">
-        <div>
-          <fieldset className="flex flex-col">
-            <label
-              htmlFor="showcasedEmail"
-              className="text-sm font-medium text-gray-700"
-            >
-              Email
-            </label>
-            <Input
-              id="showcasedEmail"
-              type="email"
-              disabled
-              value={userData.email}
-              // isDisabled="yes"
-            />
-          </fieldset>
-          <div className="flex justify-between gap-4">
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button
-                  type="button"
-                  variant="link"
-                  size="sm"
-                  className="px-0"
-                  onClick={() => changeDataDialogHandler(true, 'email')}
-                >
-                  Change email
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <div>
-                  <form className="mb-4">
-                    <CustomInput
-                      autoComplete="email"
-                      name="email"
-                      type="email"
-                      optional={false}
-                      labelValue="Email"
-                      placeholder="JohnDoe@gmail.com..."
-                      hasError={!!newUserDatastate.errors.email}
-                      errorValue={newUserDatastate.errors.email}
-                      inputValue={newUserDatastate.data.email}
-                      onChange={(e) => newUserDataChangeHandler(e)}
-                    />
-                  </form>
-                  <div className="flex w-full justify-end">
-                    <Button
-                      variant="default"
-                      size="default"
-                      onClick={() => uploadNewUserDataHandler('email')}
-                    >
-                      Accept
-                    </Button>
-                  </div>
-                </div>
-              </DialogContent>
-            </Dialog>
-          </div>
-        </div>
-        <div className="flex gap-4">
+    <div className="flex flex-col justify-around gap-8 sm:flex-row">
+      <section className="w-full">
+        <h5 className="mb-4">User information</h5>
+        <div className="flex flex-col gap-4">
           <div>
             <fieldset className="flex flex-col">
               <label
-                htmlFor="showcasedFirstName"
+                htmlFor="showcasedEmail"
                 className="text-sm font-medium text-gray-700"
               >
-                First name
+                Email
               </label>
               <Input
-                id="showcasedFirstName"
-                type="text"
+                id="showcasedEmail"
+                type="email"
                 disabled
-                value={userData.user_info.credentials.first_name}
+                value={userData.email}
               />
             </fieldset>
-
             <div className="flex justify-between gap-4">
               <Dialog>
                 <DialogTrigger asChild>
                   <Button
+                    type="button"
                     variant="link"
                     size="sm"
-                    onClick={() => changeDataDialogHandler(true, 'first_name')}
                     className="px-0"
+                    onClick={() => changeDataDialogHandler(true, 'email')}
                   >
-                    Change first name
+                    Change email
                   </Button>
                 </DialogTrigger>
                 <DialogContent>
                   <div>
                     <form className="mb-4">
                       <CustomInput
-                        name="first_name"
-                        type="text"
+                        autoComplete="email"
+                        name="email"
+                        type="email"
                         optional={false}
-                        labelValue="First Name"
-                        placeholder="John..."
-                        hasError={!!newUserDatastate.errors.first_name}
-                        errorValue={newUserDatastate.errors.first_name}
-                        inputValue={newUserDatastate.data.first_name}
+                        labelValue="Email"
+                        placeholder="JohnDoe@gmail.com..."
+                        hasError={!!newUserDatastate.errors.email}
+                        errorValue={newUserDatastate.errors.email}
+                        inputValue={newUserDatastate.data.email}
                         onChange={(e) => newUserDataChangeHandler(e)}
                       />
                     </form>
@@ -428,7 +370,191 @@ export default function EditUserData() {
                       <Button
                         variant="default"
                         size="default"
-                        onClick={() => uploadNewUserDataHandler('first_name')}
+                        onClick={() => uploadNewUserDataHandler('email')}
+                      >
+                        Accept
+                      </Button>
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </div>
+          </div>
+          <div className="flex gap-4">
+            <div>
+              <fieldset className="flex flex-col">
+                <label
+                  htmlFor="showcasedFirstName"
+                  className="text-sm font-medium text-gray-700"
+                >
+                  First name
+                </label>
+                <Input
+                  id="showcasedFirstName"
+                  type="text"
+                  disabled
+                  value={userData.user_info.credentials.first_name}
+                />
+              </fieldset>
+
+              <div className="flex justify-between gap-4">
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button
+                      variant="link"
+                      size="sm"
+                      onClick={() =>
+                        changeDataDialogHandler(true, 'first_name')
+                      }
+                      className="px-0"
+                    >
+                      Change first name
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <div>
+                      <form className="mb-4">
+                        <CustomInput
+                          name="first_name"
+                          type="text"
+                          optional={false}
+                          labelValue="First Name"
+                          placeholder="John..."
+                          hasError={!!newUserDatastate.errors.first_name}
+                          errorValue={newUserDatastate.errors.first_name}
+                          inputValue={newUserDatastate.data.first_name}
+                          onChange={(e) => newUserDataChangeHandler(e)}
+                        />
+                      </form>
+                      <div className="flex w-full justify-end">
+                        <Button
+                          variant="default"
+                          size="default"
+                          onClick={() => uploadNewUserDataHandler('first_name')}
+                        >
+                          Accept
+                        </Button>
+                      </div>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              </div>
+            </div>
+            <div>
+              <fieldset className="flex flex-col">
+                <label
+                  htmlFor="showcasedLastName"
+                  className="text-sm font-medium text-gray-700"
+                >
+                  Last name
+                </label>
+                <Input
+                  id="showcasedLastName"
+                  type="text"
+                  disabled
+                  value={userData.user_info.credentials.last_name}
+                />
+              </fieldset>
+
+              <div className="flex justify-between gap-4">
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button
+                      variant="link"
+                      size="sm"
+                      onClick={() => changeDataDialogHandler(true, 'last_name')}
+                      className="px-0"
+                    >
+                      Change last name
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <div>
+                      <form className="mb-4">
+                        <fieldset>
+                          <CustomInput
+                            name="last_name"
+                            type="text"
+                            optional={false}
+                            labelValue="Last Name"
+                            placeholder="Doe..."
+                            hasError={!!newUserDatastate.errors.last_name}
+                            errorValue={newUserDatastate.errors.last_name}
+                            inputValue={newUserDatastate.data.last_name}
+                            onChange={(e) => newUserDataChangeHandler(e)}
+                          />
+                          <div className="flex w-full justify-end">
+                            <Button
+                              variant="default"
+                              size="default"
+                              onClick={() =>
+                                uploadNewUserDataHandler('last_name')
+                              }
+                            >
+                              Accept
+                            </Button>
+                          </div>
+                        </fieldset>
+                      </form>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              </div>
+            </div>
+          </div>
+          <div>
+            <fieldset className="flex flex-col">
+              <label
+                htmlFor="showcasedPassword"
+                className="text-sm font-medium text-gray-700"
+              >
+                Password
+              </label>
+              <Input
+                id="showcasedPassword"
+                type="text"
+                disabled
+                value="*****"
+              />
+            </fieldset>
+            <div className="flex justify-between">
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button
+                    variant="link"
+                    size="sm"
+                    onClick={() => changeDataDialogHandler(true, 'password')}
+                    className="px-0"
+                  >
+                    Change password
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <div>
+                    <form
+                      className={`${
+                        newUserDatastate.visible.password
+                          ? 'max-h-20 opacity-100'
+                          : 'max-h-0 opacity-0'
+                      } overflow-hidden p-1 transition-[max-height,opacity] duration-300 ease-in-out`}
+                    >
+                      <CustomInput
+                        name="password"
+                        type="text"
+                        optional={false}
+                        labelValue="New Password"
+                        placeholder="Password..."
+                        hasError={!!newUserDatastate.errors.password}
+                        errorValue={newUserDatastate.errors.password}
+                        inputValue={newUserDatastate.data.password}
+                        onChange={(e) => newUserDataChangeHandler(e)}
+                      />
+                    </form>
+                    <div className="flex justify-between">
+                      <Button
+                        variant="default"
+                        size="default"
+                        onClick={() => uploadNewUserDataHandler('password')}
                       >
                         Accept
                       </Button>
@@ -441,43 +567,284 @@ export default function EditUserData() {
           <div>
             <fieldset className="flex flex-col">
               <label
-                htmlFor="showcasedLastName"
+                htmlFor="showcasedPhone"
                 className="text-sm font-medium text-gray-700"
               >
-                Last name
+                Phone
               </label>
               <Input
-                id="showcasedLastName"
-                type="text"
+                id="showcasedPhone"
+                type="tel"
                 disabled
-                value={userData.user_info.credentials.last_name}
+                placeholder="000-000-000"
+                value={userData.user_info.phone}
               />
             </fieldset>
-
-            <div className="flex justify-between gap-4 pt-2">
+            <div className="flex justify-between">
               <Dialog>
                 <DialogTrigger asChild>
                   <Button
                     variant="link"
                     size="sm"
-                    onClick={() => changeDataDialogHandler(true, 'last_name')}
+                    onClick={() => changeDataDialogHandler(true, 'phone')}
+                    className="px-0"
                   >
-                    Change last name
+                    Change phone
                   </Button>
                 </DialogTrigger>
                 <DialogContent>
                   <div>
                     <form className="mb-4">
+                      <CustomInput
+                        name="phone"
+                        type="text"
+                        optional={false}
+                        labelValue="Phone"
+                        placeholder="000-000-000"
+                        hasError={!!newUserDatastate.errors.phone}
+                        errorValue={newUserDatastate.errors.phone}
+                        inputValue={newUserDatastate.data.phone}
+                        onChange={(e) => newUserDataChangeHandler(e)}
+                      />
+                    </form>
+                    <div className="flex w-full justify-end">
+                      <Button
+                        variant="default"
+                        size="default"
+                        onClick={() => uploadNewUserDataHandler('phone')}
+                      >
+                        Accept
+                      </Button>
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </div>
+          </div>
+          <div>
+            <fieldset className="flex flex-col">
+              <label
+                htmlFor="showcasedAddress"
+                className="text-sm font-medium text-gray-700"
+              >
+                Address
+              </label>
+              <Input
+                id="showcasedAddress"
+                type="text"
+                disabled
+                placeholder="Address"
+                value={`${userData.user_info.address.line1},${userData.user_info.address.line2},${userData.user_info.address.city}, ${userData.user_info.address.state},${userData.user_info.address.country}`}
+              />
+            </fieldset>
+            <div className="flex justify-between">
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button
+                    variant="link"
+                    size="sm"
+                    onClick={() => changeDataDialogHandler(true, 'address')}
+                    className="px-0"
+                  >
+                    Change address
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <div>
+                    <CustomInput
+                      name="line1"
+                      type="text"
+                      optional={false}
+                      labelValue="Address 1"
+                      placeholder={userData.user_info.address.line1 || 'Street'}
+                      hasError={!!newUserDatastate.errors.address?.line1}
+                      errorValue={newUserDatastate.errors.address?.line1}
+                      inputValue={newUserDatastate.data.address?.line1}
+                      onChange={(e) => newUserDataChangeHandler(e, 'address')}
+                    />
+                    <CustomInput
+                      name="line2"
+                      type="text"
+                      optional={false}
+                      labelValue="Address 2"
+                      placeholder={
+                        userData.user_info.address.line2 ||
+                        'Apartament number etc.'
+                      }
+                      hasError={!!newUserDatastate.errors.address?.line2}
+                      errorValue={newUserDatastate.errors.address?.line2}
+                      inputValue={newUserDatastate.data.address?.line2}
+                      onChange={(e) => newUserDataChangeHandler(e, 'address')}
+                    />
+                    <CustomInput
+                      name="city"
+                      type="text"
+                      optional={false}
+                      labelValue="City"
+                      placeholder={userData.user_info.address.city || 'Warsaw'}
+                      hasError={!!newUserDatastate.errors.address?.city}
+                      errorValue={newUserDatastate.errors.address?.city}
+                      inputValue={newUserDatastate.data.address?.city}
+                      onChange={(e) => newUserDataChangeHandler(e, 'address')}
+                    />
+                    <CustomInput
+                      name="state"
+                      type="text"
+                      optional={false}
+                      labelValue="State"
+                      placeholder={
+                        userData.user_info.address.state || 'Mazovia'
+                      }
+                      hasError={!!newUserDatastate.errors.address?.state}
+                      errorValue={newUserDatastate.errors.address?.state}
+                      inputValue={newUserDatastate.data.address?.state}
+                      onChange={(e) => newUserDataChangeHandler(e, 'address')}
+                    />
+                    <CustomInput
+                      name="postal_code"
+                      type="text"
+                      optional={false}
+                      labelValue="Postal Code"
+                      placeholder={
+                        userData.user_info.address.postal_code || '12-345'
+                      }
+                      hasError={!!newUserDatastate.errors.address?.postal_code}
+                      errorValue={newUserDatastate.errors.address?.postal_code}
+                      inputValue={newUserDatastate.data.address?.postal_code}
+                      onChange={(e) => newUserDataChangeHandler(e, 'address')}
+                    />
+                    <CustomInput
+                      name="country"
+                      type="text"
+                      optional={false}
+                      labelValue="Country"
+                      placeholder={
+                        userData.user_info.address.country || 'Poland'
+                      }
+                      hasError={!!newUserDatastate.errors.address?.country}
+                      errorValue={newUserDatastate.errors.address?.country}
+                      inputValue={newUserDatastate.data.address?.country}
+                      onChange={(e) => newUserDataChangeHandler(e, 'address')}
+                    />
+                    <div className="flex w-full justify-end">
+                      <Button
+                        variant="default"
+                        size="default"
+                        onClick={() => uploadNewUserDataHandler('address')}
+                        type="button"
+                      >
+                        Accept
+                      </Button>
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {userData.role !== 'User' && (
+        <section className="w-full">
+          <h5 className="mb-5">Author information</h5>
+          <div className="flex flex-col gap-4">
+            <div>
+              <fieldset className="flex flex-col">
+                <label
+                  htmlFor="showcasedQuote"
+                  className="text-sm font-medium text-gray-700"
+                >
+                  Quote
+                </label>
+                <Input
+                  id="showcasedQuote"
+                  type="text"
+                  disabled
+                  placeholder={userData.author_info.quote || 'No quote ...'}
+                  value={userData.author_info.quote}
+                />
+              </fieldset>
+              <div className="flex justify-between">
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button
+                      variant="link"
+                      size="sm"
+                      onClick={() => changeDataDialogHandler(true, 'quote')}
+                      className="px-0"
+                    >
+                      Change quote
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <div>
                       <fieldset>
                         <CustomInput
-                          name="last_name"
+                          name="quote"
                           type="text"
                           optional={false}
-                          labelValue="Last Name"
+                          labelValue="Quote"
                           placeholder="Doe..."
-                          hasError={!!newUserDatastate.errors.last_name}
-                          errorValue={newUserDatastate.errors.last_name}
-                          inputValue={newUserDatastate.data.last_name}
+                          hasError={!!newUserDatastate.errors.quote}
+                          errorValue={newUserDatastate.errors.quote}
+                          inputValue={newUserDatastate.data.quote}
+                          onChange={(e) => newUserDataChangeHandler(e)}
+                        />
+                        <div className="flex w-full justify-end">
+                          <Button
+                            variant="default"
+                            size="default"
+                            onClick={() => uploadNewUserDataHandler('quote')}
+                          >
+                            Accept
+                          </Button>
+                        </div>
+                      </fieldset>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              </div>
+            </div>
+            <div>
+              <fieldset className="flex flex-col">
+                <label
+                  htmlFor="showcasedPseudonim"
+                  className="text-sm font-medium text-gray-700"
+                >
+                  Pseudonim
+                </label>
+                <Input
+                  id="showcasedPseudonim"
+                  type="text"
+                  disabled
+                  placeholder={userData.author_info.pseudonim}
+                  value={userData.author_info.pseudonim}
+                />
+              </fieldset>
+              <div className="flex justify-between">
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button
+                      variant="link"
+                      size="sm"
+                      onClick={() => changeDataDialogHandler(true, 'pseudonim')}
+                      className="px-0"
+                    >
+                      Change pseudonim
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <div>
+                      <fieldset>
+                        <CustomInput
+                          name="pseudonim"
+                          type="text"
+                          optional={false}
+                          labelValue="Pseudonim"
+                          placeholder="Doe..."
+                          hasError={!!newUserDatastate.errors.pseudonim}
+                          errorValue={newUserDatastate.errors.pseudonim}
+                          inputValue={newUserDatastate.data.pseudonim}
                           onChange={(e) => newUserDataChangeHandler(e)}
                         />
                         <div className="flex w-full justify-end">
@@ -485,424 +852,82 @@ export default function EditUserData() {
                             variant="default"
                             size="default"
                             onClick={() =>
-                              uploadNewUserDataHandler('last_name')
+                              uploadNewUserDataHandler('pseudonim')
                             }
                           >
                             Accept
                           </Button>
                         </div>
                       </fieldset>
-                    </form>
-                  </div>
-                </DialogContent>
-              </Dialog>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              </div>
             </div>
-          </div>
-        </div>
-      </div>
-      <div>
-        <fieldset className="flex flex-col">
-          <label
-            htmlFor="showcasedPassword"
-            className="text-sm font-medium text-gray-700"
-          >
-            Password
-          </label>
-          <Input id="showcasedPassword" type="text" disabled value="*****" />
-        </fieldset>
-        <div className="flex justify-between pt-2">
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button
-                variant="link"
-                size="sm"
-                onClick={() => changeDataDialogHandler(true, 'password')}
-              >
-                Change password
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <div>
-                <form
-                  className={`${
-                    newUserDatastate.visible.password
-                      ? 'max-h-20 opacity-100'
-                      : 'max-h-0 opacity-0'
-                  } overflow-hidden p-1 transition-[max-height,opacity] duration-300 ease-in-out`}
+            <div>
+              <fieldset className="flex flex-col">
+                <label
+                  htmlFor="showcasedShortDescription"
+                  className="text-sm font-medium text-gray-700"
                 >
-                  <CustomInput
-                    name="password"
-                    type="text"
-                    optional={false}
-                    labelValue="New Password"
-                    placeholder="Password..."
-                    hasError={!!newUserDatastate.errors.password}
-                    errorValue={newUserDatastate.errors.password}
-                    inputValue={newUserDatastate.data.password}
-                    onChange={(e) => newUserDataChangeHandler(e)}
-                  />
-                </form>
-                <div className="flex justify-between">
-                  <Button
-                    variant="default"
-                    size="default"
-                    onClick={() => uploadNewUserDataHandler('password')}
-                  >
-                    Accept
-                  </Button>
-                </div>
-              </div>
-            </DialogContent>
-          </Dialog>
-        </div>
-      </div>
-      <div>
-        <fieldset className="flex flex-col">
-          <label
-            htmlFor="showcasedPhone"
-            className="text-sm font-medium text-gray-700"
-          >
-            Phone
-          </label>
-          <Input
-            id="showcasedPhone"
-            type="tel"
-            disabled
-            placeholder="000-000-000"
-            value={userData.user_info.phone}
-          />
-        </fieldset>
-        <div className="flex justify-between pt-2">
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button
-                variant="link"
-                size="sm"
-                onClick={() => changeDataDialogHandler(true, 'phone')}
-              >
-                Change phone
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <div>
-                <form className="mb-4">
-                  <CustomInput
-                    name="phone"
-                    type="text"
-                    optional={false}
-                    labelValue="Phone"
-                    placeholder="000-000-000"
-                    hasError={!!newUserDatastate.errors.phone}
-                    errorValue={newUserDatastate.errors.phone}
-                    inputValue={newUserDatastate.data.phone}
-                    onChange={(e) => newUserDataChangeHandler(e)}
-                  />
-                </form>
-                <div className="flex w-full justify-end">
-                  <Button
-                    variant="default"
-                    size="default"
-                    onClick={() => uploadNewUserDataHandler('phone')}
-                  >
-                    Accept
-                  </Button>
-                </div>
-              </div>
-            </DialogContent>
-          </Dialog>
-        </div>
-      </div>
-      <div>
-        <fieldset className="flex flex-col">
-          <label
-            htmlFor="showcasedAddress"
-            className="text-sm font-medium text-gray-700"
-          >
-            Address
-          </label>
-          <Input
-            id="showcasedAddress"
-            type="text"
-            disabled
-            placeholder="Address"
-            value={`${userData.user_info.address.line1},${userData.user_info.address.line2},${userData.user_info.address.city}, ${userData.user_info.address.state},${userData.user_info.address.country}`}
-          />
-        </fieldset>
-        <div className="flex justify-between pt-2">
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button
-                variant="link"
-                size="sm"
-                onClick={() => changeDataDialogHandler(true, 'address')}
-              >
-                Change address
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <div>
-                <CustomInput
-                  name="line1"
+                  Short Description
+                </label>
+                <Input
+                  id="showcasedShortDescription"
                   type="text"
-                  optional={false}
-                  labelValue="Address 1"
-                  placeholder={userData.user_info.address.line1 || 'Street'}
-                  hasError={!!newUserDatastate.errors.address?.line1}
-                  errorValue={newUserDatastate.errors.address?.line1}
-                  inputValue={newUserDatastate.data.address?.line1}
-                  onChange={(e) => newUserDataChangeHandler(e, 'address')}
+                  disabled
+                  placeholder={userData.author_info.short_description}
+                  value={userData.author_info.short_description}
                 />
-                <CustomInput
-                  name="line2"
-                  type="text"
-                  optional={false}
-                  labelValue="Address 2"
-                  placeholder={
-                    userData.user_info.address.line2 || 'Apartament number etc.'
-                  }
-                  hasError={!!newUserDatastate.errors.address?.line2}
-                  errorValue={newUserDatastate.errors.address?.line2}
-                  inputValue={newUserDatastate.data.address?.line2}
-                  onChange={(e) => newUserDataChangeHandler(e, 'address')}
-                />
-                <CustomInput
-                  name="city"
-                  type="text"
-                  optional={false}
-                  labelValue="City"
-                  placeholder={userData.user_info.address.city || 'Warsaw'}
-                  hasError={!!newUserDatastate.errors.address?.city}
-                  errorValue={newUserDatastate.errors.address?.city}
-                  inputValue={newUserDatastate.data.address?.city}
-                  onChange={(e) => newUserDataChangeHandler(e, 'address')}
-                />
-                <CustomInput
-                  name="state"
-                  type="text"
-                  optional={false}
-                  labelValue="State"
-                  placeholder={userData.user_info.address.state || 'Mazovia'}
-                  hasError={!!newUserDatastate.errors.address?.state}
-                  errorValue={newUserDatastate.errors.address?.state}
-                  inputValue={newUserDatastate.data.address?.state}
-                  onChange={(e) => newUserDataChangeHandler(e, 'address')}
-                />
-                <CustomInput
-                  name="postal_code"
-                  type="text"
-                  optional={false}
-                  labelValue="Postal Code"
-                  placeholder={
-                    userData.user_info.address.postal_code || '12-345'
-                  }
-                  hasError={!!newUserDatastate.errors.address?.postal_code}
-                  errorValue={newUserDatastate.errors.address?.postal_code}
-                  inputValue={newUserDatastate.data.address?.postal_code}
-                  onChange={(e) => newUserDataChangeHandler(e, 'address')}
-                />
-                <CustomInput
-                  name="country"
-                  type="text"
-                  optional={false}
-                  labelValue="Country"
-                  placeholder={userData.user_info.address.country || 'Poland'}
-                  hasError={!!newUserDatastate.errors.address?.country}
-                  errorValue={newUserDatastate.errors.address?.country}
-                  inputValue={newUserDatastate.data.address?.country}
-                  onChange={(e) => newUserDataChangeHandler(e, 'address')}
-                />
-                <div className="flex w-full justify-end">
-                  <Button
-                    variant="default"
-                    size="default"
-                    onClick={() => uploadNewUserDataHandler('address')}
-                    type="button"
-                  >
-                    Accept
-                  </Button>
-                </div>
-              </div>
-            </DialogContent>
-          </Dialog>
-        </div>
-      </div>
-      {userData.role !== 'User' && (
-        <div>
-          <h5>Author information</h5>
-          <div>
-            <fieldset className="flex flex-col">
-              <label
-                htmlFor="showcasedQuote"
-                className="text-sm font-medium text-gray-700"
-              >
-                Quote
-              </label>
-              <Input
-                id="showcasedQuote"
-                type="text"
-                disabled
-                placeholder={userData.author_info.quote || 'No quote ...'}
-                value={userData.author_info.quote}
-              />
-            </fieldset>
-            <div className="flex justify-between pt-2">
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button
-                    variant="link"
-                    size="sm"
-                    onClick={() => changeDataDialogHandler(true, 'quote')}
-                  >
-                    Change quote
-                  </Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <div>
-                    <fieldset>
-                      <CustomInput
-                        name="quote"
-                        type="text"
-                        optional={false}
-                        labelValue="Quote"
-                        placeholder="Doe..."
-                        hasError={!!newUserDatastate.errors.quote}
-                        errorValue={newUserDatastate.errors.quote}
-                        inputValue={newUserDatastate.data.quote}
-                        onChange={(e) => newUserDataChangeHandler(e)}
-                      />
-                      <div className="flex w-full justify-end">
-                        <Button
-                          variant="default"
-                          size="default"
-                          onClick={() => uploadNewUserDataHandler('quote')}
-                        >
-                          Accept
-                        </Button>
-                      </div>
-                    </fieldset>
-                  </div>
-                </DialogContent>
-              </Dialog>
-            </div>
-          </div>
-          <div>
-            <fieldset className="flex flex-col">
-              <label
-                htmlFor="showcasedPseudonim"
-                className="text-sm font-medium text-gray-700"
-              >
-                Pseudonim
-              </label>
-              <Input
-                id="showcasedPseudonim"
-                type="text"
-                disabled
-                placeholder={userData.author_info.pseudonim}
-                value={userData.author_info.pseudonim}
-              />
-            </fieldset>
-            <div className="flex justify-between pt-2">
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button
-                    variant="link"
-                    size="sm"
-                    onClick={() => changeDataDialogHandler(true, 'pseudonim')}
-                  >
-                    Change pseudonim
-                  </Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <div>
-                    <fieldset>
-                      <CustomInput
-                        name="pseudonim"
-                        type="text"
-                        optional={false}
-                        labelValue="Pseudonim"
-                        placeholder="Doe..."
-                        hasError={!!newUserDatastate.errors.pseudonim}
-                        errorValue={newUserDatastate.errors.pseudonim}
-                        inputValue={newUserDatastate.data.pseudonim}
-                        onChange={(e) => newUserDataChangeHandler(e)}
-                      />
-                      <div className="flex w-full justify-end">
-                        <Button
-                          variant="default"
-                          size="default"
-                          onClick={() => uploadNewUserDataHandler('pseudonim')}
-                        >
-                          Accept
-                        </Button>
-                      </div>
-                    </fieldset>
-                  </div>
-                </DialogContent>
-              </Dialog>
-            </div>
-          </div>
-          <div>
-            <fieldset className="flex flex-col">
-              <label
-                htmlFor="showcasedShortDescription"
-                className="text-sm font-medium text-gray-700"
-              >
-                Short Description
-              </label>
-              <Input
-                id="showcasedShortDescription"
-                type="text"
-                disabled
-                placeholder={userData.author_info.short_description}
-                value={userData.author_info.short_description}
-              />
-            </fieldset>
-            <div className="flex justify-between pt-2">
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button
-                    variant="link"
-                    size="sm"
-                    onClick={() =>
-                      changeDataDialogHandler(true, 'short_description')
-                    }
-                  >
-                    Change short description
-                  </Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <div>
-                    <fieldset>
-                      <label htmlFor="shortDescription">
-                        Short description
-                      </label>
-                      <textarea
-                        name="short_description"
-                        id="shortDescription"
-                        rows={6}
-                        onChange={(e) => newUserDataChangeHandler(e)}
-                        value={newUserDatastate.data.short_description}
-                        className="w-full resize-none rounded-md border-2 border-gray-200"
-                      />
+              </fieldset>
+              <div className="flex justify-between">
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button
+                      variant="link"
+                      size="sm"
+                      onClick={() =>
+                        changeDataDialogHandler(true, 'short_description')
+                      }
+                      className="px-0"
+                    >
+                      Change short description
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <div>
+                      <fieldset>
+                        <label htmlFor="shortDescription">
+                          Short description
+                        </label>
+                        <textarea
+                          name="short_description"
+                          id="shortDescription"
+                          rows={6}
+                          onChange={(e) => newUserDataChangeHandler(e)}
+                          value={newUserDatastate.data.short_description}
+                          className="w-full resize-none rounded-md border-2 border-gray-200"
+                        />
 
-                      <div className="flex w-full justify-end">
-                        <Button
-                          variant="default"
-                          size="default"
-                          onClick={() =>
-                            uploadNewUserDataHandler('short_description')
-                          }
-                        >
-                          Accept
-                        </Button>
-                      </div>
-                    </fieldset>
-                  </div>
-                </DialogContent>
-              </Dialog>
+                        <div className="flex w-full justify-end">
+                          <Button
+                            variant="default"
+                            size="default"
+                            onClick={() =>
+                              uploadNewUserDataHandler('short_description')
+                            }
+                          >
+                            Accept
+                          </Button>
+                        </div>
+                      </fieldset>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              </div>
             </div>
           </div>
-        </div>
+        </section>
       )}
     </div>
   );

@@ -34,7 +34,6 @@ export default function ProductPage() {
   const [isFetchingData, setIsFetchingData] = useState(false);
   const [isMyProduct, setIsMyProduct] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [productData, setProductData] = useState<UnknownProductTypes>();
   const [newData, setNewData] = useState({
     newTitle: productData?.title,
@@ -124,7 +123,6 @@ export default function ProductPage() {
       url: DATABASE_ENDPOINTS.PRODUCT_DELETE,
       body: { _id: productData?._id },
     });
-    setShowDeleteDialog(false);
     fetchProductData();
     navigate('/');
   };
@@ -187,16 +185,12 @@ export default function ProductPage() {
                         <button
                           type="button"
                           onClick={() => deleteItemHandler()}
+                          className="rounded-md bg-red-500 px-3 py-1 text-white"
                         >
                           Delete
                         </button>
                         <DialogTrigger asChild>
-                          <button
-                            type="button"
-                            className="rounded-md bg-red-500 px-3 py-1 text-white"
-                          >
-                            Cancel
-                          </button>
+                          <button type="button">Cancel</button>
                         </DialogTrigger>
                       </DialogFooter>
                     </DialogContent>
