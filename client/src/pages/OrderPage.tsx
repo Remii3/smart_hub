@@ -1,15 +1,21 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useEffect, useState, useContext, useCallback } from 'react';
-import axios from 'axios';
 import MainContainer from '@layout/MainContainer';
 import { UserContext } from '@context/UserProvider';
 import { OrderTypes } from '@customTypes/interfaces';
 import { useGetAccessDatabase } from '../hooks/useAaccessDatabase';
 import { DATABASE_ENDPOINTS } from '../data/endpoints';
 
+interface OrderType {
+  data: OrderTypes | null;
+  isLoading: boolean;
+}
+
 export default function OrderPage() {
-  const [orderData, setOrderData] = useState<OrderTypes | null>(null);
-  const [fetchingState, setFetchingState] = useState(false);
+  const [orderData, setOrderData] = useState<OrderType>({
+    data: null,
+    isLoading: true,
+  });
   const { userData } = useContext(UserContext);
   const path = useLocation();
 
@@ -18,31 +24,36 @@ export default function OrderPage() {
   orderId = orderId[orderId.length - 1];
 
   const fetchData = useCallback(async () => {
-    const { data } = await useGetAccessDatabase({
-      url: DATABASE_ENDPOINTS.ORDER_ONE,
-      params: { userId: userData?._id, orderId },
-    });
-    setOrderData(data);
-  }, []);
+    if (userData?._id && orderId) {
+      const { data } = await useGetAccessDatabase({
+        url: DATABASE_ENDPOINTS.ORDER_ONE,
+        params: { userId: userData?._id, orderId },
+      });
+      setOrderData((prevState) => {
+        return { ...prevState, data };
+      });
+    }
+  }, [orderId, userData?._id]);
 
   useEffect(() => {
-    setFetchingState(true);
-    if (userData?._id && orderId) {
-      fetchData();
-      setFetchingState(false);
-    }
-  }, [orderId, fetchData, userData?._id]);
+    setOrderData((prevState) => {
+      return { ...prevState, isLoading: true };
+    });
+    fetchData();
+    setOrderData((prevState) => {
+      return { ...prevState, isLoading: false };
+    });
+  }, [fetchData]);
+  if (!orderData.data && orderData.isLoading) return <div>Loading</div>;
 
-  if (!orderData && fetchingState) return <div>Loading</div>;
-
-  if (!orderData) return <div>No data</div>;
+  if (!orderData.data) return <div>No data</div>;
 
   return (
     <MainContainer>
       <div>
-        <h5>Order: #{orderData._id}</h5>
+        <h5>Order: #{orderData.data._id}</h5>
         <div>
-          {orderData.products.map((item) => (
+          {orderData.data.products.map((item) => (
             <Link
               to={`/product/${item.product._id}`}
               key={item.product._id}

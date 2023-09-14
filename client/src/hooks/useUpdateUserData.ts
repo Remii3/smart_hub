@@ -1,12 +1,6 @@
-import axios from 'axios';
 import { ChangeEvent } from 'react';
 import { AuthorTypes } from '@customTypes/interfaces';
 import { UserRoleType } from '@customTypes/types';
-import {
-  useGetAccessDatabase,
-  usePostAccessDatabase,
-} from './useAaccessDatabase';
-import { DATABASE_ENDPOINTS } from '../data/endpoints';
 
 export enum UpdateNewDataType {
   Username = 'username',
@@ -15,12 +9,6 @@ export enum UpdateNewDataType {
   Pseudonim = 'pseudonim',
   ShortDescription = 'short_description',
   Quote = 'quote',
-}
-
-interface UseUserNewDataTypes {
-  userEmail: string;
-  e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>;
-  updatedField: UpdateNewDataType;
 }
 
 interface UserNewDataEditTypes {

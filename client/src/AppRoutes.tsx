@@ -13,13 +13,13 @@ import AuctionsPage from './pages/AuctionsPage';
 import CartPage from './pages/CartPage';
 import CheckoutPage from './pages/CheckoutPage';
 import BlogPage from './pages/BlogPage';
-import MyProductsPage from './pages/MyProductsPage';
 import NoPage404 from './pages/NoPage404';
 import ContactPage from './pages/ContactPage';
 import ProductPage from './pages/ProductPage';
 import SearchPage from './pages/SearchPage';
 import OtherUserPage from './pages/OtherUserPage';
 import OrderPage from './pages/OrderPage';
+import ThankYouPage from '@pages/ThankYouPage';
 
 export default function AppRoutes() {
   const { userData } = useContext(UserContext);
@@ -37,6 +37,7 @@ export default function AppRoutes() {
       <Route path="/blog" element={<BlogPage />} />
       <Route path="/cart" element={<CartPage />} />
       <Route path="/checkout" element={<CheckoutPage />} />
+      <Route path="/thankyou" element={<ThankYouPage />} />
       <Route path="/account/register" element={<RegisterPage />} />
       <Route path="/account/login" element={<LoginPage />} />
       <Route path="/account/my/order/:id" element={<OrderPage />} />
@@ -45,10 +46,6 @@ export default function AppRoutes() {
         element={userData ? <MyAccount /> : <RegisterPage />}
       />
       <Route path="/account/:userId" element={<OtherUserPage />} />
-      <Route
-        path="/account/my/my-products"
-        element={userData ? <MyProductsPage /> : <RegisterPage />}
-      />
       <Route path="/*" element={<NoPage404 />} />
     </Routes>
   );

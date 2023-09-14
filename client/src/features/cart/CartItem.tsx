@@ -95,7 +95,7 @@ export default function CartItem({
         >
           <span className="sr-only">Remove item</span>
 
-          <TrashIcon className="h-1 w-1" />
+          <TrashIcon className="h-4 w-4" />
         </button>
       </div>
     </li>

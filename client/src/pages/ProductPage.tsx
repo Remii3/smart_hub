@@ -129,7 +129,6 @@ export default function ProductPage() {
 
   if (productData === undefined && isFetchingData) return <p>Loading</p>;
   if (productData === undefined) return <p> No data</p>;
-  const DUMMYIMGS = [{ id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }];
 
   const addNewCommentHandler = async () => {
     setIsAddingComment(true);
@@ -155,8 +154,8 @@ export default function ProductPage() {
             <div className="grid grid-cols-2 gap-4 md:grid-cols-1">
               <ProductImage />
               <div className="grid grid-cols-2 gap-4 lg:mt-4">
-                {DUMMYIMGS.map((img) => (
-                  <ProductImage key={img.id} />
+                {[...Array(4)].map((el, index) => (
+                  <ProductImage key={index} />
                 ))}
               </div>
             </div>

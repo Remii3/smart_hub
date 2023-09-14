@@ -1,4 +1,3 @@
-/* eslint-disable consistent-return */
 import { useMemo } from 'react';
 
 const range = (start: number, end: number) => {

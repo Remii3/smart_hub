@@ -10,9 +10,13 @@ const allProducts = async (req, res) => {
   try {
     let products = null;
     if (category) {
-      products = await Product.find({});
+      products = await Product.find({
+        quantity: { $gt: 0 },
+      });
     } else {
-      products = await Product.find();
+      products = await Product.find({
+        quantity: { $gt: 0 },
+      });
     }
     const preparedProducts = [];
     for (let product of products) {
@@ -27,7 +31,10 @@ const allProducts = async (req, res) => {
 
 const shopProducts = async (req, res) => {
   try {
-    const products = await Product.find({ market_place: 'Shop' });
+    const products = await Product.find({
+      market_place: 'Shop',
+      quantity: { $gt: 0 },
+    });
 
     const preparedProducts = [];
     for (let product of products) {
@@ -42,7 +49,10 @@ const shopProducts = async (req, res) => {
 
 const auctionProducts = async (req, res) => {
   try {
-    const products = await Product.find({ market_place: 'Auction' });
+    const products = await Product.find({
+      market_place: 'Auction',
+      quantity: { $gt: 0 },
+    });
 
     const preparedProducts = [];
     for (let product of products) {
@@ -100,6 +110,7 @@ const searchedProducts = async (req, res) => {
     let highestPrice = null;
     let totalDocuments = null;
     let totalPages = null;
+    searchQuery.quantity = { $gt: 0 };
     if (specialQuery) {
       switch (specialQuery) {
         case 'bestseller':

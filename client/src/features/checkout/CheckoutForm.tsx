@@ -16,13 +16,14 @@ import { getCookie } from '@lib/utils';
 import { CartContext } from '@context/CartProvider';
 import { usePostAccessDatabase } from '../../hooks/useAaccessDatabase';
 import { DATABASE_ENDPOINTS } from '../../data/endpoints';
+import { useNavigate } from 'react-router-dom';
 
-export default function CheckoutForm({ changeShowThankYouHandler }: any) {
+export default function CheckoutForm() {
   const stripe = useStripe();
   const elements = useElements();
   const { userData } = useContext(UserContext);
   const { fetchCartData, cartState } = useContext(CartContext);
-
+  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -116,9 +117,8 @@ export default function CheckoutForm({ changeShowThankYouHandler }: any) {
         },
       });
 
-      changeShowThankYouHandler(cartState);
-
       fetchCartData();
+      navigate('/thankyou');
     }
     setIsLoading(false);
   };

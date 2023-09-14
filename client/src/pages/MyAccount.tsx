@@ -12,7 +12,7 @@ import EditUserData from '@features/myAccount/EditUserData';
 import MyShop from '@features/myAccount/MyShop';
 import { UserContext } from '@context/UserProvider';
 import MarketplaceBadge from '@components/UI/badges/MarketplaceBadge';
-import testImg from '@assets/img/avataaars.svg';
+import avatarImg from '@assets/img/avataaars.svg';
 import { Button } from '@components/UI/button';
 import SecurityPermissions from '@features/myAccount/SecurityPermissions';
 import OrderHistory from '@features/myAccount/OrderHistory';
@@ -71,37 +71,38 @@ const initialProductData = {
   startingPrice: { value: 1, hasError: false },
 };
 
+const TABS_ARRAY = [
+  {
+    text: 'My data',
+    name: tabNames.MY_DATA,
+    icon: <UserIcon height={20} width={20} />,
+  },
+  {
+    text: 'Security & Permissions',
+    name: tabNames.SECURITY_PERMISSIONS,
+    icon: <LockClosedIcon height={20} width={20} />,
+  },
+  {
+    text: 'History',
+    name: tabNames.HISTORY,
+    icon: <ArchiveBoxIcon height={20} width={20} />,
+  },
+  {
+    text: 'My products',
+    name: tabNames.MY_PRODUCTS,
+    icon: <Square2StackIcon height={20} width={20} />,
+  },
+  {
+    text: 'Admin',
+    name: tabNames.ADMIN,
+  },
+];
+
 export default function MyAccount() {
   const { userData, fetchUserData } = useContext(UserContext);
-  const [isOpen, setIsOpen] = useState(false);
   const [finishAuctionDate, setFinishAuctionDate] = useState<Date>();
-  const tabsArray = [
-    {
-      text: 'My data',
-      name: tabNames.MY_DATA,
-      icon: <UserIcon height={20} width={20} />,
-    },
-    {
-      text: 'Security & Permissions',
-      name: tabNames.SECURITY_PERMISSIONS,
-      icon: <LockClosedIcon height={20} width={20} />,
-    },
-    {
-      text: 'History',
-      name: tabNames.HISTORY,
-      icon: <ArchiveBoxIcon height={20} width={20} />,
-    },
-    {
-      text: 'My products',
-      name: tabNames.MY_PRODUCTS,
-      icon: <Square2StackIcon height={20} width={20} />,
-    },
-    {
-      text: 'Admin',
-      name: tabNames.ADMIN,
-    },
-  ];
-  const [selectedtab, setSelectedtab] = useState(tabsArray[0].name);
+
+  const [selectedtab, setSelectedtab] = useState(TABS_ARRAY[0].name);
 
   const [productData, setProductData] =
     useState<ProductDataTypes>(initialProductData);
@@ -139,22 +140,6 @@ export default function MyAccount() {
       });
       setAuthorState((prevState) => {
         return { ...prevState, value: [] };
-      });
-    }, 200);
-  };
-
-  const resetHasFailed = () => {
-    setStatus((prevState) => {
-      return { ...prevState, hasFailed: false };
-    });
-  };
-  const changeIsOpen = () => {
-    setIsOpen((prevState) => !prevState);
-    resetProductData();
-    setTimeout(() => {
-      resetHasFailed();
-      setStatus((prevState) => {
-        return { ...prevState, isSuccess: false };
       });
     }, 200);
   };
@@ -269,31 +254,31 @@ export default function MyAccount() {
     }
   };
 
-  const filterColors = (inputValue: string) => {
+  const filterCategories = (inputValue: string) => {
     return categoryState.options.filter((i: { label: string }) => {
       return i.label.toLowerCase().includes(inputValue.toLowerCase());
     });
   };
-  const authorFilter = (inputValue: string) => {
+  const filterAuthors = (inputValue: string) => {
     return authorState.options.filter((i: { label: string }) => {
       return i.label.toLowerCase().includes(inputValue.toLowerCase());
     });
   };
-  const promiseOptions = (inputValue: string) =>
+  const categoryOptions = (inputValue: string) =>
     new Promise<any[]>((resolve) => {
       setTimeout(() => {
-        resolve(filterColors(inputValue));
+        resolve(filterCategories(inputValue));
       }, 1000);
     });
 
   const authorOptions = (inputValue: string) =>
     new Promise<any[]>((resolve) => {
       setTimeout(() => {
-        resolve(authorFilter(inputValue));
+        resolve(filterAuthors(inputValue));
       }, 1000);
     });
 
-  const slectedChangetest = (selectedOptions: any) => {
+  const selectCategoryChange = (selectedOptions: any) => {
     setCategoryState((prevState) => {
       return { ...prevState, value: selectedOptions };
     });
@@ -319,7 +304,7 @@ export default function MyAccount() {
                 <div className="flex flex-col items-center gap-4 sm:flex-row">
                   <img
                     className="inline-block h-24 w-24 rounded-full ring-2 ring-white"
-                    src={testImg}
+                    src={avatarImg}
                     alt="avatar_img"
                   />
                   <div className="pt-1 text-left">
@@ -430,9 +415,9 @@ export default function MyAccount() {
                                 isMulti
                                 cacheOptions
                                 defaultOptions
-                                loadOptions={promiseOptions}
+                                loadOptions={categoryOptions}
                                 value={categoryState.value}
-                                onChange={slectedChangetest}
+                                onChange={selectCategoryChange}
                               />
                             </div>
                           </fieldset>
@@ -606,7 +591,7 @@ export default function MyAccount() {
                   onChange={(e) => setSelectedtab(e.target.value)}
                   value={selectedtab}
                 >
-                  {tabsArray.map((tab) => {
+                  {TABS_ARRAY.map((tab) => {
                     if (
                       tab.name === 'admin' &&
                       userData?.role !== UserRoleTypes.ADMIN
@@ -630,7 +615,7 @@ export default function MyAccount() {
               <div className="hidden sm:block">
                 <div className="border-b border-gray-200">
                   <nav className="-mb-px flex gap-6" aria-label="Tabs">
-                    {tabsArray.map((option) => {
+                    {TABS_ARRAY.map((option) => {
                       if (
                         option.name === 'admin' &&
                         userData?.role !== UserRoleTypes.ADMIN
