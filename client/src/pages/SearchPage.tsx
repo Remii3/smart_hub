@@ -15,7 +15,6 @@ import {
   sortOptionsArray,
 } from '@hooks/useSortProducts';
 import { Badge } from '@components/UI/badge';
-import { Skeleton } from '@components/UI/skeleton';
 
 interface SearchedProductsDataTypes {
   products: UnknownProductTypes[] | null;
@@ -43,7 +42,6 @@ export default function SearchPage() {
     currentPage: 1,
     pageIteration: 5,
   });
-
   const [searchedProductsData, setSearchedProductsData] =
     useState<SearchedProductsDataTypes>({
       products: null,
@@ -54,22 +52,11 @@ export default function SearchPage() {
         totalProducts: 0,
         highestPrice: 0,
       },
-      isLoading: true,
+      isLoading: false,
     });
+
   const params = new URLSearchParams(window.location.search);
   const defaultSearch = params.get('sort');
-
-  const updateSortHandler = (e: SortType) => {
-    params.set('sort', e);
-    const newUrl = `${window.location.pathname}?${params.toString()}`;
-    window.history.replaceState(null, '', newUrl);
-  };
-
-  useEffect(() => {
-    if (!defaultSearch) {
-      updateSortHandler(sortOptions.DATE_DESC);
-    }
-  }, []);
 
   const [sortOption, setSortOption] = useState<string>(
     defaultSearch || sortOptions.DATE_DESC
@@ -91,9 +78,12 @@ export default function SearchPage() {
       maxPrice: '',
     },
   });
+
   const searchQuery = useLocation();
+  const searchQueryParams = searchQuery.search;
   const updatedQuery = searchQuery.search.slice(1);
   const navigate = useNavigate();
+
   const fetchData = useCallback(async () => {
     setSearchedProductsData((prevState) => {
       return { ...prevState, isLoading: true };
@@ -115,15 +105,11 @@ export default function SearchPage() {
     });
   }, [updatedQuery, pagesData, sortOption, filtersData]);
 
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
-
-  useEffect(() => {
-    setPagesData((prevState) => {
-      return { ...prevState, currentPage: 1 };
-    });
-  }, [sortOption, filtersData]);
+  const updateSortHandler = (e: SortType) => {
+    params.set('sort', e);
+    const newUrl = `${window.location.pathname}?${params.toString()}`;
+    window.history.replaceState(null, '', newUrl);
+  };
 
   const changePriceHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFiltersData((prevState) => {
@@ -188,13 +174,30 @@ export default function SearchPage() {
 
   const sortOptionChangeHandler = (e: ChangeEvent<HTMLSelectElement>) => {
     setSortOption(e.target.value);
-    const selectedSortOption = sortOptionsArray.find(
-      (item) => item.key === e.target.value
-    );
+    const selectedSortOption = sortOptionsArray.find((item) => {
+      return item.value === e.target.value;
+    });
     if (selectedSortOption) {
       updateSortHandler(selectedSortOption.value);
     }
   };
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  useEffect(() => {
+    setPagesData((prevState) => {
+      return { ...prevState, currentPage: 1 };
+    });
+  }, [sortOption, filtersData]);
+
+  useEffect(() => {
+    if (!defaultSearch) {
+      updateSortHandler(sortOptions.DATE_DESC);
+    }
+  }, [window.location.search]);
+
   return (
     <MainContainer>
       <div className="flex justify-between">
@@ -223,25 +226,34 @@ export default function SearchPage() {
           />
         </aside>
         <section className="w-full space-y-2">
-          <ul className="grid auto-cols-max grid-flow-col auto-rows-max gap-5">
-            {searchedProductsData.rawData.queries &&
-              searchedProductsData.rawData.queries.map((query) => (
-                <li key={query.key}>
-                  <Badge variant={'outline'}>
-                    <button
-                      name={query.key}
-                      type="button"
-                      onClick={(e) => removeQueryHandler(e)}
-                      className="space-x-2"
-                    >
-                      <span className=" text-sm">{query.value}</span>
-                      <span>X</span>
-                    </button>
-                  </Badge>
-                </li>
-              ))}
-          </ul>
+          {searchQueryParams && (
+            <ul className="grid auto-cols-max grid-flow-col auto-rows-max gap-5">
+              {searchedProductsData.rawData.queries &&
+                searchedProductsData.rawData.queries.map((query) => (
+                  <li key={query.key}>
+                    <Badge variant={'outline'}>
+                      <button
+                        name={query.key}
+                        type="button"
+                        onClick={(e) => removeQueryHandler(e)}
+                        className="space-x-2"
+                      >
+                        <span className=" text-sm">{query.value}</span>
+                        <span>X</span>
+                      </button>
+                    </Badge>
+                  </li>
+                ))}
+            </ul>
+          )}
 
+          {!searchedProductsData.isLoading &&
+            searchedProductsData.products &&
+            searchedProductsData.products.length === 0 && (
+              <div className="flex h-full w-full items-center justify-center">
+                No products
+              </div>
+            )}
           <div>
             <div className="grid grid-flow-row grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {searchedProductsData.isLoading &&
@@ -252,8 +264,7 @@ export default function SearchPage() {
                     width="w-full"
                   />
                 ))}
-              {!searchedProductsData.isLoading &&
-                !searchedProductsData.products && <div>No products</div>}
+
               {!searchedProductsData.isLoading &&
                 searchedProductsData.products &&
                 searchedProductsData.products.map((item) => {

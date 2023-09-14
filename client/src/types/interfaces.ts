@@ -175,8 +175,8 @@ export interface ProductAuctionCardType extends ProductCardTypes {
 // * news types
 
 export interface NewsTypes {
-  id: string;
+  _id: string;
   title: string;
-  shortDescription?: string;
+  subtitle?: string;
   content: string;
 }

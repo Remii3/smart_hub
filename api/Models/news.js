@@ -3,7 +3,8 @@ const mongoose = require('mongoose');
 const NewsSchema = mongoose.Schema({
   created_at: { type: Date, default: Date.now },
   title: { type: String, required: true },
-  short_description: { type: String },
+  subtitle: { type: String },
+  headImage: { type: String },
   content: { type: String },
 });
 

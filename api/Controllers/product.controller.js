@@ -300,6 +300,7 @@ const addProduct = async (req, res) => {
 
 const updateProduct = async (req, res) => {
   const {
+    _id,
     title,
     description,
     shop_info,
@@ -309,9 +310,9 @@ const updateProduct = async (req, res) => {
     quantity,
     market_place,
     auction_info,
-  } = req.body.newProductData;
+  } = req.body;
   try {
-    if (market_place === 'Shop') {
+    if (market_place === "Shop") {
       await Product.updateOne(
         { _id },
         {
@@ -323,7 +324,7 @@ const updateProduct = async (req, res) => {
           authors,
           quantity,
           market_place,
-        },
+        }
       );
     } else {
       await Product.updateOne(
@@ -337,12 +338,12 @@ const updateProduct = async (req, res) => {
           authors,
           quantity,
           market_place,
-        },
+        }
       );
     }
-    res.status(200).json({ message: 'Success' });
+    res.status(200).json({ message: "Success" });
   } catch (err) {
-    res.status(500).json({ message: 'Failed' });
+    res.status(500).json({ message: "Failed" });
   }
 };
 
