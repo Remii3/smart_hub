@@ -43,8 +43,14 @@ export default function Nav({ scrollFlag }: { scrollFlag: boolean }) {
   gsap.registerPlugin();
 
   const showMobileOverlay = () => {
+    if (
+      !/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+        navigator.userAgent
+      )
+    ) {
+      document.querySelector('body')?.classList.toggle('mr-[17px]');
+    }
     document.querySelector('body')?.classList.toggle('overflow-hidden');
-    document.querySelector('body')?.classList.toggle('mr-[17px]');
     setOpenedBurger((prevState) => !prevState);
   };
 

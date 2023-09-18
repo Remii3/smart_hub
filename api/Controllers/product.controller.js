@@ -12,10 +12,12 @@ const allProducts = async (req, res) => {
     if (category) {
       products = await Product.find({
         quantity: { $gt: 0 },
+        deleted: false,
       });
     } else {
       products = await Product.find({
         quantity: { $gt: 0 },
+        deleted: false,
       });
     }
     const preparedProducts = [];
@@ -34,6 +36,7 @@ const shopProducts = async (req, res) => {
     const products = await Product.find({
       market_place: 'Shop',
       quantity: { $gt: 0 },
+      deleted: false,
     });
 
     const preparedProducts = [];
@@ -52,6 +55,7 @@ const auctionProducts = async (req, res) => {
     const products = await Product.find({
       market_place: 'Auction',
       quantity: { $gt: 0 },
+      deleted: false,
     });
 
     const preparedProducts = [];
@@ -111,6 +115,7 @@ const searchedProducts = async (req, res) => {
     let totalDocuments = null;
     let totalPages = null;
     searchQuery.quantity = { $gt: 0 };
+    searchQuery.deleted = false;
     if (specialQuery) {
       switch (specialQuery) {
         case 'bestseller':
@@ -143,9 +148,11 @@ const searchedProducts = async (req, res) => {
                 },
               },
             ]);
-            searchQuery._id = {
-              $in: top_selling_products[0].top_selling_products,
-            };
+            if (top_selling_products.length > 0) {
+              searchQuery._id = {
+                $in: top_selling_products[0].top_selling_products,
+              };
+            }
             products = await Product.find(searchQuery).sort(sortMetod);
             const products_copy = [...products];
             highestPrice =
@@ -165,7 +172,7 @@ const searchedProducts = async (req, res) => {
         .sort(sortMetod)
         .skip(skipPages)
         .limit(limitPages);
-      highestPrice = await Product.find({})
+      highestPrice = await Product.find({ deleted: false })
         .sort({ 'shop_info.price': -1 })
         .limit(1);
       totalDocuments = await Product.find(searchQuery).countDocuments();
@@ -173,10 +180,10 @@ const searchedProducts = async (req, res) => {
     }
     finalRawData.totalPages = totalPages;
     finalRawData.totalProducts = totalDocuments;
-
-    finalRawData.highestPrice = highestPrice
-      ? Number(highestPrice[0].shop_info.price)
-      : 0;
+    finalRawData.highestPrice =
+      highestPrice && highestPrice.length > 0
+        ? Number(highestPrice[0].shop_info.price)
+        : 0;
 
     const preparedProducts = [];
     if (products.length >= 1) {
@@ -189,12 +196,14 @@ const searchedProducts = async (req, res) => {
       finalRawData,
     });
   } catch (err) {
+    console.log(err);
     res.status(500).json({ message: 'Faield fetching searched query' });
   }
 };
 
 const addProduct = async (req, res) => {
   const {
+    seller_data,
     price,
     title,
     description,
@@ -231,6 +240,7 @@ const addProduct = async (req, res) => {
 
       try {
         await Product.create({
+          seller_data,
           _id,
           title,
           description,
@@ -258,6 +268,7 @@ const addProduct = async (req, res) => {
 
       try {
         await Product.create({
+          seller_data,
           _id,
           title,
           description,
@@ -280,14 +291,12 @@ const addProduct = async (req, res) => {
     }
 
     try {
-      for (const author of authors) {
-        await User.updateOne(
-          {
-            _id: author._id,
-          },
-          { $push: { 'author_info.my_products': _id } },
-        );
-      }
+      await User.updateOne(
+        {
+          _id: seller_data._id,
+        },
+        { $push: { 'author_info.my_products': _id } },
+      );
     } catch (err) {
       return res.status(500).json({ message: 'Failed updating user data' });
     }
@@ -312,7 +321,7 @@ const updateProduct = async (req, res) => {
     auction_info,
   } = req.body;
   try {
-    if (market_place === "Shop") {
+    if (market_place === 'Shop') {
       await Product.updateOne(
         { _id },
         {
@@ -324,7 +333,7 @@ const updateProduct = async (req, res) => {
           authors,
           quantity,
           market_place,
-        }
+        },
       );
     } else {
       await Product.updateOne(
@@ -338,12 +347,12 @@ const updateProduct = async (req, res) => {
           authors,
           quantity,
           market_place,
-        }
+        },
       );
     }
-    res.status(200).json({ message: "Success" });
+    res.status(200).json({ message: 'Success' });
   } catch (err) {
-    res.status(500).json({ message: "Failed" });
+    res.status(500).json({ message: 'Failed' });
   }
 };
 
@@ -352,9 +361,14 @@ const deleteProduct = async (req, res) => {
   try {
     await User.updateOne(
       { _id: userId },
-      { $pull: { 'my_products.$._id': _id } },
+      { $pull: { 'author_info.my_products': _id } },
     );
-    await Product.deleteOne({ _id });
+    let currentDate = new Date();
+    let currentMonth = currentDate.getMonth();
+    let monthFromNow = currentMonth + 6;
+    let futureDate = new Date(currentDate.getFullYear(), monthFromNow, 1);
+    futureDate.setDate(futureDate.getDate() - 1);
+    await Product.updateOne({ _id }, { deleted: true, expireAt: futureDate });
     res.status(200).json({ message: 'Success' });
   } catch (err) {
     res.status(500).json({ message: 'Failed' });

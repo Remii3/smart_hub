@@ -53,13 +53,28 @@ export default function BasicProductCollection({
     isLoading: true,
     originalData: null,
   });
-
   let highestPrice =
     products &&
     products.originalData &&
+    products.originalData.length > 0 &&
     [...products.originalData].sort((a, b) =>
       a.shop_info.price > b.shop_info.price ? -1 : 1
     )[0].shop_info.price;
+
+  const filterData = (rawData: UnknownProductTypes[]) => {
+    const { sortedProducts } = useSortProducts({
+      sortType: selectedSortOption,
+      products: (rawData && [...rawData]) || [],
+    });
+    const { filteredProducts } = useFilterProducts({
+      products: [...sortedProducts],
+      filterData: {
+        filterType: 'Price',
+        filterValues: { minPrice, maxPrice },
+      },
+    });
+    return { filteredProducts };
+  };
 
   const fetchData = useCallback(async () => {
     setProducts((prevState) => {
@@ -75,8 +90,14 @@ export default function BasicProductCollection({
       },
     });
 
+    const { filteredProducts } = filterData(data);
+
     setTimeout(() => {
-      setProducts({ originalData: data, filteredData: data, isLoading: false });
+      setProducts({
+        originalData: data,
+        filteredData: filteredProducts,
+        isLoading: false,
+      });
     }, 100);
   }, []);
 
@@ -85,22 +106,16 @@ export default function BasicProductCollection({
   }, [fetchData]);
 
   useEffect(() => {
-    const { sortedProducts } = useSortProducts({
-      sortType: selectedSortOption,
-      products: (products?.originalData && [...products?.originalData]) || [],
-    });
-    const { filteredProducts } = useFilterProducts({
-      products: [...sortedProducts],
-      filterData: { filterType: 'Price', filterValues: { minPrice, maxPrice } },
-    });
-
-    setProducts((prevState) => {
-      return {
-        ...prevState,
-        originalData: prevState.originalData,
-        filteredData: filteredProducts,
-      };
-    });
+    if (products.originalData) {
+      const { filteredProducts } = filterData(products.originalData);
+      setProducts((prevState) => {
+        return {
+          originalData: prevState.originalData,
+          filteredData: filteredProducts,
+          isLoading: prevState.isLoading,
+        };
+      });
+    }
   }, [minPrice, maxPrice, selectedSortOption]);
 
   const sortOptionChangeHandler = (e: ChangeEvent<HTMLSelectElement>) => {
@@ -125,7 +140,6 @@ export default function BasicProductCollection({
   const maxPriceChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {
     setMaxPrice(Number(e.target.value));
   };
-
   return (
     <section>
       <header className="px-4">
@@ -174,7 +188,9 @@ export default function BasicProductCollection({
             ))}
           </div>
         )}
-        {!products.isLoading && products?.filteredData ? (
+        {!products.isLoading &&
+        products.filteredData &&
+        products.filteredData.length > 0 ? (
           <LongSwiper swiperCategory={category}>
             {products.filteredData.map((product, id) => (
               <SwiperSlide key={id}>

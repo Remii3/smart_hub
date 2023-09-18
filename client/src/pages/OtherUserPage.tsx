@@ -1,5 +1,5 @@
 import { useEffect, useState, useContext, useCallback } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { SwiperSlide } from 'swiper/react';
 import { AuthorTypes } from '@customTypes/interfaces';
 import ShopCard from '@components/cards/ShopCard';
@@ -17,9 +17,12 @@ import { DATABASE_ENDPOINTS } from '../data/endpoints';
 
 export default function OtherUserPage() {
   const [otherUserData, setOtherUserData] = useState<AuthorTypes>();
-  const path = useLocation();
 
   const { userData } = useContext(UserContext);
+
+  const navigate = useNavigate();
+
+  const path = useLocation();
   let userId: string | any[] | null = null;
   userId = path.pathname.split('/');
   userId = userId[userId.length - 1];
@@ -31,22 +34,31 @@ export default function OtherUserPage() {
   );
 
   const getOtherUserData = useCallback(async () => {
-    const { data } = await useGetAccessDatabase({
-      url: DATABASE_ENDPOINTS.USER_OTHER_PROFILE,
-      params: { userId },
-    });
-    setOtherUserData(data);
-    if (data) {
-      setIsFollowing(
-        data.author_info.followers.some((id: string) => id === userData?._id) ||
-          false
-      );
+    if (userId !== userData?._id) {
+      const { data } = await useGetAccessDatabase({
+        url: DATABASE_ENDPOINTS.USER_OTHER_PROFILE,
+        params: { userId },
+      });
+      setOtherUserData(data);
+      if (data) {
+        setIsFollowing(
+          data.author_info.followers.some(
+            (id: string) => id === userData?._id
+          ) || false
+        );
+      }
     }
   }, [userData?._id, userId]);
 
   useEffect(() => {
     getOtherUserData();
   }, [getOtherUserData]);
+
+  useEffect(() => {
+    if (userId === userData?._id) {
+      navigate('/account/my', { replace: true });
+    }
+  }, []);
 
   const otherUserStats = otherUserData?.author_info
     ? [

@@ -15,6 +15,8 @@ const prepareProductObject = product => {
     currency,
     shop_info,
     auction_info,
+    seller_data,
+    deleted,
   } = product;
 
   const preparedObject = {
@@ -31,6 +33,8 @@ const prepareProductObject = product => {
     sold,
     comments,
     currency,
+    seller_data,
+    deleted,
   };
 
   if (shop_info) {

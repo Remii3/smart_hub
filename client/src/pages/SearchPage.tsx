@@ -54,7 +54,6 @@ export default function SearchPage() {
       },
       isLoading: false,
     });
-
   const params = new URLSearchParams(window.location.search);
   const defaultSearch = params.get('sort');
 
@@ -98,9 +97,10 @@ export default function SearchPage() {
         sortOption,
       },
     });
+
     setSearchedProductsData({
-      products: data.products,
-      rawData: data.finalRawData,
+      products: (data && data.products) || [],
+      rawData: data && data.finalRawData,
       isLoading: false,
     });
   }, [updatedQuery, pagesData, sortOption, filtersData]);
@@ -222,13 +222,18 @@ export default function SearchPage() {
             onPriceChange={changePriceHandler}
             onMarketplaceReset={resetMarketplaceHandler}
             onPriceReset={resetPriceHandler}
-            highestPrice={searchedProductsData.rawData.highestPrice}
+            highestPrice={
+              (searchedProductsData.rawData &&
+                searchedProductsData.rawData.highestPrice) ||
+              0
+            }
           />
         </aside>
         <section className="w-full space-y-2">
           {searchQueryParams && (
             <ul className="grid auto-cols-max grid-flow-col auto-rows-max gap-5">
-              {searchedProductsData.rawData.queries &&
+              {searchedProductsData.rawData &&
+                searchedProductsData.rawData.queries &&
                 searchedProductsData.rawData.queries.map((query) => (
                   <li key={query.key}>
                     <Badge variant={'outline'}>

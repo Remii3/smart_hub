@@ -2,10 +2,10 @@ import {
   ChangeEvent,
   FormEvent,
   useCallback,
+  useContext,
   useEffect,
   useState,
 } from 'react';
-import { Link } from 'react-router-dom';
 import {
   Dialog,
   DialogContent,
@@ -17,39 +17,63 @@ import {
 } from '@components/UI/dialog';
 import MainContainer from '@layout/MainContainer';
 import { Button } from '@components/UI/button';
-import { NewsTypes } from '@customTypes/interfaces';
+import { NewsTypes, UserTypes } from '@customTypes/interfaces';
 import {
   useGetAccessDatabase,
   usePostAccessDatabase,
-} from '../hooks/useAaccessDatabase';
-import { DATABASE_ENDPOINTS } from '../data/endpoints';
+} from '../../hooks/useAaccessDatabase';
+import { DATABASE_ENDPOINTS } from '../../data/endpoints';
 import { Label } from '@components/UI/label';
 import { Input } from '@components/UI/input';
+import { UserContext } from '@context/UserProvider';
+import LoadingCircle from '@components/Loaders/LoadingCircle';
+import { Skeleton } from '@components/UI/skeleton';
+import NewsArticle from './NewsArticle';
 
-interface NewsArticleType {
+interface NewArticleType {
   title: string;
   subtitle: string;
   headImage: null;
   content: string;
+}
+interface NewsArticleType extends NewArticleType {
+  _id: string;
 }
 
 interface SelectArticleType {
   isLoading: boolean;
   data: null | NewsArticleType;
 }
+type CommentsType = {
+  _id: string;
+  product_id: string;
+  user: UserTypes;
+  value: { rating: number; text: string };
+  created_at: string;
+};
+
+interface CommentTypes {
+  newCommentData: {
+    value: string;
+    isAdding: boolean;
+  };
+  comments: {
+    original: null | CommentsType[];
+    prepared: null | CommentsType[];
+  };
+  loadAll: boolean;
+  isLoading: boolean;
+}
 
 export default function NewsPage() {
   const [newsList, setNewsList] = useState<null | NewsTypes[]>(null);
-  const [newArticleData, setNewArticleData] = useState<NewsArticleType>({
+  const [newArticleData, setNewArticleData] = useState<NewArticleType>({
     title: '',
     subtitle: '',
     headImage: null,
     content: '',
   });
-  const [selectedArticle, setSelectedArticle] = useState<SelectArticleType>({
-    isLoading: false,
-    data: null,
-  });
+  const { userData } = useContext(UserContext);
   const fetchData = useCallback(async () => {
     const { data } = await useGetAccessDatabase({
       url: DATABASE_ENDPOINTS.NEWS_ALL,
@@ -57,15 +81,11 @@ export default function NewsPage() {
     setNewsList(data);
   }, []);
 
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
-
   const addNewNewsHandler = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     await usePostAccessDatabase({
       url: DATABASE_ENDPOINTS.NEWS_ONE,
-      body: newArticleData,
+      body: { userId: userData?._id, ...newArticleData },
     });
     await fetchData();
   };
@@ -75,30 +95,21 @@ export default function NewsPage() {
       return { ...prevState, [e.target.name]: e.target.value };
     });
   };
-  const fetchArticleData = async (newsId: string) => {
-    const { data } = await useGetAccessDatabase({
-      url: DATABASE_ENDPOINTS.NEWS_ONE,
-      params: { newsId },
-    });
 
-    return data;
-  };
-  const showArticleHandler = async (newsId: string) => {
-    setSelectedArticle((prevState) => {
-      return { ...prevState, isLoading: true };
-    });
-
-    const data = await fetchArticleData(newsId);
-    setSelectedArticle({ data, isLoading: false });
-  };
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+  console.log('commentState');
   return (
     <MainContainer>
       <div>
         <span>News</span>
         <Dialog>
-          <DialogTrigger asChild>
-            <Button variant="default">+Add new</Button>
-          </DialogTrigger>
+          {userData?.role !== 'User' && (
+            <DialogTrigger asChild>
+              <Button variant="default">+Add new</Button>
+            </DialogTrigger>
+          )}
           <DialogContent>
             <form className="space-y-4" onSubmit={addNewNewsHandler}>
               <DialogHeader>
@@ -171,7 +182,6 @@ export default function NewsPage() {
                   <button
                     type="button"
                     className="rounded-md border border-slate-400 p-3 text-start shadow-sm"
-                    onClick={() => showArticleHandler(item._id)}
                   >
                     <h6>{item.title}</h6>
                     {item.subtitle && (
@@ -179,24 +189,8 @@ export default function NewsPage() {
                     )}
                   </button>
                 </DialogTrigger>
-                <DialogContent>
-                  {selectedArticle.isLoading ? (
-                    <div>loading</div>
-                  ) : (
-                    <div>
-                      {selectedArticle.data && (
-                        <div className="space-y-6">
-                          <div className="space-y-2">
-                            <h3>{selectedArticle.data.title}</h3>
-                            <h6 className="text-slate-600">
-                              {selectedArticle.data.subtitle}
-                            </h6>
-                          </div>
-                          <p>{selectedArticle.data.content}</p>
-                        </div>
-                      )}
-                    </div>
-                  )}
+                <DialogContent className="h-[80%] max-h-[80%] overflow-auto">
+                  <NewsArticle newsId={item._id} />
                 </DialogContent>
               </Dialog>
             </div>

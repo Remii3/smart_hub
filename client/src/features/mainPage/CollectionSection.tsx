@@ -33,7 +33,7 @@ export default function CollectionSection() {
         your next favorite book with us"
         />
       </div>
-      <div className="grid w-full grid-cols-1 gap-4 sm:grid-cols-2">
+      <div className="grid w-full grid-cols-1 gap-6 sm:grid-cols-2">
         <Link
           to="/shop"
           className="block cursor-pointer space-y-10 rounded-xl bg-gray900 p-10 shadow-sm transition duration-300 ease-in-out hover:scale-[1.02] hover:shadow-md active:scale-100 sm:col-span-2"

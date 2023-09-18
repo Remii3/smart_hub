@@ -9,6 +9,10 @@ export interface UnknownProductTypes
     AuctionProductTypes {}
 
 export interface ProductTypes {
+  seller_data: {
+    _id: string;
+    pseudonim: string;
+  };
   _id: string;
   title: string;
   description?: string;
@@ -79,6 +83,7 @@ export interface UserTypes {
   security_settings: {
     hide_private_information: boolean;
   };
+  news: string[];
 }
 
 export interface AuthorTypes extends UserTypes {

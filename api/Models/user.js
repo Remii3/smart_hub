@@ -30,6 +30,7 @@ const UserSchema = new mongoose.Schema({
   following: [{ type: mongoose.Types.ObjectId, ref: 'User' }],
   orders: [{ type: mongoose.Types.ObjectId, ref: 'Order' }],
   role: { type: String, default: 'User', enum: ['User', 'Author', 'Admin'] },
+  news: { type: [mongoose.Types.ObjectId] },
   security_settings: {
     type: {
       hide_private_information: Boolean,

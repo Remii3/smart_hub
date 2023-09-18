@@ -36,6 +36,13 @@ import {
   usePostAccessDatabase,
 } from '../hooks/useAaccessDatabase';
 import { DATABASE_ENDPOINTS } from '../data/endpoints';
+import {
+  Link,
+  useLocation,
+  useNavigate,
+  useParams,
+  useSearchParams,
+} from 'react-router-dom';
 
 const tabNames = {
   MY_DATA: 'myData',
@@ -101,8 +108,11 @@ const TABS_ARRAY = [
 export default function MyAccount() {
   const { userData, fetchUserData } = useContext(UserContext);
   const [finishAuctionDate, setFinishAuctionDate] = useState<Date>();
-
-  const [selectedtab, setSelectedtab] = useState(TABS_ARRAY[0].name);
+  const [searchParams] = useSearchParams();
+  const lastSearchQuery = searchParams.get('tab');
+  const [selectedtab, setSelectedtab] = useState(
+    lastSearchQuery || TABS_ARRAY[0].name
+  );
 
   const [productData, setProductData] =
     useState<ProductDataTypes>(initialProductData);
@@ -131,6 +141,16 @@ export default function MyAccount() {
     options: [],
     value: [],
   });
+  const navigate = useNavigate();
+  const path = useLocation();
+
+  const changeSelectedTab = (option: string) => {
+    setSelectedtab(option);
+    navigate(
+      { pathname: path.pathname, search: `tab=${option}` },
+      { replace: true }
+    );
+  };
 
   const resetProductData = () => {
     setTimeout(() => {
@@ -215,7 +235,10 @@ export default function MyAccount() {
   const addProductHandler = async (e: React.FormEvent) => {
     e.preventDefault();
     const newProductData = {
-      user_id: userData?._id,
+      seller_data: {
+        _id: userData?._id,
+        pseudonim: userData?.author_info.pseudonim,
+      },
       title: productData.title.value,
       description: productData.description.value,
       price: Number(productData.price.value),
@@ -340,17 +363,17 @@ export default function MyAccount() {
                         <Button variant="default">Add new book</Button>
                       </DialogTrigger>
                       <DialogContent>
-                        <DialogHeader>
-                          <DialogTitle>Add product</DialogTitle>
-                          <DialogDescription>
-                            Fill in your product data. Click the &apos;add&apos;
-                            button when you&apos;re done.
-                          </DialogDescription>
-                        </DialogHeader>
                         <form
                           onSubmit={(e) => addProductHandler(e)}
                           className="w-full"
                         >
+                          <DialogHeader>
+                            <DialogTitle>Add product</DialogTitle>
+                            <DialogDescription>
+                              Fill in your product data. Click the
+                              &apos;add&apos; button when you&apos;re done.
+                            </DialogDescription>
+                          </DialogHeader>
                           <fieldset className="mb-2 space-y-1">
                             <label
                               htmlFor="title"
@@ -565,12 +588,14 @@ export default function MyAccount() {
                               />
                             </div>
                           )}
+                          <DialogFooter>
+                            <DialogTrigger asChild>
+                              <Button variant="default" type="submit">
+                                Add
+                              </Button>
+                            </DialogTrigger>
+                          </DialogFooter>
                         </form>
-                        <DialogFooter>
-                          <Button variant="default" type="submit">
-                            Add
-                          </Button>
-                        </DialogFooter>
                       </DialogContent>
                     </Dialog>
                   </div>
@@ -588,7 +613,7 @@ export default function MyAccount() {
                 <select
                   id="Tab"
                   className="w-full rounded-md border-gray-200"
-                  onChange={(e) => setSelectedtab(e.target.value)}
+                  onChange={(e) => changeSelectedTab(e.target.value)}
                   value={selectedtab}
                 >
                   {TABS_ARRAY.map((tab) => {
@@ -631,10 +656,10 @@ export default function MyAccount() {
                       }
 
                       return (
-                        <a
-                          href="#"
+                        <button
                           key={option.name}
-                          onClick={() => setSelectedtab(option.name)}
+                          type="button"
+                          onClick={() => changeSelectedTab(option.name)}
                           className={`${
                             selectedtab === option.name
                               ? 'border-sky-500 text-sky-600'
@@ -643,7 +668,7 @@ export default function MyAccount() {
                         >
                           {option.icon}
                           {option.text}
-                        </a>
+                        </button>
                       );
                     })}
                   </nav>

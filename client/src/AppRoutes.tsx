@@ -7,7 +7,7 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import MainPage from './pages/MainPage';
 import MyAccount from './pages/MyAccount';
-import NewsPage from './pages/NewsPage';
+import NewsPage from './pages/newsPage/NewsPage';
 import CollectionsPage from './pages/CollectionsPage';
 import AuctionsPage from './pages/AuctionsPage';
 import CartPage from './pages/CartPage';

@@ -51,7 +51,7 @@ const productSearchVerification = async (req, res, next) => {
       finalRawData.queries = [...finalRawData.queries, { key, value }];
     }
     if (key === 'category') {
-      const category = await Category.findOne({ value: value });
+      const category = await Category.findOne({ value });
       finalQuery['categories'] = category._id;
       finalRawData.queries = [...finalRawData.queries, { key, value }];
     }

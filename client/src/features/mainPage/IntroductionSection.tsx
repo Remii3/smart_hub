@@ -11,7 +11,7 @@ export default function IntroductionSection() {
           </h1>
         </div>
       </div>
-      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-4 px-4 pb-6 pt-7 sm:grid-cols-2">
+      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-6 px-4 pb-6 pt-7 sm:grid-cols-2">
         <article className="h-full rounded-md bg-gray900 p-8 text-lg">
           Dive into the world of imagination and explore our vast collection of
           books from various genres. Find your next unputdownable read, make

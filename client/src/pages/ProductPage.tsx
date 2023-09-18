@@ -5,7 +5,12 @@ import {
   useContext,
   useCallback,
 } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import {
+  Link,
+  useLocation,
+  useNavigate,
+  useSearchParams,
+} from 'react-router-dom';
 import { AuthorTypes, UnknownProductTypes } from '@customTypes/interfaces';
 import { UserContext } from '@context/UserProvider';
 import ProductImage from '@features/product/ProductImage';
@@ -105,7 +110,6 @@ export default function ProductPage() {
         },
       };
     });
-
     setProductState({ data, isLoading: false });
   }, [prodId]);
 
@@ -125,7 +129,7 @@ export default function ProductPage() {
         return { ...prevState, isMyProduct: true };
       });
     }
-  }, [userData]);
+  }, [userData, productState]);
 
   const newDataChangeHandler = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -182,7 +186,7 @@ export default function ProductPage() {
     if (productState.data) {
       await usePostAccessDatabase({
         url: DATABASE_ENDPOINTS.PRODUCT_DELETE,
-        body: { _id: productState.data._id },
+        body: { _id: productState.data._id, userId: userData?._id },
       });
       fetchUserData();
       navigate(-1);
@@ -198,13 +202,13 @@ export default function ProductPage() {
       body: {
         userId: userData?._id,
         productId: prodId,
+        target: 'Product',
         value: { rating: 2, text: commentState.value },
       },
     });
     setCommentState({ isAdding: false, value: '' });
     fetchData();
   };
-
   if (!productState.data && productState.isLoading) return <p>Loading</p>;
   if (!productState.data && !productState.isLoading) return <p> No data</p>;
   return (
@@ -298,7 +302,7 @@ export default function ProductPage() {
                       key={category._id}
                       to={{
                         pathname: '/search',
-                        search: `category=${category.label}`,
+                        search: `category=${category.value}`,
                       }}
                       className="pr-2"
                     >
@@ -310,6 +314,18 @@ export default function ProductPage() {
                   Added:{' '}
                   {productState.data &&
                     productState.data.created_at.slice(0, 10)}
+                </div>
+                <div>
+                  <p>Seller:</p>
+                  {productState.data && (
+                    <Link
+                      key={productState.data.seller_data._id}
+                      className="pr-4"
+                      to={`/account/${productState.data.seller_data._id}`}
+                    >
+                      {productState.data.seller_data.pseudonim}
+                    </Link>
+                  )}
                 </div>
                 <div>
                   <p>Authors:</p>
