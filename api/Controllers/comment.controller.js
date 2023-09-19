@@ -1,60 +1,91 @@
 const { default: mongoose } = require('mongoose');
-const CommentModel = require('../Models/comment');
+const Comment = require('../Models/comment');
 const Product = require('../Models/product');
 const News = require('../Models/news');
+const User = require('../Models/user');
 
-const allComments = (req, res) => {
-  const { productId } = req.query;
-  CommentModel.findAll({ productId })
-    .then(res => res.status(200).json(res.data))
-    .catch(err => {
-      return res.status(500).json({ message: 'Failed fetching comments' });
+const getAllComments = async (req, res) => {
+  const { targetId } = req.query;
+
+  if (!targetId) {
+    return res.status(422).json({ message: 'Provide comment target id' });
+  }
+  try {
+    const data = await Comment.find({ target_id: targetId }).sort({
+      created_at: -1,
     });
+
+    return res.status(200).json({ data });
+  } catch (err) {
+    return res
+      .status(500)
+      .json({ message: 'Failed fetching comments', error: err.message });
+  }
 };
 
-const oneComment = (req, res) => {};
+const addOneComment = async (req, res) => {
+  const { userId, targetId, value, target } = req.body;
 
-const addComment = async (req, res) => {
-  const { userId, productId, value, target } = req.body;
-  const created_at = new Date().getTime();
+  if (!userId) {
+    return res.status(422).json({ message: 'Provide user id' });
+  }
+
+  if (!targetId) {
+    return res.status(422).json({ message: 'Provide target id' });
+  }
+
   try {
+    const created_at = new Date().getTime();
     const _id = new mongoose.Types.ObjectId();
+
     if (target === 'Product') {
-      await CommentModel.create({
+      await Comment.create({
         _id,
         user: userId,
-        product_id: productId,
+        target_id: targetId,
         value,
         target,
         created_at,
       });
-      await Product.updateOne({ _id: productId }, { $push: { comments: _id } });
-    } else if (target === 'News') {
-      await CommentModel.create({
+      await Product.updateOne({ _id: targetId }, { $push: { comments: _id } });
+      return res.status(201).json({ message: 'Success' });
+    }
+    if (target === 'News') {
+      await Comment.create({
         _id,
         user: userId,
-        product_id: productId,
+        target_id: targetId,
         value: { text: value },
         target,
         created_at,
       });
-      await News.updateOne({ _id: productId }, { $push: { comments: _id } });
+      await News.updateOne({ _id: targetId }, { $push: { comments: _id } });
+      return res.status(201).json({ message: 'Success' });
     }
-    res.status(201).json({ message: 'Succesfully added new comment' });
   } catch (err) {
-    console.log(err);
-    res.status(500).json({ message: 'Failed adding new comment' });
+    return res
+      .status(500)
+      .json({ message: 'Failed adding new comment', error: err.message });
   }
 };
 
-const commentDelete = async (req, res) => {
-  const { commentId } = req.body;
+const deleteOneComment = async (req, res) => {
+  const { commentId, userId } = req.body;
+  if (!commentId) {
+    return res.status(422).json({ message: 'Provide comment id' });
+  }
+  if (!userId) {
+    return res.status(422).json({ message: 'Provide user id' });
+  }
   try {
-    await CommentModel.deleteOne({ _id: commentId });
-    res.json('success');
+    await User.updateOne({ _id: userId }, { $pull: { news: commentId } });
+    await Comment.deleteOne({ _id: commentId });
+    return res.status(200).json({ message: 'Success' });
   } catch (err) {
-    res.json('Failed');
+    return res
+      .status(500)
+      .json({ message: 'Failed deleting a comment', error: err.message });
   }
 };
 
-module.exports = { allComments, oneComment, addComment, commentDelete };
+module.exports = { getAllComments, addOneComment, deleteOneComment };

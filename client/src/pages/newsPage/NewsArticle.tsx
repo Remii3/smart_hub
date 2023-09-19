@@ -1,6 +1,14 @@
 import LoadingCircle from '@components/Loaders/LoadingCircle';
 import { Button } from '@components/UI/button';
-import { DialogTrigger } from '@components/UI/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@components/UI/dialog';
 import { Input } from '@components/UI/input';
 import { Skeleton } from '@components/UI/skeleton';
 import {
@@ -27,7 +35,7 @@ import {
 import { Link } from 'react-router-dom';
 interface RatingTypes {
   vote: string | null;
-  quantity: { likes: number; dislikes: number } | null;
+  quantity: { like: number; dislike: number } | null;
 }
 interface ArticleDataTypes {
   isLoading: boolean;
@@ -40,7 +48,7 @@ interface ArticleDataTypes {
     content: string;
     rating: {
       votes: { user: string; vote: number }[];
-      quantity: { likes: number; dislikes: number };
+      quantity: { like: number; dislike: number };
     };
   };
   comments: {
@@ -120,22 +128,26 @@ export default function NewsArticle({
       url: DATABASE_ENDPOINTS.NEWS_ONE,
       params: { newsId },
     });
+    const commentsData = await useGetAccessDatabase({
+      url: DATABASE_ENDPOINTS.COMMENT_ALL,
+      params: { targetId: newsId },
+    });
     setArticleData((prevState) => {
       return {
         ...prevState,
-        comments: { ...prevState.comments, data: data.comments },
-        data: data.data,
+        comments: { ...prevState.comments, data: commentsData.data },
+        data: data,
         isLoading: false,
       };
     });
-    const userVote = checkUserVoted(data.data.rating.votes);
-    setVote({ vote: userVote, quantity: data.data.rating.quantity });
+    const userVote = checkUserVoted(data.rating.votes);
+    setVote({ vote: userVote, quantity: data.rating.quantity });
   }, []);
 
   const fetchUpdateComments = async () => {
     const { data } = await useGetAccessDatabase({
-      url: DATABASE_ENDPOINTS.NEWS_COMMENTS,
-      params: { newsId },
+      url: DATABASE_ENDPOINTS.COMMENT_ALL,
+      params: { targetId: newsId },
     });
     setArticleData((prevState) => {
       return {
@@ -146,25 +158,28 @@ export default function NewsArticle({
   };
 
   const addCommentHandler = async () => {
-    setArticleData((prevState) => {
-      return {
-        ...prevState,
-        comments: { ...prevState.comments, isLoading: true },
-      };
-    });
-    await usePostAccessDatabase({
-      url: DATABASE_ENDPOINTS.COMMENT_ONE,
-      body: {
-        userId: userData?._id,
-        productId: newsId,
-        value: newCommentState.data,
-        target: COMMENT_TARGET.NEWS,
-      },
-    });
-    await fetchUpdateComments();
-    setNewCommentState((prevState) => {
-      return { ...prevState, data: '' };
-    });
+    if (newCommentState.data !== '') {
+      setNewCommentState((prevState) => {
+        return { ...prevState, isLoading: true };
+      });
+      await usePostAccessDatabase({
+        url: DATABASE_ENDPOINTS.COMMENT_ONE,
+        body: {
+          userId: userData?._id,
+          targetId: newsId,
+          value: newCommentState.data,
+          target: COMMENT_TARGET.NEWS,
+        },
+      });
+      setNewCommentState({ isLoading: false, data: '' });
+      setArticleData((prevState) => {
+        return {
+          ...prevState,
+          comments: { ...prevState.comments, isLoading: true },
+        };
+      });
+      await fetchUpdateComments();
+    }
   };
 
   const deleteCommentHandler = async (commentId: string) => {
@@ -174,13 +189,16 @@ export default function NewsArticle({
         comments: { ...prevState.comments, isLoading: true },
       };
     });
-    await usePostAccessDatabase({
+    const { error } = await usePostAccessDatabase({
       url: DATABASE_ENDPOINTS.COMMENT_DELETE,
       body: {
         commentId,
+        userId: userData?._id,
       },
     });
-    await fetchUpdateComments();
+    if (error === null) {
+      await fetchUpdateComments();
+    }
   };
 
   const newCommentChangeHandler = (e: ChangeEvent<HTMLTextAreaElement>) => {
@@ -214,7 +232,6 @@ export default function NewsArticle({
       : articleData.comments.data;
 
   const handleVote = async (voteType: any) => {
-    console.log('voteType', voteType);
     if (voteType === vote.vote) {
       await usePostAccessDatabase({
         url: DATABASE_ENDPOINTS.NEWS_VOTE_REMOVE,
@@ -230,7 +247,6 @@ export default function NewsArticle({
     }
   };
 
-  console.log('vote: ', vote);
   return (
     <div>
       {articleData.isLoading && !articleData.data && (
@@ -287,16 +303,44 @@ export default function NewsArticle({
                   </TooltipProvider>
                 </div>
               )}
-              <p>Likes: {vote.quantity?.likes}</p>
-              <p>Dislikes: {vote.quantity?.dislikes}</p>
+              <p>Likes: {vote.quantity?.like}</p>
+              <p>Dislikes: {vote.quantity?.dislike}</p>
 
               <h3>{articleData.data.title}</h3>
               <h6 className="text-slate-600">{articleData.data.subtitle}</h6>
-              <DialogTrigger asChild>
-                <Button onClick={() => deleteArticleHandler(newsId)}>
-                  Delete
-                </Button>
-              </DialogTrigger>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button
+                    variant={'destructive'}
+                    type="button"
+                    className="text-red-400"
+                  >
+                    Delete
+                    <TrashIcon className="h-6 w-6" />
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Are you sure?</DialogTitle>
+                    <DialogDescription>
+                      Deleting this will permamently remove the item from the
+                      database.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <DialogFooter>
+                    <Button
+                      type="button"
+                      onClick={() => deleteArticleHandler(newsId)}
+                      className="rounded-md bg-red-500 px-3 py-1 text-white hover:bg-red-600"
+                    >
+                      Delete
+                    </Button>
+                    <DialogTrigger asChild>
+                      <button type="button">Cancel</button>
+                    </DialogTrigger>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
             </div>
             <div>
               <p>Author:</p>
@@ -335,12 +379,11 @@ export default function NewsArticle({
                     <div className="flex items-center justify-end gap-2 bg-white p-3">
                       <Button
                         variant="default"
-                        disabled={!userData?._id}
+                        disabled={!userData?._id || newCommentState.data === ''}
                         onClick={addCommentHandler}
+                        className="w-1/3"
                       >
-                        <LoadingCircle
-                          isLoading={articleData.comments.isLoading}
-                        >
+                        <LoadingCircle isLoading={newCommentState.isLoading}>
                           Publish
                         </LoadingCircle>
                       </Button>
@@ -388,13 +431,40 @@ export default function NewsArticle({
                             (articleData.data &&
                               userData?.news.includes(articleData.data._id)) ||
                             userData?.role === 'Admin') && (
-                            <Button
-                              variant={'destructive'}
-                              className="hover:text-red-600"
-                              onClick={() => deleteCommentHandler(comment._id)}
-                            >
-                              <TrashIcon className="h-6 w-6" />
-                            </Button>
+                            <Dialog>
+                              <DialogTrigger asChild>
+                                <Button
+                                  variant={'destructive'}
+                                  type="button"
+                                  className="text-red-400"
+                                >
+                                  <TrashIcon className="h-6 w-6" />
+                                </Button>
+                              </DialogTrigger>
+                              <DialogContent>
+                                <DialogHeader>
+                                  <DialogTitle>Are you sure?</DialogTitle>
+                                  <DialogDescription>
+                                    Deleting this will permamently remove the
+                                    item from the database.
+                                  </DialogDescription>
+                                </DialogHeader>
+                                <DialogFooter>
+                                  <Button
+                                    type="button"
+                                    onClick={() =>
+                                      deleteCommentHandler(comment._id)
+                                    }
+                                    className="rounded-md bg-red-500 px-3 py-1 text-white hover:bg-red-600"
+                                  >
+                                    Delete
+                                  </Button>
+                                  <DialogTrigger asChild>
+                                    <button type="button">Cancel</button>
+                                  </DialogTrigger>
+                                </DialogFooter>
+                              </DialogContent>
+                            </Dialog>
                           )}
                         </div>
                       ))}

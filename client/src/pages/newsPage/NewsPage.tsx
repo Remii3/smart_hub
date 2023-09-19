@@ -17,7 +17,7 @@ import {
 } from '@components/UI/dialog';
 import MainContainer from '@layout/MainContainer';
 import { Button } from '@components/UI/button';
-import { NewsTypes, UserTypes } from '@customTypes/interfaces';
+import { NewsTypes } from '@customTypes/interfaces';
 import {
   useGetAccessDatabase,
   usePostAccessDatabase,
@@ -26,8 +26,6 @@ import { DATABASE_ENDPOINTS } from '../../data/endpoints';
 import { Label } from '@components/UI/label';
 import { Input } from '@components/UI/input';
 import { UserContext } from '@context/UserProvider';
-import LoadingCircle from '@components/Loaders/LoadingCircle';
-import { Skeleton } from '@components/UI/skeleton';
 import NewsArticle from './NewsArticle';
 
 interface NewArticleType {
@@ -35,34 +33,6 @@ interface NewArticleType {
   subtitle: string;
   headImage: null;
   content: string;
-}
-interface NewsArticleType extends NewArticleType {
-  _id: string;
-}
-
-interface SelectArticleType {
-  isLoading: boolean;
-  data: null | NewsArticleType;
-}
-type CommentsType = {
-  _id: string;
-  product_id: string;
-  user: UserTypes;
-  value: { rating: number; text: string };
-  created_at: string;
-};
-
-interface CommentTypes {
-  newCommentData: {
-    value: string;
-    isAdding: boolean;
-  };
-  comments: {
-    original: null | CommentsType[];
-    prepared: null | CommentsType[];
-  };
-  loadAll: boolean;
-  isLoading: boolean;
 }
 
 export default function NewsPage() {
@@ -107,13 +77,13 @@ export default function NewsPage() {
   useEffect(() => {
     fetchData();
   }, [fetchData]);
-  console.log('commentState');
+
   return (
     <MainContainer>
       <div>
         <span>News</span>
         <Dialog>
-          {userData?.role !== 'User' && (
+          {userData && userData.role !== 'User' && (
             <DialogTrigger asChild>
               <Button variant="default">+Add new</Button>
             </DialogTrigger>
@@ -197,7 +167,7 @@ export default function NewsPage() {
                     )}
                   </button>
                 </DialogTrigger>
-                <DialogContent className="h-[80%] max-h-[80%] overflow-auto">
+                <DialogContent className="h-full max-h-full w-screen overflow-y-auto sm:max-h-[80%]">
                   <NewsArticle
                     newsId={item._id}
                     deleteArticleHandler={deleteArticleHandler}

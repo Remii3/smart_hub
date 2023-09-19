@@ -1,22 +1,33 @@
 const User = require('../Models/user');
 
-const allUsers = async (req, res) => {
+const getAllUsers = async (req, res) => {
   try {
     const users = await User.find({});
-    res.status(200).json(users);
+    return res.status(200).json({ data: users });
   } catch (err) {
-    res.status(500).json('Failed fetching users');
+    return res
+      .status(500)
+      .json({ message: 'Failed fetching users data', error: err.message });
   }
 };
 
-const oneUser = async (req, res) => {
+const getOneUser = async (req, res) => {
   const { email } = req.body;
+
+  if (!email) {
+    return res
+      .status(422)
+      .json({ message: 'Provide email', error: err.message });
+  }
+
   try {
     const user = await User.findOne({ email });
-    res.status(200).json(user);
+    return res.status(200).json({ data: user });
   } catch (err) {
-    res.status(500).json('Failed fetching users');
+    return res
+      .status(500)
+      .json({ message: 'Failed fetching user data', error: err.message });
   }
 };
 
-module.exports = { allUsers, oneUser };
+module.exports = { getAllUsers, getOneUser };

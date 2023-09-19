@@ -13,11 +13,11 @@ const NewsSchema = mongoose.Schema({
       votes: [
         { user: { type: mongoose.Types.ObjectId, ref: 'User' }, vote: Number },
       ],
-      quantity: { likes: Number, dislikes: Number },
+      quantity: { like: Number, dislike: Number },
     },
     default: {
       votes: [],
-      quantity: { likes: 0, dislikes: 0 },
+      quantity: { like: 0, dislike: 0 },
     },
   },
 });

@@ -201,7 +201,7 @@ export default function ProductPage() {
       url: DATABASE_ENDPOINTS.COMMENT_ONE,
       body: {
         userId: userData?._id,
-        productId: prodId,
+        targetId: prodId,
         target: 'Product',
         value: { rating: 2, text: commentState.value },
       },

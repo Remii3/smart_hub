@@ -10,6 +10,14 @@ const salt = bcrypt.genSaltSync(12);
 const login = async (req, res) => {
   const { email, password } = req.body;
 
+  if (!email) {
+    return res.status(422).json({ message: 'Email is required' });
+  }
+
+  if (!password) {
+    return res.status(422).json({ message: 'Password is required' });
+  }
+
   const userDoc = await User.findOne({ email });
 
   if (userDoc) {
@@ -24,17 +32,17 @@ const login = async (req, res) => {
         {},
         (err, token) => {
           if (err) throw 'firts';
-          res.status(200).cookie('token', token).json(userDoc);
+          return res.status(200).cookie('token', token).json({ data: userDoc });
         },
       );
     } else {
-      res.status(422).json({
+      return res.status(422).json({
         name: 'password',
         message: 'Incorrect password',
       });
     }
   } else {
-    res.status(500).json({
+    return res.status(500).json({
       name: 'username',
       message: 'No account found',
     });
@@ -43,6 +51,18 @@ const login = async (req, res) => {
 
 const register = async (req, res) => {
   let { credentials, email, username, password } = req.body;
+
+  if (!password) {
+    return res.status(422).json({ message: 'Password is required' });
+  }
+
+  if (!email) {
+    return res.status(422).json({ message: 'Email is required' });
+  }
+
+  if (!username) {
+    return res.status(422).json({ message: 'Username is required' });
+  }
 
   try {
     const userId = new mongoose.Types.ObjectId();
@@ -103,7 +123,7 @@ const register = async (req, res) => {
       {},
       (err, token) => {
         if (err) throw 'firts';
-        res
+        return res
           .status(201)
           .cookie('token', token)
           .json({ message: 'Succesfully created an account' });
@@ -117,12 +137,11 @@ const register = async (req, res) => {
         message: Object.values(responseObject)[0] + ` already exists`,
       });
     }
-    console.log(err);
-    res.status(500).json({ message: 'Failed to register' });
+    return res.status(500).json({ message: 'Failed to register' });
   }
 };
 
-const myProfile = async (req, res) => {
+const getMyProfile = async (req, res) => {
   try {
     const {
       _id,
@@ -134,6 +153,7 @@ const myProfile = async (req, res) => {
       role,
       author_info,
       security_settings,
+      news,
     } = await User.findOne(
       {
         _id: req.user.user_id,
@@ -193,19 +213,25 @@ const myProfile = async (req, res) => {
       cart: cartData,
       role,
       security_settings,
+      news,
     };
 
     if (role !== 'User') {
       preparedUserData.author_info = preparedAuthorInfo;
     }
-    res.status(200).json(preparedUserData);
+    res.status(200).json({ data: preparedUserData });
   } catch (err) {
     res.status(500).json({ message: 'Failed to fetch user data' });
   }
 };
 
-const otherProfile = async (req, res) => {
+const getOtherProfile = async (req, res) => {
   const { userId } = req.query;
+
+  if (!userId) {
+    return res.status(422).json({ message: 'user id is required' });
+  }
+
   try {
     const { role, email, username, user_info, author_info } =
       await User.findOne({
@@ -239,14 +265,14 @@ const otherProfile = async (req, res) => {
     };
 
     if (role === 'Author') {
-      res.status(200).json({
+      return res.status(200).json({
         email,
         username,
         user_info,
         author_info: preparedAuthorInfo,
       });
     } else {
-      res.status(200).json({
+      return res.status(200).json({
         email,
         username,
         user_info,
@@ -254,11 +280,13 @@ const otherProfile = async (req, res) => {
       });
     }
   } catch (err) {
-    res.status(500).json({ message: 'Failed to fetch user data' });
+    return res
+      .status(500)
+      .json({ message: 'Failed to fetch user data', error: err.message });
   }
 };
 
-const guestProfile = async (req, res) => {
+const getGuestProfile = async (req, res) => {
   jwt.sign(
     {
       email: getRandomString(10),
@@ -274,7 +302,7 @@ const guestProfile = async (req, res) => {
   );
 };
 
-const allAuthors = async (req, res) => {
+const getAllAuthors = async (req, res) => {
   try {
     const authors = await User.find({ role: 'Author' });
     const authorsData = [];
@@ -286,13 +314,15 @@ const allAuthors = async (req, res) => {
       });
     }
 
-    res.status(200).json(authorsData);
+    return res.status(200).json({ data: authorsData });
   } catch (err) {
-    res.status(500).json({ message: 'Failed to fetch authors' });
+    return res
+      .status(500)
+      .json({ message: 'Failed to fetch authors', error: err.message });
   }
 };
 
-const allAdmins = async (req, res) => {
+const getAllAdmins = async (req, res) => {
   try {
     const admins = await User.find({ role: 'Admin' });
     const adminData = [];
@@ -304,14 +334,23 @@ const allAdmins = async (req, res) => {
       });
     }
 
-    res.status(200).json(adminData);
+    return res.status(200).json({ data: adminData });
   } catch (err) {
-    res.status(500).json({ message: 'Failed to fetch authors' });
+    return res
+      .status(500)
+      .json({ message: 'Failed to fetch authors', error: err.message });
   }
 };
 
-const addFollow = async (req, res) => {
+const addOneFollow = async (req, res) => {
   const { followGiverId, followReceiverId } = req.body;
+
+  if (!followGiverId) {
+    return res.status(422).json({ message: 'Giver id is required' });
+  }
+  if (!followReceiverId) {
+    return res.status(422).json({ message: 'Receiver id is required' });
+  }
 
   try {
     await User.updateOne(
@@ -322,14 +361,23 @@ const addFollow = async (req, res) => {
       { _id: followReceiverId },
       { $addToSet: { 'author_info.followers': followGiverId } },
     );
-    res.status(200).json('success');
+    return res.status(200).json({ message: 'success' });
   } catch (err) {
-    res.status(500).json({ message: 'Failed adding follow' });
+    return res
+      .status(500)
+      .json({ message: 'Failed adding follow', error: err.message });
   }
 };
 
-const removeFollow = async (req, res) => {
+const removeOneFollow = async (req, res) => {
   const { followGiverId, followReceiverId } = req.body;
+
+  if (!followGiverId) {
+    return res.status(422).json({ message: 'Giver id is required' });
+  }
+  if (!followReceiverId) {
+    return res.status(422).json({ message: 'Receiver id is required' });
+  }
 
   try {
     await User.updateOne(
@@ -340,14 +388,15 @@ const removeFollow = async (req, res) => {
       { _id: followReceiverId },
       { $pull: { 'author_info.followers': followGiverId } },
     );
-    res.status(200).json('success');
+    return res.status(200).json({ message: 'success' });
   } catch (err) {
-    res.status(500).json({ message: 'Failed removing follow' });
+    return res
+      .status(500)
+      .json({ message: 'Failed removing follow', error: err.message });
   }
 };
 
-const updateUser = async (req, res) => {
-  console.log(req);
+const updateOneUser = async (req, res) => {
   const { userEmail, fieldValue } = req.body;
   const { fieldPath } = req;
 
@@ -364,7 +413,7 @@ const updateUser = async (req, res) => {
       );
     }
 
-    res.status(200).json({ message: 'Successfully updated data' });
+    return res.status(200).json({ message: 'Successfully updated data' });
   } catch (err) {
     if (err.code === 11000) {
       return res.status(422).json({
@@ -372,8 +421,9 @@ const updateUser = async (req, res) => {
         message: Object.values(responseObject)[0] + ` already exists`,
       });
     } else {
-      console.log(err);
-      res.status(500).json({ message: 'Failed to update data' });
+      return res
+        .status(500)
+        .json({ message: 'Failed to update data', error: err.message });
     }
   }
 };
@@ -381,12 +431,12 @@ const updateUser = async (req, res) => {
 module.exports = {
   login,
   register,
-  myProfile,
-  otherProfile,
-  guestProfile,
-  allAuthors,
-  allAdmins,
-  addFollow,
-  removeFollow,
-  updateUser,
+  getMyProfile,
+  getOtherProfile,
+  getGuestProfile,
+  getAllAuthors,
+  getAllAdmins,
+  addOneFollow,
+  removeOneFollow,
+  updateOneUser,
 };

@@ -8,10 +8,10 @@ const {
   cartItemIncrement,
   addItemToCart,
   removeItemFromCart,
-  allCartItems,
+  getAllCartItems,
 } = require('../Controllers/cart.controller');
 
-router.get('/all', allCartItems);
+router.get('/all', getAllCartItems);
 
 router.post('/add', addItemToCart);
 router.post('/remove', removeItemFromCart);

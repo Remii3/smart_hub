@@ -2,24 +2,24 @@ const express = require('express');
 
 const router = express.Router();
 const {
-  addProduct,
-  updateProduct,
-  deleteProduct,
-  allProducts,
-  shopProducts,
-  auctionProducts,
-  oneProduct,
-  searchedProducts,
+  getAllProducts,
+  getShopProducts,
+  getAuctionProducts,
+  getOneProduct,
+  getSearchedProducts,
+  addOneProduct,
+  updateOneProduct,
+  deleteOneProduct,
 } = require('../Controllers/product.controller');
 const productSearchVerification = require('../Middleware/productSearchVerification.middleaware');
 
-router.get('/all', allProducts);
-router.get('/shop', shopProducts);
-router.get('/auction', auctionProducts);
-router.get('/one', oneProduct);
-router.get('/searched', productSearchVerification, searchedProducts);
+router.get('/all', getAllProducts);
+router.get('/shop', getShopProducts);
+router.get('/auction', getAuctionProducts);
+router.get('/one', getOneProduct);
+router.get('/searched', productSearchVerification, getSearchedProducts);
 
-router.post('/one', addProduct);
-router.post('/update', updateProduct);
-router.post('/delete', deleteProduct);
+router.post('/one', addOneProduct);
+router.post('/update', updateOneProduct);
+router.post('/delete', deleteOneProduct);
 module.exports = router;

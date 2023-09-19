@@ -1,25 +1,23 @@
 const express = require('express');
 const {
-  allNews,
-  oneNews,
-  addNews,
-  newsComments,
-  addVote,
-  removeVote,
-  getVotes,
-  deleteNews,
+  getAllNews,
+  getOneNews,
+  addOneNews,
+  deleteOneNews,
+  addOneVote,
+  removeOneVote,
+  getAllVotes,
 } = require('../Controllers/news.controller');
 
 const router = express.Router();
 
-router.get('/all', allNews);
-router.get('/one', oneNews);
-router.get('/comments', newsComments);
-router.get('/votes', getVotes);
+router.get('/all', getAllNews);
+router.get('/one', getOneNews);
+router.get('/votes', getAllVotes);
 
-router.post('/one', addNews);
-router.post('/delete', deleteNews);
-router.post('/vote-add', addVote);
-router.post('/vote-remove', removeVote);
+router.post('/one', addOneNews);
+router.post('/delete', deleteOneNews);
+router.post('/vote-add', addOneVote);
+router.post('/vote-remove', removeOneVote);
 
 module.exports = router;

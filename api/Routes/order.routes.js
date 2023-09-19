@@ -2,14 +2,14 @@ const express = require('express');
 
 const router = express.Router();
 const {
-  addOrder,
-  allOrders,
-  oneOrder,
+  getAllOrders,
+  getOneOrder,
+  addOneOrder,
 } = require('../Controllers/order.controller');
 
-router.get('/all', allOrders);
-router.get('/one', oneOrder);
+router.get('/all', getAllOrders);
+router.get('/one', getOneOrder);
 
-router.post('/one', addOrder);
+router.post('/one', addOneOrder);
 
 module.exports = router;
