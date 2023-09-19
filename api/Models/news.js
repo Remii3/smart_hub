@@ -9,9 +9,16 @@ const NewsSchema = mongoose.Schema({
   comments: [{ type: mongoose.Types.ObjectId, ref: 'Comment' }],
   content: { type: String },
   rating: {
-    type: { liked: Number, disliked: Number },
-    required: true,
-    default: { liked: 0, disliked: 0 },
+    type: {
+      votes: [
+        { user: { type: mongoose.Types.ObjectId, ref: 'User' }, vote: Number },
+      ],
+      quantity: { likes: Number, dislikes: Number },
+    },
+    default: {
+      votes: [],
+      quantity: { likes: 0, dislikes: 0 },
+    },
   },
 });
 

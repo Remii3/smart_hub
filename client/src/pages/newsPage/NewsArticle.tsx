@@ -1,7 +1,14 @@
 import LoadingCircle from '@components/Loaders/LoadingCircle';
 import { Button } from '@components/UI/button';
+import { DialogTrigger } from '@components/UI/dialog';
 import { Input } from '@components/UI/input';
 import { Skeleton } from '@components/UI/skeleton';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@components/UI/tooltip';
 import { UserContext } from '@context/UserProvider';
 import { UserTypes } from '@customTypes/interfaces';
 import { COMMENT_TARGET, DATABASE_ENDPOINTS } from '@data/endpoints';
@@ -18,7 +25,10 @@ import {
   useState,
 } from 'react';
 import { Link } from 'react-router-dom';
-
+interface RatingTypes {
+  vote: string | null;
+  quantity: { likes: number; dislikes: number } | null;
+}
 interface ArticleDataTypes {
   isLoading: boolean;
   data: null | {
@@ -28,6 +38,10 @@ interface ArticleDataTypes {
     subtitle: string;
     headImage: null;
     content: string;
+    rating: {
+      votes: { user: string; vote: number }[];
+      quantity: { likes: number; dislikes: number };
+    };
   };
   comments: {
     data:
@@ -49,7 +63,13 @@ interface CommentDataTypes {
   isLoading: boolean;
 }
 
-export default function NewsArticle({ newsId }: { newsId: string }) {
+export default function NewsArticle({
+  newsId,
+  deleteArticleHandler,
+}: {
+  newsId: string;
+  deleteArticleHandler: (newsId: string) => void;
+}) {
   const [articleData, setArticleData] = useState<ArticleDataTypes>({
     isLoading: false,
     data: null,
@@ -66,6 +86,29 @@ export default function NewsArticle({ newsId }: { newsId: string }) {
   });
 
   const { userData } = useContext(UserContext);
+
+  const [vote, setVote] = useState<RatingTypes>({
+    vote: null,
+    quantity: null,
+  });
+
+  const checkUserVoted = (votes: { user: string; vote: number }[]) => {
+    const voted = votes.find((item) => item.user === userData?._id);
+    let result = null;
+    if (voted) {
+      result = voted.vote === 1 ? 'like' : 'dislike';
+    }
+    return result;
+  };
+
+  const fetchVotes = async () => {
+    const { data } = await useGetAccessDatabase({
+      url: DATABASE_ENDPOINTS.NEWS_VOTES_ALL,
+      params: { newsId },
+    });
+    const userVote = checkUserVoted(data.rating.votes);
+    setVote({ vote: userVote, quantity: data.rating.quantity });
+  };
 
   const commentsQuantity = 5;
 
@@ -85,6 +128,8 @@ export default function NewsArticle({ newsId }: { newsId: string }) {
         isLoading: false,
       };
     });
+    const userVote = checkUserVoted(data.data.rating.votes);
+    setVote({ vote: userVote, quantity: data.data.rating.quantity });
   }, []);
 
   const fetchUpdateComments = async () => {
@@ -162,30 +207,30 @@ export default function NewsArticle({ newsId }: { newsId: string }) {
   useEffect(() => {
     fetchData();
   }, [fetchData]);
-  console.log('first');
+
   const preparedComments =
     !articleData.comments.showAll && articleData.comments.data
       ? articleData.comments.data.slice(0, 5)
       : articleData.comments.data;
 
-  const [vote, setVote] = useState(null); // null means no vote has been cast yet
-
   const handleVote = async (voteType: any) => {
-    if (voteType === vote) {
-      setVote(null);
+    console.log('voteType', voteType);
+    if (voteType === vote.vote) {
       await usePostAccessDatabase({
         url: DATABASE_ENDPOINTS.NEWS_VOTE_REMOVE,
-        body: { vote: voteType },
+        body: { userId: userData?._id, newsId, vote: voteType },
       });
+      await fetchVotes();
     } else {
-      setVote(voteType);
       await usePostAccessDatabase({
         url: DATABASE_ENDPOINTS.NEWS_VOTE_ADD,
-        body: { vote: voteType },
+        body: { userId: userData?._id, newsId, vote: voteType },
       });
+      await fetchVotes();
     }
   };
 
+  console.log('vote: ', vote);
   return (
     <div>
       {articleData.isLoading && !articleData.data && (
@@ -199,23 +244,59 @@ export default function NewsArticle({ newsId }: { newsId: string }) {
         <div>
           <div className="space-y-6">
             <div className="space-y-2">
-              <button
-                onClick={() => handleVote('like')}
-                disabled={vote === 'dislike'}
-              >
-                Like
-              </button>
-              <button
-                onClick={() => handleVote('dislike')}
-                disabled={vote === 'like'}
-              >
-                Dislike
-              </button>
-              <p>Likes: {vote === 'like' ? 1 : 0}</p>
-              <p>Dislikes: {vote === 'dislike' ? 1 : 0}</p>
+              {userData ? (
+                <div>
+                  <button
+                    onClick={() => handleVote('like')}
+                    disabled={vote.vote === 'dislike'}
+                  >
+                    Like
+                  </button>
+                  <button
+                    onClick={() => handleVote('dislike')}
+                    disabled={!userData || vote.vote === 'like'}
+                  >
+                    Dislike
+                  </button>
+                </div>
+              ) : (
+                <div>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button className="text-slate-400" disabled={true}>
+                          Like
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Sign in to add vote</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button className="text-slate-400" disabled={true}>
+                          Dislike
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Sign in to add vote</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </div>
+              )}
+              <p>Likes: {vote.quantity?.likes}</p>
+              <p>Dislikes: {vote.quantity?.dislikes}</p>
 
               <h3>{articleData.data.title}</h3>
               <h6 className="text-slate-600">{articleData.data.subtitle}</h6>
+              <DialogTrigger asChild>
+                <Button onClick={() => deleteArticleHandler(newsId)}>
+                  Delete
+                </Button>
+              </DialogTrigger>
             </div>
             <div>
               <p>Author:</p>
@@ -269,21 +350,16 @@ export default function NewsArticle({ newsId }: { newsId: string }) {
               </section>
               {articleData.comments.isLoading && (
                 <div className="space-y-8">
-                  {[...Array(3)].map((el, index) => (
-                    <Skeleton
-                      key={index}
-                      className="flex h-[92px] w-full items-center px-4"
-                    >
-                      <div className="space-y-3">
-                        <Skeleton className="h-3 w-5" />
-                        <Skeleton className="h-3 w-10" />
-                        <Skeleton className="h-3 w-14" />
-                      </div>
-                    </Skeleton>
-                  ))}
+                  <Skeleton className="flex h-[92px] w-full items-center px-4">
+                    <div className="space-y-3">
+                      <Skeleton className="h-3 w-5" />
+                      <Skeleton className="h-3 w-10" />
+                      <Skeleton className="h-3 w-14" />
+                    </div>
+                  </Skeleton>
                 </div>
               )}
-              {!articleData.comments.isLoading && articleData.comments.data ? (
+              {!articleData.comments.isLoading && articleData.comments.data && (
                 <section>
                   <div>
                     {preparedComments &&
@@ -334,9 +410,9 @@ export default function NewsArticle({ newsId }: { newsId: string }) {
                     )}
                   </div>
                 </section>
-              ) : (
-                <div>No data</div>
               )}
+              {!articleData.comments.isLoading &&
+                !articleData.comments.data && <div>No data</div>}
             </div>
           </div>
         </div>

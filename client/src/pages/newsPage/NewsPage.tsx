@@ -96,6 +96,14 @@ export default function NewsPage() {
     });
   };
 
+  const deleteArticleHandler = async (newsId: string) => {
+    await usePostAccessDatabase({
+      url: DATABASE_ENDPOINTS.NEWS_DELETE,
+      body: { userId: userData?._id, newsId },
+    });
+    await fetchData();
+  };
+
   useEffect(() => {
     fetchData();
   }, [fetchData]);
@@ -190,7 +198,10 @@ export default function NewsPage() {
                   </button>
                 </DialogTrigger>
                 <DialogContent className="h-[80%] max-h-[80%] overflow-auto">
-                  <NewsArticle newsId={item._id} />
+                  <NewsArticle
+                    newsId={item._id}
+                    deleteArticleHandler={deleteArticleHandler}
+                  />
                 </DialogContent>
               </Dialog>
             </div>
