@@ -1,4 +1,10 @@
-import { ChangeEvent, useContext, useReducer, useState } from 'react';
+import {
+  ChangeEvent,
+  FormEvent,
+  useContext,
+  useReducer,
+  useState,
+} from 'react';
 import axios from 'axios';
 
 import { UserContext } from '@context/UserProvider';
@@ -233,14 +239,23 @@ const changeDataHandler = (state: State, action: Action): State => {
 
 export default function EditUserData() {
   const { userData, changeUserData } = useContext(UserContext);
-  const [changingData, setChangingData] = useState({
-    isChanging: false,
-    name: '',
-  });
+  const [openDialog, setOpenDialog] = useState(false);
   const [newUserDatastate, dispatch] = useReducer(
     changeDataHandler,
     initialNewUserDataState
   );
+
+  const openChangeHandler = (state: boolean) => {
+    if (state) {
+      setOpenDialog(true);
+    } else {
+      setOpenDialog(false);
+    }
+  };
+  const closeDialogHandler = () => {
+    setOpenDialog(false);
+  };
+
   const newDataSwitchHandler = (
     newDataName: NewDataNameTypes,
     flag: boolean
@@ -265,32 +280,45 @@ export default function EditUserData() {
       payload: { label: e.target.name, value: e.target.value, mainLabel },
     });
   };
-  const uploadNewUserDataHandler = async (name: NewDataNameTypes) => {
+  const uploadNewUserDataHandler = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    const name = e.currentTarget.name;
+    console.log('name', name);
     if (!userData) return;
+
     try {
       dispatch({
         type: ActionKind.ClearError,
-        payload: { label: name, value: null },
+        payload: { label: e.currentTarget.name, value: null },
       });
-      await usePostAccessDatabase({
+      const { error } = await usePostAccessDatabase({
         url: DATABASE_ENDPOINTS.USER_UPDATE,
         body: {
           userEmail: userData.email,
-          fieldKey: name,
-          fieldValue: newUserDatastate.data[name],
+          fieldKey: e.currentTarget.name,
+          fieldValue: newUserDatastate.data[e.currentTarget.name],
         },
       });
-      const { data } = await useGetAccessDatabase({
-        url: DATABASE_ENDPOINTS.USER_PROFILE,
-      });
-      changeUserData(data);
-      setChangingData(() => {
-        return {
-          isChanging: false,
-          name: name ?? '',
-        };
-      });
+      if (error) {
+        console.log('ERROR');
+        console.log(name);
+        dispatch({
+          type: ActionKind.ErrorChange,
+          payload: {
+            label: name,
+            value: error,
+          },
+        });
+      } else {
+        const { data } = await useGetAccessDatabase({
+          url: DATABASE_ENDPOINTS.USER_PROFILE,
+        });
+        changeUserData(data);
+        closeDialogHandler();
+      }
     } catch (err: any) {
+      console.log('err: ', err);
       dispatch({
         type: ActionKind.ErrorChange,
         payload: {
@@ -300,17 +328,17 @@ export default function EditUserData() {
       });
     }
   };
-
+  console.log(newUserDatastate);
   const changeDataDialogHandler = (
     actionType: true | false,
     name?: NewDataNameTypes
   ) => {
-    setChangingData((prevState) => {
-      return {
-        isChanging: actionType || !prevState.isChanging,
-        name: name ?? '',
-      };
-    });
+    // setChangingData((prevState) => {
+    //   return {
+    //     isChanging: actionType || !prevState.isChanging,
+    //     name: name ?? '',
+    //   };
+    // });
     if (name) {
       newDataSwitchHandler(name, true);
     }
@@ -338,21 +366,25 @@ export default function EditUserData() {
               />
             </fieldset>
             <div className="flex justify-between gap-4">
-              <Dialog>
+              <Dialog open={openDialog} onOpenChange={openChangeHandler}>
                 <DialogTrigger asChild>
                   <Button
                     type="button"
                     variant="link"
                     size="sm"
                     className="px-0"
-                    onClick={() => changeDataDialogHandler(true, 'email')}
+                    // onClick={() => changeDataDialogHandler(true, 'email')}
                   >
                     Change email
                   </Button>
                 </DialogTrigger>
                 <DialogContent>
                   <div>
-                    <form className="mb-4">
+                    <form
+                      className="mb-4"
+                      name="email"
+                      onSubmit={(e) => uploadNewUserDataHandler(e)}
+                    >
                       <CustomInput
                         autoComplete="email"
                         name="email"
@@ -365,16 +397,14 @@ export default function EditUserData() {
                         inputValue={newUserDatastate.data.email}
                         onChange={(e) => newUserDataChangeHandler(e)}
                       />
+                      <div className="flex w-full justify-end">
+                        {/* <DialogTrigger asChild> */}
+                        <Button variant="default" size="default" type="submit">
+                          Accept
+                        </Button>
+                        {/* </DialogTrigger> */}
+                      </div>
                     </form>
-                    <div className="flex w-full justify-end">
-                      <Button
-                        variant="default"
-                        size="default"
-                        onClick={() => uploadNewUserDataHandler('email')}
-                      >
-                        Accept
-                      </Button>
-                    </div>
                   </div>
                 </DialogContent>
               </Dialog>
