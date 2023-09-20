@@ -1,3 +1,5 @@
+import MainContainer from '@layout/MainContainer';
+
 export default function CollectionsPage() {
-  return <div>CollectionsPage</div>;
+  return <MainContainer>Collection Page</MainContainer>;
 }

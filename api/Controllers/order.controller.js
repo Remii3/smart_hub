@@ -3,39 +3,70 @@ const Order = require('../Models/order');
 const Product = require('../Models/product');
 const User = require('../Models/user');
 
-const getOrders = async (req, res) => {
-  const { userId } = req.body;
+const getAllOrders = async (req, res) => {
+  const { userId } = req.query;
+
+  if (!userId) {
+    return res.status(422).json({ message: 'Provide user id' });
+  }
+
   try {
-    const orders = await Order.find({ buyerId: userId });
-    res.status(200).json(orders);
+    const orders = await Order.find({ buyerId: userId }).populate(
+      'products.product',
+    );
+    return res.status(200).json({ data: orders });
   } catch (err) {
-    res.status(500).json({
+    return res.status(500).json({
       message: 'Failed fetching orders',
+      error: err.message,
     });
   }
 };
 
 const getOneOrder = async (req, res) => {
-  const { userId, orderId } = req.body;
+  const { userId, orderId } = req.query;
+
+  if (!userId) {
+    return res.status(422).json({ message: 'Provide user id' });
+  }
+
+  if (!orderId) {
+    return res.status(422).json({ message: 'Provide order id' });
+  }
+
   try {
-    const order = await Order.find({ buyerId: userId, _id: orderId });
-    res.status(200).json(order);
+    const order = await Order.findOne({
+      buyer_id: userId,
+      _id: orderId,
+    }).populate('products.product');
+
+    return res.status(200).json({ data: order });
   } catch (err) {
-    res.status(500).json({
+    return res.status(500).json({
       message: 'Failed fetching orders',
+      error: err.message,
     });
   }
 };
 
-const addOrder = async (req, res) => {
+const addOneOrder = async (req, res) => {
+  const { buyerId, items } = req.body;
+  if (!buyerId) {
+    return res.status(422).json({ message: 'Provide buyer id' });
+  }
   try {
-    const { buyerId, items } = req.body;
-
     const orderId = new mongoose.Types.ObjectId();
+    const mappedItems = items.map(item => {
+      return {
+        product: item.productData,
+        in_cart_quantity: item.inCartQuantity,
+        total_price: item.totalPrice,
+      };
+    });
     await Order.create({
       _id: orderId,
       buyer_id: buyerId,
-      products: items,
+      products: mappedItems,
     });
     await User.updateOne({ _id: buyerId }, { $push: { orders: orderId } });
     for (const item of items) {
@@ -62,11 +93,12 @@ const addOrder = async (req, res) => {
       }
     }
 
-    res.status(201).json({ message: 'Success' });
+    return res.status(201).json({ message: 'Success' });
   } catch (err) {
-    console.log(err);
-    res.status(500).json({ message: 'Failed adding new order', err });
+    return res
+      .status(500)
+      .json({ message: 'Failed adding new order', error: err.message });
   }
 };
 
-module.exports = { getOrders, addOrder, getOneOrder };
+module.exports = { getAllOrders, getOneOrder, addOneOrder };

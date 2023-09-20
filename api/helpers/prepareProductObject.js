@@ -15,6 +15,8 @@ const prepareProductObject = product => {
     currency,
     shop_info,
     auction_info,
+    seller_data,
+    deleted,
   } = product;
 
   const preparedObject = {
@@ -31,6 +33,8 @@ const prepareProductObject = product => {
     sold,
     comments,
     currency,
+    seller_data,
+    deleted,
   };
 
   if (shop_info) {
@@ -39,7 +43,7 @@ const prepareProductObject = product => {
 
   if (auction_info) {
     preparedObject.auction_info = {
-      starting_price: auction_info.starting_price,
+      starting_price: parseFloat(auction_info.starting_price),
       current_price: auction_info.current_price,
       auction_end_date: auction_info.auction_end_date,
     };

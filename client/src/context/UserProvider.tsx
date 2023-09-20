@@ -1,7 +1,16 @@
 import axios from 'axios';
-import { createContext, ReactNode, useEffect, useMemo, useState } from 'react';
+import {
+  createContext,
+  ReactNode,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 
-import { AuthorTypes } from '../types/interfaces';
+import { AuthorTypes } from '@customTypes/interfaces';
+import { useGetAccessDatabase } from '../hooks/useAaccessDatabase';
+import { DATABASE_ENDPOINTS } from '../data/endpoints';
 
 type ContextTypes = {
   userData: null | AuthorTypes;
@@ -17,10 +26,13 @@ export const UserContext = createContext<ContextTypes>({
 
 export default function UserProvider({ children }: { children: ReactNode }) {
   const [userData, setUserData] = useState<null | AuthorTypes>(null);
-  const fetchUserData = async () => {
-    const res = await axios.get('/user/myProfile');
-    setUserData(res.data);
-  };
+
+  const fetchUserData = useCallback(async () => {
+    const { data } = await useGetAccessDatabase({
+      url: DATABASE_ENDPOINTS.USER_PROFILE,
+    });
+    setUserData(data);
+  }, []);
 
   const changeUserData = (data: AuthorTypes | null) => {
     setUserData(data);

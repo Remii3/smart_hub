@@ -1,15 +1,16 @@
 const mongoose = require('mongoose');
-
 const ShopDataSchema = mongoose.Schema({
+  seller_data: {
+    type: { _id: mongoose.Types.ObjectId, pseudonim: String },
+    ref: 'User',
+  },
   title: { type: String, required: true },
   description: { type: String },
   img: { type: Buffer },
   img_type: { type: String },
   categories: [
     {
-      type: {
-        _id: mongoose.Types.ObjectId,
-      },
+      type: mongoose.Types.ObjectId,
       ref: 'Category',
     },
   ],
@@ -26,9 +27,10 @@ const ShopDataSchema = mongoose.Schema({
   },
   auction_info: {
     starting_price: { type: mongoose.Types.Decimal128 },
-    current_price: { type: mongoose.Types.Decimal128 },
-    auction_end_date: { type: Date },
+    auction_end_date: { type: String },
   },
+  deleted: { type: Boolean, required: true, default: false },
+  expireAt: { type: Date, expires: 0 },
 });
 
 const ShopDataModel = mongoose.model('Product', ShopDataSchema);

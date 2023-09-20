@@ -1,31 +1,33 @@
 const express = require('express');
 
 const router = express.Router();
-
 const checkAuth = require('../Middleware/checkAuth.middleware');
 const {
-  signIn,
-  signUp,
-  myProfile,
-  newData,
-  guestData,
-  otherUserData,
-  addFollow,
-  removeFollow,
+  login,
+  register,
+  getMyProfile,
+  getOtherProfile,
+  getGuestProfile,
   getAllAuthors,
+  getAllAdmins,
+  addOneFollow,
+  removeOneFollow,
+  updateOneUser,
 } = require('../Controllers/user.controller');
 const checkSignUpData = require('../Middleware/checkSignUpData.middleware');
 const checkSignInData = require('../Middleware/checkSignInData.middleware');
+const userPathUpdate = require('../Middleware/userPathUpdate.middleware');
 
-router.get('/myProfile', checkAuth, myProfile);
-router.get('/guest', guestData);
-router.get('/otherUser', otherUserData);
+router.get('/profile', checkAuth, getMyProfile);
+router.get('/other-profile', getOtherProfile);
+router.get('/guest', getGuestProfile);
 router.get('/authors', getAllAuthors);
+router.get('/admins', getAllAdmins);
 
-router.post('/register', checkSignUpData, signUp);
-router.post('/login', checkSignInData, signIn);
-router.post('/newData', newData);
-router.post('/add-follow', addFollow);
-router.post('/remove-follow', removeFollow);
+router.post('/login', checkSignInData, login);
+router.post('/register', checkSignUpData, register);
+router.post('/follow-add', addOneFollow);
+router.post('/follow-remove', removeOneFollow);
+router.post('/update', userPathUpdate, updateOneUser);
 
 module.exports = router;

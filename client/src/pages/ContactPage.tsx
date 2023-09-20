@@ -1,3 +1,5 @@
+import MainContainer from '@layout/MainContainer';
+
 export default function ContactPage() {
-  return <div>ContactPage</div>;
+  return <MainContainer>ContactPage</MainContainer>;
 }

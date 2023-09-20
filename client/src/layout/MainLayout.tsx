@@ -1,32 +1,37 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
+import axios from 'axios';
+import { useLocation } from 'react-router-dom';
 import Footer from './Footer';
 import Header from './Header';
+import AppRoutes from '../AppRoutes';
+import { useGetAccessDatabase } from '../hooks/useAaccessDatabase';
+import { DATABASE_ENDPOINTS } from '../data/endpoints';
 
-type PropsType = {
-  children: React.ReactNode;
-};
+export default function MainLayout() {
+  const { pathname } = useLocation();
 
-function MainLayout({ children }: PropsType) {
-  const [currentPathname, setCurrentPathname] = useState('');
-  const isMainPage = currentPathname === '/';
+  window.onunload = () => {
+    window.scrollTo(0, 0);
+  };
 
   useEffect(() => {
-    setCurrentPathname(window.location.pathname);
-  }, [children]);
+    window.scrollTo(0, 0);
+
+    if (
+      !document.cookie.match('token') &&
+      !document.cookie.match('guestToken')
+    ) {
+      useGetAccessDatabase({ url: DATABASE_ENDPOINTS.USER_GUEST });
+    }
+  }, [pathname]);
 
   return (
     <div id="mainContainer" className="relative overflow-clip bg-white">
-      <Header currentPathname={currentPathname} />
-      <main
-        className={`${
-          isMainPage ? '' : 'mt-16'
-        } h-full min-h-[calc(100vh-64px-284px)] w-full`}
-      >
-        {children}
+      <Header currentPathname={pathname} />
+      <main className="h-full min-h-[calc(100vh-64px-284px)] w-full">
+        <AppRoutes />
       </main>
       <Footer />
     </div>
   );
 }
-
-export default MainLayout;

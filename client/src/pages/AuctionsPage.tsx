@@ -1,18 +1,11 @@
-import axios from 'axios';
-import { useEffect, useState } from 'react';
-import BasicProductCollection from '../components/collections/BasicProductCollection';
-import { UnknownProductTypes } from '../types/interfaces';
+import { useState } from 'react';
+import BasicProductCollection from '@features/productCollections/BasicProductCollection';
+import { UnknownProductTypes } from '@customTypes/interfaces';
 
 export default function AuctionsPage() {
   const [auctionProducts, setAuctionProducts] = useState<UnknownProductTypes[]>(
     []
   );
-
-  useEffect(() => {
-    axios
-      .get('/product/auction-products')
-      .then((res) => setAuctionProducts(res.data));
-  }, []);
 
   return (
     <div className="min-h-screen">
@@ -22,7 +15,6 @@ export default function AuctionsPage() {
           <BasicProductCollection
             category="adventure"
             title="New collection"
-            allProducts={auctionProducts}
             marketPlace="Auction"
           />
         )}
@@ -32,7 +24,6 @@ export default function AuctionsPage() {
             title="New title"
             showMore
             subTitle="adsasd asdasd"
-            allProducts={auctionProducts}
             marketPlace="Auction"
           />
         )}
@@ -47,7 +38,6 @@ export default function AuctionsPage() {
           dignissimos facere assumenda in accusamus dolor nihil, minima
           neque beatae.
         "
-            allProducts={auctionProducts}
             marketPlace="Auction"
           />
         )}

@@ -30,6 +30,13 @@ const UserSchema = new mongoose.Schema({
   following: [{ type: mongoose.Types.ObjectId, ref: 'User' }],
   orders: [{ type: mongoose.Types.ObjectId, ref: 'Order' }],
   role: { type: String, default: 'User', enum: ['User', 'Author', 'Admin'] },
+  news: { type: [mongoose.Types.ObjectId] },
+  security_settings: {
+    type: {
+      hide_private_information: Boolean,
+    },
+    default: { hide_private_information: false },
+  },
   author_info: {
     type: {
       categories: [{ type: String }],
@@ -39,7 +46,7 @@ const UserSchema = new mongoose.Schema({
       avg_products_grade: { type: Number },
       sold_books_quantity: { type: Number },
       my_products: [{ type: mongoose.Types.ObjectId, ref: 'Product' }],
-      followers: { type: Number },
+      followers: [{ type: mongoose.Types.ObjectId, ref: 'User' }],
     },
   },
 });

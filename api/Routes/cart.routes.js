@@ -3,20 +3,20 @@ const express = require('express');
 const router = express.Router();
 
 const {
-  addToCart,
-  removeFromCart,
-  getCart,
   cartItemDecrement,
   initiatePayment,
   cartItemIncrement,
+  addItemToCart,
+  removeItemFromCart,
+  getAllCartItems,
 } = require('../Controllers/cart.controller');
 
-router.get('/all', getCart);
+router.get('/all', getAllCartItems);
 
-router.post('/add', addToCart);
-router.post('/remove-one', removeFromCart);
-router.post('/increment-one', cartItemIncrement);
-router.post('/decrement-one', cartItemDecrement);
+router.post('/add', addItemToCart);
+router.post('/remove', removeItemFromCart);
+router.post('/increment', cartItemIncrement);
+router.post('/decrement', cartItemDecrement);
 router.post('/create-payment-intent', initiatePayment);
 
 module.exports = router;

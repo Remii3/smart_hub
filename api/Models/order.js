@@ -2,17 +2,17 @@ const mongoose = require('mongoose');
 
 const OrderSchema = mongoose.Schema({
   buyer_id: { type: mongoose.Types.ObjectId, ref: 'User' },
+  seller_id: { type: mongoose.Types.ObjectId, ref: 'User' },
   products: [
     {
       type: {
-        product: mongoose.Types.ObjectId,
+        product: { type: mongoose.Types.ObjectId, ref: 'Product' },
         in_cart_quantity: Number,
         total_price: Number,
       },
-      ref: 'Product',
     },
   ],
-  created_at: { type: Date },
+  created_at: { type: Date, default: Date.now },
 });
 
 const OrderModel = mongoose.model('Order', OrderSchema);

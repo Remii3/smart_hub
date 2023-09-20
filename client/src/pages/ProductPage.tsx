@@ -5,32 +5,81 @@ import {
   useContext,
   useCallback,
 } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import { UnknownProductTypes } from '../types/interfaces';
-import { UserContext } from '../context/UserProvider';
-import CustomDialog from '../components/UI/headlessUI/CustomDialog';
-import ProductImage from '../components/product/ProductImage';
-import ProductPill from '../components/product/ProductPill';
-import StarRating from '../components/product/StarRating';
-import ProductForm from '../components/product/ProductForm';
-import PrimaryBtn from '../components/UI/Btns/PrimaryBtn';
+import {
+  Link,
+  useLocation,
+  useNavigate,
+  useSearchParams,
+} from 'react-router-dom';
+import { AuthorTypes, UnknownProductTypes } from '@customTypes/interfaces';
+import { UserContext } from '@context/UserProvider';
+import ProductImage from '@features/product/ProductImage';
+import ProductPill from '@features/product/ProductPill';
+import StarRating from '@features/product/StarRating';
+import ProductForm from '@features/product/ProductForm';
+import { Button } from '@components/UI/button';
+import LoadingCircle from '@components/Loaders/LoadingCircle';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@components/UI/dialog';
+import {
+  useGetAccessDatabase,
+  usePostAccessDatabase,
+} from '../hooks/useAaccessDatabase';
+import { DATABASE_ENDPOINTS } from '../data/endpoints';
+
+interface ProductTypes {
+  isLoading: boolean;
+  data: null | UnknownProductTypes;
+}
+interface ProductEditTypes {
+  isMyProduct: boolean;
+  isEditing: boolean;
+  newData: {
+    title: null | string;
+    price: null | number;
+    categories: null | { value: string; label: string; _id: string }[];
+    authors: null | AuthorTypes[];
+    quantity: null | number;
+    description: null | string;
+  };
+}
+
+interface CommentTypes {
+  value: string;
+  isAdding: boolean;
+}
 
 export default function ProductPage() {
-  const [isFetchingData, setIsFetchingData] = useState(false);
-  const [isMyProduct, setIsMyProduct] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [productData, setProductData] = useState<UnknownProductTypes>();
-  const [newData, setNewData] = useState({
-    newTitle: productData?.title,
-    newPrice: productData?.shop_info?.price,
-    newDescription: productData?.description,
-    newQuantity: productData?.quantity,
+  const [productState, setProductState] = useState<ProductTypes>({
+    isLoading: false,
+    data: null,
   });
+  const [productEditState, setProductEditState] = useState<ProductEditTypes>({
+    isMyProduct: false,
+    isEditing: false,
+    newData: {
+      title: null,
+      price: null,
+      categories: null,
+      authors: null,
+      quantity: null,
+      description: null,
+    },
+  });
+  const [commentState, setCommentState] = useState<CommentTypes>({
+    value: '',
+    isAdding: false,
+  });
+
+  const { fetchUserData } = useContext(UserContext);
   const { userData } = useContext(UserContext);
-  const [newComment, setNewComment] = useState('');
-  const [isAddingComment, setIsAddingComment] = useState(false);
 
   const navigate = useNavigate();
   const path = useLocation();
@@ -39,90 +88,129 @@ export default function ProductPage() {
   prodId = path.pathname.split('/');
   prodId = prodId[prodId.length - 1];
 
-  const fetchProductData = useCallback(() => {
-    setIsFetchingData(true);
-    axios
-      .get('/product/product', { params: { productId: prodId } })
-      .then((res) => {
-        setNewData({
-          newDescription: res.data.description,
-          newPrice: res.data.price,
-          newTitle: res.data.title,
-          newQuantity: res.data.quantity,
-        });
-        setProductData(res.data);
-      });
-    setIsFetchingData(false);
+  const fetchData = useCallback(async () => {
+    setProductState((prevState) => {
+      return { ...prevState, isLoading: true };
+    });
+    const { data } = await useGetAccessDatabase({
+      url: DATABASE_ENDPOINTS.PRODUCT_ONE,
+      params: { productId: prodId },
+    });
+
+    setProductEditState((prevState) => {
+      return {
+        ...prevState,
+        newData: {
+          title: data.title,
+          authors: data.authors,
+          categories: data.categories,
+          price: data.shop_info.price,
+          quantity: data.quantity,
+          description: data.description,
+        },
+      };
+    });
+    setProductState({ data, isLoading: false });
   }, [prodId]);
 
   useEffect(() => {
-    fetchProductData();
-  }, [fetchProductData]);
+    fetchData();
+  }, [fetchData]);
 
   useEffect(() => {
     if (
       userData &&
       userData.role !== 'User' &&
       userData.author_info.my_products.find(
-        (product: UnknownProductTypes) => product._id === productData?._id
+        (product: UnknownProductTypes) => product._id === productState.data?._id
       )
     ) {
-      setIsMyProduct(true);
+      setProductEditState((prevState) => {
+        return { ...prevState, isMyProduct: true };
+      });
     }
-  }, [userData, productData]);
+  }, [userData, productState]);
 
   const newDataChangeHandler = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     e.preventDefault();
-    setNewData((prevState) => {
-      return { ...prevState, [e.target.name]: e.target.value };
+    setProductEditState((prevState) => {
+      return {
+        ...prevState,
+        newData: {
+          ...prevState.newData,
+          [e.target.name]: e.target.value,
+        },
+      };
     });
   };
 
   const updateProductData = async () => {
-    await axios.post('/product/update', {
-      _id: productData?._id,
-      title: newData.newTitle,
-      price: newData.newPrice,
-      description: newData.newDescription,
-      quantity: newData.newQuantity,
-    });
-    fetchProductData();
-    setIsEditing(false);
+    if (productState.data) {
+      setProductEditState((prevState) => {
+        return { ...prevState, isEditing: true };
+      });
+      await usePostAccessDatabase({
+        url: DATABASE_ENDPOINTS.PRODUCT_UPDATE,
+        body: {
+          _id: productState.data._id,
+          market_place: productState.data.market_place,
+          title: productEditState.newData.title,
+          price: productEditState.newData.price,
+          quantity: productEditState.newData.quantity,
+          description: productEditState.newData.description,
+        },
+      });
+      await fetchData();
+      setProductEditState((prevState) => {
+        return { ...prevState, isEditing: false };
+      });
+    }
   };
 
   const toggleEditting = () => {
-    if (isEditing) {
-      fetchProductData();
-      setIsEditing(false);
+    if (productEditState.isEditing) {
+      fetchData();
+      setProductEditState((prevState) => {
+        return { ...prevState, isEditing: false };
+      });
     } else {
-      setIsEditing(true);
+      setProductEditState((prevState) => {
+        return { ...prevState, isEditing: true };
+      });
     }
   };
 
   const deleteItemHandler = async () => {
-    await axios.post('/product/delete', { _id: productData?._id });
-    setShowDeleteDialog(false);
-    fetchProductData();
-    navigate('/');
+    if (productState.data) {
+      await usePostAccessDatabase({
+        url: DATABASE_ENDPOINTS.PRODUCT_DELETE,
+        body: { _id: productState.data._id, userId: userData?._id },
+      });
+      fetchUserData();
+      navigate(-1);
+    }
   };
-
-  if (productData === undefined && isFetchingData) return <p>Loading</p>;
-  if (productData === undefined) return <p> No data</p>;
-  const DUMMYIMGS = [{ id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }];
 
   const addNewCommentHandler = async () => {
-    setIsAddingComment(true);
-    await axios.post('/comment/add-comment', {
-      userId: userData?._id,
-      productId: prodId,
-      value: { rating: 2, comment: newComment },
+    setCommentState((prevState) => {
+      return { ...prevState, isAdding: true };
     });
-    setIsAddingComment(false);
-    fetchProductData();
+    await usePostAccessDatabase({
+      url: DATABASE_ENDPOINTS.COMMENT_ONE,
+      body: {
+        userId: userData?._id,
+        targetId: prodId,
+        target: 'Product',
+        value: { rating: 2, text: commentState.value },
+      },
+    });
+    setCommentState({ isAdding: false, value: '' });
+    fetchData();
   };
-
+  if (!productState.data && productState.isLoading) return <p>Loading</p>;
+  if (!productState.data && !productState.isLoading) return <p> No data</p>;
   return (
     <section className="relative">
       <div className="relative mx-auto max-w-screen-xl px-4 py-8">
@@ -131,8 +219,8 @@ export default function ProductPage() {
             <div className="grid grid-cols-2 gap-4 md:grid-cols-1">
               <ProductImage />
               <div className="grid grid-cols-2 gap-4 lg:mt-4">
-                {DUMMYIMGS.map((img) => (
-                  <ProductImage key={img.id} />
+                {[...Array(4)].map((el, index) => (
+                  <ProductImage key={index} />
                 ))}
               </div>
             </div>
@@ -140,45 +228,47 @@ export default function ProductPage() {
 
           <div className="sticky top-24">
             <div className="relative mb-3 w-full">
-              <ProductPill text={productData && productData.market_place} />
-              {isMyProduct && (
+              <ProductPill
+                text={productState.data && productState.data.market_place}
+              />
+              {productEditState.isMyProduct && (
                 <div className="absolute right-0 top-0 flex gap-3">
-                  <CustomDialog
-                    isOpen={showDeleteDialog}
-                    changeIsOpen={() => setShowDeleteDialog(false)}
-                    title="Are you sure?"
-                    description="Deleting this will permamently remove the item from the
-                    database."
-                  >
-                    <div className="flex w-full justify-end gap-3">
-                      <button type="button" onClick={() => deleteItemHandler()}>
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <button type="button" className="text-red-400">
                         Delete
                       </button>
-                      <button
-                        type="button"
-                        className="rounded-md bg-red-500 px-3 py-1 text-white"
-                        onClick={() => setShowDeleteDialog(false)}
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  </CustomDialog>
-
-                  <button
-                    type="button"
-                    onClick={() => setShowDeleteDialog(true)}
-                    className="text-red-400"
-                  >
-                    Delete
-                  </button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Are you sure?</DialogTitle>
+                        <DialogDescription>
+                          Deleting this will permamently remove the item from
+                          the database.
+                        </DialogDescription>
+                      </DialogHeader>
+                      <DialogFooter>
+                        <button
+                          type="button"
+                          onClick={() => deleteItemHandler()}
+                          className="rounded-md bg-red-500 px-3 py-1 text-white"
+                        >
+                          Delete
+                        </button>
+                        <DialogTrigger asChild>
+                          <button type="button">Cancel</button>
+                        </DialogTrigger>
+                      </DialogFooter>
+                    </DialogContent>
+                  </Dialog>
                   <button
                     type="button"
                     className="inline-block rounded-md border border-gray-300 px-2"
                     onClick={toggleEditting}
                   >
-                    {isEditing ? 'Cancel' : 'Edit'}
+                    {productEditState.isEditing ? 'Cancel' : 'Edit'}
                   </button>
-                  {isEditing && (
+                  {productEditState.isEditing && (
                     <button
                       type="button"
                       className="inline-block rounded-md border border-gray-300 px-2 text-green-500"
@@ -193,51 +283,81 @@ export default function ProductPage() {
 
             <div className="mt-8 flex justify-between">
               <div className="max-w-[35ch] space-y-2">
-                {isEditing ? (
+                {productEditState.isEditing ? (
                   <input
-                    name="newTitle"
+                    name="title"
                     type="text"
-                    value={newData.newTitle}
+                    value={productEditState.newData.title || ''}
                     className="border-1 border"
                     onChange={(e) => newDataChangeHandler(e)}
                   />
                 ) : (
-                  <h1 className="text-xl font-bold sm:text-2xl">
-                    {productData && productData.title}
+                  <h1 className="text-xl font-bold sm:text-3xl">
+                    {productState.data && productState.data.title}
                   </h1>
                 )}
                 <div>
-                  {productData &&
-                    productData.categories?.map((category) => (
-                      <span key={category._id}>{category.value}</span>
-                    ))}
-                </div>
-                <p className="text-xs">
-                  Added: {productData && productData.created_at.slice(0, 10)}
-                </p>
-                <p className="text-xs">
-                  Authors:{' '}
-                  {productData?.authors?.map((author) => (
-                    <Link key={author._id} to={`/account/${author._id}`}>
-                      {author.author_info.pseudonim}
+                  {productEditState.newData.categories?.map((category) => (
+                    <Link
+                      key={category._id}
+                      to={{
+                        pathname: '/search',
+                        search: `category=${category.value}`,
+                      }}
+                      className="pr-2"
+                    >
+                      {category.label}
                     </Link>
                   ))}
-                </p>
+                </div>
+                <div>
+                  Added:{' '}
+                  {productState.data &&
+                    productState.data.created_at.slice(0, 10)}
+                </div>
+                <div>
+                  <p>Seller:</p>
+                  {productState.data && (
+                    <Link
+                      key={productState.data.seller_data._id}
+                      className="pr-4"
+                      to={`/account/${productState.data.seller_data._id}`}
+                    >
+                      {productState.data.seller_data.pseudonim}
+                    </Link>
+                  )}
+                </div>
+                <div>
+                  <p>Authors:</p>
+                  {productState.data &&
+                    productState.data.authors.map((author) => (
+                      <Link
+                        key={author._id}
+                        className="pr-4"
+                        to={`/account/${author._id}`}
+                      >
+                        {author.author_info.pseudonim}
+                      </Link>
+                    ))}
+                </div>
                 <p className="text-sm">Highest Rated Product</p>
 
                 <StarRating />
               </div>
-              {isEditing ? (
+              {productEditState.isEditing ? (
                 <input
-                  name="newPrice"
+                  name="price"
                   type="number"
-                  value={newData.newPrice}
+                  value={productEditState.newData.price || 0}
                   className="h-min"
                   onChange={(e) => newDataChangeHandler(e)}
                 />
               ) : (
-                <p className="text-lg font-bold">
-                  {productData?.shop_info && productData.shop_info.price}€
+                <p className="text-xl font-bold">
+                  {productState.data &&
+                    productState.data.shop_info &&
+                    productState.data.shop_info.price}
+                  €
                 </p>
               )}
             </div>
@@ -245,32 +365,32 @@ export default function ProductPage() {
             <div className="mt-4">
               <div className="max-w-none">
                 <span>Available: </span>
-                {isEditing ? (
+                {productEditState.isEditing ? (
                   <input
-                    name="newQuantity"
-                    value={newData.newQuantity}
+                    name="quantity"
+                    value={productEditState.newData.quantity || 0}
                     onChange={(e) => newDataChangeHandler(e)}
                   />
                 ) : (
-                  <span>{productData && productData.quantity}</span>
+                  <span>{productState.data && productState.data.quantity}</span>
                 )}
               </div>
               <div className="prose max-w-none">
-                {isEditing ? (
+                {productEditState.isEditing ? (
                   <textarea
-                    name="newDescription"
+                    name="description"
                     className="resize-none"
-                    value={newData.newDescription}
+                    value={productEditState.newData.description || ''}
                     onChange={(e) => newDataChangeHandler(e)}
                   />
                 ) : (
-                  <p>{productData && productData.description}</p>
+                  <p>{productState.data && productState.data.description}</p>
                 )}
               </div>
 
-              {productData &&
-                productData.description &&
-                productData.description.length > 600 && (
+              {productState.data &&
+                productState.data.description &&
+                productState.data.description.length > 600 && (
                   <button
                     type="button"
                     className="mt-2 text-sm font-medium underline"
@@ -281,55 +401,79 @@ export default function ProductPage() {
             </div>
 
             <ProductForm
-              productId={productData?._id}
-              productQuantity={productData?.quantity}
-              sold={productData.sold}
+              productId={productState.data?._id}
+              productQuantity={productState.data?.quantity}
+              sold={(productState.data && productState.data.sold) || false}
             />
           </div>
         </div>
-        <div>
-          <h5>Comments</h5>
-          <section>
-            <div className="flex gap-5">
+        <div className="mt-8">
+          <h5 className="pb-2">Comments</h5>
+          <section className="mb-16">
+            <div className="flex flex-col-reverse gap-8 md:flex-row">
               <div>
-                <p>You</p>
-                <p>rating</p>
+                <p className="mb-3">rating</p>
+                <div className="flex gap-4">
+                  <img src="#" alt="profile_img" />
+                  <p>{userData?.username}</p>
+                </div>
               </div>
-              <div>
+              <div className="] w-full max-w-[580px] overflow-hidden rounded-lg border border-gray-200 shadow-sm focus-within:border-blue-600 focus-within:ring-1 focus-within:ring-blue-600">
                 <label htmlFor="newComment" className="sr-only">
                   New comment
                 </label>
-                <input
+                <textarea
                   id="newComment"
+                  className="w-full resize-none border-none align-top focus:ring-0 sm:text-sm"
                   name="newComment"
-                  type="text"
-                  value={newComment}
-                  onChange={(e) => setNewComment(e.target.value)}
+                  rows={4}
+                  placeholder="Enter new comment..."
+                  value={commentState.value}
+                  onChange={(e) =>
+                    setCommentState((prevState) => {
+                      return { ...prevState, value: e.target.value };
+                    })
+                  }
                 />
+
+                <div className="flex items-center justify-end gap-2 bg-white p-3">
+                  <Button
+                    variant="default"
+                    disabled={!userData?._id}
+                    onClick={() => addNewCommentHandler()}
+                  >
+                    <LoadingCircle isLoading={commentState.isAdding}>
+                      Publish
+                    </LoadingCircle>
+                  </Button>
+                </div>
               </div>
             </div>
-            <PrimaryBtn
-              type="button"
-              usecase="action"
-              isLoading={isAddingComment}
-              onClick={addNewCommentHandler}
-              disabled={!userData?._id}
-            >
-              Publish
-            </PrimaryBtn>
           </section>
           <section>
-            {productData?.comments.map((comment) => (
-              <div key={comment._id} className="flex gap-5">
-                <div>
-                  <p>{comment.user.user_info.credentials.full_name}</p>
-                  <p>{comment.value.rating}</p>
+            {productState.data &&
+              productState.data.comments.map((comment) => (
+                <div
+                  key={comment._id}
+                  className="mb-8 flex w-full flex-col-reverse gap-8 rounded-md bg-gray-50 p-4 sm:flex-row"
+                >
+                  <div>
+                    <p className="mb-3">{comment.value.rating}</p>
+                    <div className="flex gap-4">
+                      <img src="#" alt="profile_img" />
+                      <p className="font-semibold">{comment.user.username}</p>
+                    </div>
+                  </div>
+                  <div className="flex w-full flex-col gap-4">
+                    <div className="flex justify-end">
+                      <small className="text-sm">
+                        {comment.created_at.slice(0, 10)}
+                      </small>
+                    </div>
+                    <div>{comment.value.text}</div>
+                  </div>
                 </div>
-                <div>
-                  <p>{comment.value.comment}</p>
-                </div>
-              </div>
-            ))}
+              ))}
           </section>
         </div>
       </div>

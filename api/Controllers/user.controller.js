@@ -1,17 +1,22 @@
 const User = require('../Models/user');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const Product = require('../Models/product');
 const mongoose = require('mongoose');
 const Cart = require('../Models/cart');
 const getRandomString = require('../helpers/getRandomString');
-const { verifyNewUserData } = require('../helpers/verify');
 const prepareProductObject = require('../helpers/prepareProductObject');
-
 const salt = bcrypt.genSaltSync(12);
 
-const signIn = async (req, res) => {
+const login = async (req, res) => {
   const { email, password } = req.body;
+
+  if (!email) {
+    return res.status(422).json({ message: 'Email is required' });
+  }
+
+  if (!password) {
+    return res.status(422).json({ message: 'Password is required' });
+  }
 
   const userDoc = await User.findOne({ email });
 
@@ -27,25 +32,37 @@ const signIn = async (req, res) => {
         {},
         (err, token) => {
           if (err) throw 'firts';
-          res.status(200).cookie('token', token).json(userDoc);
+          return res.status(200).cookie('token', token).json({ data: userDoc });
         },
       );
     } else {
-      res.status(422).json({
+      return res.status(422).json({
         name: 'password',
         message: 'Incorrect password',
       });
     }
   } else {
-    res.status(500).json({
+    return res.status(500).json({
       name: 'username',
       message: 'No account found',
     });
   }
 };
 
-const signUp = async (req, res) => {
+const register = async (req, res) => {
   let { credentials, email, username, password } = req.body;
+
+  if (!password) {
+    return res.status(422).json({ message: 'Password is required' });
+  }
+
+  if (!email) {
+    return res.status(422).json({ message: 'Email is required' });
+  }
+
+  if (!username) {
+    return res.status(422).json({ message: 'Username is required' });
+  }
 
   try {
     const userId = new mongoose.Types.ObjectId();
@@ -87,7 +104,7 @@ const signUp = async (req, res) => {
         avg_products_grade: 0,
         sold_books_quantity: 0,
         my_products: [],
-        followers: 0,
+        followers: [],
       },
     });
 
@@ -106,7 +123,7 @@ const signUp = async (req, res) => {
       {},
       (err, token) => {
         if (err) throw 'firts';
-        res
+        return res
           .status(201)
           .cookie('token', token)
           .json({ message: 'Succesfully created an account' });
@@ -120,11 +137,11 @@ const signUp = async (req, res) => {
         message: Object.values(responseObject)[0] + ` already exists`,
       });
     }
-    res.status(500).json({ message: 'Failed to register' });
+    return res.status(500).json({ message: 'Failed to register' });
   }
 };
 
-const myProfile = async (req, res) => {
+const getMyProfile = async (req, res) => {
   try {
     const {
       _id,
@@ -135,12 +152,26 @@ const myProfile = async (req, res) => {
       orders,
       role,
       author_info,
+      security_settings,
+      news,
     } = await User.findOne(
       {
         _id: req.user.user_id,
       },
       { password: 0 },
-    ).populate('author_info.my_products');
+    ).populate([
+      {
+        path: 'author_info',
+        populate: { path: 'my_products' },
+      },
+      {
+        path: 'orders',
+      },
+      {
+        path: 'orders',
+        populate: { path: 'products.product' },
+      },
+    ]);
 
     const cartData = await Cart.findOne({
       user_id: _id,
@@ -181,71 +212,26 @@ const myProfile = async (req, res) => {
       orders,
       cart: cartData,
       role,
+      security_settings,
+      news,
     };
 
     if (role !== 'User') {
       preparedUserData.author_info = preparedAuthorInfo;
     }
-    res.status(200).json(preparedUserData);
+    res.status(200).json({ data: preparedUserData });
   } catch (err) {
     res.status(500).json({ message: 'Failed to fetch user data' });
   }
 };
 
-const newData = async (req, res) => {
-  let { userEmail, fieldKey, newValue } = req.body;
-  const errors = verifyNewUserData(fieldKey, newValue);
-
-  if (errors.length > 0) {
-    return res.status(422).json(errors[0]);
-  }
-
-  let fieldPath = fieldKey;
-
-  if (fieldKey === 'first_name' || fieldKey === 'last_name') {
-    fieldPath = `user_info.credentials.${fieldKey}`;
-  }
-
-  if (fieldKey === 'password') {
-    newValue = bcrypt.hashSync(newValue, salt);
-  }
-
-  try {
-    await User.updateOne(
-      { email: userEmail },
-      { $set: { [fieldPath]: newValue } },
-    );
-    res.status(200).json({ message: 'Successfully updated data' });
-  } catch (err) {
-    if (err.code === 11000) {
-      return res.status(422).json({
-        name: Object.keys(responseObject)[0],
-        message: Object.values(responseObject)[0] + ` already exists`,
-      });
-    } else {
-      res.status(500).json({ message: 'Failed to update data', err });
-    }
-  }
-};
-
-const guestData = async (req, res) => {
-  jwt.sign(
-    {
-      email: getRandomString(10),
-      user_id: getRandomString(15),
-    },
-    getRandomString(40),
-    {},
-    (err, token) => {
-      if (err) res.status(500).json({ message: 'Failed to fetch guest Data' });
-      token = token.slice(token.length - 12, token.length);
-      res.status(200).cookie('guestToken', token).json('Success');
-    },
-  );
-};
-
-const otherUserData = async (req, res) => {
+const getOtherProfile = async (req, res) => {
   const { userId } = req.query;
+
+  if (!userId) {
+    return res.status(422).json({ message: 'user id is required' });
+  }
+
   try {
     const { role, email, username, user_info, author_info } =
       await User.findOne({
@@ -279,57 +265,41 @@ const otherUserData = async (req, res) => {
     };
 
     if (role === 'Author') {
-      res.status(200).json({
+      return res.status(200).json({
         email,
         username,
         user_info,
         author_info: preparedAuthorInfo,
       });
     } else {
-      res.status(200).json({
+      return res.status(200).json({
         email,
         username,
         user_info,
+        role,
       });
     }
   } catch (err) {
-    res.status(500).json({ message: 'Failed to fetch user data' });
+    return res
+      .status(500)
+      .json({ message: 'Failed to fetch user data', error: err.message });
   }
 };
 
-const addFollow = async (req, res) => {
-  const { followGiverId, followReceiverId } = req.body;
-
-  try {
-    await User.updateOne(
-      { _id: followGiverId },
-      { $addToSet: { following: followReceiverId } },
-    );
-    await User.updateOne(
-      { _id: followReceiverId },
-      { $addToSet: { followers: followGiverId } },
-    );
-    res.status(200).json('success');
-  } catch (err) {
-    res.status(500).json({ message: 'Failed adding follow' });
-  }
-};
-const removeFollow = async (req, res) => {
-  const { followGiverId, followReceiverId } = req.body;
-
-  try {
-    await User.updateOne(
-      { _id: followGiverId },
-      { $pull: { following: followReceiverId } },
-    );
-    await User.updateOne(
-      { _id: followReceiverId },
-      { $pull: { followers: followGiverId } },
-    );
-    res.status(200).json('success');
-  } catch (err) {
-    res.status(500).json({ message: 'Failed removing follow' });
-  }
+const getGuestProfile = async (req, res) => {
+  jwt.sign(
+    {
+      email: getRandomString(10),
+      user_id: getRandomString(15),
+    },
+    getRandomString(40),
+    {},
+    (err, token) => {
+      if (err) res.status(500).json({ message: 'Failed to fetch guest Data' });
+      token = token.slice(token.length - 12, token.length);
+      res.status(200).cookie('guestToken', token).json('Success');
+    },
+  );
 };
 
 const getAllAuthors = async (req, res) => {
@@ -344,20 +314,129 @@ const getAllAuthors = async (req, res) => {
       });
     }
 
-    res.status(200).json(authorsData);
+    return res.status(200).json({ data: authorsData });
   } catch (err) {
-    res.status(500).json({ message: 'Failed to fetch authors' });
+    return res
+      .status(500)
+      .json({ message: 'Failed to fetch authors', error: err.message });
+  }
+};
+
+const getAllAdmins = async (req, res) => {
+  try {
+    const admins = await User.find({ role: 'Admin' });
+    const adminData = [];
+    for (const admin of admins) {
+      adminData.push({
+        label: admin.author_info.pseudonim,
+        value: admin.admin_info.pseudonim,
+        _id: admin._id,
+      });
+    }
+
+    return res.status(200).json({ data: adminData });
+  } catch (err) {
+    return res
+      .status(500)
+      .json({ message: 'Failed to fetch authors', error: err.message });
+  }
+};
+
+const addOneFollow = async (req, res) => {
+  const { followGiverId, followReceiverId } = req.body;
+
+  if (!followGiverId) {
+    return res.status(422).json({ message: 'Giver id is required' });
+  }
+  if (!followReceiverId) {
+    return res.status(422).json({ message: 'Receiver id is required' });
+  }
+
+  try {
+    await User.updateOne(
+      { _id: followGiverId },
+      { $addToSet: { following: followReceiverId } },
+    );
+    await User.updateOne(
+      { _id: followReceiverId },
+      { $addToSet: { 'author_info.followers': followGiverId } },
+    );
+    return res.status(200).json({ message: 'success' });
+  } catch (err) {
+    return res
+      .status(500)
+      .json({ message: 'Failed adding follow', error: err.message });
+  }
+};
+
+const removeOneFollow = async (req, res) => {
+  const { followGiverId, followReceiverId } = req.body;
+
+  if (!followGiverId) {
+    return res.status(422).json({ message: 'Giver id is required' });
+  }
+  if (!followReceiverId) {
+    return res.status(422).json({ message: 'Receiver id is required' });
+  }
+
+  try {
+    await User.updateOne(
+      { _id: followGiverId },
+      { $pull: { following: followReceiverId } },
+    );
+    await User.updateOne(
+      { _id: followReceiverId },
+      { $pull: { 'author_info.followers': followGiverId } },
+    );
+    return res.status(200).json({ message: 'success' });
+  } catch (err) {
+    return res
+      .status(500)
+      .json({ message: 'Failed removing follow', error: err.message });
+  }
+};
+
+const updateOneUser = async (req, res) => {
+  const { userEmail, fieldValue } = req.body;
+  const { fieldPath } = req;
+
+  try {
+    if (typeof fieldValue == 'object') {
+      await User.updateOne(
+        { email: userEmail },
+        { $set: { [fieldPath]: { ...fieldValue } } },
+      );
+    } else {
+      await User.updateOne(
+        { email: userEmail },
+        { $set: { [fieldPath]: fieldValue } },
+      );
+    }
+
+    return res.status(200).json({ message: 'Successfully updated data' });
+  } catch (err) {
+    if (err.code === 11000) {
+      return res.status(422).json({
+        name: Object.keys(responseObject)[0],
+        message: Object.values(responseObject)[0] + ` already exists`,
+      });
+    } else {
+      return res
+        .status(500)
+        .json({ message: 'Failed to update data', error: err.message });
+    }
   }
 };
 
 module.exports = {
-  signIn,
-  signUp,
-  myProfile,
-  newData,
-  guestData,
-  otherUserData,
-  addFollow,
-  removeFollow,
+  login,
+  register,
+  getMyProfile,
+  getOtherProfile,
+  getGuestProfile,
   getAllAuthors,
+  getAllAdmins,
+  addOneFollow,
+  removeOneFollow,
+  updateOneUser,
 };
