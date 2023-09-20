@@ -337,7 +337,7 @@ const updateOneProduct = async (req, res) => {
     _id,
     title,
     description,
-    shop_info,
+    price,
     img,
     categories,
     authors,
@@ -352,7 +352,7 @@ const updateOneProduct = async (req, res) => {
         {
           title,
           description,
-          shop_info,
+          'shop_info.price': price,
           img,
           categories,
           authors,
