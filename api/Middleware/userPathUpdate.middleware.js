@@ -12,7 +12,7 @@ const userPathUpdate = (req, res, next) => {
 
   switch (fieldKey) {
     case 'phone':
-      fieldPath = `user_info/${fieldKey}`;
+      fieldPath = `user_info.${fieldKey}`;
       break;
 
     case 'first_name':
@@ -28,13 +28,13 @@ const userPathUpdate = (req, res, next) => {
       fieldValue = bcrypt.hashSync(fieldValue, salt);
       break;
     case 'pseudonim':
-      fieldPath = `author_info/${fieldKey}`;
+      fieldPath = `author_info.${fieldKey}`;
       break;
     case 'short_description':
-      fieldPath = `author_info/${fieldKey}`;
+      fieldPath = `author_info.${fieldKey}`;
       break;
     case 'quote':
-      fieldPath = `author_info/${fieldKey}`;
+      fieldPath = `author_info.${fieldKey}`;
       break;
     case 'hide_private_information':
       fieldPath = `security_settings.${fieldKey}`;

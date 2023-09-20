@@ -1,6 +1,10 @@
-import { ChangeEvent, useContext, useReducer, useState } from 'react';
-import axios from 'axios';
-
+import {
+  ChangeEvent,
+  FormEvent,
+  useContext,
+  useReducer,
+  useState,
+} from 'react';
 import { UserContext } from '@context/UserProvider';
 import CustomInput from '@components/form/CustomInput';
 import { Button } from '@components/UI/button';
@@ -23,17 +27,16 @@ type NewDataNameTypes =
   | 'pseudonim'
   | 'short_description';
 
-type StateVisibleTypes = {
-  [key: string]: boolean;
-  first_name: boolean;
-  last_name: boolean;
-  email: boolean;
-  password: boolean;
-  phone: boolean;
-  address: boolean;
-  quote: boolean;
-  pseudonim: boolean;
-  short_description: boolean;
+const NEWDATA_NAMES: { [key: string]: NewDataNameTypes } = {
+  email: 'email',
+  first_name: 'first_name',
+  last_name: 'last_name',
+  password: 'password',
+  phone: 'phone',
+  address: 'address',
+  quote: 'quote',
+  pseudonim: 'pseudonim',
+  short_description: 'short_description',
 };
 
 type StateDataTypes = {
@@ -78,7 +81,6 @@ type StateErrorTypes = {
 type State = {
   data: StateDataTypes;
   errors: StateErrorTypes;
-  visible: StateVisibleTypes;
 };
 
 const initialNewUserDataState: State = {
@@ -118,21 +120,9 @@ const initialNewUserDataState: State = {
     pseudonim: null,
     short_description: null,
   },
-  visible: {
-    first_name: false,
-    last_name: false,
-    email: false,
-    password: false,
-    phone: false,
-    address: false,
-    quote: false,
-    pseudonim: false,
-    short_description: false,
-  },
 };
 enum ActionKind {
   ValueChange = 'value_change',
-  VisibleChange = 'visible_change',
   ErrorChange = 'error_change',
   ClearData = 'clear_data',
   ClearError = 'clear_error',
@@ -167,23 +157,6 @@ const changeDataHandler = (state: State, action: Action): State => {
         ...state,
         data: { ...state.data, [payload.label]: payload.value },
       };
-    case ActionKind.VisibleChange: {
-      if (payload === undefined) return state;
-      const newVisibleState = {} as StateVisibleTypes;
-
-      Object.keys(state.visible).forEach((key: keyof StateVisibleTypes) => {
-        if (key === payload.label && typeof payload.value === 'boolean') {
-          newVisibleState[key] = payload.value;
-        } else {
-          newVisibleState[key] = false;
-        }
-      });
-
-      return {
-        ...state,
-        visible: newVisibleState,
-      };
-    }
 
     case ActionKind.ErrorChange:
       if (payload === undefined || typeof payload.value !== 'string')
@@ -195,7 +168,6 @@ const changeDataHandler = (state: State, action: Action): State => {
 
     case ActionKind.ClearData: {
       const newDataState = {} as StateDataTypes;
-
       Object.keys(state.data).forEach((key: keyof StateDataTypes) => {
         if (key === 'address') {
           newDataState[key] = {
@@ -232,30 +204,49 @@ const changeDataHandler = (state: State, action: Action): State => {
 };
 
 export default function EditUserData() {
-  const { userData, changeUserData } = useContext(UserContext);
-  const [changingData, setChangingData] = useState({
-    isChanging: false,
-    name: '',
-  });
   const [newUserDatastate, dispatch] = useReducer(
     changeDataHandler,
     initialNewUserDataState
   );
-  const newDataSwitchHandler = (
-    newDataName: NewDataNameTypes,
-    flag: boolean
-  ) => {
-    dispatch({
-      type: ActionKind.ClearData,
-    });
-    dispatch({
-      type: ActionKind.VisibleChange,
-      payload: {
-        label: newDataName,
-        value: flag,
-      },
-    });
+
+  const [openDialog, setOpenDialog] = useState<{
+    state: boolean;
+    element: null | string;
+  }>({
+    state: false,
+    element: null,
+  });
+
+  const { userData, changeUserData } = useContext(UserContext);
+
+  const openDialogChangeHandler = ({
+    state,
+    element,
+  }: {
+    state: boolean;
+    element: NewDataNameTypes;
+  }) => {
+    if (state) {
+      setOpenDialog({ state: true, element });
+    } else {
+      setOpenDialog({ state: false, element });
+    }
+    setTimeout(() => {
+      dispatch({
+        type: ActionKind.ClearData,
+      });
+    }, 100);
   };
+
+  const closeDialogHandler = ({ element }: { element: NewDataNameTypes }) => {
+    setOpenDialog({ state: false, element });
+    setTimeout(() => {
+      dispatch({
+        type: ActionKind.ClearData,
+      });
+    }, 100);
+  };
+
   const newUserDataChangeHandler = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
     mainLabel?: string
@@ -265,14 +256,18 @@ export default function EditUserData() {
       payload: { label: e.target.name, value: e.target.value, mainLabel },
     });
   };
-  const uploadNewUserDataHandler = async (name: NewDataNameTypes) => {
+
+  const uploadNewUserDataHandler = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    const name = e.currentTarget.name as NewDataNameTypes;
     if (!userData) return;
     try {
       dispatch({
         type: ActionKind.ClearError,
         payload: { label: name, value: null },
       });
-      await usePostAccessDatabase({
+      const { error } = await usePostAccessDatabase({
         url: DATABASE_ENDPOINTS.USER_UPDATE,
         body: {
           userEmail: userData.email,
@@ -280,16 +275,21 @@ export default function EditUserData() {
           fieldValue: newUserDatastate.data[name],
         },
       });
-      const { data } = await useGetAccessDatabase({
-        url: DATABASE_ENDPOINTS.USER_PROFILE,
-      });
-      changeUserData(data);
-      setChangingData(() => {
-        return {
-          isChanging: false,
-          name: name ?? '',
-        };
-      });
+      if (error) {
+        dispatch({
+          type: ActionKind.ErrorChange,
+          payload: {
+            label: name,
+            value: error,
+          },
+        });
+      } else {
+        const { data } = await useGetAccessDatabase({
+          url: DATABASE_ENDPOINTS.USER_PROFILE,
+        });
+        changeUserData(data);
+        closeDialogHandler({ element: name });
+      }
     } catch (err: any) {
       dispatch({
         type: ActionKind.ErrorChange,
@@ -301,22 +301,7 @@ export default function EditUserData() {
     }
   };
 
-  const changeDataDialogHandler = (
-    actionType: true | false,
-    name?: NewDataNameTypes
-  ) => {
-    setChangingData((prevState) => {
-      return {
-        isChanging: actionType || !prevState.isChanging,
-        name: name ?? '',
-      };
-    });
-    if (name) {
-      newDataSwitchHandler(name, true);
-    }
-  };
   if (!userData) return <div>No data</div>;
-
   return (
     <div className="flex flex-col justify-around gap-8 sm:flex-row">
       <section className="w-full">
@@ -338,21 +323,31 @@ export default function EditUserData() {
               />
             </fieldset>
             <div className="flex justify-between gap-4">
-              <Dialog>
+              <Dialog
+                open={
+                  NEWDATA_NAMES.email === openDialog.element && openDialog.state
+                }
+                onOpenChange={(state) =>
+                  openDialogChangeHandler({ state, element: 'email' })
+                }
+              >
                 <DialogTrigger asChild>
                   <Button
                     type="button"
                     variant="link"
                     size="sm"
                     className="px-0"
-                    onClick={() => changeDataDialogHandler(true, 'email')}
                   >
                     Change email
                   </Button>
                 </DialogTrigger>
                 <DialogContent>
                   <div>
-                    <form className="mb-4">
+                    <form
+                      className="mb-4"
+                      name="email"
+                      onSubmit={(e) => uploadNewUserDataHandler(e)}
+                    >
                       <CustomInput
                         autoComplete="email"
                         name="email"
@@ -365,16 +360,12 @@ export default function EditUserData() {
                         inputValue={newUserDatastate.data.email}
                         onChange={(e) => newUserDataChangeHandler(e)}
                       />
+                      <div className="flex w-full justify-end">
+                        <Button variant="default" size="default" type="submit">
+                          Accept
+                        </Button>
+                      </div>
                     </form>
-                    <div className="flex w-full justify-end">
-                      <Button
-                        variant="default"
-                        size="default"
-                        onClick={() => uploadNewUserDataHandler('email')}
-                      >
-                        Accept
-                      </Button>
-                    </div>
                   </div>
                 </DialogContent>
               </Dialog>
@@ -398,22 +389,27 @@ export default function EditUserData() {
               </fieldset>
 
               <div className="flex justify-between gap-4">
-                <Dialog>
+                <Dialog
+                  open={
+                    NEWDATA_NAMES.first_name === openDialog.element &&
+                    openDialog.state
+                  }
+                  onOpenChange={(state) =>
+                    openDialogChangeHandler({ state, element: 'first_name' })
+                  }
+                >
                   <DialogTrigger asChild>
-                    <Button
-                      variant="link"
-                      size="sm"
-                      onClick={() =>
-                        changeDataDialogHandler(true, 'first_name')
-                      }
-                      className="px-0"
-                    >
+                    <Button variant="link" size="sm" className="px-0">
                       Change first name
                     </Button>
                   </DialogTrigger>
                   <DialogContent>
                     <div>
-                      <form className="mb-4">
+                      <form
+                        className="mb-4"
+                        name="first_name"
+                        onSubmit={(e) => uploadNewUserDataHandler(e)}
+                      >
                         <CustomInput
                           name="first_name"
                           type="text"
@@ -425,16 +421,16 @@ export default function EditUserData() {
                           inputValue={newUserDatastate.data.first_name}
                           onChange={(e) => newUserDataChangeHandler(e)}
                         />
+                        <div className="flex w-full justify-end">
+                          <Button
+                            variant="default"
+                            size="default"
+                            type="submit"
+                          >
+                            Accept
+                          </Button>
+                        </div>
                       </form>
-                      <div className="flex w-full justify-end">
-                        <Button
-                          variant="default"
-                          size="default"
-                          onClick={() => uploadNewUserDataHandler('first_name')}
-                        >
-                          Accept
-                        </Button>
-                      </div>
                     </div>
                   </DialogContent>
                 </Dialog>
@@ -457,20 +453,27 @@ export default function EditUserData() {
               </fieldset>
 
               <div className="flex justify-between gap-4">
-                <Dialog>
+                <Dialog
+                  open={
+                    NEWDATA_NAMES.last_name === openDialog.element &&
+                    openDialog.state
+                  }
+                  onOpenChange={(state) =>
+                    openDialogChangeHandler({ state, element: 'last_name' })
+                  }
+                >
                   <DialogTrigger asChild>
-                    <Button
-                      variant="link"
-                      size="sm"
-                      onClick={() => changeDataDialogHandler(true, 'last_name')}
-                      className="px-0"
-                    >
+                    <Button variant="link" size="sm" className="px-0">
                       Change last name
                     </Button>
                   </DialogTrigger>
                   <DialogContent>
                     <div>
-                      <form className="mb-4">
+                      <form
+                        className="mb-4"
+                        name="last_name"
+                        onSubmit={(e) => uploadNewUserDataHandler(e)}
+                      >
                         <fieldset>
                           <CustomInput
                             name="last_name"
@@ -487,9 +490,7 @@ export default function EditUserData() {
                             <Button
                               variant="default"
                               size="default"
-                              onClick={() =>
-                                uploadNewUserDataHandler('last_name')
-                              }
+                              type="submit"
                             >
                               Accept
                             </Button>
@@ -518,25 +519,26 @@ export default function EditUserData() {
               />
             </fieldset>
             <div className="flex justify-between">
-              <Dialog>
+              <Dialog
+                open={
+                  NEWDATA_NAMES.password === openDialog.element &&
+                  openDialog.state
+                }
+                onOpenChange={(state) =>
+                  openDialogChangeHandler({ state, element: 'password' })
+                }
+              >
                 <DialogTrigger asChild>
-                  <Button
-                    variant="link"
-                    size="sm"
-                    onClick={() => changeDataDialogHandler(true, 'password')}
-                    className="px-0"
-                  >
+                  <Button variant="link" size="sm" className="px-0">
                     Change password
                   </Button>
                 </DialogTrigger>
                 <DialogContent>
                   <div>
                     <form
-                      className={`${
-                        newUserDatastate.visible.password
-                          ? 'max-h-20 opacity-100'
-                          : 'max-h-0 opacity-0'
-                      } overflow-hidden p-1 transition-[max-height,opacity] duration-300 ease-in-out`}
+                      className={`p-1`}
+                      name="password"
+                      onSubmit={(e) => uploadNewUserDataHandler(e)}
                     >
                       <CustomInput
                         name="password"
@@ -549,16 +551,12 @@ export default function EditUserData() {
                         inputValue={newUserDatastate.data.password}
                         onChange={(e) => newUserDataChangeHandler(e)}
                       />
+                      <div className="flex justify-between">
+                        <Button variant="default" size="default" type="submit">
+                          Accept
+                        </Button>
+                      </div>
                     </form>
-                    <div className="flex justify-between">
-                      <Button
-                        variant="default"
-                        size="default"
-                        onClick={() => uploadNewUserDataHandler('password')}
-                      >
-                        Accept
-                      </Button>
-                    </div>
                   </div>
                 </DialogContent>
               </Dialog>
@@ -581,20 +579,26 @@ export default function EditUserData() {
               />
             </fieldset>
             <div className="flex justify-between">
-              <Dialog>
+              <Dialog
+                open={
+                  NEWDATA_NAMES.phone === openDialog.element && openDialog.state
+                }
+                onOpenChange={(state) =>
+                  openDialogChangeHandler({ state, element: 'phone' })
+                }
+              >
                 <DialogTrigger asChild>
-                  <Button
-                    variant="link"
-                    size="sm"
-                    onClick={() => changeDataDialogHandler(true, 'phone')}
-                    className="px-0"
-                  >
+                  <Button variant="link" size="sm" className="px-0">
                     Change phone
                   </Button>
                 </DialogTrigger>
                 <DialogContent>
                   <div>
-                    <form className="mb-4">
+                    <form
+                      className="mb-4"
+                      name="phone"
+                      onSubmit={(e) => uploadNewUserDataHandler(e)}
+                    >
                       <CustomInput
                         name="phone"
                         type="text"
@@ -606,16 +610,12 @@ export default function EditUserData() {
                         inputValue={newUserDatastate.data.phone}
                         onChange={(e) => newUserDataChangeHandler(e)}
                       />
+                      <div className="flex w-full justify-end">
+                        <Button variant="default" size="default" type="submit">
+                          Accept
+                        </Button>
+                      </div>
                     </form>
-                    <div className="flex w-full justify-end">
-                      <Button
-                        variant="default"
-                        size="default"
-                        onClick={() => uploadNewUserDataHandler('phone')}
-                      >
-                        Accept
-                      </Button>
-                    </div>
                   </div>
                 </DialogContent>
               </Dialog>
@@ -634,23 +634,33 @@ export default function EditUserData() {
                 type="text"
                 disabled
                 placeholder="Address"
-                value={`${userData.user_info.address.line1},${userData.user_info.address.line2},${userData.user_info.address.city}, ${userData.user_info.address.state},${userData.user_info.address.country}`}
+                value={`${userData.user_info.address.line1 || 'Street'}, ${
+                  userData.user_info.address.city || 'City'
+                }, ${userData.user_info.address.state || 'State'}, ${
+                  userData.user_info.address.country || 'Country'
+                }`}
               />
             </fieldset>
             <div className="flex justify-between">
-              <Dialog>
+              <Dialog
+                open={
+                  NEWDATA_NAMES.address === openDialog.element &&
+                  openDialog.state
+                }
+                onOpenChange={(state) =>
+                  openDialogChangeHandler({ state, element: 'address' })
+                }
+              >
                 <DialogTrigger asChild>
-                  <Button
-                    variant="link"
-                    size="sm"
-                    onClick={() => changeDataDialogHandler(true, 'address')}
-                    className="px-0"
-                  >
+                  <Button variant="link" size="sm" className="px-0">
                     Change address
                   </Button>
                 </DialogTrigger>
                 <DialogContent>
-                  <div>
+                  <form
+                    name="address"
+                    onSubmit={(e) => uploadNewUserDataHandler(e)}
+                  >
                     <CustomInput
                       name="line1"
                       type="text"
@@ -727,16 +737,11 @@ export default function EditUserData() {
                       onChange={(e) => newUserDataChangeHandler(e, 'address')}
                     />
                     <div className="flex w-full justify-end">
-                      <Button
-                        variant="default"
-                        size="default"
-                        onClick={() => uploadNewUserDataHandler('address')}
-                        type="button"
-                      >
+                      <Button variant="default" size="default" type="submit">
                         Accept
                       </Button>
                     </div>
-                  </div>
+                  </form>
                 </DialogContent>
               </Dialog>
             </div>
@@ -765,20 +770,26 @@ export default function EditUserData() {
                 />
               </fieldset>
               <div className="flex justify-between">
-                <Dialog>
+                <Dialog
+                  open={
+                    NEWDATA_NAMES.quote === openDialog.element &&
+                    openDialog.state
+                  }
+                  onOpenChange={(state) =>
+                    openDialogChangeHandler({ state, element: 'quote' })
+                  }
+                >
                   <DialogTrigger asChild>
-                    <Button
-                      variant="link"
-                      size="sm"
-                      onClick={() => changeDataDialogHandler(true, 'quote')}
-                      className="px-0"
-                    >
+                    <Button variant="link" size="sm" className="px-0">
                       Change quote
                     </Button>
                   </DialogTrigger>
                   <DialogContent>
                     <div>
-                      <fieldset>
+                      <form
+                        name="quote"
+                        onSubmit={(e) => uploadNewUserDataHandler(e)}
+                      >
                         <CustomInput
                           name="quote"
                           type="text"
@@ -794,12 +805,12 @@ export default function EditUserData() {
                           <Button
                             variant="default"
                             size="default"
-                            onClick={() => uploadNewUserDataHandler('quote')}
+                            type="submit"
                           >
                             Accept
                           </Button>
                         </div>
-                      </fieldset>
+                      </form>
                     </div>
                   </DialogContent>
                 </Dialog>
@@ -822,19 +833,25 @@ export default function EditUserData() {
                 />
               </fieldset>
               <div className="flex justify-between">
-                <Dialog>
+                <Dialog
+                  open={
+                    NEWDATA_NAMES.pseudonim === openDialog.element &&
+                    openDialog.state
+                  }
+                  onOpenChange={(state) =>
+                    openDialogChangeHandler({ state, element: 'pseudonim' })
+                  }
+                >
                   <DialogTrigger asChild>
-                    <Button
-                      variant="link"
-                      size="sm"
-                      onClick={() => changeDataDialogHandler(true, 'pseudonim')}
-                      className="px-0"
-                    >
+                    <Button variant="link" size="sm" className="px-0">
                       Change pseudonim
                     </Button>
                   </DialogTrigger>
                   <DialogContent>
-                    <div>
+                    <form
+                      name="pseudonim"
+                      onSubmit={(e) => uploadNewUserDataHandler(e)}
+                    >
                       <fieldset>
                         <CustomInput
                           name="pseudonim"
@@ -851,15 +868,13 @@ export default function EditUserData() {
                           <Button
                             variant="default"
                             size="default"
-                            onClick={() =>
-                              uploadNewUserDataHandler('pseudonim')
-                            }
+                            type="submit"
                           >
                             Accept
                           </Button>
                         </div>
                       </fieldset>
-                    </div>
+                    </form>
                   </DialogContent>
                 </Dialog>
               </div>
@@ -881,21 +896,28 @@ export default function EditUserData() {
                 />
               </fieldset>
               <div className="flex justify-between">
-                <Dialog>
+                <Dialog
+                  open={
+                    NEWDATA_NAMES.short_description === openDialog.element &&
+                    openDialog.state
+                  }
+                  onOpenChange={(state) =>
+                    openDialogChangeHandler({
+                      state,
+                      element: 'short_description',
+                    })
+                  }
+                >
                   <DialogTrigger asChild>
-                    <Button
-                      variant="link"
-                      size="sm"
-                      onClick={() =>
-                        changeDataDialogHandler(true, 'short_description')
-                      }
-                      className="px-0"
-                    >
+                    <Button variant="link" size="sm" className="px-0">
                       Change short description
                     </Button>
                   </DialogTrigger>
                   <DialogContent>
-                    <div>
+                    <form
+                      name="short_description"
+                      onSubmit={(e) => uploadNewUserDataHandler(e)}
+                    >
                       <fieldset>
                         <label htmlFor="shortDescription">
                           Short description
@@ -913,15 +935,13 @@ export default function EditUserData() {
                           <Button
                             variant="default"
                             size="default"
-                            onClick={() =>
-                              uploadNewUserDataHandler('short_description')
-                            }
+                            type="submit"
                           >
                             Accept
                           </Button>
                         </div>
                       </fieldset>
-                    </div>
+                    </form>
                   </DialogContent>
                 </Dialog>
               </div>
