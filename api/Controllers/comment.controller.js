@@ -11,9 +11,11 @@ const getAllComments = async (req, res) => {
     return res.status(422).json({ message: 'Provide comment target id' });
   }
   try {
-    const data = await Comment.find({ target_id: targetId }).sort({
-      created_at: -1,
-    });
+    const data = await Comment.find({ target_id: targetId })
+      .sort({
+        created_at: -1,
+      })
+      .populate('user');
 
     return res.status(200).json({ data });
   } catch (err) {
