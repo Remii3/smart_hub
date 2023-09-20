@@ -75,7 +75,7 @@ const removeItemFromCart = async (req, res) => {
 
   try {
     if (productId === 'all') {
-      await Cart.updateOne({ user_id: userId }, { $pull: { products: {} } });
+      await Cart.updateOne({ user_id: userId }, { $set: { products: [] } });
     } else {
       await Cart.updateOne(
         { user_id: userId },

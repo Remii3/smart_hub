@@ -256,7 +256,9 @@ export default function ProductPage() {
                           Delete
                         </button>
                         <DialogTrigger asChild>
-                          <button type="button">Cancel</button>
+                          <Button variant={'destructive'} type="button">
+                            Cancel
+                          </Button>
                         </DialogTrigger>
                       </DialogFooter>
                     </DialogContent>
