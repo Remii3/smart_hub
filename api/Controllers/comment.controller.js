@@ -1,34 +1,91 @@
 const { default: mongoose } = require('mongoose');
 const Comment = require('../Models/comment');
 const Product = require('../Models/product');
+const News = require('../Models/news');
+const User = require('../Models/user');
 
-const getComments = (req, res) => {
-  const { productId } = req.query;
-  Comment.findAll({ productId })
-    .then(res => res.status(200).json(res.data))
-    .catch(err => {
-      return res.status(500).json({ message: 'Failed fetching comments' });
-    });
-};
+const getAllComments = async (req, res) => {
+  const { targetId } = req.query;
 
-const addComment = async (req, res) => {
-  const { userId, productId, value } = req.body;
-  const created_at = new Date().getTime();
+  if (!targetId) {
+    return res.status(422).json({ message: 'Provide comment target id' });
+  }
   try {
-    const _id = new mongoose.Types.ObjectId();
-    await Comment.create({
-      _id,
-      user: userId,
-      product_id: productId,
-      value,
-      created_at,
+    const data = await Comment.find({ target_id: targetId }).sort({
+      created_at: -1,
     });
-    await Product.updateOne({ _id: productId }, { $push: { comments: _id } });
-    res.status(201).json({ message: 'Succesfully added new comment' });
+
+    return res.status(200).json({ data });
   } catch (err) {
-    console.log(err);
-    res.status(500).json({ message: 'Failed adding new comment' });
+    return res
+      .status(500)
+      .json({ message: 'Failed fetching comments', error: err.message });
   }
 };
 
-module.exports = { getComments, addComment };
+const addOneComment = async (req, res) => {
+  const { userId, targetId, value, target } = req.body;
+
+  if (!userId) {
+    return res.status(422).json({ message: 'Provide user id' });
+  }
+
+  if (!targetId) {
+    return res.status(422).json({ message: 'Provide target id' });
+  }
+
+  try {
+    const created_at = new Date().getTime();
+    const _id = new mongoose.Types.ObjectId();
+
+    if (target === 'Product') {
+      await Comment.create({
+        _id,
+        user: userId,
+        target_id: targetId,
+        value,
+        target,
+        created_at,
+      });
+      await Product.updateOne({ _id: targetId }, { $push: { comments: _id } });
+      return res.status(201).json({ message: 'Success' });
+    }
+    if (target === 'News') {
+      await Comment.create({
+        _id,
+        user: userId,
+        target_id: targetId,
+        value: { text: value },
+        target,
+        created_at,
+      });
+      await News.updateOne({ _id: targetId }, { $push: { comments: _id } });
+      return res.status(201).json({ message: 'Success' });
+    }
+  } catch (err) {
+    return res
+      .status(500)
+      .json({ message: 'Failed adding new comment', error: err.message });
+  }
+};
+
+const deleteOneComment = async (req, res) => {
+  const { commentId, userId } = req.body;
+  if (!commentId) {
+    return res.status(422).json({ message: 'Provide comment id' });
+  }
+  if (!userId) {
+    return res.status(422).json({ message: 'Provide user id' });
+  }
+  try {
+    await User.updateOne({ _id: userId }, { $pull: { news: commentId } });
+    await Comment.deleteOne({ _id: commentId });
+    return res.status(200).json({ message: 'Success' });
+  } catch (err) {
+    return res
+      .status(500)
+      .json({ message: 'Failed deleting a comment', error: err.message });
+  }
+};
+
+module.exports = { getAllComments, addOneComment, deleteOneComment };

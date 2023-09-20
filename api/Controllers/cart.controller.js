@@ -7,14 +7,17 @@ const stripe = require('stripe')(
   'sk_test_51NDZ0zHqBBlAtOOFMShIrv9OwdfC6958wOWqZa1X59kOeyY4hNtZ80ANZ6WYv67v4a8FOFguc04SCV84QKEf6nFf005r6tKBO6',
 );
 
-const addToCart = async (req, res) => {
+const addItemToCart = async (req, res) => {
   const { userId, productId, productQuantity } = req.body;
+
   if (!userId) {
     return res.status(422).json({ message: 'User id is required!' });
   }
+
   if (!productId) {
     return res.status(422).json({ message: 'Product id is required!' });
   }
+
   if (!productQuantity) {
     return res.status(422).json({ message: 'Product quantity is required!' });
   }
@@ -50,19 +53,26 @@ const addToCart = async (req, res) => {
         products: [{ _id: productId, quantity: productQuantity }],
       });
     }
-    res.status(201).json({ message: 'Successfully added' });
+    return res.status(201).json({ message: 'Successfully added' });
   } catch (err) {
-    res.status(500).json({
+    return res.status(500).json({
       message: 'Server error',
+      error: err.message,
     });
   }
 };
 
-const removeFromCart = async (req, res) => {
+const removeItemFromCart = async (req, res) => {
   const { userId, productId } = req.body;
 
-  if (!userId) res.status(422).json({ message: 'User id is required!' });
-  if (!productId) res.status(422).json({ message: 'Product id is required!' });
+  if (!userId) {
+    return res.status(422).json({ message: 'User id is required!' });
+  }
+
+  if (!productId) {
+    return res.status(422).json({ message: 'Product id is required!' });
+  }
+
   try {
     if (productId === 'all') {
       await Cart.updateOne({ user_id: userId }, { $pull: { products: {} } });
@@ -72,17 +82,20 @@ const removeFromCart = async (req, res) => {
         { $pull: { products: { _id: productId } } },
       );
     }
-    res.status(200).json({ message: 'Success' });
+    return res.status(200).json({ message: 'Success' });
   } catch (err) {
-    res.status(500).json({
+    return res.status(500).json({
       message: 'Something went wrong with removing product',
+      error: err.message,
     });
   }
 };
 
-const getCart = async (req, res) => {
+const getAllCartItems = async (req, res) => {
   const { userId } = req.query;
-  if (!userId) return res.status(422).json({ message: 'User id is required!' });
+  if (!userId) {
+    return res.status(422).json({ message: 'User id is required!' });
+  }
 
   try {
     const cartData = await Cart.findOne({ user_id: userId });
@@ -118,15 +131,17 @@ const getCart = async (req, res) => {
       cartPrice = cartPrice.toFixed(2);
 
       cartPrice = `€${cartPrice}`;
-      res.status(200).json({ products: productsData, cartPrice });
+      return res
+        .status(200)
+        .json({ data: { products: productsData, cartPrice } });
     } else {
       cartPrice = '€0';
-      res.status(200).json({ products: [], cartPrice });
+      return res.status(200).json({ data: { products: [], cartPrice } });
     }
   } catch (err) {
-    res.status(500).json({
+    return res.status(500).json({
       message: 'Something went wrong with fetching cart data',
-      products: null,
+      error: err.message,
     });
   }
 };
@@ -141,14 +156,15 @@ const cartItemIncrement = async (req, res) => {
     return res.status(422).json({ message: 'Product id is required!' });
   }
   try {
-    const test = await Cart.updateOne(
+    await Cart.updateOne(
       { user_id: userId, 'products._id': productId },
       { $inc: { 'products.$.quantity': 1 } },
     );
-    res.status(200).json({ message: 'Sduccessfuly updated data' });
+    return res.status(200).json({ message: 'Successfuly updated data' });
   } catch (err) {
-    res.status(500).json({
+    return res.status(500).json({
       message: 'Cart or product was not found',
+      error: err.message,
     });
   }
 };
@@ -169,10 +185,11 @@ const cartItemDecrement = async (req, res) => {
       { $inc: { 'products.$.quantity': -1 } },
     );
 
-    res.status(200).json({ message: 'Successfuly updated data' });
+    return res.status(200).json({ message: 'Successfuly updated data' });
   } catch (err) {
-    res.status(500).json({
+    return res.status(500).json({
       message: 'Cart or product was not found',
+      error: err.message,
     });
   }
 };
@@ -188,18 +205,20 @@ const initiatePayment = async (req, res) => {
       },
     });
 
-    res.status(200).send({
+    return res.status(200).send({
       clientSecret: paymentIntent.client_secret,
     });
   } catch (err) {
-    res.status(500).json({ message: 'Failed to initiate payment', err });
+    return res
+      .status(500)
+      .json({ message: 'Failed to initiate payment', err: err.message });
   }
 };
 
 module.exports = {
-  addToCart,
-  removeFromCart,
-  getCart,
+  addItemToCart,
+  removeItemFromCart,
+  getAllCartItems,
   cartItemIncrement,
   cartItemDecrement,
   initiatePayment,

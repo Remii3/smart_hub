@@ -1,25 +1,25 @@
-import { CalendarIcon } from '@radix-ui/react-icons';
+import * as React from 'react';
 import { format } from 'date-fns';
 
-import { cn } from '../../lib/utils';
+import { cn } from '@lib/utils';
 import { Button } from './button';
 import { Calendar } from './calendar';
 import { Popover, PopoverContent, PopoverTrigger } from './popover';
+import { CalendarIcon } from '@heroicons/react/24/outline';
 
-export function DatePicker({
-  date,
-  setDate,
-}: {
+interface PropsTypes {
   date: Date | undefined;
   setDate: React.Dispatch<React.SetStateAction<Date | undefined>>;
-}) {
+}
+
+export function DatePickerDemo({ date, setDate }: PropsTypes) {
   return (
     <Popover>
       <PopoverTrigger asChild>
         <Button
-          variant="outline"
+          variant={'outline'}
           className={cn(
-            'w-[240px] justify-start text-left font-normal',
+            'w-[280px] justify-start text-left font-normal',
             !date && 'text-muted-foreground'
           )}
         >
@@ -27,7 +27,7 @@ export function DatePicker({
           {date ? format(date, 'PPP') : <span>Pick a date</span>}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-auto p-0" align="start">
+      <PopoverContent className="w-auto p-0">
         <Calendar
           mode="single"
           selected={date}

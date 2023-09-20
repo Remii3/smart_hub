@@ -3,21 +3,25 @@ const Category = require('../Models/category');
 const getAllCategories = async (req, res) => {
   try {
     const categories = await Category.find();
-    res.status(200).json(categories);
+    return res.status(200).json({ data: categories });
   } catch (err) {
-    res.status(500).json({ error: 'Failed fatching categories', err });
+    return res
+      .status(500)
+      .json({ message: 'Failed fatching categories', error: err.message });
   }
 };
 
-const addCategory = async (req, res) => {
+const addOneCategory = async (req, res) => {
   try {
     const { label, value, description } = req.body;
 
     await Category.insertOne({ label, value, description });
-    res.status(201).json('success');
+    return res.status(201).json({ message: 'Success' });
   } catch (err) {
-    res.status(500).json({ error: 'Failed adding new category', err });
+    return res
+      .status(500)
+      .json({ message: 'Failed adding new category', error: err.message });
   }
 };
 
-module.exports = { getAllCategories, addCategory };
+module.exports = { getAllCategories, addOneCategory };

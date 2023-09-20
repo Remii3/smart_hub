@@ -2,8 +2,9 @@ import { ReactNode } from 'react';
 import { Swiper } from 'swiper/react';
 import { Autoplay, Navigation, Pagination } from 'swiper';
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/solid';
-import SuspenseComponent from '../UI/suspense/SuspenseComponent';
-import LoadingComponent from '../UI/Loaders/LoadingComponent';
+import SuspenseComponent from '@components/suspense/SuspenseComponent';
+import LoadingCircle from '@components/Loaders/LoadingCircle';
+
 import 'swiper/css/scrollbar';
 import 'swiper/css/navigation';
 import 'swiper/css';
@@ -24,17 +25,12 @@ function LongSwiper({
           nextEl: `.${swiperCategory}-next`,
           prevEl: `.${swiperCategory}-prev`,
         }}
-        modules={[Navigation, Pagination, Autoplay]}
+        modules={[Navigation, Pagination]}
         spaceBetween={24}
         slidesPerView={1}
         setWrapperSize
         grabCursor
         watchOverflow
-        autoplay={{
-          delay: 5000,
-          disableOnInteraction: false,
-          pauseOnMouseEnter: true,
-        }}
         breakpoints={{
           388: {
             slidesPerView: 1,
@@ -66,7 +62,7 @@ function LongSwiper({
           paddingRight: '22px',
         }}
       >
-        <SuspenseComponent fallback={<LoadingComponent />}>
+        <SuspenseComponent fallback={<LoadingCircle isLoading />}>
           {children}
         </SuspenseComponent>
       </Swiper>

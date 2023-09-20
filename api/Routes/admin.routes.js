@@ -2,9 +2,12 @@ const express = require('express');
 
 const router = express.Router();
 
-const { users, user } = require('../Controllers/admin.controller.js');
+const {
+  getAllUsers,
+  getOneUser,
+} = require('../Controllers/admin.controller.js');
 
-router.get('/users', users);
-router.get('/user', user);
+router.get('/users', getAllUsers);
+router.get('/user', getOneUser);
 
 module.exports = router;

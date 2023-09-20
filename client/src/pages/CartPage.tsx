@@ -1,8 +1,8 @@
 import { Link } from 'react-router-dom';
 import { useContext } from 'react';
-import { CartContext } from '../context/CartProvider';
-import { TicketIcon } from '../assets/icons/Icons';
-import CartProdList from '../components/cart/CartProdList';
+import { CartContext } from '@context/CartProvider';
+import CartProdList from '@features/cart/CartProdList';
+import { TicketIcon } from '@heroicons/react/24/outline';
 
 export default function CartPage() {
   const { cartState } = useContext(CartContext);
@@ -49,8 +49,7 @@ export default function CartPage() {
                 {false && (
                   <div className="flex justify-end">
                     <span className="inline-flex items-center justify-center rounded-full bg-indigo-100 px-2.5 py-0.5 text-indigo-700">
-                      <TicketIcon height={4} width={4} />
-
+                      <TicketIcon className="h-1 w-1" />
                       <p className="whitespace-nowrap text-xs">
                         2 Discounts Applied
                       </p>

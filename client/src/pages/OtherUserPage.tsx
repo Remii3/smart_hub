@@ -1,21 +1,28 @@
-import axios from 'axios';
 import { useEffect, useState, useContext, useCallback } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { SwiperSlide } from 'swiper/react';
-import { AuthorTypes } from '../types/interfaces';
-import ShopCard from '../components/card/ShopCard';
-import AuctionCard from '../components/card/AuctionCard';
-import ShortSwiper from '../components/swiper/ShortSwiper';
-import { UserContext } from '../context/UserProvider';
-import { Button } from '../components/UI/Btns/Button';
-import { MarketPlaceTypes, UserRoleTypes } from '../types/types';
-import { Skeleton } from '../components/UI/skeleton';
+import { AuthorTypes } from '@customTypes/interfaces';
+import ShopCard from '@components/cards/ShopCard';
+import AuctionCard from '@components/cards/AuctionCard';
+import ShortSwiper from '@components/swiper/ShortSwiper';
+import { UserContext } from '@context/UserProvider';
+import { Button } from '@components/UI/button';
+import { MarketPlaceTypes, UserRoleTypes } from '@customTypes/types';
+import { Skeleton } from '@components/UI/skeleton';
+import {
+  useGetAccessDatabase,
+  usePostAccessDatabase,
+} from '../hooks/useAaccessDatabase';
+import { DATABASE_ENDPOINTS } from '../data/endpoints';
 
 export default function OtherUserPage() {
   const [otherUserData, setOtherUserData] = useState<AuthorTypes>();
-  const path = useLocation();
 
   const { userData } = useContext(UserContext);
+
+  const navigate = useNavigate();
+
+  const path = useLocation();
   let userId: string | any[] | null = null;
   userId = path.pathname.split('/');
   userId = userId[userId.length - 1];
@@ -27,20 +34,31 @@ export default function OtherUserPage() {
   );
 
   const getOtherUserData = useCallback(async () => {
-    const response = await axios.get('/user/otherUser', { params: { userId } });
-    setOtherUserData(response.data);
-    if (response) {
-      setIsFollowing(
-        response.data.author_info.followers.some(
-          (id: string) => id === userData?._id
-        ) || false
-      );
+    if (userId !== userData?._id) {
+      const { data } = await useGetAccessDatabase({
+        url: DATABASE_ENDPOINTS.USER_OTHER_PROFILE,
+        params: { userId },
+      });
+      setOtherUserData(data);
+      if (data) {
+        setIsFollowing(
+          data.author_info.followers.some(
+            (id: string) => id === userData?._id
+          ) || false
+        );
+      }
     }
   }, [userData?._id, userId]);
 
   useEffect(() => {
     getOtherUserData();
   }, [getOtherUserData]);
+
+  useEffect(() => {
+    if (userId === userData?._id) {
+      navigate('/account/my', { replace: true });
+    }
+  }, []);
 
   const otherUserStats = otherUserData?.author_info
     ? [
@@ -63,26 +81,27 @@ export default function OtherUserPage() {
       ]
     : null;
 
-  const followHandler = () => {
+  const followHandler = async () => {
     if (userData === null) return;
     if (isFollowing) {
-      axios
-        .post('/user/remove-follow', {
+      await usePostAccessDatabase({
+        url: DATABASE_ENDPOINTS.USER_FOLLOW_REMOVE,
+        body: {
           followReceiverId: userId,
           followGiverId: userData._id,
-        })
-        .then(() => {
-          getOtherUserData();
-        });
+        },
+      });
+
+      await getOtherUserData();
     } else {
-      axios
-        .post('/user/add-follow', {
+      await usePostAccessDatabase({
+        url: DATABASE_ENDPOINTS.USER_FOLLOW_ADD,
+        body: {
           followReceiverId: userId,
           followGiverId: userData._id,
-        })
-        .then(() => {
-          getOtherUserData();
-        });
+        },
+      });
+      await getOtherUserData();
     }
   };
 
@@ -123,8 +142,7 @@ export default function OtherUserPage() {
           </div>
           <div>
             <Button
-              variant="primary"
-              isDisabled={userData === null ? 'yes' : 'no'}
+              variant="default"
               disabled={userData === null}
               onClick={() => followHandler()}
             >

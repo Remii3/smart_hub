@@ -1,32 +1,49 @@
-/* eslint-disable jsx-a11y/anchor-is-valid */
 import { useCallback, useContext, useEffect, useState } from 'react';
-import { io } from 'socket.io-client';
 import {
   UserIcon,
   ArchiveBoxIcon,
   LockClosedIcon,
   Square2StackIcon,
-  CheckIcon,
 } from '@heroicons/react/24/outline';
-import { RadioGroup } from '@headlessui/react';
 import axios from 'axios';
 import AsyncCreatableSelect from 'react-select/async-creatable';
-import MainContainer from '../components/UI/SpecialElements/MainContainer';
-import EditUserData from '../components/myAccount/EditUserData';
-import MyShop from '../components/myAccount/MyShop';
-import { UserContext } from '../context/UserProvider';
-import MarketplaceBadge from '../components/UI/badges/MarketplaceBadge';
-import testImg from '../assets/img/avataaars.svg';
-import { Button } from '../components/UI/Btns/Button';
-import CustomDialog from '../components/UI/headlessUI/CustomDialog';
-import SecurityPermissions from '../components/myAccount/SecurityPermissions';
-import OrderHistory from '../components/myAccount/OrderHistory';
-import Admin from '../components/myAccount/Admin';
-import { MarketPlaceTypes, UserRoleTypes } from '../types/types';
-import { Input } from '../components/UI/input';
-import { DatePicker } from '../components/UI/datePicker';
+import MainContainer from '@layout/MainContainer';
+import EditUserData from '@features/myAccount/EditUserData';
+import MyShop from '@features/myAccount/MyShop';
+import { UserContext } from '@context/UserProvider';
+import MarketplaceBadge from '@components/UI/badges/MarketplaceBadge';
+import avatarImg from '@assets/img/avataaars.svg';
+import { Button } from '@components/UI/button';
+import SecurityPermissions from '@features/myAccount/SecurityPermissions';
+import OrderHistory from '@features/myAccount/OrderHistory';
+import Admin from '@features/myAccount/Admin';
+import { MarketPlaceTypes, UserRoleTypes } from '@customTypes/types';
+import { Input } from '@components/UI/input';
+import { DatePickerDemo } from '@components/UI/datePicker';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@components/UI/dialog';
+import { RadioGroup, RadioGroupItem } from '@components/UI/radio-group';
+import { Label } from '@components/UI/label';
+import {
+  useGetAccessDatabase,
+  usePostAccessDatabase,
+} from '../hooks/useAaccessDatabase';
+import { DATABASE_ENDPOINTS } from '../data/endpoints';
+import {
+  Link,
+  useLocation,
+  useNavigate,
+  useParams,
+  useSearchParams,
+} from 'react-router-dom';
 
-const socket = io('ws://localhost:8080');
 const tabNames = {
   MY_DATA: 'myData',
   SECURITY_PERMISSIONS: 'securityPermissions',
@@ -61,37 +78,41 @@ const initialProductData = {
   startingPrice: { value: 1, hasError: false },
 };
 
+const TABS_ARRAY = [
+  {
+    text: 'My data',
+    name: tabNames.MY_DATA,
+    icon: <UserIcon height={20} width={20} />,
+  },
+  {
+    text: 'Security & Permissions',
+    name: tabNames.SECURITY_PERMISSIONS,
+    icon: <LockClosedIcon height={20} width={20} />,
+  },
+  {
+    text: 'History',
+    name: tabNames.HISTORY,
+    icon: <ArchiveBoxIcon height={20} width={20} />,
+  },
+  {
+    text: 'My products',
+    name: tabNames.MY_PRODUCTS,
+    icon: <Square2StackIcon height={20} width={20} />,
+  },
+  {
+    text: 'Admin',
+    name: tabNames.ADMIN,
+  },
+];
+
 export default function MyAccount() {
   const { userData, fetchUserData } = useContext(UserContext);
-  const [isOpen, setIsOpen] = useState(false);
   const [finishAuctionDate, setFinishAuctionDate] = useState<Date>();
-  const tabsArray = [
-    {
-      text: 'My data',
-      name: tabNames.MY_DATA,
-      icon: <UserIcon height={20} width={20} />,
-    },
-    {
-      text: 'Security & Permissions',
-      name: tabNames.SECURITY_PERMISSIONS,
-      icon: <LockClosedIcon height={20} width={20} />,
-    },
-    {
-      text: 'History',
-      name: tabNames.HISTORY,
-      icon: <ArchiveBoxIcon height={20} width={20} />,
-    },
-    {
-      text: 'My products',
-      name: tabNames.MY_PRODUCTS,
-      icon: <Square2StackIcon height={20} width={20} />,
-    },
-    {
-      text: 'Admin',
-      name: tabNames.ADMIN,
-    },
-  ];
-  const [selectedtab, setSelectedtab] = useState(tabsArray[0].name);
+  const [searchParams] = useSearchParams();
+  const lastSearchQuery = searchParams.get('tab');
+  const [selectedtab, setSelectedtab] = useState(
+    lastSearchQuery || TABS_ARRAY[0].name
+  );
 
   const [productData, setProductData] =
     useState<ProductDataTypes>(initialProductData);
@@ -120,6 +141,16 @@ export default function MyAccount() {
     options: [],
     value: [],
   });
+  const navigate = useNavigate();
+  const path = useLocation();
+
+  const changeSelectedTab = (option: string) => {
+    setSelectedtab(option);
+    navigate(
+      { pathname: path.pathname, search: `tab=${option}` },
+      { replace: true }
+    );
+  };
 
   const resetProductData = () => {
     setTimeout(() => {
@@ -129,22 +160,6 @@ export default function MyAccount() {
       });
       setAuthorState((prevState) => {
         return { ...prevState, value: [] };
-      });
-    }, 200);
-  };
-
-  const resetHasFailed = () => {
-    setStatus((prevState) => {
-      return { ...prevState, hasFailed: false };
-    });
-  };
-  const changeIsOpen = () => {
-    setIsOpen((prevState) => !prevState);
-    resetProductData();
-    setTimeout(() => {
-      resetHasFailed();
-      setStatus((prevState) => {
-        return { ...prevState, isSuccess: false };
       });
     }, 200);
   };
@@ -195,16 +210,20 @@ export default function MyAccount() {
   };
 
   const fetchAllCategories = useCallback(async () => {
-    const res = await axios.get('/category/all');
+    const { data } = await useGetAccessDatabase({
+      url: DATABASE_ENDPOINTS.CATEGORY_ALL,
+    });
     setCategoryState((prevState) => {
-      return { ...prevState, options: [...res.data] };
+      return { ...prevState, options: [...data] };
     });
   }, []);
 
   const fetchAllAuthors = useCallback(async () => {
-    const res = await axios.get('/user/authors');
+    const { data } = await useGetAccessDatabase({
+      url: DATABASE_ENDPOINTS.USER_AUTHORS,
+    });
     setAuthorState((prevState) => {
-      return { ...prevState, options: [...res.data] };
+      return { ...prevState, options: [...data] };
     });
   }, []);
 
@@ -216,7 +235,10 @@ export default function MyAccount() {
   const addProductHandler = async (e: React.FormEvent) => {
     e.preventDefault();
     const newProductData = {
-      user_id: userData?._id,
+      seller_data: {
+        _id: userData?._id,
+        pseudonim: userData?.author_info.pseudonim,
+      },
       title: productData.title.value,
       description: productData.description.value,
       price: Number(productData.price.value),
@@ -233,7 +255,11 @@ export default function MyAccount() {
       setStatus((prevState) => {
         return { ...prevState, isLoading: true };
       });
-      await axios.post('/product/product', { newProductData });
+
+      await usePostAccessDatabase({
+        url: DATABASE_ENDPOINTS.PRODUCT_ONE,
+        body: { newProductData },
+      });
       setStatus((prevState) => {
         return { ...prevState, isLoading: false };
       });
@@ -251,31 +277,31 @@ export default function MyAccount() {
     }
   };
 
-  const filterColors = (inputValue: string) => {
+  const filterCategories = (inputValue: string) => {
     return categoryState.options.filter((i: { label: string }) => {
       return i.label.toLowerCase().includes(inputValue.toLowerCase());
     });
   };
-  const authorFilter = (inputValue: string) => {
+  const filterAuthors = (inputValue: string) => {
     return authorState.options.filter((i: { label: string }) => {
       return i.label.toLowerCase().includes(inputValue.toLowerCase());
     });
   };
-  const promiseOptions = (inputValue: string) =>
+  const categoryOptions = (inputValue: string) =>
     new Promise<any[]>((resolve) => {
       setTimeout(() => {
-        resolve(filterColors(inputValue));
+        resolve(filterCategories(inputValue));
       }, 1000);
     });
 
   const authorOptions = (inputValue: string) =>
     new Promise<any[]>((resolve) => {
       setTimeout(() => {
-        resolve(authorFilter(inputValue));
+        resolve(filterAuthors(inputValue));
       }, 1000);
     });
 
-  const slectedChangetest = (selectedOptions: any) => {
+  const selectCategoryChange = (selectedOptions: any) => {
     setCategoryState((prevState) => {
       return { ...prevState, value: selectedOptions };
     });
@@ -291,11 +317,6 @@ export default function MyAccount() {
     getAllData();
   }, [getAllData]);
 
-  const handleSubmit = (e: any) => {
-    e.preventDefault();
-    socket.emit('message', { test: 'Hello world' });
-  };
-
   return (
     <div className="relative mb-16 min-h-screen">
       <div>
@@ -306,7 +327,7 @@ export default function MyAccount() {
                 <div className="flex flex-col items-center gap-4 sm:flex-row">
                   <img
                     className="inline-block h-24 w-24 rounded-full ring-2 ring-white"
-                    src={testImg}
+                    src={avatarImg}
                     alt="avatar_img"
                   />
                   <div className="pt-1 text-left">
@@ -337,12 +358,246 @@ export default function MyAccount() {
 
                 {userData?.role !== UserRoleTypes.USER && (
                   <div className="mt-4 flex flex-col sm:mt-0 sm:flex-row sm:items-center">
-                    <Button
-                      variant="primary"
-                      onClick={() => setIsOpen((prevState) => !prevState)}
-                    >
-                      Add new book
-                    </Button>
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button variant="default">Add new book</Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <form
+                          onSubmit={(e) => addProductHandler(e)}
+                          className="w-full"
+                        >
+                          <DialogHeader>
+                            <DialogTitle>Add product</DialogTitle>
+                            <DialogDescription>
+                              Fill in your product data. Click the
+                              &apos;add&apos; button when you&apos;re done.
+                            </DialogDescription>
+                          </DialogHeader>
+                          <fieldset className="mb-2 space-y-1">
+                            <label
+                              htmlFor="title"
+                              className="block text-sm font-medium text-gray-700"
+                            >
+                              Title
+                            </label>
+
+                            <input
+                              name="title"
+                              id="title"
+                              type="text"
+                              placeholder="Harry Potter..."
+                              className="w-full rounded-md border-gray-200 shadow-sm sm:text-sm"
+                              value={productData.title.value}
+                              onChange={(e) => productDataChangeHandler(e)}
+                            />
+                          </fieldset>
+
+                          <fieldset className="mb-2 space-y-1">
+                            <p className="block text-sm font-medium text-gray-700">
+                              Authors
+                            </p>
+                            <div>
+                              {productData.authors.value.map((author) => (
+                                <span key={author}>{author}</span>
+                              ))}
+                            </div>
+                            <div className="flex">
+                              <label
+                                htmlFor="newAuthor"
+                                className="sr-only block text-sm font-medium text-gray-700"
+                              >
+                                Author
+                              </label>
+                              <AsyncCreatableSelect
+                                isMulti
+                                cacheOptions
+                                defaultOptions
+                                loadOptions={authorOptions}
+                                value={authorState.value}
+                                onChange={selectAuthorChange}
+                              />
+                            </div>
+                          </fieldset>
+
+                          <fieldset className="mb-2 space-y-1">
+                            <p className="block text-sm font-medium text-gray-700">
+                              Categories
+                            </p>
+                            {productData.categories.value.map((category) => (
+                              <span key={category}>{category}</span>
+                            ))}
+                            <div>
+                              <label
+                                htmlFor="newCategory"
+                                className="sr-only block text-sm font-medium text-gray-700"
+                              >
+                                Category
+                              </label>
+                              <AsyncCreatableSelect
+                                isMulti
+                                cacheOptions
+                                defaultOptions
+                                loadOptions={categoryOptions}
+                                value={categoryState.value}
+                                onChange={selectCategoryChange}
+                              />
+                            </div>
+                          </fieldset>
+
+                          <fieldset className="mb-2 space-y-1">
+                            <label
+                              htmlFor="description"
+                              className="block text-sm font-medium text-gray-700"
+                            >
+                              Description
+                            </label>
+
+                            <textarea
+                              name="description"
+                              id="description"
+                              placeholder="Few words..."
+                              className="mt-1 w-full resize-none rounded-md border-gray-200 shadow-sm sm:text-sm"
+                              value={productData.description.value}
+                              onChange={(e) => productDataChangeHandler(e)}
+                            />
+                          </fieldset>
+
+                          <fieldset className="relative mb-2 max-w-full space-y-1 break-all">
+                            <label
+                              htmlFor="imgs"
+                              className="block text-sm font-medium text-gray-700  "
+                            >
+                              Imgs
+                            </label>
+
+                            <Input
+                              type="file"
+                              name="imgs"
+                              id="imgs"
+                              onChange={(e) => productDataChangeHandler(e)}
+                              accept="application/pdf, image/png"
+                            />
+
+                            {productData.imgs.value.length > 0 &&
+                              productData.imgs.value.map((img, id) => {
+                                return (
+                                  <p
+                                    className="text-xs"
+                                    key={id}
+                                    id={id.toString()}
+                                  >
+                                    {img.slice(0, 60)}...
+                                  </p>
+                                );
+                              })}
+                          </fieldset>
+
+                          <fieldset className="mb-2 space-y-1">
+                            <label
+                              htmlFor="quantity"
+                              className="block text-sm font-medium text-gray-700"
+                            >
+                              Amount
+                            </label>
+
+                            <input
+                              name="quantity"
+                              id="quantity"
+                              type="number"
+                              placeholder="1..."
+                              min={1}
+                              max={100}
+                              className="w-full rounded-md border-gray-200 shadow-sm sm:text-sm"
+                              value={productData.quantity.value}
+                              onChange={(e) => productDataChangeHandler(e)}
+                            />
+                          </fieldset>
+
+                          <fieldset className="mb-2 space-y-1">
+                            <span className="block text-sm font-medium text-gray-700">
+                              Marketplace
+                            </span>
+                            <RadioGroup defaultValue={MarketPlaceTypes.SHOP}>
+                              <div>
+                                <RadioGroupItem
+                                  value={MarketPlaceTypes.SHOP}
+                                  id={MarketPlaceTypes.SHOP}
+                                />
+                                <Label htmlFor={MarketPlaceTypes.SHOP}>
+                                  {MarketPlaceTypes.SHOP}
+                                </Label>
+                              </div>
+                              <div>
+                                <RadioGroupItem
+                                  value={MarketPlaceTypes.AUCTION}
+                                  id={MarketPlaceTypes.AUCTION}
+                                />
+                                <Label htmlFor={MarketPlaceTypes.AUCTION}>
+                                  {MarketPlaceTypes.AUCTION}
+                                </Label>
+                              </div>
+                            </RadioGroup>
+                          </fieldset>
+
+                          {productData.marketPlace.value ===
+                          MarketPlaceTypes.SHOP ? (
+                            <fieldset className="mb-2 space-y-1">
+                              <label
+                                htmlFor="price"
+                                className="block text-sm font-medium text-gray-700"
+                              >
+                                Price
+                              </label>
+                              <input
+                                name="price"
+                                id="price"
+                                type="number"
+                                placeholder="$1..."
+                                min={0.1}
+                                step={0.1}
+                                className="w-full rounded-md border-gray-200 shadow-sm sm:text-sm"
+                                value={productData.price.value}
+                                onChange={(e) => productDataChangeHandler(e)}
+                              />
+                            </fieldset>
+                          ) : (
+                            <div>
+                              <fieldset className="mb-2 space-y-1">
+                                <label
+                                  htmlFor="price"
+                                  className="block text-sm font-medium text-gray-700"
+                                >
+                                  Starting Price
+                                </label>
+                                <input
+                                  name="startingPrice"
+                                  id="startingPrice"
+                                  type="number"
+                                  placeholder="$1..."
+                                  min={0.1}
+                                  step={0.1}
+                                  className="w-full rounded-md border-gray-200 shadow-sm sm:text-sm"
+                                  value={productData.startingPrice.value}
+                                  onChange={(e) => productDataChangeHandler(e)}
+                                />
+                              </fieldset>
+                              <DatePickerDemo
+                                date={finishAuctionDate}
+                                setDate={setFinishAuctionDate}
+                              />
+                            </div>
+                          )}
+                          <DialogFooter>
+                            <DialogTrigger asChild>
+                              <Button variant="default" type="submit">
+                                Add
+                              </Button>
+                            </DialogTrigger>
+                          </DialogFooter>
+                        </form>
+                      </DialogContent>
+                    </Dialog>
                   </div>
                 )}
               </div>
@@ -358,10 +613,10 @@ export default function MyAccount() {
                 <select
                   id="Tab"
                   className="w-full rounded-md border-gray-200"
-                  onChange={(e) => setSelectedtab(e.target.value)}
+                  onChange={(e) => changeSelectedTab(e.target.value)}
                   value={selectedtab}
                 >
-                  {tabsArray.map((tab) => {
+                  {TABS_ARRAY.map((tab) => {
                     if (
                       tab.name === 'admin' &&
                       userData?.role !== UserRoleTypes.ADMIN
@@ -385,7 +640,7 @@ export default function MyAccount() {
               <div className="hidden sm:block">
                 <div className="border-b border-gray-200">
                   <nav className="-mb-px flex gap-6" aria-label="Tabs">
-                    {tabsArray.map((option) => {
+                    {TABS_ARRAY.map((option) => {
                       if (
                         option.name === 'admin' &&
                         userData?.role !== UserRoleTypes.ADMIN
@@ -401,10 +656,10 @@ export default function MyAccount() {
                       }
 
                       return (
-                        <a
-                          href="#"
+                        <button
                           key={option.name}
-                          onClick={() => setSelectedtab(option.name)}
+                          type="button"
+                          onClick={() => changeSelectedTab(option.name)}
                           className={`${
                             selectedtab === option.name
                               ? 'border-sky-500 text-sky-600'
@@ -413,14 +668,14 @@ export default function MyAccount() {
                         >
                           {option.icon}
                           {option.text}
-                        </a>
+                        </button>
                       );
                     })}
                   </nav>
                 </div>
               </div>
             </div>
-            <div className="mt-8 flex w-full flex-col justify-start gap-8 px-4 lg:flex-row">
+            <div className="mt-8 flex w-full flex-col gap-8 px-4 sm:flex-row">
               {selectedtab === tabNames.MY_DATA && <EditUserData />}
               {selectedtab === tabNames.SECURITY_PERMISSIONS && (
                 <SecurityPermissions />
@@ -432,309 +687,6 @@ export default function MyAccount() {
           </div>
         </MainContainer>
       </div>
-      <CustomDialog
-        isOpen={isOpen}
-        changeIsOpen={changeIsOpen}
-        title="Add product"
-        description={
-          "Fill in your product data. Click the 'add' button when you're done."
-        }
-        isLoading={status.isLoading}
-        hasFailed={status.hasFailed}
-        changeHasFailed={resetHasFailed}
-        isSuccess={status.isSuccess}
-      >
-        <form onSubmit={(e) => addProductHandler(e)} className="w-full">
-          <fieldset className="mb-2 space-y-1">
-            <label
-              htmlFor="title"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Title
-            </label>
-
-            <input
-              name="title"
-              id="title"
-              type="text"
-              placeholder="Harry Potter..."
-              className="w-full rounded-md border-gray-200 shadow-sm sm:text-sm"
-              value={productData.title.value}
-              onChange={(e) => productDataChangeHandler(e)}
-            />
-          </fieldset>
-
-          <fieldset className="mb-2 space-y-1">
-            <p className="block text-sm font-medium text-gray-700">Authors</p>
-            <div>
-              {productData.authors.value.map((author) => (
-                <span key={author}>{author}</span>
-              ))}
-            </div>
-            <div className="flex">
-              <label
-                htmlFor="newAuthor"
-                className="sr-only block text-sm font-medium text-gray-700"
-              >
-                Author
-              </label>
-              <AsyncCreatableSelect
-                isMulti
-                cacheOptions
-                defaultOptions
-                loadOptions={authorOptions}
-                value={authorState.value}
-                onChange={selectAuthorChange}
-              />
-            </div>
-          </fieldset>
-
-          <fieldset className="mb-2 space-y-1">
-            <p className="block text-sm font-medium text-gray-700">
-              Categories
-            </p>
-            {productData.categories.value.map((category) => (
-              <span key={category}>{category}</span>
-            ))}
-            <div>
-              <label
-                htmlFor="newCategory"
-                className="sr-only block text-sm font-medium text-gray-700"
-              >
-                Category
-              </label>
-              <AsyncCreatableSelect
-                isMulti
-                cacheOptions
-                defaultOptions
-                loadOptions={promiseOptions}
-                value={categoryState.value}
-                onChange={slectedChangetest}
-              />
-            </div>
-          </fieldset>
-
-          <fieldset className="mb-2 space-y-1">
-            <label
-              htmlFor="description"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Description
-            </label>
-
-            <textarea
-              name="description"
-              id="description"
-              placeholder="Few words..."
-              className="mt-1 w-full resize-none rounded-md border-gray-200 shadow-sm sm:text-sm"
-              value={productData.description.value}
-              onChange={(e) => productDataChangeHandler(e)}
-            />
-          </fieldset>
-
-          <fieldset className="relative mb-2 max-w-full space-y-1 break-all">
-            <label
-              htmlFor="imgs"
-              className="block text-sm font-medium text-gray-700  "
-            >
-              Imgs
-            </label>
-
-            <Input
-              type="file"
-              name="imgs"
-              id="imgs"
-              onChange={(e) => productDataChangeHandler(e)}
-              accept="application/pdf, image/png"
-            />
-
-            {productData.imgs.value.length > 0 &&
-              productData.imgs.value.map((img, id) => {
-                return (
-                  <p className="text-xs" key={id} id={id.toString()}>
-                    {img.slice(0, 60)}...
-                  </p>
-                );
-              })}
-          </fieldset>
-
-          <fieldset className="mb-2 space-y-1">
-            <label
-              htmlFor="quantity"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Amount
-            </label>
-
-            <input
-              name="quantity"
-              id="quantity"
-              type="number"
-              placeholder="1..."
-              min={1}
-              max={100}
-              className="w-full rounded-md border-gray-200 shadow-sm sm:text-sm"
-              value={productData.quantity.value}
-              onChange={(e) => productDataChangeHandler(e)}
-            />
-          </fieldset>
-
-          <fieldset className="mb-2 space-y-1">
-            <span className="block text-sm font-medium text-gray-700">
-              Marketplace
-            </span>
-            <RadioGroup
-              value={productData.marketPlace.value}
-              onChange={(value) => productDataChangeHandler(null, value)}
-            >
-              <div className="space-y-2">
-                <RadioGroup.Option
-                  value="Shop"
-                  className={({ active, checked }) =>
-                    `
-                  ${
-                    checked ? 'bg-primary bg-opacity-95 text-white' : 'bg-white'
-                  }
-                  relative flex
-                    cursor-pointer rounded-lg px-5 py-4 shadow-md focus:ring focus:ring-blue-300`
-                  }
-                >
-                  {({ active, checked }) => (
-                    <div className="flex w-full items-center justify-between">
-                      <div className="flex items-center">
-                        <div className="text-sm">
-                          <RadioGroup.Label
-                            as="p"
-                            className={`font-medium  ${
-                              checked ? 'text-white' : 'text-gray-900'
-                            }`}
-                          >
-                            Shop
-                          </RadioGroup.Label>
-                          <RadioGroup.Description
-                            as="span"
-                            className={`inline ${
-                              checked ? 'text-sky-100' : 'text-gray-500'
-                            }`}
-                          >
-                            <span>
-                              Adds the product to the Shop marketplace
-                            </span>
-                          </RadioGroup.Description>
-                        </div>
-                      </div>
-                      {checked && (
-                        <div className="shrink-0 text-white">
-                          <CheckIcon height={6} width={6} />
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </RadioGroup.Option>
-                <RadioGroup.Option
-                  value="Auction"
-                  className={({ active, checked }) =>
-                    `
-                  ${
-                    checked ? 'bg-primary bg-opacity-95 text-white' : 'bg-white'
-                  }
-                    relative flex cursor-pointer rounded-lg px-5 py-4 shadow-md focus:ring focus:ring-blue-300`
-                  }
-                >
-                  {({ active, checked }) => (
-                    <div className="flex w-full items-center justify-between">
-                      <div className="flex items-center">
-                        <div className="text-sm">
-                          <RadioGroup.Label
-                            as="p"
-                            className={`font-medium  ${
-                              checked ? 'text-white' : 'text-gray-900'
-                            }`}
-                          >
-                            Auction
-                          </RadioGroup.Label>
-                          <RadioGroup.Description
-                            as="span"
-                            className={`inline ${
-                              checked ? 'text-sky-100' : 'text-gray-500'
-                            }`}
-                          >
-                            <span>
-                              Adds the product to the Auction marketplace
-                            </span>
-                          </RadioGroup.Description>
-                        </div>
-                      </div>
-                      {checked && (
-                        <div className="shrink-0 text-white">
-                          <CheckIcon height={6} width={6} />
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </RadioGroup.Option>
-              </div>
-            </RadioGroup>
-          </fieldset>
-
-          {productData.marketPlace.value === MarketPlaceTypes.SHOP ? (
-            <fieldset className="mb-2 space-y-1">
-              <label
-                htmlFor="price"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Price
-              </label>
-              <input
-                name="price"
-                id="price"
-                type="number"
-                placeholder="$1..."
-                min={0.1}
-                step={0.1}
-                className="w-full rounded-md border-gray-200 shadow-sm sm:text-sm"
-                value={productData.price.value}
-                onChange={(e) => productDataChangeHandler(e)}
-              />
-            </fieldset>
-          ) : (
-            <div>
-              <fieldset className="mb-2 space-y-1">
-                <label
-                  htmlFor="price"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Starting Price
-                </label>
-                <input
-                  name="startingPrice"
-                  id="startingPrice"
-                  type="number"
-                  placeholder="$1..."
-                  min={0.1}
-                  step={0.1}
-                  className="w-full rounded-md border-gray-200 shadow-sm sm:text-sm"
-                  value={productData.startingPrice.value}
-                  onChange={(e) => productDataChangeHandler(e)}
-                />
-              </fieldset>
-              <DatePicker
-                date={finishAuctionDate}
-                setDate={setFinishAuctionDate}
-              />
-              <button type="button" onClick={handleSubmit}>
-                Test Socket
-              </button>
-            </div>
-          )}
-
-          <div className="mb-2 mt-4 flex justify-end">
-            <Button variant="success" type="submit">
-              Add
-            </Button>
-          </div>
-        </form>
-      </CustomDialog>
     </div>
   );
 }

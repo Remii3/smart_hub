@@ -17,10 +17,19 @@
     "useUnknownInCatchVariables": true,
     "noFallthroughCasesInSwitch": true,
     "jsx": "react-jsx",
-    "paths": {
-      "~/*": ["src/*"]
-    },
     "baseUrl": ".",
+    "paths": {
+      "@components/*": ["./src/components/*"],
+      "@lib/*": ["./src/lib/*"],
+      "@pages/*": ["./src/pages/*"],
+      "@customTypes/*": ["./src/types/*"],
+      "@hooks/*": ["./src/hooks/*"],
+      "@context/*": ["./src/context/*"],
+      "@data/*": ["./src/data/*"],
+      "@layout/*": ["./src/layout/*"],
+      "@assets/*": ["./src/assets/*"],
+      "@features/*": ["./src/features/*"]
+    },
     "typeRoots": ["src/ts", "node_modules/@types"]
   },
   "include": [

@@ -3,13 +3,14 @@ const express = require('express');
 const router = express.Router();
 
 const {
-  addComment,
-  getComments,
+  getAllComments,
+  addOneComment,
+  deleteOneComment,
 } = require('../Controllers/comment.controller');
 
-router.get('/all', getComments);
-router.get('/one');
+router.get('/all', getAllComments);
 
-router.post('/one', addComment);
+router.post('/one', addOneComment);
+router.post('/delete', deleteOneComment);
 
 module.exports = router;

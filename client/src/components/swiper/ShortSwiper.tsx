@@ -2,8 +2,8 @@ import { ReactNode } from 'react';
 import { Swiper } from 'swiper/react';
 import { Navigation, Pagination } from 'swiper';
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/solid';
-import SuspenseComponent from '../UI/suspense/SuspenseComponent';
-import LoadingComponent from '../UI/Loaders/LoadingComponent';
+import SuspenseComponent from '@components/suspense/SuspenseComponent';
+import LoadingCircle from '@components/Loaders/LoadingCircle';
 
 import 'swiper/swiper-bundle.css';
 
@@ -47,7 +47,7 @@ function ShortSwiper({
           paddingRight: '10px',
         }}
       >
-        <SuspenseComponent fallback={<LoadingComponent />}>
+        <SuspenseComponent fallback={<LoadingCircle isLoading />}>
           {children}
         </SuspenseComponent>
       </Swiper>

@@ -1,4 +1,4 @@
-import { UnknownProductTypes } from '../types/interfaces';
+import { UnknownProductTypes } from '@customTypes/interfaces';
 
 type FilterTypes = 'Marketplace' | 'Price';
 
@@ -36,7 +36,7 @@ export default function useFilterProducts({
     });
   }
 
-  if (filterData.filterType === 'Price' && maxPrice && minPrice) {
+  if (filterData.filterType === 'Price') {
     if (minPrice === '' && maxPrice === '') {
       filteredProducts = products;
     } else if (minPrice === '') {

@@ -1,14 +1,6 @@
-import { UnknownProductTypes } from '../types/interfaces';
+import { UnknownProductTypes } from '@customTypes/interfaces';
 
-interface SortProductsTypes {
-  DATE_DESC: 'Date, DESC';
-  DATE_ASC: 'Date, ASC';
-  TITLE_DESC: 'Title, DESC';
-  TITLE_ASC: 'Title, ASC';
-  PRICE_DESC: 'Price, DESC';
-  PRICE_ASC: 'Price, ASC';
-}
-type SortTypePropsTypes =
+export type SortType =
   | 'Date, DESC'
   | 'Date, ASC'
   | 'Title, DESC'
@@ -16,67 +8,80 @@ type SortTypePropsTypes =
   | 'Price, DESC'
   | 'Price, ASC';
 
-export const sortProductsTypes = {
+type SortOptionsType =
+  | 'DATE_DESC'
+  | 'DATE_ASC'
+  | 'TITLE_DESC'
+  | 'TITLE_ASC'
+  | 'PRICE_DESC'
+  | 'PRICE_ASC';
+
+export const sortOptions: Record<SortOptionsType, SortType> = {
   DATE_DESC: 'Date, DESC',
   DATE_ASC: 'Date, ASC',
   TITLE_DESC: 'Title, DESC',
   TITLE_ASC: 'Title, ASC',
   PRICE_DESC: 'Price, DESC',
   PRICE_ASC: 'Price, ASC',
-} as SortProductsTypes;
+};
+
+type SortOptionEntryType = [string, SortType];
+type SortOptionObjectType = { key: string; value: SortType };
+
+export const sortOptionsArray: SortOptionObjectType[] = Object.entries(
+  sortOptions
+).map(([key, value]: SortOptionEntryType) => ({ key, value }));
 
 export default function useSortProducts({
   products,
   sortType,
 }: {
   products: UnknownProductTypes[];
-  sortType: SortTypePropsTypes;
+  sortType: SortType;
 }) {
   let sortedProducts = null;
   switch (sortType) {
-    case sortProductsTypes.DATE_DESC: {
+    case sortOptions.DATE_DESC: {
       sortedProducts = products.sort((a, b) => {
         return a.created_at > b.created_at ? -1 : 1;
       });
       break;
     }
-    case sortProductsTypes.DATE_ASC: {
+    case sortOptions.DATE_ASC: {
       sortedProducts = products.sort((a, b) => {
         return b.created_at > a.created_at ? -1 : 1;
       });
       break;
     }
-    case sortProductsTypes.TITLE_DESC: {
+    case sortOptions.TITLE_DESC: {
       sortedProducts = products.sort((a, b) => {
         return a.title > b.title ? -1 : 1;
       });
       break;
     }
-    case sortProductsTypes.TITLE_ASC: {
+    case sortOptions.TITLE_ASC: {
       sortedProducts = products.sort((a, b) => {
         return b.title > a.title ? -1 : 1;
       });
       break;
     }
-    case sortProductsTypes.PRICE_DESC: {
+    case sortOptions.PRICE_DESC: {
       const filteredData = products.filter((product) => {
         return product.shop_info;
       });
       sortedProducts = filteredData.sort((a, b) => {
-        return a.shop_info.price > b.shop_info.price ? 1 : -1;
+        return Number(a.shop_info.price) > Number(b.shop_info.price) ? -1 : 1;
       });
       break;
     }
 
-    case sortProductsTypes.PRICE_ASC: {
-      const filteredData = products.filter(
-        (product) => product.shop_info.price
-      );
-
-      sortedProducts = filteredData.sort((a, b) => {
-        return b.shop_info.price > a.shop_info.price ? -1 : 1;
+    case sortOptions.PRICE_ASC: {
+      const filteredData = products.filter((product) => {
+        return product.shop_info;
       });
-      console.log(sortedProducts);
+      sortedProducts = filteredData.sort((a, b) => {
+        return Number(a.shop_info.price) < Number(b.shop_info.price) ? -1 : 1;
+      });
       break;
     }
     default:
