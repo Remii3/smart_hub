@@ -39,7 +39,10 @@
   body {
     @apply font-rubik;
   }
+  .star:hover,
+  .star.clicked {
+    @apply text-yellow-400; /* Change this to your desired star color on hover or click */
+  }
 }
-
 @tailwind components;
 @tailwind utilities;

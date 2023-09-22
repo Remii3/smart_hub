@@ -3,7 +3,7 @@ import { SwiperSlide } from 'swiper/react';
 import { ChangeEvent, useCallback, useEffect, useState } from 'react';
 import { UnknownProductTypes } from '@customTypes/interfaces';
 import PriceSelector from './PriceSelector';
-import SortProducts from './SortProducts';
+import SortProducts from '../../features/sortProducts/SortProducts';
 import ShopCard, { SkeletonShopCard } from '@components/cards/ShopCard';
 import LongSwiper from '@components/swiper/LongSwiper';
 import AuctionCard from '@components/cards/AuctionCard';

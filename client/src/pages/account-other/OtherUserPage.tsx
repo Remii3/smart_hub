@@ -12,8 +12,8 @@ import { Skeleton } from '@components/UI/skeleton';
 import {
   useGetAccessDatabase,
   usePostAccessDatabase,
-} from '../hooks/useAaccessDatabase';
-import { DATABASE_ENDPOINTS } from '../data/endpoints';
+} from '../../hooks/useAaccessDatabase';
+import { DATABASE_ENDPOINTS } from '../../data/endpoints';
 
 export default function OtherUserPage() {
   const [otherUserData, setOtherUserData] = useState<AuthorTypes>();

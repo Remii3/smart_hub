@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { useCallback, useEffect, useState } from 'react';
 import { ProductTypes } from '@customTypes/interfaces';
-import MainPageHeading from '@features/headings/MainPageHeading';
+import MainPageHeading from '@pages/home/MainPageHeading';
 import CollectionCard from '@components/cards/CollectionCard';
 import { useGetAccessDatabase } from '../../hooks/useAaccessDatabase';
 import { DATABASE_ENDPOINTS } from '../../data/endpoints';

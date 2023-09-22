@@ -13,10 +13,10 @@ import {
 } from 'react-router-dom';
 import { AuthorTypes, UnknownProductTypes } from '@customTypes/interfaces';
 import { UserContext } from '@context/UserProvider';
-import ProductImage from '@features/product/ProductImage';
-import ProductPill from '@features/product/ProductPill';
-import StarRating from '@features/product/StarRating';
-import ProductForm from '@features/product/ProductForm';
+import ProductImage from './ProductImage';
+import ProductPill from './ProductPill';
+import StarRating from '@features/starRating/StarRating';
+import ProductForm from '@pages/product/ProductForm';
 import { Button } from '@components/UI/button';
 import LoadingCircle from '@components/Loaders/LoadingCircle';
 import {
@@ -31,8 +31,8 @@ import {
 import {
   useGetAccessDatabase,
   usePostAccessDatabase,
-} from '../hooks/useAaccessDatabase';
-import { DATABASE_ENDPOINTS } from '../data/endpoints';
+} from '../../hooks/useAaccessDatabase';
+import { DATABASE_ENDPOINTS } from '../../data/endpoints';
 
 interface ProductTypes {
   isLoading: boolean;

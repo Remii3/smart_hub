@@ -2,22 +2,22 @@ import { useContext } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import { UserContext } from './context/UserProvider';
 
-import ShopPage from './pages/ShopPage';
-import LoginPage from './pages/LoginPage';
-import RegisterPage from './pages/RegisterPage';
-import MainPage from './pages/MainPage';
-import MyAccount from './pages/MyAccount';
-import NewsPage from './pages/newsPage/NewsPage';
+import ShopPage from './pages/shop/ShopPage';
+import LoginPage from './pages/auth/LoginPage';
+import RegisterPage from './pages/auth/RegisterPage';
+import HomePage from './pages/home/HomePage';
+import MyAccount from './pages/account-my/MyAccount';
+import NewsPage from './pages/news/NewsPage';
 import CollectionsPage from './pages/CollectionsPage';
 import AuctionsPage from './pages/AuctionsPage';
-import CartPage from './pages/CartPage';
-import CheckoutPage from './pages/CheckoutPage';
+import CartPage from './pages/cart/CartPage';
+import CheckoutPage from './pages/checkout/CheckoutPage';
 import BlogPage from './pages/BlogPage';
 import NoPage404 from './pages/NoPage404';
 import ContactPage from './pages/ContactPage';
-import ProductPage from './pages/ProductPage';
-import SearchPage from './pages/SearchPage';
-import OtherUserPage from './pages/OtherUserPage';
+import ProductPage from './pages/product/ProductPage';
+import SearchPage from './pages/search/SearchPage';
+import OtherUserPage from './pages/account-other/OtherUserPage';
 import OrderPage from './pages/OrderPage';
 import ThankYouPage from '@pages/ThankYouPage';
 
@@ -26,7 +26,7 @@ export default function AppRoutes() {
 
   return (
     <Routes>
-      <Route path="/" element={<MainPage />} />
+      <Route path="/" element={<HomePage />} />
       <Route path="/news" element={<NewsPage />} />
       <Route path="/shop" element={<ShopPage />} />
       <Route path="/product/:id" element={<ProductPage />} />

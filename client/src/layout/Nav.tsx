@@ -1,7 +1,6 @@
-import React, { Fragment, useContext, useRef, useState } from 'react';
+import React, { useContext, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import gsap from 'gsap';
-import axios from 'axios';
 import {
   ShoppingBagIcon,
   UserCircleIcon as OutlinedUserIcon,
@@ -9,7 +8,7 @@ import {
 import { MagnifyingGlassIcon, UserCircleIcon } from '@heroicons/react/24/solid';
 import { PopoverClose } from '@radix-ui/react-popover';
 import { UserContext } from '@context/UserProvider';
-import CartPopup from '@features/cart/CartPopup';
+import CartPopup from '@pages/cart/CartPopup';
 import { CartContext } from '@context/CartProvider';
 
 import {

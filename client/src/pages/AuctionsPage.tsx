@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import BasicProductCollection from '@features/productCollections/BasicProductCollection';
+import BasicProductCollection from '@pages/shop/BasicProductCollection';
 import { UnknownProductTypes } from '@customTypes/interfaces';
 
 export default function AuctionsPage() {

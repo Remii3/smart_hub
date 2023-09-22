@@ -1,10 +1,10 @@
 import '@assets/styles/swiper.css';
-import CategoriesSection from '@features/mainPage/CategoriesSection';
-import CollectionSection from '@features/mainPage/CollectionSection';
-import MainBanner from '@features/mainPage/MainBanner';
-import IntroductionSection from '@features/mainPage/IntroductionSection';
+import CategoriesSection from './CategoriesSection';
+import CollectionSection from './CollectionSection';
+import MainBanner from './MainBanner';
+import IntroductionSection from './IntroductionSection';
 
-export default function MainPage() {
+export default function HomePage() {
   return (
     <div className="min-h-screen bg-pageBackground">
       <MainBanner />

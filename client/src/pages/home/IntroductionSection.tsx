@@ -1,4 +1,4 @@
-import MainPageHeading from '@features/headings/MainPageHeading';
+import MainPageHeading from '@pages/home/MainPageHeading';
 
 export default function IntroductionSection() {
   return (

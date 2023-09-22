@@ -9,8 +9,8 @@ import { Button } from '@components/UI/button';
 import {
   useGetAccessDatabase,
   usePostAccessDatabase,
-} from '../hooks/useAaccessDatabase';
-import { DATABASE_ENDPOINTS } from '../data/endpoints';
+} from '../../hooks/useAaccessDatabase';
+import { DATABASE_ENDPOINTS } from '../../data/endpoints';
 
 export default function LoginPage() {
   const navigate = useNavigate();

@@ -1,5 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom';
-import MainPageHeading from '@features/headings/MainPageHeading';
+import MainPageHeading from '@pages/home/MainPageHeading';
 import { buttonVariants } from '@components/UI/button';
 
 type CollectionCardTypes = {

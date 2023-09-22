@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { SwiperSlide } from 'swiper/react';
 import axios from 'axios';
-import MainPageHeading from '@features/headings/MainPageHeading';
+import MainPageHeading from '@pages/home/MainPageHeading';
 import AuctionsSwiper from '@components/swiper/LongSwiper';
 import { AuctionProductTypes } from '@customTypes/interfaces';
 import AuctionCard from '@components/cards/AuctionCard';
