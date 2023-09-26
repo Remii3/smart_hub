@@ -1,5 +1,5 @@
 const prepareProductObject = product => {
-  const {
+  let {
     _id,
     title,
     description,
@@ -18,6 +18,18 @@ const prepareProductObject = product => {
     seller_data,
     deleted,
   } = product;
+
+  if (rating) {
+    let preparedRating = 0;
+    let count = 0;
+    for (let i = 0; i < rating.length; i++) {
+      if (rating[i].rating) {
+        count += rating[i].rating;
+      }
+    }
+    preparedRating = count / rating.length;
+    rating = { rating: Math.ceil(preparedRating), count: rating.length };
+  }
 
   const preparedObject = {
     _id,

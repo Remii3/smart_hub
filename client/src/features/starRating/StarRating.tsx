@@ -1,35 +1,56 @@
 import { useState } from 'react';
 import { StarIcon } from '@heroicons/react/24/solid';
 
+interface NewCommentTypes {
+  rating: null | number;
+  value: string;
+  isLoading: boolean;
+  error: null | string;
+}
+
 export default function StarRating({
   initialValue,
   showOnly = false,
+  rating,
+  setRating,
 }: {
-  initialValue: number;
-  showOnly: boolean;
+  initialValue?: number | null;
+  showOnly?: boolean;
+  rating: number;
+  setRating?: React.Dispatch<React.SetStateAction<NewCommentTypes>>;
 }) {
   const [hoveredValue, setHoveredValue] = useState(0);
-  const [clickedValue, setClickedValue] = useState(0);
+  // const [clickedValue, setClickedValue] = useState(initialValue || 0);
 
   const handleStarClick = (value: number) => {
-    if (value === clickedValue) {
-      setClickedValue(0);
-    } else {
-      setClickedValue(value);
+    if (!showOnly && setRating) {
+      if (value === rating) {
+        setRating((prevState) => {
+          return { ...prevState, rating: 0 };
+        });
+      } else {
+        setRating((prevState) => {
+          return { ...prevState, rating: value };
+        });
+      }
     }
   };
   const handleStarHover = (value: number) => {
-    setHoveredValue(value);
+    if (!showOnly) {
+      setHoveredValue(value);
+    }
   };
 
   const handleStarLeave = () => {
-    setHoveredValue(0);
+    if (!showOnly) {
+      setHoveredValue(0);
+    }
   };
 
   const renderStars = () => {
     const stars = [];
     for (let i = 1; i <= 5; i++) {
-      const isClicked = i <= clickedValue;
+      const isClicked = i <= rating;
       const isHovered = i <= hoveredValue;
 
       const colorClass = isClicked || isHovered ? 'text-yellow-400' : '';
@@ -37,7 +58,9 @@ export default function StarRating({
       stars.push(
         <StarIcon
           key={i}
-          className={`cursor-pointer ${colorClass} transition duration-150 ease-out`}
+          className={`${
+            showOnly ? '' : 'cursor-pointer'
+          } ${colorClass} transition duration-150 ease-out`}
           onClick={() => handleStarClick(i)}
           onMouseEnter={() => handleStarHover(i)}
           onMouseLeave={handleStarLeave}
