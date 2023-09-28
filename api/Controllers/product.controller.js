@@ -222,7 +222,7 @@ const addOneProduct = async (req, res) => {
     price,
     title,
     description,
-    img,
+    imgs,
     categories,
     authors,
     quantity,
@@ -261,7 +261,7 @@ const addOneProduct = async (req, res) => {
           _id,
           title,
           description,
-          img,
+          imgs,
           categories,
           authors,
           rating: 0,
@@ -291,7 +291,7 @@ const addOneProduct = async (req, res) => {
           _id,
           title,
           description,
-          img,
+          imgs,
           categories,
           authors,
           rating: 0,
@@ -324,7 +324,9 @@ const addOneProduct = async (req, res) => {
         .json({ message: 'Failed updating user data', error: err.message });
     }
 
-    return res.status(201).json({ message: 'Succesfully added enw product' });
+    return res
+      .status(201)
+      .json({ message: 'Succesfully added new product', id: _id });
   } catch (err) {
     return res
       .status(500)
@@ -338,7 +340,7 @@ const updateOneProduct = async (req, res) => {
     title,
     description,
     price,
-    img,
+    imgs,
     categories,
     authors,
     quantity,
@@ -346,6 +348,8 @@ const updateOneProduct = async (req, res) => {
     auction_info,
   } = req.body;
   try {
+    console.log(_id, market_place);
+    console.log(imgs);
     if (market_place === 'Shop') {
       await Product.updateOne(
         { _id },
@@ -353,7 +357,7 @@ const updateOneProduct = async (req, res) => {
           title,
           description,
           'shop_info.price': price,
-          img,
+          imgs,
           categories,
           authors,
           quantity,
@@ -367,7 +371,7 @@ const updateOneProduct = async (req, res) => {
           title,
           description,
           auction_info,
-          img,
+          imgs,
           categories,
           authors,
           quantity,

@@ -16,7 +16,7 @@ export interface ProductTypes {
   _id: string;
   title: string;
   description?: string;
-  img?: string;
+  imgs?: string[];
   categories?: { value: string; label: string; _id: string }[];
   authors: AuthorTypes[];
   rating?: number;
