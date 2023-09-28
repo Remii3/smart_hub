@@ -6,8 +6,7 @@ const ShopDataSchema = mongoose.Schema({
   },
   title: { type: String, required: true },
   description: { type: String },
-  img: { type: Buffer },
-  img_type: { type: String },
+  imgs: { type: [String] },
   categories: [
     {
       type: mongoose.Types.ObjectId,

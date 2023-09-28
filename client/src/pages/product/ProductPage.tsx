@@ -219,12 +219,32 @@ export default function ProductPage() {
         <div className="grid grid-cols-1 items-start gap-8 md:grid-cols-2">
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4 md:grid-cols-1">
-              <ProductImage />
-              <div className="grid grid-cols-2 gap-4 lg:mt-4">
-                {[...Array(4)].map((el, index) => (
-                  <ProductImage key={index} />
-                ))}
-              </div>
+              {productState.data?.imgs && productState.data?.imgs[0] ? (
+                <img
+                  src={productState.data.imgs[0]}
+                  className="aspect-square w-full rounded-xl object-cover"
+                />
+              ) : (
+                <ProductImage />
+              )}
+              {productState.data?.imgs && productState.data.imgs.length > 1 && (
+                <div className="grid grid-cols-2 gap-4 lg:mt-4">
+                  {productState.data.imgs.map((el, index) => {
+                    if (index !== 0) {
+                      return (
+                        <>
+                          <img
+                            src={el}
+                            key={index}
+                            alt="product_img"
+                            className="aspect-square w-full rounded-xl object-cover"
+                          />
+                        </>
+                      );
+                    }
+                  })}
+                </div>
+              )}
             </div>
           </div>
 
