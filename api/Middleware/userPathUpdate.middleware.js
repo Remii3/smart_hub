@@ -14,7 +14,6 @@ const userPathUpdate = (req, res, next) => {
     case 'phone':
       fieldPath = `user_info.${fieldKey}`;
       break;
-
     case 'first_name':
       fieldPath = `user_info.credentials.${fieldKey}`;
       break;
@@ -38,6 +37,9 @@ const userPathUpdate = (req, res, next) => {
       break;
     case 'hide_private_information':
       fieldPath = `security_settings.${fieldKey}`;
+      break;
+    case 'profile_img':
+      fieldPath = `user_info.${fieldKey}`;
       break;
   }
   req.fieldPath = fieldPath;
