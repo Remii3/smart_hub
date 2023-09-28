@@ -1,4 +1,4 @@
-import BasicProductCollection from '@features/productCollections/BasicProductCollection';
+import BasicProductCollection from '@pages/shop/BasicProductCollection';
 
 export default function ShopPage() {
   return (

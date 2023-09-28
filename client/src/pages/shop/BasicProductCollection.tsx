@@ -3,7 +3,7 @@ import { SwiperSlide } from 'swiper/react';
 import { ChangeEvent, useCallback, useEffect, useState } from 'react';
 import { UnknownProductTypes } from '@customTypes/interfaces';
 import PriceSelector from './PriceSelector';
-import SortProducts from './SortProducts';
+import SortProducts from '../../features/sortProducts/SortProducts';
 import ShopCard, { SkeletonShopCard } from '@components/cards/ShopCard';
 import LongSwiper from '@components/swiper/LongSwiper';
 import AuctionCard from '@components/cards/AuctionCard';
@@ -188,42 +188,43 @@ export default function BasicProductCollection({
             ))}
           </div>
         )}
-        {!products.isLoading &&
-        products.filteredData &&
-        products.filteredData.length > 0 ? (
-          <LongSwiper swiperCategory={category}>
-            {products.filteredData.map((product, id) => (
-              <SwiperSlide key={id}>
-                <div>
-                  {marketPlace === 'Shop' ? (
-                    <ShopCard
-                      _id={product._id}
-                      price={product.shop_info.price}
-                      productQuantity={product.quantity}
-                      title={product.title}
-                      authors={product.authors}
-                      description={product.description}
-                      img={product.img}
-                    />
-                  ) : (
-                    <AuctionCard
-                      _id={product._id}
-                      title={product.title}
-                      authors={product.authors}
-                      description={product.description}
-                      img={product.img}
-                      startingPrice={product.auction_info.starting_price}
-                      currentPrice={product.auction_info.current_price}
-                      auctionEndDate={product.auction_info.auction_end_date}
-                    />
-                  )}
-                </div>
-              </SwiperSlide>
-            ))}
-          </LongSwiper>
-        ) : (
+        {!products.isLoading && !products.filteredData && (
           <p className="mx-8">No products</p>
         )}
+        {!products.isLoading &&
+          products.filteredData &&
+          products.filteredData.length > 0 && (
+            <LongSwiper swiperCategory={category}>
+              {products.filteredData.map((product, id) => (
+                <SwiperSlide key={id}>
+                  <div>
+                    {marketPlace === 'Shop' ? (
+                      <ShopCard
+                        _id={product._id}
+                        price={product.shop_info.price}
+                        productQuantity={product.quantity}
+                        title={product.title}
+                        authors={product.authors}
+                        description={product.description}
+                        img={product.img}
+                      />
+                    ) : (
+                      <AuctionCard
+                        _id={product._id}
+                        title={product.title}
+                        authors={product.authors}
+                        description={product.description}
+                        img={product.img}
+                        startingPrice={product.auction_info.starting_price}
+                        currentPrice={product.auction_info.current_price}
+                        auctionEndDate={product.auction_info.auction_end_date}
+                      />
+                    )}
+                  </div>
+                </SwiperSlide>
+              ))}
+            </LongSwiper>
+          )}
       </div>
     </section>
   );

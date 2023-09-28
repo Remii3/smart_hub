@@ -1,14 +1,14 @@
 import { useState, useEffect, ChangeEvent, useCallback } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
-import AdvancedFilter from '@features/search/AdvancedFilter';
+import AdvancedFilter from '@pages/search/AdvancedFilter';
 import { UnknownProductTypes } from '@customTypes/interfaces';
 import ShopCard, { SkeletonShopCard } from '@components/cards/ShopCard';
 import AuctionCard from '@components/cards/AuctionCard';
 import MainContainer from '@layout/MainContainer';
 import Pagination from '@components/paginations/Pagination';
-import SortProducts from '@features/productCollections/SortProducts';
-import { useGetAccessDatabase } from '../hooks/useAaccessDatabase';
-import { DATABASE_ENDPOINTS } from '../data/endpoints';
+import SortProducts from '@features/sortProducts/SortProducts';
+import { useGetAccessDatabase } from '../../hooks/useAaccessDatabase';
+import { DATABASE_ENDPOINTS } from '../../data/endpoints';
 import {
   SortType,
   sortOptions,

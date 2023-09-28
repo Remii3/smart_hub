@@ -29,18 +29,18 @@ const addOneComment = async (req, res) => {
   const { userId, targetId, value, target } = req.body;
 
   if (!userId) {
-    return res.status(422).json({ message: 'Provide user id' });
+    return res.status(422).json({ message: "Provide user id" });
   }
 
   if (!targetId) {
-    return res.status(422).json({ message: 'Provide target id' });
+    return res.status(422).json({ message: "Provide target id" });
   }
 
   try {
     const created_at = new Date().getTime();
     const _id = new mongoose.Types.ObjectId();
 
-    if (target === 'Product') {
+    if (target === "Product") {
       await Comment.create({
         _id,
         user: userId,
@@ -49,25 +49,41 @@ const addOneComment = async (req, res) => {
         target,
         created_at,
       });
-      await Product.updateOne({ _id: targetId }, { $push: { comments: _id } });
-      return res.status(201).json({ message: 'Success' });
+      await Product.updateOne(
+        { _id: targetId },
+        {
+          $push: {
+            comments: _id,
+            rating: { _id: userId, rating: value.rating },
+          },
+        }
+      );
+      return res.status(201).json({ message: "Success" });
     }
-    if (target === 'News') {
+    if (target === "News") {
       await Comment.create({
         _id,
         user: userId,
         target_id: targetId,
-        value: { text: value },
+        value,
         target,
         created_at,
       });
-      await News.updateOne({ _id: targetId }, { $push: { comments: _id } });
-      return res.status(201).json({ message: 'Success' });
+      await News.updateOne(
+        { _id: targetId },
+        {
+          $push: {
+            comments: _id,
+            rating: { _id: userId, rating: value.rating },
+          },
+        }
+      );
+      return res.status(201).json({ message: "Success" });
     }
   } catch (err) {
     return res
       .status(500)
-      .json({ message: 'Failed adding new comment', error: err.message });
+      .json({ message: "Failed adding new comment", error: err.message });
   }
 };
 

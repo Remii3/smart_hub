@@ -1,12 +1,12 @@
 import { Elements } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
 import { useState, useEffect, useCallback } from 'react';
-import CheckoutForm from '@features/checkout/CheckoutForm';
-import CheckoutProdList from '@features/checkout/CheckoutProdList';
+import CheckoutForm from '@pages/checkout/CheckoutForm';
+import CheckoutProdList from './CheckoutProdList';
 import { SimpleFetchDataTypes } from '@customTypes/interfaces';
 
-import { usePostAccessDatabase } from '../hooks/useAaccessDatabase';
-import { DATABASE_ENDPOINTS } from '../data/endpoints';
+import { usePostAccessDatabase } from '../../hooks/useAaccessDatabase';
+import { DATABASE_ENDPOINTS } from '../../data/endpoints';
 
 interface ClientSecretTypes extends SimpleFetchDataTypes {
   data: string;

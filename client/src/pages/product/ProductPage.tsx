@@ -13,10 +13,10 @@ import {
 } from 'react-router-dom';
 import { AuthorTypes, UnknownProductTypes } from '@customTypes/interfaces';
 import { UserContext } from '@context/UserProvider';
-import ProductImage from '@features/product/ProductImage';
-import ProductPill from '@features/product/ProductPill';
-import StarRating from '@features/product/StarRating';
-import ProductForm from '@features/product/ProductForm';
+import ProductImage from './ProductImage';
+import ProductPill from './ProductPill';
+import StarRating from '@features/starRating/StarRating';
+import ProductForm from '@pages/product/ProductForm';
 import { Button } from '@components/UI/button';
 import LoadingCircle from '@components/Loaders/LoadingCircle';
 import {
@@ -31,8 +31,9 @@ import {
 import {
   useGetAccessDatabase,
   usePostAccessDatabase,
-} from '../hooks/useAaccessDatabase';
-import { DATABASE_ENDPOINTS } from '../data/endpoints';
+} from '../../hooks/useAaccessDatabase';
+import { DATABASE_ENDPOINTS } from '../../data/endpoints';
+import Comments from '@features/comments/Comments';
 
 interface ProductTypes {
   isLoading: boolean;
@@ -84,9 +85,9 @@ export default function ProductPage() {
   const navigate = useNavigate();
   const path = useLocation();
 
-  let prodId: string | any[] | null = null;
-  prodId = path.pathname.split('/');
-  prodId = prodId[prodId.length - 1];
+  let unPreparedProdId: string | any[] | null = null;
+  unPreparedProdId = path.pathname.split('/');
+  const prodId: string = unPreparedProdId[unPreparedProdId.length - 1];
 
   const fetchData = useCallback(async () => {
     setProductState((prevState) => {
@@ -209,6 +210,7 @@ export default function ProductPage() {
     setCommentState({ isAdding: false, value: '' });
     fetchData();
   };
+
   if (!productState.data && productState.isLoading) return <p>Loading</p>;
   if (!productState.data && !productState.isLoading) return <p> No data</p>;
   return (
@@ -363,8 +365,22 @@ export default function ProductPage() {
                     ))}
                 </div>
                 <p className="text-sm">Highest Rated Product</p>
-
-                <StarRating />
+                <div className="">
+                  <StarRating
+                    showOnly
+                    rating={
+                      productState.data?.rating
+                        ? productState.data.rating.rating
+                        : 0
+                    }
+                  />
+                </div>
+                <span className="text-sm">
+                  votes:{' '}
+                  {productState.data?.rating
+                    ? productState.data.rating.count
+                    : 0}
+                </span>
               </div>
               {productEditState.isEditing ? (
                 <input
@@ -429,75 +445,13 @@ export default function ProductPage() {
             />
           </div>
         </div>
-        <div className="mt-8">
-          <h5 className="pb-2">Comments</h5>
-          <section className="mb-16">
-            <div className="flex flex-col-reverse gap-8 md:flex-row">
-              <div>
-                <p className="mb-3">rating</p>
-                <div className="flex gap-4">
-                  <img src="#" alt="profile_img" />
-                  <p>{userData?.username}</p>
-                </div>
-              </div>
-              <div className="] w-full max-w-[580px] overflow-hidden rounded-lg border border-gray-200 shadow-sm focus-within:border-blue-600 focus-within:ring-1 focus-within:ring-blue-600">
-                <label htmlFor="newComment" className="sr-only">
-                  New comment
-                </label>
-                <textarea
-                  id="newComment"
-                  className="w-full resize-none border-none align-top focus:ring-0 sm:text-sm"
-                  name="newComment"
-                  rows={4}
-                  placeholder="Enter new comment..."
-                  value={commentState.value}
-                  onChange={(e) =>
-                    setCommentState((prevState) => {
-                      return { ...prevState, value: e.target.value };
-                    })
-                  }
-                />
-
-                <div className="flex items-center justify-end gap-2 bg-white p-3">
-                  <Button
-                    variant="default"
-                    disabled={!userData?._id}
-                    onClick={() => addNewCommentHandler()}
-                  >
-                    <LoadingCircle isLoading={commentState.isAdding}>
-                      Publish
-                    </LoadingCircle>
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </section>
-          <section>
-            {productState.data &&
-              productState.data.comments.map((comment) => (
-                <div
-                  key={comment._id}
-                  className="mb-8 flex w-full flex-col-reverse gap-8 rounded-md bg-gray-50 p-4 sm:flex-row"
-                >
-                  <div>
-                    <p className="mb-3">{comment.value.rating}</p>
-                    <div className="flex gap-4">
-                      <img src="#" alt="profile_img" />
-                      <p className="font-semibold">{comment.user.username}</p>
-                    </div>
-                  </div>
-                  <div className="flex w-full flex-col gap-4">
-                    <div className="flex justify-end">
-                      <small className="text-sm">
-                        {comment.created_at.slice(0, 10)}
-                      </small>
-                    </div>
-                    <div>{comment.value.text}</div>
-                  </div>
-                </div>
-              ))}
-          </section>
-        </div>
+        {prodId && (
+          <Comments
+            target={'Product'}
+            targetId={prodId}
+            updateProductStatus={fetchData}
+          />
+        )}
       </div>
     </section>
   );

@@ -13,15 +13,15 @@ import {
 } from '@heroicons/react/24/outline';
 import AsyncCreatableSelect from 'react-select/async-creatable';
 import MainContainer from '@layout/MainContainer';
-import EditUserData from '@features/myAccount/EditUserData';
-import MyShop from '@features/myAccount/MyShop';
+import EditUserData from './EditUserData';
+import MyShop from './MyShop';
 import { UserContext } from '@context/UserProvider';
 import MarketplaceBadge from '@components/UI/badges/MarketplaceBadge';
 import avatarImg from '@assets/img/avataaars.svg';
 import { Button } from '@components/UI/button';
-import SecurityPermissions from '@features/myAccount/SecurityPermissions';
-import OrderHistory from '@features/myAccount/OrderHistory';
-import Admin from '@features/myAccount/Admin';
+import SecurityPermissions from './SecurityPermissions';
+import OrderHistory from './OrderHistory';
+import Admin from './Admin';
 import { MarketPlaceTypes, UserRoleTypes } from '@customTypes/types';
 import { Input } from '@components/UI/input';
 import { DatePickerDemo } from '@components/UI/datePicker';
@@ -39,8 +39,8 @@ import { Label } from '@components/UI/label';
 import {
   useGetAccessDatabase,
   usePostAccessDatabase,
-} from '../hooks/useAaccessDatabase';
-import { DATABASE_ENDPOINTS } from '../data/endpoints';
+} from '@hooks/useAaccessDatabase';
+import { DATABASE_ENDPOINTS } from '@data/endpoints';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import useUploadImg from '@hooks/useUploadImg';
 

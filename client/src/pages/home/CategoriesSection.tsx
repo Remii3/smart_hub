@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import MainPageHeading from '@features/headings/MainPageHeading';
+import MainPageHeading from '@pages/home/MainPageHeading';
 import CategoryCard from '@components/cards/CategoryCard';
 import { ProductCategories } from '@customTypes/interfaces';
 import { buttonVariants } from '@components/UI/button';

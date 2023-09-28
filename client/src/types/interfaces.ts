@@ -19,7 +19,7 @@ export interface ProductTypes {
   imgs?: string[];
   categories?: { value: string; label: string; _id: string }[];
   authors: AuthorTypes[];
-  rating?: number;
+  rating: { rating: number; count: number };
   quantity: number;
   market_place: MarketPlaceTypes;
   created_at: string;
