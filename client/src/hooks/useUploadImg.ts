@@ -2,7 +2,7 @@ import { storage } from '../firebase';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { v4 } from 'uuid';
 
-type Targets = 'Profile_img' | 'Product_imgs';
+type Targets = 'Profile_img' | 'Product_imgs' | 'News_img';
 
 interface PropsTypes {
   selectedFile: File | null;
@@ -28,6 +28,14 @@ export default function useUploadImg({
     });
   } else if (targetLocation === 'Product_imgs') {
     const imgRef = ref(storage, `${targetLocation}/${ownerId}/${iteration}`);
+    return uploadBytes(imgRef, selectedFile).then((snapshot) => {
+      return getDownloadURL(snapshot.ref).then((url) => {
+        return url;
+      });
+    });
+  } else if (targetLocation === 'News_img') {
+    const imgRef = ref(storage, `${targetLocation}/${ownerId}`);
+
     return uploadBytes(imgRef, selectedFile).then((snapshot) => {
       return getDownloadURL(snapshot.ref).then((url) => {
         return url;

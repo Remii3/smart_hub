@@ -217,7 +217,7 @@ export default function Nav({ scrollFlag }: { scrollFlag: boolean }) {
                       <div className="h-8 w-8">
                         <img
                           src={userData.user_info.profile_img}
-                          className=" rounded-full bg-cover object-contain"
+                          className="h-full w-full rounded-full object-cover"
                         />
                       </div>
                     ) : (

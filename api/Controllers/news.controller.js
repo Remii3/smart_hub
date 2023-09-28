@@ -54,8 +54,34 @@ const deleteOneNews = async (req, res) => {
   }
 };
 
+const updateOne = async (req, res) => {
+  const { _id, title, subtitle, img, content } = req.body;
+  console.log(_id);
+  if (!_id) {
+    return res.status(422).json({ message: 'Provide news id' });
+  }
+
+  try {
+    await News.updateOne(
+      { _id },
+      {
+        title,
+        subtitle,
+        img,
+        content,
+      },
+    );
+    return res.status(200).json({ message: 'Successfully updated news' });
+  } catch (err) {
+    return res.status(500).json({
+      message: 'Failed updating news',
+      error: err.message,
+    });
+  }
+};
+
 const addOneNews = async (req, res) => {
-  const { userId, title, subtitle, headImage, content } = req.body;
+  const { userId, title, subtitle, img, content } = req.body;
 
   if (!userId) {
     return res.status(422).json({ message: 'Provide user id' });
@@ -70,12 +96,12 @@ const addOneNews = async (req, res) => {
       _id,
       title,
       subtitle,
-      headImage,
+      img,
       content,
       created_at,
     });
     await User.updateOne({ _id: userId }, { $push: { news: _id } });
-    return res.status(201).json({ message: 'Success' });
+    return res.status(201).json({ message: 'Success', id: _id });
   } catch (err) {
     return res.status(500).json({
       message: 'Failed adding news',
@@ -172,4 +198,5 @@ module.exports = {
   addOneVote,
   removeOneVote,
   getAllVotes,
+  updateOne,
 };

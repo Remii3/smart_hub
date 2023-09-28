@@ -54,8 +54,9 @@ export default function LoginPage() {
         url: DATABASE_ENDPOINTS.USER_PROFILE,
       });
       changeUserData(data);
-
-      navigate('/');
+      if (data) {
+        navigate('/');
+      }
     } catch (err: any) {
       if (axios.isAxiosError(err)) {
         if (err.response)

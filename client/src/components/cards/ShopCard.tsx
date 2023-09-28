@@ -7,7 +7,7 @@ import { Button } from '@components/UI/button';
 import { Skeleton } from '@components/UI/skeleton';
 
 const defaultProps = {
-  img: [],
+  img: '',
   authors: [],
   description: '',
 };
@@ -65,7 +65,7 @@ export default function ShopCard({
       setIsAddingToCart(false);
     }
   };
-
+  console.log(img);
   const currentItem = cartState.products.find(
     (product: CartProductTypes) => product.productData._id === _id
   );
@@ -87,11 +87,19 @@ export default function ShopCard({
       >
         <div className="flex flex-col gap-3">
           <Link to={`/product/${_id}`}>
-            <img
-              src="https://images.unsplash.com/photo-1523381210434-271e8be1f52b?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80"
-              alt="img"
-              className=" w-full rounded-t-lg object-cover"
-            />
+            {img ? (
+              <img
+                className="h-[240px] max-h-[240px] w-full rounded-t-lg object-cover"
+                src={img}
+                alt="product_cover"
+              />
+            ) : (
+              <img
+                src="https://images.unsplash.com/photo-1523381210434-271e8be1f52b?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80"
+                alt="img"
+                className="h-[240px] max-h-[240px] w-full rounded-t-lg object-cover"
+              />
+            )}
           </Link>
           <div className="px-3">
             <Link to={`/product/${_id}`}>

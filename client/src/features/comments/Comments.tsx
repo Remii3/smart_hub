@@ -5,6 +5,7 @@ import { UserTypes } from '@customTypes/interfaces';
 import { DATABASE_ENDPOINTS } from '@data/endpoints';
 import StarRating from '@features/starRating/StarRating';
 import { UserCircleIcon } from '@heroicons/react/24/outline';
+import { UserCircleIcon as UserIcon } from '@heroicons/react/24/solid';
 import {
   useGetAccessDatabase,
   usePostAccessDatabase,
@@ -85,16 +86,30 @@ export default function Comments({
   }, []);
 
   const addNewCommentHandler = async () => {
+    const preparedValue = {} as {
+      text?: string;
+      rating?: number;
+    };
+
+    if (newComment.rating) {
+      preparedValue.rating = newComment.rating;
+    }
+    if (newComment.value) {
+      preparedValue.text = newComment.value;
+    }
+    if (!preparedValue.rating && !preparedValue.text) return;
+
     setNewComment((prevState) => {
       return { ...prevState, isLoading: true };
     });
+
     const { error } = await usePostAccessDatabase({
       url: DATABASE_ENDPOINTS.COMMENT_ONE,
       body: {
         userId: userData?._id,
         targetId,
         target: target,
-        value: { rating: newComment.rating, text: newComment.value },
+        value: preparedValue,
       },
     });
     if (error) {
@@ -132,11 +147,17 @@ export default function Comments({
             <div className="flex gap-4">
               {userData ? (
                 <>
-                  <img
-                    src={userData?.user_info.profile_img}
-                    className="h-14 w-14 rounded-md"
-                    alt="profile_img"
-                  />
+                  {userData.user_info.profile_img ? (
+                    <div className="h-14 w-14">
+                      <img
+                        src={userData?.user_info.profile_img}
+                        className="h-full w-full rounded-md object-cover"
+                        alt="profile_img"
+                      />
+                    </div>
+                  ) : (
+                    <UserIcon className="h-8 w-8" />
+                  )}
 
                   <p>{userData?.username}</p>
                 </>
@@ -204,11 +225,13 @@ export default function Comments({
                   <StarRating rating={comment.value.rating} showOnly />
                 </div>
                 <div className="flex gap-4">
-                  <img
-                    src={comment.user.user_info.profile_img}
-                    alt="profile_img"
-                    className="h-14 w-14 rounded-lg"
-                  />
+                  <div className="h-14 w-14">
+                    <img
+                      src={comment.user.user_info.profile_img}
+                      alt="profile_img"
+                      className="h-full w-full rounded-lg object-cover"
+                    />
+                  </div>
                   <p className="font-semibold">{comment.user.username}</p>
                 </div>
               </div>

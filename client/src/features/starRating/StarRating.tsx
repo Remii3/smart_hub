@@ -20,7 +20,6 @@ export default function StarRating({
   setRating?: React.Dispatch<React.SetStateAction<NewCommentTypes>>;
 }) {
   const [hoveredValue, setHoveredValue] = useState(0);
-  // const [clickedValue, setClickedValue] = useState(initialValue || 0);
 
   const handleStarClick = (value: number) => {
     if (!showOnly && setRating) {
@@ -60,7 +59,7 @@ export default function StarRating({
           key={i}
           className={`${
             showOnly ? '' : 'cursor-pointer'
-          } ${colorClass} transition duration-150 ease-out`}
+          } ${colorClass} h-5 w-5 transition duration-150 ease-out`}
           onClick={() => handleStarClick(i)}
           onMouseEnter={() => handleStarHover(i)}
           onMouseLeave={handleStarLeave}
@@ -70,5 +69,9 @@ export default function StarRating({
     return stars;
   };
 
-  return <div className="flex items-center space-x-1">{renderStars()}</div>;
+  return (
+    <div className="flex items-center space-x-1">
+      {rating > 0 ? renderStars() : <div className="h-5" />}
+    </div>
+  );
 }

@@ -21,6 +21,7 @@ import { UserContext } from '@context/UserProvider';
 import { UserTypes } from '@customTypes/interfaces';
 import { COMMENT_TARGET, DATABASE_ENDPOINTS } from '@data/endpoints';
 import { TrashIcon } from '@heroicons/react/24/outline';
+import { UserCircleIcon } from '@heroicons/react/24/solid';
 import {
   useGetAccessDatabase,
   usePostAccessDatabase,
@@ -44,7 +45,7 @@ interface ArticleDataTypes {
     _id: string;
     title: string;
     subtitle: string;
-    headImage: null;
+    img: null | string;
     content: string;
     rating: {
       votes: { user: string; vote: number }[];
@@ -305,7 +306,9 @@ export default function NewsArticle({
               )}
               <p>Likes: {vote.quantity?.like}</p>
               <p>Dislikes: {vote.quantity?.dislike}</p>
-
+              {articleData.data.img && (
+                <img src={articleData.data.img} alt="article_img" />
+              )}
               <h3>{articleData.data.title}</h3>
               <h6 className="text-slate-600">{articleData.data.subtitle}</h6>
               <Dialog>
@@ -356,7 +359,17 @@ export default function NewsArticle({
                   <div>
                     <p className="mb-3">rating</p>
                     <div className="flex gap-4">
-                      <img src="#" alt="profile_img" />
+                      <div className="h-14 w-14">
+                        {userData && userData.user_info.profile_img ? (
+                          <img
+                            src={userData.user_info.profile_img}
+                            className="h-full w-full rounded-lg object-cover"
+                            alt="profile_img"
+                          />
+                        ) : (
+                          <UserCircleIcon className="h-full w-full" />
+                        )}
+                      </div>
                       <p>{userData?.username}</p>
                     </div>
                   </div>
@@ -413,7 +426,17 @@ export default function NewsArticle({
                         >
                           <div>
                             <div className="flex gap-4">
-                              <img src="#" alt="profile_img" />
+                              <div className="h-14 w-14">
+                                {comment.user.user_info.profile_img ? (
+                                  <img
+                                    src={comment.user.user_info.profile_img}
+                                    className="h-full w-full rounded-lg object-cover"
+                                    alt="profile_img"
+                                  />
+                                ) : (
+                                  <UserCircleIcon className="h-full w-full" />
+                                )}
+                              </div>
                               <p className="font-semibold">
                                 {comment.user.username}
                               </p>

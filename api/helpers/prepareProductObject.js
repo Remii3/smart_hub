@@ -20,6 +20,7 @@ const prepareProductObject = product => {
   } = product;
 
   if (rating) {
+    console.log(rating);
     let preparedRating = 0;
     let count = 0;
     for (let i = 0; i < rating.length; i++) {

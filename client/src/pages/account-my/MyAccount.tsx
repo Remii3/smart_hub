@@ -427,7 +427,7 @@ export default function MyAccount() {
                       )}
                     </label>
                     <img
-                      className="inline-block h-24 w-24 rounded-full ring-2 ring-white"
+                      className="inline-block h-24 w-24 rounded-full object-cover ring-2 ring-white"
                       src={
                         userData?.user_info.profile_img
                           ? userData?.user_info.profile_img
