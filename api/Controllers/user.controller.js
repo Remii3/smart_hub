@@ -263,20 +263,23 @@ const getOtherProfile = async (req, res) => {
       sold_books_quantity,
       _id,
     };
-
-    if (role === 'Author') {
+    if (role !== 'User') {
       return res.status(200).json({
-        email,
-        username,
-        user_info,
-        author_info: preparedAuthorInfo,
+        data: {
+          email,
+          username,
+          user_info,
+          author_info: preparedAuthorInfo,
+        },
       });
     } else {
       return res.status(200).json({
-        email,
-        username,
-        user_info,
-        role,
+        data: {
+          email,
+          username,
+          user_info,
+          role,
+        },
       });
     }
   } catch (err) {

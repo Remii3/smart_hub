@@ -4,6 +4,7 @@ import { UserContext } from '@context/UserProvider';
 import { UserTypes } from '@customTypes/interfaces';
 import { DATABASE_ENDPOINTS } from '@data/endpoints';
 import StarRating from '@features/starRating/StarRating';
+import { UserCircleIcon } from '@heroicons/react/24/outline';
 import {
   useGetAccessDatabase,
   usePostAccessDatabase,
@@ -129,32 +130,55 @@ export default function Comments({
               />
             </div>
             <div className="flex gap-4">
-              <img src="#" alt="profile_img" />
-              <p>{userData?.username}</p>
+              {userData ? (
+                <>
+                  <img
+                    src={userData?.user_info.profile_img}
+                    className="h-14 w-14 rounded-md"
+                    alt="profile_img"
+                  />
+
+                  <p>{userData?.username}</p>
+                </>
+              ) : (
+                <>
+                  <UserCircleIcon className="h-8 w-8" />
+                  <p>Guest</p>
+                </>
+              )}
             </div>
           </div>
-          <div className="] w-full max-w-[580px] overflow-hidden rounded-lg border border-gray-200 shadow-sm focus-within:border-blue-600 focus-within:ring-1 focus-within:ring-blue-600">
+          <div className="relative w-full max-w-[580px] overflow-hidden rounded-lg border border-gray-200 shadow-sm focus-within:border-blue-600 focus-within:ring-1 focus-within:ring-blue-600">
             <label htmlFor="newComment" className="sr-only">
               New comment
             </label>
-            <textarea
-              id="newComment"
-              className="w-full resize-none border-none align-top focus:ring-0 sm:text-sm"
-              name="newComment"
-              rows={4}
-              placeholder="Enter new comment..."
-              value={newComment.value}
-              onChange={(e) =>
-                setNewComment((prevState) => {
-                  return { ...prevState, value: e.target.value };
-                })
-              }
-            />
+            <div>
+              <textarea
+                id="newComment"
+                className="w-full resize-none border-none align-top focus:ring-0 sm:text-sm"
+                name="newComment"
+                rows={4}
+                disabled={!userData}
+                placeholder={userData ? 'Enter new comment...' : ''}
+                value={newComment.value}
+                onChange={(e) =>
+                  setNewComment((prevState) => {
+                    return { ...prevState, value: e.target.value };
+                  })
+                }
+              />
+              {!userData && (
+                <div className="absolute top-0 flex h-full w-full items-center justify-center bg-slate-300/20">
+                  <span className="text-lg">Register to upload a message</span>
+                </div>
+              )}
+            </div>
 
             <div className="flex items-center justify-end gap-2 bg-white p-3">
               <Button
                 variant="default"
-                disabled={!userData?._id}
+                disabled={!userData}
+                className={`${!userData && 'bg-slate-300'}`}
                 onClick={() => addNewCommentHandler()}
               >
                 <LoadingCircle isLoading={newComment.isLoading}>
@@ -180,7 +204,11 @@ export default function Comments({
                   <StarRating rating={comment.value.rating} showOnly />
                 </div>
                 <div className="flex gap-4">
-                  <img src="#" alt="profile_img" />
+                  <img
+                    src={comment.user.user_info.profile_img}
+                    alt="profile_img"
+                    className="h-14 w-14 rounded-lg"
+                  />
                   <p className="font-semibold">{comment.user.username}</p>
                 </div>
               </div>

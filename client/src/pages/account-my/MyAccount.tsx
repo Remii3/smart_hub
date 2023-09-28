@@ -1,11 +1,16 @@
-import { useCallback, useContext, useEffect, useState } from 'react';
+import {
+  ChangeEvent,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
 import {
   UserIcon,
   ArchiveBoxIcon,
   LockClosedIcon,
   Square2StackIcon,
 } from '@heroicons/react/24/outline';
-import axios from 'axios';
 import AsyncCreatableSelect from 'react-select/async-creatable';
 import MainContainer from '@layout/MainContainer';
 import EditUserData from './EditUserData';
@@ -16,7 +21,7 @@ import avatarImg from '@assets/img/avataaars.svg';
 import { Button } from '@components/UI/button';
 import SecurityPermissions from './SecurityPermissions';
 import OrderHistory from './OrderHistory';
-import Admin from '@pages/account-my/Admin';
+import Admin from './Admin';
 import { MarketPlaceTypes, UserRoleTypes } from '@customTypes/types';
 import { Input } from '@components/UI/input';
 import { DatePickerDemo } from '@components/UI/datePicker';
@@ -34,15 +39,13 @@ import { Label } from '@components/UI/label';
 import {
   useGetAccessDatabase,
   usePostAccessDatabase,
-} from '../../hooks/useAaccessDatabase';
-import { DATABASE_ENDPOINTS } from '../../data/endpoints';
-import {
-  Link,
-  useLocation,
-  useNavigate,
-  useParams,
-  useSearchParams,
-} from 'react-router-dom';
+} from '@hooks/useAaccessDatabase';
+import { DATABASE_ENDPOINTS } from '@data/endpoints';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
+import useUploadImg from '@hooks/useUploadImg';
+
+import { PlusCircleIcon } from '@heroicons/react/24/outline';
+import LoadingCircle from '@components/Loaders/LoadingCircle';
 
 const tabNames = {
   MY_DATA: 'myData',
@@ -105,6 +108,12 @@ const TABS_ARRAY = [
   },
 ];
 
+interface SelectedImgTypes {
+  data: null | File[];
+  isLoading: boolean;
+  error: null | string;
+}
+
 export default function MyAccount() {
   const { userData, fetchUserData } = useContext(UserContext);
   const [finishAuctionDate, setFinishAuctionDate] = useState<Date>();
@@ -113,7 +122,11 @@ export default function MyAccount() {
   const [selectedtab, setSelectedtab] = useState(
     lastSearchQuery || TABS_ARRAY[0].name
   );
-
+  const [selectedImg, setSelectedImg] = useState<SelectedImgTypes>({
+    isLoading: false,
+    data: null,
+    error: null,
+  });
   const [productData, setProductData] =
     useState<ProductDataTypes>(initialProductData);
 
@@ -141,6 +154,9 @@ export default function MyAccount() {
     options: [],
     value: [],
   });
+
+  const [selectedImgs, setSelectedImgs] = useState<[] | File[]>([]);
+
   const navigate = useNavigate();
   const path = useLocation();
 
@@ -242,7 +258,7 @@ export default function MyAccount() {
       title: productData.title.value,
       description: productData.description.value,
       price: Number(productData.price.value),
-      img: productData.imgs.value,
+      imgs: [],
       categories: categoryState.value,
       authors: authorState.value,
       quantity: productData.quantity.value,
@@ -256,20 +272,41 @@ export default function MyAccount() {
         return { ...prevState, isLoading: true };
       });
 
-      await usePostAccessDatabase({
+      const { error, data } = await usePostAccessDatabase({
         url: DATABASE_ENDPOINTS.PRODUCT_ONE,
         body: { newProductData },
       });
-      setStatus((prevState) => {
-        return { ...prevState, isLoading: false };
-      });
-      fetchUserData();
-      resetProductData();
+      if (error) {
+      } else {
+        if (selectedImgs) {
+          const urlsTable = [];
+          for (let i = 0; i < selectedImgs.length; i++) {
+            urlsTable.push(
+              await useUploadImg({
+                ownerId: data.id,
+                selectedFile: selectedImgs[i],
+                targetLocation: 'Product_imgs',
+                iteration: i,
+              })
+            );
+          }
+          const { error } = await usePostAccessDatabase({
+            url: DATABASE_ENDPOINTS.PRODUCT_UPDATE,
+            body: { _id: data.id, imgs: urlsTable, market_place: 'Shop' },
+          });
+        }
 
-      setStatus((prevState) => {
-        return { ...prevState, isSuccess: true };
-      });
-      getAllData();
+        setStatus((prevState) => {
+          return { ...prevState, isLoading: false };
+        });
+        fetchUserData();
+        resetProductData();
+
+        setStatus((prevState) => {
+          return { ...prevState, isSuccess: true };
+        });
+        getAllData();
+      }
     } catch (err) {
       setStatus((prevState) => {
         return { ...prevState, isLoading: false, hasFailed: true };
@@ -317,6 +354,45 @@ export default function MyAccount() {
     getAllData();
   }, [getAllData]);
 
+  const uploadProfileImg = async (e: ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files) return;
+    setSelectedImg((prevState) => {
+      return { ...prevState, isLoading: true };
+    });
+
+    const url = await useUploadImg({
+      selectedFile: e.target.files[0],
+      ownerId: userData?._id,
+      targetLocation: 'Profile_img',
+    });
+
+    if (url) {
+      await usePostAccessDatabase({
+        url: DATABASE_ENDPOINTS.USER_UPDATE,
+        body: {
+          userEmail: userData?.email,
+          fieldValue: url,
+          fieldKey: e.target.name,
+        },
+      });
+      fetchUserData();
+      setSelectedImg({ data: null, error: null, isLoading: false });
+    } else {
+      setSelectedImg({
+        data: null,
+        error: 'Failed adding img',
+        isLoading: false,
+      });
+    }
+  };
+
+  const productImgsHandler = (e: ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files && files.length > 0) {
+      setSelectedImgs((prevState) => [...prevState, ...files]);
+    }
+  };
+
   return (
     <div className="relative mb-16 min-h-screen">
       <div>
@@ -325,11 +401,41 @@ export default function MyAccount() {
             <div className="mx-auto py-8 sm:py-12">
               <div className="gap-2 sm:flex sm:items-center sm:justify-between">
                 <div className="flex flex-col items-center gap-4 sm:flex-row">
-                  <img
-                    className="inline-block h-24 w-24 rounded-full ring-2 ring-white"
-                    src={avatarImg}
-                    alt="avatar_img"
-                  />
+                  <button type="button" className="group relative ">
+                    <label
+                      className={`${
+                        selectedImg.isLoading && 'opacity-100'
+                      } absolute flex h-full w-full cursor-pointer items-center justify-center rounded-full bg-slate-200/60 opacity-0 transition duration-150 ease-in-out group-hover:opacity-100`}
+                    >
+                      <input
+                        type="file"
+                        name="profile_img"
+                        onChange={(e) => uploadProfileImg(e)}
+                        className="hidden"
+                      />
+                      {!selectedImg.isLoading && (
+                        <PlusCircleIcon className="h-10 w-10 text-slate-800" />
+                      )}
+                      {selectedImg.isLoading && (
+                        <div
+                          className="absolute mx-auto block h-6 w-6 animate-spin rounded-full border-[3px] border-current border-t-primary text-white"
+                          role="status"
+                          aria-label="loading"
+                        >
+                          <span className="sr-only">Loading...</span>
+                        </div>
+                      )}
+                    </label>
+                    <img
+                      className="inline-block h-24 w-24 rounded-full ring-2 ring-white"
+                      src={
+                        userData?.user_info.profile_img
+                          ? userData?.user_info.profile_img
+                          : avatarImg
+                      }
+                      alt="avatar_img"
+                    />
+                  </button>
                   <div className="pt-1 text-left">
                     <h1 className="text-2xl font-bold text-gray-900 sm:text-5xl">
                       Welcome Back, {userData?.username}!
@@ -475,8 +581,9 @@ export default function MyAccount() {
                               type="file"
                               name="imgs"
                               id="imgs"
-                              onChange={(e) => productDataChangeHandler(e)}
-                              accept="application/pdf, image/png"
+                              multiple
+                              onChange={(e) => productImgsHandler(e)}
+                              accept="image/png"
                             />
 
                             {productData.imgs.value.length > 0 &&

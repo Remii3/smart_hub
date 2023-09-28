@@ -100,7 +100,6 @@ const getOneProduct = async (req, res) => {
         ],
       },
     ]);
-    console.log('product', product);
     const preparedProduct = prepareProductObject(product);
     return res.status(200).json({ data: preparedProduct });
   } catch (err) {
@@ -348,8 +347,6 @@ const updateOneProduct = async (req, res) => {
     auction_info,
   } = req.body;
   try {
-    console.log(_id, market_place);
-    console.log(imgs);
     if (market_place === 'Shop') {
       await Product.updateOne(
         { _id },

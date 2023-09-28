@@ -14,6 +14,7 @@ import {
   usePostAccessDatabase,
 } from '../../hooks/useAaccessDatabase';
 import { DATABASE_ENDPOINTS } from '../../data/endpoints';
+import { UserCircleIcon } from '@heroicons/react/24/outline';
 
 export default function OtherUserPage() {
   const [otherUserData, setOtherUserData] = useState<AuthorTypes>();
@@ -40,7 +41,7 @@ export default function OtherUserPage() {
         params: { userId },
       });
       setOtherUserData(data);
-      if (data) {
+      if (data && data.role !== 'User') {
         setIsFollowing(
           data.author_info.followers.some(
             (id: string) => id === userData?._id
@@ -60,26 +61,27 @@ export default function OtherUserPage() {
     }
   }, []);
 
-  const otherUserStats = otherUserData?.author_info
-    ? [
-        {
-          text: 'Products',
-          quantity: otherUserData?.author_info.my_products?.filter(
-            (item) => item.market_place === MarketPlaceTypes.SHOP
-          ).length,
-        },
-        {
-          text: 'Auctions',
-          quantity: otherUserData?.author_info.my_products?.filter(
-            (item) => item.market_place === MarketPlaceTypes.AUCTION
-          ).length,
-        },
-        {
-          text: 'Followers',
-          quantity: otherUserData?.author_info.followers.length,
-        },
-      ]
-    : null;
+  const otherUserStats =
+    otherUserData && otherUserData.author_info
+      ? [
+          {
+            text: 'Products',
+            quantity: otherUserData?.author_info.my_products?.filter(
+              (item) => item.market_place === MarketPlaceTypes.SHOP
+            ).length,
+          },
+          {
+            text: 'Auctions',
+            quantity: otherUserData?.author_info.my_products?.filter(
+              (item) => item.market_place === MarketPlaceTypes.AUCTION
+            ).length,
+          },
+          {
+            text: 'Followers',
+            quantity: otherUserData?.author_info.followers.length,
+          },
+        ]
+      : null;
 
   const followHandler = async () => {
     if (userData === null) return;
@@ -104,8 +106,7 @@ export default function OtherUserPage() {
       await getOtherUserData();
     }
   };
-
-  if (!userData)
+  if (!otherUserData)
     return (
       <div className="flex h-full w-full flex-col items-center justify-center space-y-4">
         <Skeleton className="h-16 w-16 rounded-full bg-slate-200" />
@@ -122,7 +123,17 @@ export default function OtherUserPage() {
     <div className="mx-auto flex max-w-[1900px] flex-col gap-5 p-5 lg:items-center lg:justify-center xl:flex-row">
       <section className="flex w-1/2 basis-1/2 flex-col items-center justify-center">
         <div className="flex flex-col items-center justify-center rounded p-5 shadow">
-          <div>profileImg</div>
+          <div>
+            {otherUserData.user_info.profile_img ? (
+              <img
+                src={otherUserData.user_info.profile_img}
+                className="h-12 w-12 rounded-full"
+                alt="profile_img"
+              />
+            ) : (
+              <UserCircleIcon className="h-7 w-7" />
+            )}
+          </div>
           <h6>
             {otherUserData?.user_info.credentials.first_name}{' '}
             {otherUserData?.user_info.credentials.last_name}
@@ -156,7 +167,8 @@ export default function OtherUserPage() {
         <section className="w-full max-w-7xl space-y-4">
           <div className="max-w-[1092px]">
             <h5 className="mb-5">Products</h5>
-            {otherUserData?.author_info.my_products &&
+            {otherUserData.author_info &&
+            otherUserData?.author_info.my_products &&
             otherUserData?.author_info.my_products.length > 0 ? (
               <ShortSwiper swiperCategory="product">
                 {otherUserData?.author_info.my_products?.map((product) => {
@@ -172,7 +184,7 @@ export default function OtherUserPage() {
                           authors={product.authors}
                           description={product.description}
                           price={product.shop_info.price}
-                          img={product.img}
+                          img={product.imgs[0]}
                           productQuantity={product.quantity}
                         />
                       </SwiperSlide>
@@ -186,7 +198,8 @@ export default function OtherUserPage() {
           </div>
           <div className="relative max-w-[1092px]">
             <h5 className="mb-5">Auctions</h5>
-            {otherUserData?.author_info.my_products &&
+            {otherUserData?.author_info &&
+            otherUserData?.author_info.my_products &&
             otherUserData?.author_info.my_products.length > 0 ? (
               <ShortSwiper swiperCategory="auction">
                 {otherUserData?.author_info.my_products?.map((product) => {
@@ -201,7 +214,7 @@ export default function OtherUserPage() {
                           title={product.title}
                           authors={product.authors}
                           description={product.description}
-                          img={product.img}
+                          img={product.imgs[0]}
                           auctionEndDate={product.auction_info.auction_end_date}
                           currentPrice={product.auction_info.current_price}
                           startingPrice={product.auction_info.starting_price}
