@@ -56,7 +56,6 @@ const deleteOneNews = async (req, res) => {
 
 const updateOne = async (req, res) => {
   const { _id, title, subtitle, img, content } = req.body;
-  console.log(_id);
   if (!_id) {
     return res.status(422).json({ message: 'Provide news id' });
   }
@@ -131,8 +130,8 @@ const addOneVote = async (req, res) => {
     await News.updateOne(
       { _id: newsId },
       {
-        $push: { 'rating.votes': { user: userId, vote: voteValue } },
-        $inc: { [`rating.quantity.${vote}`]: 1 },
+        $push: { 'voting.votes': { user: userId, vote: voteValue } },
+        $inc: { [`voting.quantity.${vote}`]: 1 },
       },
     );
     return res.status(200).json({ message: 'Succesfully added vote' });
@@ -164,8 +163,8 @@ const removeOneVote = async (req, res) => {
     await News.updateOne(
       { _id: newsId },
       {
-        $pull: { 'rating.votes': { user: userId } },
-        $inc: { [`rating.quantity.${vote}`]: -1 },
+        $pull: { 'voting.votes': { user: userId } },
+        $inc: { [`voting.quantity.${vote}`]: -1 },
       },
     );
     return res.status(200).json({ message: 'Succesfully removed vote' });
@@ -183,7 +182,7 @@ const getAllVotes = async (req, res) => {
   }
 
   try {
-    const data = await News.findOne({ _id: newsId }).select('rating');
+    const data = await News.findOne({ _id: newsId }).select('voting');
     return res.json({ data });
   } catch (err) {
     return res.json({ message: 'Failed getting votes', error: err.message });

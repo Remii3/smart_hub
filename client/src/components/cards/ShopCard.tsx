@@ -65,7 +65,6 @@ export default function ShopCard({
       setIsAddingToCart(false);
     }
   };
-  console.log(img);
   const currentItem = cartState.products.find(
     (product: CartProductTypes) => product.productData._id === _id
   );

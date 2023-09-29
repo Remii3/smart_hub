@@ -447,6 +447,7 @@ export default function ProductPage() {
         </div>
         {prodId && (
           <Comments
+            withRating={true}
             target={'Product'}
             targetId={prodId}
             updateProductStatus={fetchData}

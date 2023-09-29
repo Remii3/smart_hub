@@ -412,6 +412,7 @@ export default function MyAccount() {
                         name="profile_img"
                         onChange={(e) => uploadProfileImg(e)}
                         className="hidden"
+                        accept="image/png, image/jpg"
                       />
                       {!selectedImg.isLoading && (
                         <PlusCircleIcon className="h-10 w-10 text-slate-800" />
@@ -583,7 +584,7 @@ export default function MyAccount() {
                               id="imgs"
                               multiple
                               onChange={(e) => productImgsHandler(e)}
-                              accept="image/png"
+                              accept="image/png, image/jpg"
                             />
 
                             {productData.imgs.value.length > 0 &&

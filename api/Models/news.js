@@ -8,7 +8,7 @@ const NewsSchema = mongoose.Schema({
   img: { type: String },
   comments: [{ type: mongoose.Types.ObjectId, ref: 'Comment' }],
   content: { type: String },
-  rating: {
+  voting: {
     type: {
       votes: [
         { user: { type: mongoose.Types.ObjectId, ref: 'User' }, vote: Number },

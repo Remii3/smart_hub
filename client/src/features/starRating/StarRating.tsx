@@ -69,9 +69,5 @@ export default function StarRating({
     return stars;
   };
 
-  return (
-    <div className="flex items-center space-x-1">
-      {rating > 0 ? renderStars() : <div className="h-5" />}
-    </div>
-  );
+  return <div className="flex items-center space-x-1">{renderStars()}</div>;
 }

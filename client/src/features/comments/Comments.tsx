@@ -1,10 +1,20 @@
 import LoadingCircle from '@components/Loaders/LoadingCircle';
 import { Button } from '@components/UI/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@components/UI/dialog';
+import { Skeleton } from '@components/UI/skeleton';
 import { UserContext } from '@context/UserProvider';
 import { UserTypes } from '@customTypes/interfaces';
 import { DATABASE_ENDPOINTS } from '@data/endpoints';
 import StarRating from '@features/starRating/StarRating';
-import { UserCircleIcon } from '@heroicons/react/24/outline';
+import { TrashIcon, UserCircleIcon } from '@heroicons/react/24/outline';
 import { UserCircleIcon as UserIcon } from '@heroicons/react/24/solid';
 import {
   useGetAccessDatabase,
@@ -39,12 +49,14 @@ interface PropsTypes {
   targetId: string;
   target: CommentTargetTypes;
   updateProductStatus: () => void;
+  withRating: boolean;
 }
 
 export default function Comments({
   targetId,
   target,
   updateProductStatus,
+  withRating,
 }: PropsTypes) {
   const [comments, setComments] = useState<CommentsTypes>({
     data: null,
@@ -132,18 +144,42 @@ export default function Comments({
     fetchData();
   }, [fetchData]);
 
+  const deleteCommentHandler = async (commentId: string) => {
+    // setArticleData((prevState) => {
+    //   return {
+    //     ...prevState,
+    //     comments: { ...prevState.comments, isLoading: true },
+    //   };
+    // });
+    const { error } = await usePostAccessDatabase({
+      url: DATABASE_ENDPOINTS.COMMENT_DELETE,
+      body: {
+        target,
+        targetId,
+        commentId,
+        userId: userData?._id,
+      },
+    });
+    if (error === null) {
+      await fetchData();
+      updateProductStatus();
+    }
+  };
+
   return (
     <div className="mt-8">
       <h5 className="pb-2">Comments</h5>
       <section className="mb-16">
         <div className="flex flex-col-reverse gap-8 md:flex-row">
           <div>
-            <div className="mb-3">
-              <StarRating
-                rating={newComment.rating ? newComment.rating : 0}
-                setRating={setNewComment}
-              />
-            </div>
+            {withRating && (
+              <div className="mb-3">
+                <StarRating
+                  rating={newComment.rating ? newComment.rating : 0}
+                  setRating={setNewComment}
+                />
+              </div>
+            )}
             <div className="flex gap-4">
               {userData ? (
                 <>
@@ -211,7 +247,17 @@ export default function Comments({
         </div>
       </section>
       <section>
-        {comments.isLoading && <div>loading</div>}
+        {comments.isLoading && (
+          <div className="space-y-8">
+            <Skeleton className="flex h-[92px] w-full items-center px-4">
+              <div className="space-y-3">
+                <Skeleton className="h-3 w-5" />
+                <Skeleton className="h-3 w-10" />
+                <Skeleton className="h-3 w-14" />
+              </div>
+            </Skeleton>
+          </div>
+        )}
         {!comments.isLoading && !comments.data && <div>No data</div>}
         {!comments.isLoading &&
           comments.data &&
@@ -221,9 +267,11 @@ export default function Comments({
               className="mb-8 flex w-full flex-col-reverse gap-8 rounded-md bg-gray-50 p-4 sm:flex-row"
             >
               <div>
-                <div className="mb-3">
-                  <StarRating rating={comment.value.rating} showOnly />
-                </div>
+                {withRating && (
+                  <div className="mb-3">
+                    <StarRating rating={comment.value.rating} showOnly />
+                  </div>
+                )}
                 <div className="flex gap-4">
                   <div className="h-14 w-14">
                     <img
@@ -243,6 +291,41 @@ export default function Comments({
                 </div>
                 <div>{comment.value.text}</div>
               </div>
+              {(userData?._id === comment.user._id ||
+                userData?.role === 'Admin') && (
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button
+                      variant={'destructive'}
+                      type="button"
+                      className="text-red-400"
+                    >
+                      <TrashIcon className="h-6 w-6" />
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Are you sure?</DialogTitle>
+                      <DialogDescription>
+                        Deleting this will permamently remove the item from the
+                        database.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter>
+                      <Button
+                        type="button"
+                        onClick={() => deleteCommentHandler(comment._id)}
+                        className="rounded-md bg-red-500 px-3 py-1 text-white hover:bg-red-600"
+                      >
+                        Delete
+                      </Button>
+                      <DialogTrigger asChild>
+                        <button type="button">Cancel</button>
+                      </DialogTrigger>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+              )}
             </div>
           ))}
       </section>

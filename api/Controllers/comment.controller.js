@@ -49,14 +49,12 @@ const addOneComment = async (req, res) => {
         target,
         created_at,
       });
-      console.log('rating', value);
       if (value.rating) {
         await Product.updateOne(
           { _id: targetId },
           {
             $push: {
-              comments: _id,
-              rating: { _id: userId, rating: value.rating },
+              rating: { value: value.rating, userId, commentId: _id },
             },
           },
         );
@@ -73,17 +71,16 @@ const addOneComment = async (req, res) => {
         target,
         created_at,
       });
-      if (value.rating) {
-        await News.updateOne(
-          { _id: targetId },
-          {
-            $push: {
-              comments: _id,
-              rating: { _id: userId, rating: value.rating },
-            },
-          },
-        );
-      }
+      // if (value.rating) {
+      //   await News.updateOne(
+      //     { _id: targetId },
+      //     {
+      //       $push: {
+      //         rating: { userId, rating: value.rating, commentId: _id },
+      //       },
+      //     },
+      //   );
+      // }
 
       return res.status(201).json({ message: 'Success' });
     }
@@ -95,7 +92,7 @@ const addOneComment = async (req, res) => {
 };
 
 const deleteOneComment = async (req, res) => {
-  const { commentId, userId } = req.body;
+  const { commentId, userId, target, targetId } = req.body;
   if (!commentId) {
     return res.status(422).json({ message: 'Provide comment id' });
   }
@@ -105,6 +102,13 @@ const deleteOneComment = async (req, res) => {
   try {
     await User.updateOne({ _id: userId }, { $pull: { news: commentId } });
     await Comment.deleteOne({ _id: commentId });
+    if (target === 'Product') {
+      const test = await Product.updateOne(
+        { _id: targetId },
+        { $pull: { rating: { commentId } } },
+      );
+    }
+
     return res.status(200).json({ message: 'Success' });
   } catch (err) {
     return res

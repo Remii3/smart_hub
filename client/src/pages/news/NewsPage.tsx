@@ -137,6 +137,7 @@ export default function NewsPage() {
                       type="file"
                       name="img"
                       onChange={(e) => setSelectedImgs(e.target.files)}
+                      accept="image/png, image/jpg"
                     />
                   </Label>
                 </fieldset>
