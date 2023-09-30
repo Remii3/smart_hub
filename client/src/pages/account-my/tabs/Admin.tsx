@@ -1,5 +1,4 @@
 import { Link } from 'react-router-dom';
-import axios from 'axios';
 import {
   ChangeEvent,
   useCallback,
@@ -21,8 +20,8 @@ import { UpdateNewDataType, useEditUserData } from '@hooks/useUpdateUserData';
 import {
   useGetAccessDatabase,
   usePostAccessDatabase,
-} from '../../hooks/useAaccessDatabase';
-import { DATABASE_ENDPOINTS } from '../../data/endpoints';
+} from '../../../hooks/useAaccessDatabase';
+import { DATABASE_ENDPOINTS } from '../../../data/endpoints';
 
 interface AdminUsersTypes {
   users: AuthorTypes[] | null;

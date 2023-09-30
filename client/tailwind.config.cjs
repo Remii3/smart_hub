@@ -21,24 +21,53 @@ module.exports = {
         mainBanner: 'url("/src/assets/img/parallaxImg.jpg")',
       },
       colors: {
-        primary: '#2563eb',
-        primaryText: '#3F63BF',
-        secondary: '#c4d3f3',
-        accent: '#2d3b62',
         pageBackground: '#0C223B',
         dark: '#161618',
-        darkTint: '#1E1E20',
-        gray500: '#90A4AE',
         gray600: '#727070',
         gray800: '#E3E3E3',
         gray900: '#F7F7FB',
-        highlight: '#FDF24C',
         subtleGray: '#D8D8D8',
-        success: '#5cb85c',
-        warning: '#f0ad4e',
-        danger: '#d9534f',
-        transparentGray: 'rgba(0,0,0,0.43)',
-        background: '#ffffff',
+
+        border: 'hsl(var(--border))',
+        input: 'hsl(var(--input))',
+        ring: 'hsl(var(--ring))',
+        background: 'hsl(var(--background))',
+        foreground: 'hsl(var(--foreground))',
+
+        primary: {
+          DEFAULT: '#2563eb',
+          foreground: 'hsl(var(--primary-foreground))',
+        },
+        secondary: {
+          DEFAULT: '#c4d3f3',
+          foreground: 'hsl(var(--secondary-foreground))',
+        },
+        destructive: {
+          DEFAULT: 'hsl(var(--destructive) / <alpha-value>)',
+          foreground: 'hsl(var(--destructive-foreground) / <alpha-value>)',
+        },
+        muted: {
+          DEFAULT: 'hsl(var(--muted))',
+          foreground: 'hsl(var(--muted-foreground))',
+        },
+        accent: {
+          DEFAULT: 'hsl(var(--accent))',
+          foreground: 'hsl(var(--accent-foreground))',
+        },
+        popover: {
+          DEFAULT: 'hsl(var(--popover))',
+          foreground: 'hsl(var(--popover-foreground))',
+        },
+        card: {
+          DEFAULT: 'hsl(var(--card))',
+          foreground: 'hsl(var(--card-foreground))',
+        },
+      },
+      borderRadius: {
+        xl: `calc(var(--radius) + 4px)`,
+        lg: `var(--radius)`,
+        md: `calc(var(--radius) - 2px)`,
+        sm: 'calc(var(--radius) - 4px)',
       },
       keyframes: {
         overlayShow: {

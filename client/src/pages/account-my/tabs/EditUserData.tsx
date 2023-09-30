@@ -13,8 +13,8 @@ import { Dialog, DialogContent, DialogTrigger } from '@components/UI/dialog';
 import {
   useGetAccessDatabase,
   usePostAccessDatabase,
-} from '../../hooks/useAaccessDatabase';
-import { DATABASE_ENDPOINTS } from '../../data/endpoints';
+} from '@hooks/useAaccessDatabase';
+import { DATABASE_ENDPOINTS } from '@data/endpoints';
 
 type NewDataNameTypes =
   | 'email'

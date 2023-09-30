@@ -20,14 +20,14 @@ function CategoryCard({ _id, label, value, description }: ProductCategories) {
         className="relative flex h-full cursor-pointer flex-col gap-4 rounded-lg bg-gray900 px-10 py-12 shadow-sm transition duration-300 ease-in-out hover:scale-[1.02] hover:shadow-md active:scale-100"
       >
         <h4 className="text-dark">{label}</h4>
-        <p className="line-clamp-2 text-darkTint sm:text-lg lg:text-xl">
+        <p className="line-clamp-2 text-dark/80 sm:text-lg lg:text-xl">
           {description}
         </p>
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 24 24"
           fill="currentColor"
-          className="absolute bottom-5 right-5 h-6 w-6 text-gray500"
+          className="text-gray500 absolute bottom-5 right-5 h-6 w-6"
         >
           <path
             fillRule="evenodd"

@@ -24,7 +24,7 @@ export default function MainPageHeading({
       )}
       <p
         className={`${
-          color === 'dark' ? 'text-darkTint' : 'text-gray900'
+          color === 'dark' ? 'text-dark/80' : 'text-gray900'
         }  uppercase sm:text-lg`}
       >
         {subTitle}

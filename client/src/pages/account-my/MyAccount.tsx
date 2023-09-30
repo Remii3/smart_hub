@@ -1,53 +1,50 @@
-import {
-  ChangeEvent,
-  useCallback,
-  useContext,
-  useEffect,
-  useState,
-} from 'react';
+import { ChangeEvent, useContext, useState } from 'react';
 import {
   UserIcon,
   ArchiveBoxIcon,
   LockClosedIcon,
   Square2StackIcon,
 } from '@heroicons/react/24/outline';
-import AsyncCreatableSelect from 'react-select/async-creatable';
 import MainContainer from '@layout/MainContainer';
-import EditUserData from './EditUserData';
-import MyShop from './MyShop';
+import EditUserData from './tabs/EditUserData';
+import MyShop from './tabs/my_products/MyShop';
 import { UserContext } from '@context/UserProvider';
 import MarketplaceBadge from '@components/UI/badges/MarketplaceBadge';
 import avatarImg from '@assets/img/avataaars.svg';
-import { Button } from '@components/UI/button';
-import SecurityPermissions from './SecurityPermissions';
-import OrderHistory from './OrderHistory';
-import Admin from './Admin';
-import { MarketPlaceTypes, UserRoleTypes } from '@customTypes/types';
-import { Input } from '@components/UI/input';
-import { DatePickerDemo } from '@components/UI/datePicker';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@components/UI/dialog';
-import { RadioGroup, RadioGroupItem } from '@components/UI/radio-group';
-import { Label } from '@components/UI/label';
-import {
-  useGetAccessDatabase,
-  usePostAccessDatabase,
-} from '@hooks/useAaccessDatabase';
+import SecurityPermissions from './tabs/SecurityPermissions';
+import OrderHistory from './tabs/OrderHistory';
+import Admin from './tabs/Admin';
+import { UserRoleTypes } from '@customTypes/types';
+
+import { usePostAccessDatabase } from '@hooks/useAaccessDatabase';
 import { DATABASE_ENDPOINTS } from '@data/endpoints';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import useUploadImg from '@hooks/useUploadImg';
 
 import { PlusCircleIcon } from '@heroicons/react/24/outline';
-import LoadingCircle from '@components/Loaders/LoadingCircle';
+import NewProduct from './NewProduct';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+} from '@components/UI/select';
 
-const tabNames = {
+type TabKeysTypes =
+  | 'MY_DATA'
+  | 'SECURITY_PERMISSIONS'
+  | 'HISTORY'
+  | 'MY_PRODUCTS'
+  | 'ADMIN';
+
+type TabNamesTypes =
+  | 'myData'
+  | 'securityPermissions'
+  | 'history'
+  | 'myProducts'
+  | 'admin';
+
+const tabNames: Record<TabKeysTypes, TabNamesTypes> = {
   MY_DATA: 'myData',
   SECURITY_PERMISSIONS: 'securityPermissions',
   HISTORY: 'history',
@@ -55,56 +52,35 @@ const tabNames = {
   ADMIN: 'admin',
 };
 
-type ProductDataTypes = {
-  title: { value: string; hasError: boolean };
-  authors: { value: string[]; hasError: boolean };
-  categories: { value: string[]; hasError: boolean };
-  otherCategory: { value: string; hasError: boolean };
-  description: { value: string; hasError: boolean };
-  imgs: { value: string[]; hasError: boolean };
-  quantity: { value: number; hasError: boolean };
-  price: { value: number; hasError: boolean };
-  marketPlace: { value: string; hasError: boolean };
-  startingPrice: { value: number; hasError: boolean };
-};
-
-const initialProductData = {
-  title: { value: '', hasError: false },
-  authors: { value: [], hasError: false },
-  categories: { value: [], hasError: false },
-  otherCategory: { value: '', hasError: false },
-  description: { value: '', hasError: false },
-  imgs: { value: [], hasError: false },
-  quantity: { value: 1, hasError: false },
-  price: { value: 1, hasError: false },
-  marketPlace: { value: MarketPlaceTypes.SHOP, hasError: false },
-  startingPrice: { value: 1, hasError: false },
-};
-
-const TABS_ARRAY = [
+const TABS_ARRAY: {
+  text: string;
+  name: TabNamesTypes;
+  icon: JSX.Element;
+}[] = [
   {
     text: 'My data',
-    name: tabNames.MY_DATA,
+    name: 'myData',
     icon: <UserIcon height={20} width={20} />,
   },
   {
     text: 'Security & Permissions',
-    name: tabNames.SECURITY_PERMISSIONS,
+    name: 'securityPermissions',
     icon: <LockClosedIcon height={20} width={20} />,
   },
   {
     text: 'History',
-    name: tabNames.HISTORY,
+    name: 'history',
     icon: <ArchiveBoxIcon height={20} width={20} />,
   },
   {
     text: 'My products',
-    name: tabNames.MY_PRODUCTS,
+    name: 'myProducts',
     icon: <Square2StackIcon height={20} width={20} />,
   },
   {
     text: 'Admin',
-    name: tabNames.ADMIN,
+    name: 'admin',
+    icon: <Square2StackIcon height={20} width={20} />,
   },
 ];
 
@@ -116,243 +92,30 @@ interface SelectedImgTypes {
 
 export default function MyAccount() {
   const { userData, fetchUserData } = useContext(UserContext);
-  const [finishAuctionDate, setFinishAuctionDate] = useState<Date>();
   const [searchParams] = useSearchParams();
   const lastSearchQuery = searchParams.get('tab');
-  const [selectedtab, setSelectedtab] = useState(
-    lastSearchQuery || TABS_ARRAY[0].name
+  const initialTab = lastSearchQuery || TABS_ARRAY[0].name;
+  const [selectedtab, setSelectedtab] = useState<TabNamesTypes | string>(
+    initialTab
   );
   const [selectedImg, setSelectedImg] = useState<SelectedImgTypes>({
     isLoading: false,
     data: null,
-    error: null,
+    error: 'failed adding',
   });
-  const [productData, setProductData] =
-    useState<ProductDataTypes>(initialProductData);
-
-  const [categoryState, setCategoryState] = useState<{
-    isLoading: boolean;
-    options: any;
-    value: [];
-  }>({
-    isLoading: false,
-    options: [],
-    value: [],
-  });
-
-  const [status, setStatus] = useState({
-    isLoading: false,
-    hasFailed: false,
-    isSuccess: false,
-  });
-  const [authorState, setAuthorState] = useState<{
-    isLoading: boolean;
-    options: any;
-    value: [];
-  }>({
-    isLoading: false,
-    options: [],
-    value: [],
-  });
-
-  const [selectedImgs, setSelectedImgs] = useState<[] | File[]>([]);
 
   const navigate = useNavigate();
   const path = useLocation();
 
-  const changeSelectedTab = (option: string) => {
+  if (!userData) return;
+
+  const changeSelectedTab = (option: TabNamesTypes) => {
     setSelectedtab(option);
     navigate(
       { pathname: path.pathname, search: `tab=${option}` },
       { replace: true }
     );
   };
-
-  const resetProductData = () => {
-    setTimeout(() => {
-      setProductData(initialProductData);
-      setCategoryState((prevState) => {
-        return { ...prevState, value: [] };
-      });
-      setAuthorState((prevState) => {
-        return { ...prevState, value: [] };
-      });
-    }, 200);
-  };
-
-  const productDataChangeHandler = (
-    e: React.ChangeEvent<
-      HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement
-    > | null,
-    radioValue?: string
-  ) => {
-    if (e === null) {
-      if (radioValue) {
-        setProductData((prevState) => {
-          return {
-            ...prevState,
-            marketPlace: { value: radioValue, hasError: false },
-          };
-        });
-      }
-    } else if (e.target.name === 'imgs') {
-      setProductData((prevState) => {
-        return {
-          ...prevState,
-          imgs: {
-            value: [...prevState.imgs.value, e.target.value],
-            hasError: false,
-          },
-        };
-      });
-    } else if (e.target.name === 'authors') {
-      setProductData((prevState) => {
-        return {
-          ...prevState,
-          authors: {
-            value: [...prevState.imgs.value, e.target.value],
-            hasError: false,
-          },
-        };
-      });
-    } else {
-      setProductData((prevState) => {
-        return {
-          ...prevState,
-          [e.target.name]: { value: e.target.value, hasError: false },
-        };
-      });
-    }
-  };
-
-  const fetchAllCategories = useCallback(async () => {
-    const { data } = await useGetAccessDatabase({
-      url: DATABASE_ENDPOINTS.CATEGORY_ALL,
-    });
-    setCategoryState((prevState) => {
-      return { ...prevState, options: [...data] };
-    });
-  }, []);
-
-  const fetchAllAuthors = useCallback(async () => {
-    const { data } = await useGetAccessDatabase({
-      url: DATABASE_ENDPOINTS.USER_AUTHORS,
-    });
-    setAuthorState((prevState) => {
-      return { ...prevState, options: [...data] };
-    });
-  }, []);
-
-  const getAllData = useCallback(async () => {
-    fetchAllAuthors();
-    fetchAllCategories();
-  }, [fetchAllAuthors, fetchAllCategories]);
-
-  const addProductHandler = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const newProductData = {
-      seller_data: {
-        _id: userData?._id,
-        pseudonim: userData?.author_info.pseudonim,
-      },
-      title: productData.title.value,
-      description: productData.description.value,
-      price: Number(productData.price.value),
-      imgs: [],
-      categories: categoryState.value,
-      authors: authorState.value,
-      quantity: productData.quantity.value,
-      market_place: productData.marketPlace.value,
-      auction_end_date: finishAuctionDate,
-      starting_price: Number(productData.startingPrice.value),
-    };
-
-    try {
-      setStatus((prevState) => {
-        return { ...prevState, isLoading: true };
-      });
-
-      const { error, data } = await usePostAccessDatabase({
-        url: DATABASE_ENDPOINTS.PRODUCT_ONE,
-        body: { newProductData },
-      });
-      if (error) {
-      } else {
-        if (selectedImgs) {
-          const urlsTable = [];
-          for (let i = 0; i < selectedImgs.length; i++) {
-            urlsTable.push(
-              await useUploadImg({
-                ownerId: data.id,
-                selectedFile: selectedImgs[i],
-                targetLocation: 'Product_imgs',
-                iteration: i,
-              })
-            );
-          }
-          const { error } = await usePostAccessDatabase({
-            url: DATABASE_ENDPOINTS.PRODUCT_UPDATE,
-            body: { _id: data.id, imgs: urlsTable, market_place: 'Shop' },
-          });
-        }
-
-        setStatus((prevState) => {
-          return { ...prevState, isLoading: false };
-        });
-        fetchUserData();
-        resetProductData();
-
-        setStatus((prevState) => {
-          return { ...prevState, isSuccess: true };
-        });
-        getAllData();
-      }
-    } catch (err) {
-      setStatus((prevState) => {
-        return { ...prevState, isLoading: false, hasFailed: true };
-      });
-    }
-  };
-
-  const filterCategories = (inputValue: string) => {
-    return categoryState.options.filter((i: { label: string }) => {
-      return i.label.toLowerCase().includes(inputValue.toLowerCase());
-    });
-  };
-  const filterAuthors = (inputValue: string) => {
-    return authorState.options.filter((i: { label: string }) => {
-      return i.label.toLowerCase().includes(inputValue.toLowerCase());
-    });
-  };
-  const categoryOptions = (inputValue: string) =>
-    new Promise<any[]>((resolve) => {
-      setTimeout(() => {
-        resolve(filterCategories(inputValue));
-      }, 1000);
-    });
-
-  const authorOptions = (inputValue: string) =>
-    new Promise<any[]>((resolve) => {
-      setTimeout(() => {
-        resolve(filterAuthors(inputValue));
-      }, 1000);
-    });
-
-  const selectCategoryChange = (selectedOptions: any) => {
-    setCategoryState((prevState) => {
-      return { ...prevState, value: selectedOptions };
-    });
-  };
-
-  const selectAuthorChange = (selectedOptions: any) => {
-    setAuthorState((prevState) => {
-      return { ...prevState, value: selectedOptions };
-    });
-  };
-
-  useEffect(() => {
-    getAllData();
-  }, [getAllData]);
 
   const uploadProfileImg = async (e: ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return;
@@ -362,7 +125,7 @@ export default function MyAccount() {
 
     const url = await useUploadImg({
       selectedFile: e.target.files[0],
-      ownerId: userData?._id,
+      ownerId: userData._id,
       targetLocation: 'Profile_img',
     });
 
@@ -370,7 +133,7 @@ export default function MyAccount() {
       await usePostAccessDatabase({
         url: DATABASE_ENDPOINTS.USER_UPDATE,
         body: {
-          userEmail: userData?.email,
+          userEmail: userData.email,
           fieldValue: url,
           fieldKey: e.target.name,
         },
@@ -386,12 +149,7 @@ export default function MyAccount() {
     }
   };
 
-  const productImgsHandler = (e: ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (files && files.length > 0) {
-      setSelectedImgs((prevState) => [...prevState, ...files]);
-    }
-  };
+  console.log();
 
   return (
     <div className="relative mb-16 min-h-screen">
@@ -401,45 +159,49 @@ export default function MyAccount() {
             <div className="mx-auto py-8 sm:py-12">
               <div className="gap-2 sm:flex sm:items-center sm:justify-between">
                 <div className="flex flex-col items-center gap-4 sm:flex-row">
-                  <button type="button" className="group relative ">
-                    <label
-                      className={`${
-                        selectedImg.isLoading && 'opacity-100'
-                      } absolute flex h-full w-full cursor-pointer items-center justify-center rounded-full bg-slate-200/60 opacity-0 transition duration-150 ease-in-out group-hover:opacity-100`}
-                    >
-                      <input
-                        type="file"
-                        name="profile_img"
-                        onChange={(e) => uploadProfileImg(e)}
-                        className="hidden"
-                        accept="image/png, image/jpg"
+                  <div>
+                    <button type="button" className="group relative ">
+                      <label
+                        className={`${
+                          selectedImg.isLoading && 'opacity-100'
+                        } absolute flex h-full w-full cursor-pointer items-center justify-center rounded-full bg-slate-200/60 opacity-0 transition duration-150 ease-in-out group-hover:opacity-100`}
+                      >
+                        <input
+                          type="file"
+                          name="profile_img"
+                          onChange={(e) => uploadProfileImg(e)}
+                          className="hidden"
+                          accept="image/png, image/jpg"
+                        />
+                        {!selectedImg.isLoading && (
+                          <PlusCircleIcon className="h-10 w-10 text-slate-800" />
+                        )}
+                        {selectedImg.isLoading && (
+                          <div
+                            className="absolute mx-auto block h-6 w-6 animate-spin rounded-full border-[3px] border-current border-t-primary text-white"
+                            role="status"
+                            aria-label="loading"
+                          >
+                            <span className="sr-only">Loading...</span>
+                          </div>
+                        )}
+                      </label>
+                      <img
+                        className="inline-block h-24 w-24 rounded-full object-cover ring-2 ring-white"
+                        src={
+                          userData.user_info.profile_img
+                            ? userData.user_info.profile_img
+                            : avatarImg
+                        }
+                        alt="avatar_img"
                       />
-                      {!selectedImg.isLoading && (
-                        <PlusCircleIcon className="h-10 w-10 text-slate-800" />
-                      )}
-                      {selectedImg.isLoading && (
-                        <div
-                          className="absolute mx-auto block h-6 w-6 animate-spin rounded-full border-[3px] border-current border-t-primary text-white"
-                          role="status"
-                          aria-label="loading"
-                        >
-                          <span className="sr-only">Loading...</span>
-                        </div>
-                      )}
-                    </label>
-                    <img
-                      className="inline-block h-24 w-24 rounded-full object-cover ring-2 ring-white"
-                      src={
-                        userData?.user_info.profile_img
-                          ? userData?.user_info.profile_img
-                          : avatarImg
-                      }
-                      alt="avatar_img"
-                    />
-                  </button>
+                    </button>
+                    {selectedImg.error && <p>{selectedImg.error}</p>}
+                  </div>
+
                   <div className="pt-1 text-left">
                     <h1 className="text-2xl font-bold text-gray-900 sm:text-5xl">
-                      Welcome Back, {userData?.username}!
+                      Welcome Back, {userData.username}!
                     </h1>
 
                     <p className="mt-1.5 text-lg text-gray-500">
@@ -463,322 +225,87 @@ export default function MyAccount() {
                   </div>
                 </div>
 
-                {userData?.role !== UserRoleTypes.USER && (
-                  <div className="mt-4 flex flex-col sm:mt-0 sm:flex-row sm:items-center">
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <Button variant="default">Add new book</Button>
-                      </DialogTrigger>
-                      <DialogContent>
-                        <form
-                          onSubmit={(e) => addProductHandler(e)}
-                          className="w-full"
-                        >
-                          <DialogHeader>
-                            <DialogTitle>Add product</DialogTitle>
-                            <DialogDescription>
-                              Fill in your product data. Click the
-                              &apos;add&apos; button when you&apos;re done.
-                            </DialogDescription>
-                          </DialogHeader>
-                          <fieldset className="mb-2 space-y-1">
-                            <label
-                              htmlFor="title"
-                              className="block text-sm font-medium text-gray-700"
-                            >
-                              Title
-                            </label>
-
-                            <input
-                              name="title"
-                              id="title"
-                              type="text"
-                              placeholder="Harry Potter..."
-                              className="w-full rounded-md border-gray-200 shadow-sm sm:text-sm"
-                              value={productData.title.value}
-                              onChange={(e) => productDataChangeHandler(e)}
-                            />
-                          </fieldset>
-
-                          <fieldset className="mb-2 space-y-1">
-                            <p className="block text-sm font-medium text-gray-700">
-                              Authors
-                            </p>
-                            <div>
-                              {productData.authors.value.map((author) => (
-                                <span key={author}>{author}</span>
-                              ))}
-                            </div>
-                            <div className="flex">
-                              <label
-                                htmlFor="newAuthor"
-                                className="sr-only block text-sm font-medium text-gray-700"
-                              >
-                                Author
-                              </label>
-                              <AsyncCreatableSelect
-                                isMulti
-                                cacheOptions
-                                defaultOptions
-                                loadOptions={authorOptions}
-                                value={authorState.value}
-                                onChange={selectAuthorChange}
-                              />
-                            </div>
-                          </fieldset>
-
-                          <fieldset className="mb-2 space-y-1">
-                            <p className="block text-sm font-medium text-gray-700">
-                              Categories
-                            </p>
-                            {productData.categories.value.map((category) => (
-                              <span key={category}>{category}</span>
-                            ))}
-                            <div>
-                              <label
-                                htmlFor="newCategory"
-                                className="sr-only block text-sm font-medium text-gray-700"
-                              >
-                                Category
-                              </label>
-                              <AsyncCreatableSelect
-                                isMulti
-                                cacheOptions
-                                defaultOptions
-                                loadOptions={categoryOptions}
-                                value={categoryState.value}
-                                onChange={selectCategoryChange}
-                              />
-                            </div>
-                          </fieldset>
-
-                          <fieldset className="mb-2 space-y-1">
-                            <label
-                              htmlFor="description"
-                              className="block text-sm font-medium text-gray-700"
-                            >
-                              Description
-                            </label>
-
-                            <textarea
-                              name="description"
-                              id="description"
-                              placeholder="Few words..."
-                              className="mt-1 w-full resize-none rounded-md border-gray-200 shadow-sm sm:text-sm"
-                              value={productData.description.value}
-                              onChange={(e) => productDataChangeHandler(e)}
-                            />
-                          </fieldset>
-
-                          <fieldset className="relative mb-2 max-w-full space-y-1 break-all">
-                            <label
-                              htmlFor="imgs"
-                              className="block text-sm font-medium text-gray-700  "
-                            >
-                              Imgs
-                            </label>
-
-                            <Input
-                              type="file"
-                              name="imgs"
-                              id="imgs"
-                              multiple
-                              onChange={(e) => productImgsHandler(e)}
-                              accept="image/png, image/jpg"
-                            />
-
-                            {productData.imgs.value.length > 0 &&
-                              productData.imgs.value.map((img, id) => {
-                                return (
-                                  <p
-                                    className="text-xs"
-                                    key={id}
-                                    id={id.toString()}
-                                  >
-                                    {img.slice(0, 60)}...
-                                  </p>
-                                );
-                              })}
-                          </fieldset>
-
-                          <fieldset className="mb-2 space-y-1">
-                            <label
-                              htmlFor="quantity"
-                              className="block text-sm font-medium text-gray-700"
-                            >
-                              Amount
-                            </label>
-
-                            <input
-                              name="quantity"
-                              id="quantity"
-                              type="number"
-                              placeholder="1..."
-                              min={1}
-                              max={100}
-                              className="w-full rounded-md border-gray-200 shadow-sm sm:text-sm"
-                              value={productData.quantity.value}
-                              onChange={(e) => productDataChangeHandler(e)}
-                            />
-                          </fieldset>
-
-                          <fieldset className="mb-2 space-y-1">
-                            <span className="block text-sm font-medium text-gray-700">
-                              Marketplace
-                            </span>
-                            <RadioGroup defaultValue={MarketPlaceTypes.SHOP}>
-                              <div>
-                                <RadioGroupItem
-                                  value={MarketPlaceTypes.SHOP}
-                                  id={MarketPlaceTypes.SHOP}
-                                />
-                                <Label htmlFor={MarketPlaceTypes.SHOP}>
-                                  {MarketPlaceTypes.SHOP}
-                                </Label>
-                              </div>
-                              <div>
-                                <RadioGroupItem
-                                  value={MarketPlaceTypes.AUCTION}
-                                  id={MarketPlaceTypes.AUCTION}
-                                />
-                                <Label htmlFor={MarketPlaceTypes.AUCTION}>
-                                  {MarketPlaceTypes.AUCTION}
-                                </Label>
-                              </div>
-                            </RadioGroup>
-                          </fieldset>
-
-                          {productData.marketPlace.value ===
-                          MarketPlaceTypes.SHOP ? (
-                            <fieldset className="mb-2 space-y-1">
-                              <label
-                                htmlFor="price"
-                                className="block text-sm font-medium text-gray-700"
-                              >
-                                Price
-                              </label>
-                              <input
-                                name="price"
-                                id="price"
-                                type="number"
-                                placeholder="$1..."
-                                min={0.1}
-                                step={0.1}
-                                className="w-full rounded-md border-gray-200 shadow-sm sm:text-sm"
-                                value={productData.price.value}
-                                onChange={(e) => productDataChangeHandler(e)}
-                              />
-                            </fieldset>
-                          ) : (
-                            <div>
-                              <fieldset className="mb-2 space-y-1">
-                                <label
-                                  htmlFor="price"
-                                  className="block text-sm font-medium text-gray-700"
-                                >
-                                  Starting Price
-                                </label>
-                                <input
-                                  name="startingPrice"
-                                  id="startingPrice"
-                                  type="number"
-                                  placeholder="$1..."
-                                  min={0.1}
-                                  step={0.1}
-                                  className="w-full rounded-md border-gray-200 shadow-sm sm:text-sm"
-                                  value={productData.startingPrice.value}
-                                  onChange={(e) => productDataChangeHandler(e)}
-                                />
-                              </fieldset>
-                              <DatePickerDemo
-                                date={finishAuctionDate}
-                                setDate={setFinishAuctionDate}
-                              />
-                            </div>
-                          )}
-                          <DialogFooter>
-                            <DialogTrigger asChild>
-                              <Button variant="default" type="submit">
-                                Add
-                              </Button>
-                            </DialogTrigger>
-                          </DialogFooter>
-                        </form>
-                      </DialogContent>
-                    </Dialog>
-                  </div>
-                )}
+                {/* {userData.role !== UserRoleTypes.USER && <NewProduct />} */}
               </div>
             </div>
           </header>
           <div>
             <div className="px-2">
               <div className="sm:hidden">
-                <label htmlFor="Tab" className="sr-only">
+                <label htmlFor="tabMobile" className="sr-only">
                   Tab
                 </label>
 
-                <select
-                  id="Tab"
-                  className="w-full rounded-md border-gray-200"
-                  onChange={(e) => changeSelectedTab(e.target.value)}
+                <Select
+                  name="tabMobile"
+                  onValueChange={(e) => changeSelectedTab(e as TabNamesTypes)}
                   value={selectedtab}
                 >
-                  {TABS_ARRAY.map((tab) => {
-                    if (
-                      tab.name === 'admin' &&
-                      userData?.role !== UserRoleTypes.ADMIN
-                    )
-                      return null;
-                    if (
-                      tab.name === 'myProducts' &&
-                      userData?.role !== UserRoleTypes.ADMIN &&
-                      userData?.role !== UserRoleTypes.AUTHOR
-                    )
-                      return null;
-                    return (
-                      <option key={tab.name} value={tab.name}>
-                        {tab.text}
-                      </option>
-                    );
-                  })}
-                </select>
+                  <SelectTrigger className="w-full rounded-md border-gray-200">
+                    {TABS_ARRAY.find((tab) => tab.name === initialTab)?.text}
+                  </SelectTrigger>
+                  <SelectContent>
+                    {TABS_ARRAY.map((tab) => {
+                      if (
+                        tab.name === 'admin' &&
+                        userData.role !== UserRoleTypes.ADMIN
+                      )
+                        return null;
+                      if (
+                        tab.name === 'myProducts' &&
+                        userData.role !== UserRoleTypes.ADMIN &&
+                        userData.role !== UserRoleTypes.AUTHOR
+                      )
+                        return null;
+                      return (
+                        <SelectItem key={tab.name} value={tab.name}>
+                          {tab.text}
+                        </SelectItem>
+                      );
+                    })}
+                  </SelectContent>
+                </Select>
               </div>
 
               <div className="hidden sm:block">
                 <div className="border-b border-gray-200">
                   <nav className="-mb-px flex gap-6" aria-label="Tabs">
-                    {TABS_ARRAY.map((option) => {
-                      if (
-                        option.name === 'admin' &&
-                        userData?.role !== UserRoleTypes.ADMIN
-                      ) {
-                        return null;
-                      }
-                      if (
-                        option.name === 'myProducts' &&
-                        userData?.role !== UserRoleTypes.ADMIN &&
-                        userData?.role !== UserRoleTypes.AUTHOR
-                      ) {
-                        return null;
-                      }
+                    <label htmlFor="tabDesktop" className="sr-only">
+                      Tab
+                    </label>
+                    <ul id="tabDesktop">
+                      {TABS_ARRAY.map((option) => {
+                        if (
+                          option.name === 'admin' &&
+                          userData.role !== UserRoleTypes.ADMIN
+                        ) {
+                          return null;
+                        }
+                        if (
+                          option.name === 'myProducts' &&
+                          userData.role !== UserRoleTypes.ADMIN &&
+                          userData.role !== UserRoleTypes.AUTHOR
+                        ) {
+                          return null;
+                        }
 
-                      return (
-                        <button
-                          key={option.name}
-                          type="button"
-                          onClick={() => changeSelectedTab(option.name)}
-                          className={`${
-                            selectedtab === option.name
-                              ? 'border-sky-500 text-sky-600'
-                              : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
-                          } ease inline-flex shrink-0 items-center gap-2 border-b-2 px-1 pb-4 text-sm font-medium transition duration-200`}
-                        >
-                          {option.icon}
-                          {option.text}
-                        </button>
-                      );
-                    })}
+                        return (
+                          <li
+                            key={option.name}
+                            value={option.name}
+                            onClick={() => changeSelectedTab(option.name)}
+                            className={`${
+                              selectedtab === option.name
+                                ? 'border-sky-500 text-sky-600'
+                                : 'cursor-pointer border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                            } ease inline-flex shrink-0 items-center gap-2 border-b-2 px-1 pb-4 text-sm font-medium transition duration-200`}
+                          >
+                            {option.icon}
+                            {option.text}
+                          </li>
+                        );
+                      })}
+                    </ul>
                   </nav>
                 </div>
               </div>

@@ -1,7 +1,7 @@
 import { useContext, useState, ChangeEvent } from 'react';
 import { UserContext } from '@context/UserProvider';
-import { usePostAccessDatabase } from '../../hooks/useAaccessDatabase';
-import { DATABASE_ENDPOINTS } from '../../data/endpoints';
+import { usePostAccessDatabase } from '@hooks/useAaccessDatabase';
+import { DATABASE_ENDPOINTS } from '@data/endpoints';
 import { Label } from '@components/UI/label';
 import { Switch } from '@components/UI/switch';
 
