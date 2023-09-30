@@ -29,6 +29,16 @@ import {
   SelectItem,
   SelectTrigger,
 } from '@components/UI/select';
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+} from '@components/UI/alerts/alert';
+import { Close } from '@radix-ui/react-dialog';
+import { PopoverClose } from '@radix-ui/react-popover';
+import { Cross2Icon } from '@radix-ui/react-icons';
+import { useToast } from '@components/UI/use-toast';
+import { Button } from '@components/UI/button';
 
 type TabKeysTypes =
   | 'MY_DATA'
@@ -91,7 +101,6 @@ interface SelectedImgTypes {
 }
 
 export default function MyAccount() {
-  const { userData, fetchUserData } = useContext(UserContext);
   const [searchParams] = useSearchParams();
   const lastSearchQuery = searchParams.get('tab');
   const initialTab = lastSearchQuery || TABS_ARRAY[0].name;
@@ -106,7 +115,8 @@ export default function MyAccount() {
 
   const navigate = useNavigate();
   const path = useLocation();
-
+  const { userData, fetchUserData } = useContext(UserContext);
+  const { toast } = useToast();
   if (!userData) return;
 
   const changeSelectedTab = (option: TabNamesTypes) => {
@@ -141,71 +151,80 @@ export default function MyAccount() {
       fetchUserData();
       setSelectedImg({ data: null, error: null, isLoading: false });
     } else {
+      toast({
+        variant: 'destructive',
+        title: 'Uh oh! Something went wrong.',
+        description: 'Failed adding profile img',
+      });
       setSelectedImg({
         data: null,
-        error: 'Failed adding img',
+        error: 'Failed adding profile img',
         isLoading: false,
       });
     }
   };
 
-  console.log();
+  const subtitle =
+    userData.role === UserRoleTypes.ADMIN ? (
+      <span>Let&apos; put some things in order!</span>
+    ) : userData.role === UserRoleTypes.AUTHOR ? (
+      <p>Let&apos; add some new books! </p>
+    ) : (
+      <p>Let&apos;s see some books! 🎉</p>
+    );
 
   return (
     <div className="relative mb-16 min-h-screen">
       <div>
         <MainContainer>
           <header>
-            <div className="mx-auto py-8 sm:py-12">
+            <div className="mx-auto py-8 sm:pb-9 sm:pt-12">
               <div className="gap-2 sm:flex sm:items-center sm:justify-between">
                 <div className="flex flex-col items-center gap-4 sm:flex-row">
-                  <div>
-                    <button type="button" className="group relative ">
-                      <label
-                        className={`${
-                          selectedImg.isLoading && 'opacity-100'
-                        } absolute flex h-full w-full cursor-pointer items-center justify-center rounded-full bg-slate-200/60 opacity-0 transition duration-150 ease-in-out group-hover:opacity-100`}
-                      >
-                        <input
-                          type="file"
-                          name="profile_img"
-                          onChange={(e) => uploadProfileImg(e)}
-                          className="hidden"
-                          accept="image/png, image/jpg"
-                        />
-                        {!selectedImg.isLoading && (
-                          <PlusCircleIcon className="h-10 w-10 text-slate-800" />
-                        )}
-                        {selectedImg.isLoading && (
-                          <div
-                            className="absolute mx-auto block h-6 w-6 animate-spin rounded-full border-[3px] border-current border-t-primary text-white"
-                            role="status"
-                            aria-label="loading"
-                          >
-                            <span className="sr-only">Loading...</span>
-                          </div>
-                        )}
-                      </label>
-                      <img
-                        className="inline-block h-24 w-24 rounded-full object-cover ring-2 ring-white"
-                        src={
-                          userData.user_info.profile_img
-                            ? userData.user_info.profile_img
-                            : avatarImg
-                        }
-                        alt="avatar_img"
+                  <button type="button" className="group relative ">
+                    <label
+                      className={`${
+                        selectedImg.isLoading && 'opacity-100'
+                      } absolute flex h-full w-full cursor-pointer items-center justify-center rounded-full bg-slate-200/60 opacity-0 transition duration-150 ease-in-out group-hover:opacity-100`}
+                    >
+                      <input
+                        type="file"
+                        name="profile_img"
+                        onChange={(e) => uploadProfileImg(e)}
+                        className="hidden"
+                        accept="image/png, image/jpg"
                       />
-                    </button>
-                    {selectedImg.error && <p>{selectedImg.error}</p>}
-                  </div>
+                      {!selectedImg.isLoading && (
+                        <PlusCircleIcon className="h-10 w-10 text-slate-800" />
+                      )}
+                      {selectedImg.isLoading && (
+                        <div
+                          className="absolute mx-auto block h-6 w-6 animate-spin rounded-full border-[3px] border-current border-t-primary text-white"
+                          role="status"
+                          aria-label="loading"
+                        >
+                          <span className="sr-only">Loading...</span>
+                        </div>
+                      )}
+                    </label>
+                    <img
+                      className="inline-block h-24 w-24 rounded-full object-cover ring-2 ring-white"
+                      src={
+                        userData.user_info.profile_img
+                          ? userData.user_info.profile_img
+                          : avatarImg
+                      }
+                      alt="avatar_img"
+                    />
+                  </button>
 
-                  <div className="pt-1 text-left">
+                  <div className="pt-1 text-center sm:text-left">
                     <h1 className="text-2xl font-bold text-gray-900 sm:text-5xl">
                       Welcome Back, {userData.username}!
                     </h1>
 
-                    <p className="mt-1.5 text-lg text-gray-500">
-                      Let&apos;s see some books! 🎉{' '}
+                    <p className="mt-1.5 space-x-2 text-lg text-gray-500">
+                      {subtitle}
                       {userData && userData.role !== 'User' && (
                         <MarketplaceBadge
                           message={userData.role}
@@ -298,7 +317,7 @@ export default function MyAccount() {
                               selectedtab === option.name
                                 ? 'border-sky-500 text-sky-600'
                                 : 'cursor-pointer border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
-                            } ease inline-flex shrink-0 items-center gap-2 border-b-2 px-1 pb-4 text-sm font-medium transition duration-200`}
+                            } ease inline-flex shrink-0 items-center gap-2 border-b-2 px-3 pb-4 pt-3 text-sm font-medium transition duration-200 `}
                           >
                             {option.icon}
                             {option.text}

@@ -2,6 +2,7 @@ import axios from 'axios';
 import UserProvider from './context/UserProvider';
 import CartProvider from './context/CartProvider';
 import MainLayout from './layout/MainLayout';
+import { Toaster } from '@components/UI/toaster';
 
 let properUrl = 'http://localhost:4000';
 
@@ -24,6 +25,7 @@ export default function App() {
     <UserProvider>
       <CartProvider>
         <MainLayout />
+        <Toaster />
       </CartProvider>
     </UserProvider>
   );
