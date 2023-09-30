@@ -37,11 +37,11 @@ function Header({ currentPathname }: HeaderTypes) {
           currentPathname === '/' &&
           'transition-opacity duration-200 ease-in-out'
         } 
-        absolute left-0 top-0 h-full w-full bg-white shadow-sm`}
+        absolute left-0 top-0 h-full w-full bg-background shadow-sm`}
       />
       <div
         className={`${
-          scrollFlag ? 'text-white' : 'text-black'
+          scrollFlag ? 'text-background' : 'text-foreground'
         } transition duration-100 ease-out`}
       >
         <Nav scrollFlag={scrollFlag} />

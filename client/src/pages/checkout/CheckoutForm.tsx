@@ -166,12 +166,12 @@ export default function CheckoutForm() {
         }
         id="submit"
         style={{ marginTop: '1rem' }}
-        className="block w-full rounded-md border-0 bg-primary px-4 py-3 font-semibold text-white transition-colors duration-200 ease-out disabled:cursor-auto disabled:opacity-50"
+        className="block w-full rounded-md border-0 bg-primary px-4 py-3 font-semibold text-background transition-colors duration-200 ease-out disabled:cursor-auto disabled:opacity-50"
       >
         <span id="button-text">
           {isLoading ? (
             <div
-              className="mx-auto block h-6 w-6 animate-spin rounded-full border-[3px] border-current border-t-primary text-white"
+              className="mx-auto block h-6 w-6 animate-spin rounded-full border-[3px] border-current border-t-primary text-background"
               role="status"
               aria-label="loading"
             >

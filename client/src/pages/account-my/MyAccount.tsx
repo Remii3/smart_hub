@@ -191,7 +191,7 @@ export default function MyAccount() {
                       )}
                       {selectedImg.isLoading && (
                         <div
-                          className="absolute mx-auto block h-6 w-6 animate-spin rounded-full border-[3px] border-current border-t-primary text-white"
+                          className="absolute mx-auto block h-6 w-6 animate-spin rounded-full border-[3px] border-current border-t-primary text-background"
                           role="status"
                           aria-label="loading"
                         >
@@ -211,7 +211,7 @@ export default function MyAccount() {
                   </button>
 
                   <div className="pt-1 text-center sm:text-left">
-                    <h1 className="text-2xl font-bold text-gray-900 sm:text-5xl">
+                    <h1 className="text-2xl font-bold text-foreground sm:text-5xl">
                       Welcome Back, {userData.username}!
                     </h1>
 
@@ -236,7 +236,7 @@ export default function MyAccount() {
                   </div>
                 </div>
 
-                {/* {userData.role !== UserRoleTypes.USER && <NewProduct />} */}
+                {userData.role !== UserRoleTypes.USER && <NewProduct />}
               </div>
             </div>
           </header>

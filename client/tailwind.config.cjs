@@ -22,12 +22,6 @@ module.exports = {
       },
       colors: {
         pageBackground: '#0C223B',
-        dark: '#161618',
-        gray600: '#727070',
-        gray800: '#E3E3E3',
-        gray900: '#F7F7FB',
-        subtleGray: '#D8D8D8',
-
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
         ring: 'hsl(var(--ring))',
@@ -35,11 +29,11 @@ module.exports = {
         foreground: 'hsl(var(--foreground))',
 
         primary: {
-          DEFAULT: '#2563eb',
+          DEFAULT: 'hsl(var(--primary))',
           foreground: 'hsl(var(--primary-foreground))',
         },
         secondary: {
-          DEFAULT: '#c4d3f3',
+          DEFAULT: 'hsl(var(--secondary))',
           foreground: 'hsl(var(--secondary-foreground))',
         },
         destructive: {

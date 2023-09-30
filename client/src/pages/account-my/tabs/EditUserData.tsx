@@ -305,7 +305,7 @@ export default function EditUserData() {
   return (
     <div className="flex flex-col justify-around gap-8 sm:flex-row">
       <section className="w-full">
-        <h5 className="mb-4">User information</h5>
+        <h5 className="mb-4 text-foreground">User information</h5>
         <div className="flex flex-col gap-4">
           <div>
             <fieldset className="flex flex-col">
@@ -751,7 +751,7 @@ export default function EditUserData() {
 
       {userData.role !== 'User' && (
         <section className="w-full">
-          <h5 className="mb-5">Author information</h5>
+          <h5 className="mb-5 text-foreground">Author information</h5>
           <div className="flex flex-col gap-4">
             <div>
               <fieldset className="flex flex-col">

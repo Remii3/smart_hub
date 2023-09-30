@@ -6,6 +6,7 @@ export enum UserRoleTypes {
 export enum MarketPlaceTypes {
   AUCTION = 'Auction',
   SHOP = 'Shop',
+  COLLECTION = 'Collection',
 }
 
 export type UserRoleType =

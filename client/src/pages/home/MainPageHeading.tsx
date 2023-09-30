@@ -2,7 +2,7 @@ type PropsTypes = {
   mainTitle: string;
   subTitle?: string;
   usecase: 'main' | 'sub';
-  color: 'white' | 'dark';
+  color: 'background' | 'foreground';
 };
 
 export default function MainPageHeading({
@@ -24,7 +24,9 @@ export default function MainPageHeading({
       )}
       <p
         className={`${
-          color === 'dark' ? 'text-dark/80' : 'text-gray900'
+          color === 'foreground'
+            ? 'text-foreground/80'
+            : 'text-muted-foreground'
         }  uppercase sm:text-lg`}
       >
         {subTitle}

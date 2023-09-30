@@ -273,7 +273,7 @@ export default function ProductPage() {
                         <button
                           type="button"
                           onClick={() => deleteItemHandler()}
-                          className="rounded-md bg-red-500 px-3 py-1 text-white"
+                          className="rounded-md bg-red-500 px-3 py-1 text-background"
                         >
                           Delete
                         </button>

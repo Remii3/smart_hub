@@ -30,7 +30,7 @@ function CartPopup() {
             <Link
               to="/checkout"
               className="block w-full rounded border border-primary bg-primary px-12 py-3 text-sm font-medium
-            text-white shadow-sm transition ease-out hover:bg-blue-700 focus:ring focus:ring-blue-300"
+            text-background shadow-sm transition ease-out hover:bg-blue-700 focus:ring focus:ring-blue-300"
             >
               Checkout
             </Link>

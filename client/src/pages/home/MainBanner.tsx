@@ -31,14 +31,14 @@ export default function MainBanner() {
             id="mainPageTitle"
             className="mx-auto max-w-xl text-center lg:max-w-3xl"
           >
-            <h1 className=" font-extrabold text-white ">
+            <h1 className=" font-extrabold text-background ">
               Understand User Flow.
-              <strong className="font-extrabold text-primary sm:block">
+              <strong className="font-extrabold text-blue-600 sm:block">
                 Increase Conversion.
               </strong>
             </h1>
 
-            <p className="mt-4 text-white sm:text-xl/relaxed">
+            <p className="mt-4 text-background sm:text-xl/relaxed">
               Dive into the world of books and unleash your imagination! Browse
               through our vast collection and find your next literary escape.
             </p>
@@ -52,8 +52,8 @@ export default function MainBanner() {
             </div>
           </div>
           <div className="absolute inset-0 m-auto h-14 w-8 translate-y-96">
-            <div className="mousey box-content h-9 w-1 rounded-3xl border-2 border-solid border-white px-4 py-3 opacity-75">
-              <div className="h-3 w-1 animate-scroll-down rounded-[25%] bg-white" />
+            <div className="mousey box-content h-9 w-1 rounded-3xl border-2 border-solid border-background px-4 py-3 opacity-75">
+              <div className="h-3 w-1 animate-scroll-down rounded-[25%] bg-background" />
             </div>
           </div>
         </div>

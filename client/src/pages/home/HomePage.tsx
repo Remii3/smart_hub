@@ -8,7 +8,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-pageBackground">
       <MainBanner />
-      <div className="flex min-h-screen w-full flex-col items-center justify-center bg-white ">
+      <div className="flex min-h-screen w-full flex-col items-center justify-center bg-background ">
         <IntroductionSection />
         <CategoriesSection />
         <CollectionSection />

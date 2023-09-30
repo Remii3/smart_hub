@@ -67,7 +67,7 @@ export default function CheckoutPage() {
             </div>
           </div>
 
-          <div className="bg-white py-12 md:py-24">
+          <div className="bg-background py-12 md:py-24">
             <div className="mx-auto max-w-lg px-4 lg:px-8">
               {!clientSecret.data && clientSecret.isLoading && (
                 <p>Loading...</p>

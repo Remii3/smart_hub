@@ -39,7 +39,7 @@ export default function CategoriesSection() {
     <section className="relative flex w-full flex-col items-center gap-12 pb-16">
       <div className="relative left-0 top-0 w-full ">
         <MainPageHeading
-          color="dark"
+          color="foreground"
           usecase="main"
           mainTitle="Reading with us is easy"
           subTitle="Offering a diverse array of book genres to choose from, for

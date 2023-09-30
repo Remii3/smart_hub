@@ -231,7 +231,7 @@ export default function Comments({
               )}
             </div>
 
-            <div className="flex items-center justify-end gap-2 bg-white p-3">
+            <div className="flex items-center justify-end gap-2 bg-background p-3">
               <Button
                 variant="default"
                 disabled={!userData}
@@ -315,7 +315,7 @@ export default function Comments({
                       <Button
                         type="button"
                         onClick={() => deleteCommentHandler(comment._id)}
-                        className="rounded-md bg-red-500 px-3 py-1 text-white hover:bg-red-600"
+                        className="rounded-md bg-red-500 px-3 py-1 text-background hover:bg-red-600"
                       >
                         Delete
                       </Button>

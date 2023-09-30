@@ -46,7 +46,7 @@ function SpecialAuctionCard({
       id={`${_id}`}
       className="mx-auto h-full w-full max-w-md rounded-lg md:max-w-none"
     >
-      <div className="rounded-2xl bg-white px-3 py-3">
+      <div className="rounded-2xl bg-background px-3 py-3">
         <div className="flex flex-col gap-3 xl:flex-row">
           <div className="mx-auto w-full max-w-xs basis-1/2 overflow-hidden rounded-md lg:block">
             {img && (
@@ -61,32 +61,32 @@ function SpecialAuctionCard({
           </div>
           <div className="flex-grow pt-3">
             <Link to={`/product/${_id}`}>
-              <h4 className="pb-6 text-dark">{titleShortened}</h4>
+              <h4 className="pb-6 text-foreground">{titleShortened}</h4>
             </Link>
             <div className="flex flex-col justify-between pb-3">
               <div className="flex flex-row lg:max-w-lg">
                 <div className="flex w-full flex-col gap-3">
                   <p className="flex justify-between sm:text-lg">
                     <span className="text-gray600"> Highest bid:</span>
-                    <span className="text-darkTint">{currentPrice}€</span>
+                    <span className="text-foreground">{currentPrice}€</span>
                   </p>
                   <p className="flex justify-between  sm:text-lg">
                     <span className="text-gray600"> Min bid:</span>
-                    <span className="text-darkTint">{startingPrice}€</span>
+                    <span className="text-foreground">{startingPrice}€</span>
                   </p>
                   <p className="flex justify-between sm:text-lg">
                     <span className="text-gray600"> Deadline:</span>
-                    <span className="text-darkTint"></span>
+                    <span className="text-foreground"></span>
                   </p>
                   <p
                     className={`${
                       descHidden ? 'max-h-0 opacity-0' : 'max-h-72 opacity-100'
                     } overflow-hidden pb-3 transition-[max-height,opacity] duration-300 ease-in-out`}
                   >
-                    <span className="text-base text-gray600">
+                    <span className="text-gray600 text-base">
                       Description:{' '}
                     </span>
-                    <span className="text-md break-words text-darkTint">
+                    <span className="text-md break-words text-foreground">
                       {description}
                     </span>
                   </p>
@@ -132,7 +132,7 @@ function SpecialAuctionCard({
               } hidden overflow-hidden transition-[max-height,opacity] duration-300 ease-in-out sm:text-lg lg:block`}
             >
               <span className="text-gray600">Description: </span>
-              <span className="break-words text-darkTint">{description}</span>
+              <span className="break-words text-foreground">{description}</span>
             </p> */}
           </div>
         </div>

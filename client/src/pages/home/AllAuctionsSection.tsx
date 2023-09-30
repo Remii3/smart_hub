@@ -26,10 +26,10 @@ export default function AllAuctionsSection() {
 
   if (auctions.length < 1) return <div />;
   return (
-    <section className="relative flex w-full flex-col items-center gap-12 bg-white px-0 pb-24 lg:px-12">
+    <section className="relative flex w-full flex-col items-center gap-12 bg-background px-0 pb-24 lg:px-12">
       <div className="w-full">
         <MainPageHeading
-          color="dark"
+          color="foreground"
           usecase="sub"
           mainTitle="Similar auctions"
           subTitle="You may like this too"

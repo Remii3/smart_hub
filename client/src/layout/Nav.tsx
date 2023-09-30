@@ -102,10 +102,10 @@ export default function Nav({ scrollFlag }: { scrollFlag: boolean }) {
     setSearchbarValue(e.target.value);
   };
   const burgerColor = openedBurger
-    ? 'bg-dark'
+    ? 'bg-foreground'
     : scrollFlag
-    ? 'bg-white'
-    : 'bg-dark';
+    ? 'bg-background'
+    : 'bg-foreground';
   return (
     <nav>
       <div className="relative mx-auto flex h-[64px] max-w-[1480px] flex-row items-center justify-between px-4 py-3 sm:px-10">
@@ -138,7 +138,7 @@ export default function Nav({ scrollFlag }: { scrollFlag: boolean }) {
             className="relative mx-auto me-4 flex w-full justify-end text-gray-600"
           >
             <input
-              className="border-1 h-full max-w-[24rem] rounded-lg border-gray-300 bg-white pl-3 pr-12 text-sm transition-[width] duration-200 ease-in-out focus:w-full focus:outline-none sm:w-56"
+              className="border-1 h-full max-w-[24rem] rounded-lg border-gray-300 bg-background pl-3 pr-12 text-sm transition-[width] duration-200 ease-in-out focus:w-full focus:outline-none sm:w-56"
               type="text"
               name="search"
               placeholder="Search"
@@ -160,13 +160,13 @@ export default function Nav({ scrollFlag }: { scrollFlag: boolean }) {
               <PopoverTrigger>
                 <MagnifyingGlassIcon className={` h-8 w-8`} />
               </PopoverTrigger>
-              <PopoverContent className="mt-3 block w-screen rounded-t-none bg-white lg:hidden">
+              <PopoverContent className="mt-3 block w-screen rounded-t-none bg-background lg:hidden">
                 <form
                   onSubmit={(e) => searchHandler(e)}
                   className="relative mx-auto w-full max-w-xl text-gray-600"
                 >
                   <input
-                    className="h-full w-full rounded-lg border-2 border-gray-300 bg-white px-3 pr-16 text-sm focus:outline-none"
+                    className="h-full w-full rounded-lg border-2 border-gray-300 bg-background px-3 pr-16 text-sm focus:outline-none"
                     type="text"
                     name="search"
                     placeholder="Search"
@@ -193,8 +193,8 @@ export default function Nav({ scrollFlag }: { scrollFlag: boolean }) {
                   <span
                     className={`${
                       scrollFlag
-                        ? 'bg-dark/95 text-white'
-                        : 'bg-white text-dark'
+                        ? 'bg-foreground/95 text-background'
+                        : 'bg-background text-foreground'
                     } absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full transition-colors duration-200 ease-in-out`}
                   >
                     {cartState.products.length}
@@ -204,7 +204,7 @@ export default function Nav({ scrollFlag }: { scrollFlag: boolean }) {
               <PopoverContent
                 className={`${
                   !scrollFlag && 'rounded-t-none'
-                } relative mt-3 w-screen max-w-full bg-white px-6 py-8 sm:px-6 md:max-w-sm lg:px-6`}
+                } relative mt-3 w-screen max-w-full bg-background px-6 py-8 sm:px-6 md:max-w-sm lg:px-6`}
               >
                 <CartPopup />
               </PopoverContent>
@@ -230,7 +230,7 @@ export default function Nav({ scrollFlag }: { scrollFlag: boolean }) {
                 <PopoverContent
                   className={`${
                     !scrollFlag && 'rounded-t-none'
-                  } mt-3 w-auto bg-white p-0`}
+                  } mt-3 w-auto bg-background p-0`}
                 >
                   <ul>
                     {!userData && (
@@ -315,14 +315,14 @@ export default function Nav({ scrollFlag }: { scrollFlag: boolean }) {
         ref={navMobile}
         className={`${
           openedBurger ? 'left-0 opacity-100' : 'left-[100vw] opacity-0'
-        } mobile-overlay absolute top-[0] z-10 h-screen w-full transform overflow-auto bg-white pt-16 transition-[left,opacity] duration-500 ease-in-out lg:hidden`}
+        } mobile-overlay absolute top-[0] z-10 h-screen w-full transform overflow-auto bg-background pt-16 transition-[left,opacity] duration-500 ease-in-out lg:hidden`}
       >
-        <ul className="flex flex-col text-dark">
+        <ul className="flex flex-col text-foreground">
           {navLinkList.map((navLink, id) => (
             <li key={id}>
               <Link
                 to={navLink.to}
-                className="mx-auto block w-1/3 py-3 text-center text-lg transition-[color] duration-200 ease-out hover:text-primaryText"
+                className="hover:text-primaryText mx-auto block w-1/3 py-3 text-center text-lg transition-[color] duration-200 ease-out"
                 onClick={showMobileOverlay}
               >
                 {navLink.text[0].toLocaleUpperCase()}
@@ -336,14 +336,14 @@ export default function Nav({ scrollFlag }: { scrollFlag: boolean }) {
               <div className="flex-col">
                 <Link
                   to={{ pathname: '/account/login' }}
-                  className="mx-auto block w-1/3 py-3 text-center text-lg transition-[color] duration-200 ease-out hover:text-primaryText"
+                  className="hover:text-primaryText mx-auto block w-1/3 py-3 text-center text-lg transition-[color] duration-200 ease-out"
                   onClick={showMobileOverlay}
                 >
                   Sign in
                 </Link>
                 <Link
                   to={{ pathname: '/account/register' }}
-                  className="mx-auto block w-1/3 py-3 text-center text-lg transition-[color] duration-200 ease-out hover:text-primaryText"
+                  className="hover:text-primaryText mx-auto block w-1/3 py-3 text-center text-lg transition-[color] duration-200 ease-out"
                   onClick={showMobileOverlay}
                 >
                   Sign up
@@ -353,7 +353,7 @@ export default function Nav({ scrollFlag }: { scrollFlag: boolean }) {
               <div className="flex-col">
                 <Link
                   to="/account/my"
-                  className="mx-auto block w-1/3 py-3 text-center text-lg transition-[color] duration-200 ease-out hover:text-primaryText"
+                  className="hover:text-primaryText mx-auto block w-1/3 py-3 text-center text-lg transition-[color] duration-200 ease-out"
                   onClick={showMobileOverlay}
                 >
                   Profile

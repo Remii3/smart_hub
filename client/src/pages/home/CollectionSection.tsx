@@ -7,6 +7,7 @@ import { useGetAccessDatabase } from '../../hooks/useAaccessDatabase';
 import { DATABASE_ENDPOINTS } from '../../data/endpoints';
 import { Link } from 'react-router-dom';
 import { sortOptions } from '@hooks/useSortProducts';
+import { Card } from '@components/UI/card';
 
 export default function CollectionSection() {
   const [collection, setCollection] = useState<ProductTypes[]>([]);
@@ -24,9 +25,9 @@ export default function CollectionSection() {
 
   return (
     <section className="relative flex w-full max-w-7xl flex-col items-center gap-12 px-3 pb-16">
-      <div className="w-full bg-white">
+      <div className="w-full bg-background">
         <MainPageHeading
-          color="dark"
+          color="foreground"
           usecase="main"
           mainTitle="Discover your next great read"
           subTitle="Unleash the power of imagination, explore new worlds and find
@@ -34,58 +35,65 @@ export default function CollectionSection() {
         />
       </div>
       <div className="grid w-full grid-cols-1 gap-6 sm:grid-cols-2">
-        <Link
-          to="/shop"
-          className="block cursor-pointer space-y-10 rounded-xl bg-gray900 p-10 shadow-sm transition duration-300 ease-in-out hover:scale-[1.02] hover:shadow-md active:scale-100 sm:col-span-2"
-        >
-          <div className="space-y-1">
-            <h4 className="pb-2 uppercase">Variety</h4>
-            <p className="pb-1 text-gray500">
-              Genres galore, for every bookworm
-            </p>
-          </div>
-          <div className="flex max-h-[300px] items-center overflow-hidden rounded-md">
-            <img
-              src="https://wallpapers.com/images/hd/black-and-white-long-boardwalk-dgva6b5fa6cmynyb.webp"
-              alt="test_img"
-              className="w-full object-fill object-center"
-            />
-          </div>
+        <Link to="/shop" className="block cursor-pointer sm:col-span-2">
+          <Card className="space-y-10 p-10 transition-[box-shadow,transform] duration-300 ease-in-out hover:scale-[1.02] hover:shadow-md active:scale-100 ">
+            <div className="space-y-1">
+              <h4 className="pb-2 uppercase">Variety</h4>
+              <p className="pb-1 text-muted-foreground">
+                Genres galore, for every bookworm
+              </p>
+            </div>
+            <div className="flex max-h-[300px] items-center overflow-hidden rounded-md">
+              <img
+                src="https://wallpapers.com/images/hd/black-and-white-long-boardwalk-dgva6b5fa6cmynyb.webp"
+                alt="test_img"
+                className="w-full object-fill object-center"
+              />
+            </div>
+          </Card>
         </Link>
         <Link
           to={{ pathname: '/search', search: 'special=bestseller' }}
-          className="block cursor-pointer space-y-10 rounded-xl bg-gray900 p-10 shadow-sm transition duration-300 ease-in-out hover:scale-[1.02] hover:shadow-md active:scale-100"
+          className="block cursor-pointer"
         >
-          <div className="space-y-1">
-            <h4 className="pb-2 uppercase">Bestsellers</h4>
-            <p className="pb-1 text-gray500">The hottest literary hits</p>
-          </div>
-          <div className="flex max-h-[300px] items-center overflow-hidden rounded-md">
-            <img
-              src="https://wallpapers.com/images/hd/black-and-white-long-boardwalk-dgva6b5fa6cmynyb.webp"
-              alt="test_img"
-              className="w-full object-fill object-center"
-            />
-          </div>
+          <Card className="space-y-10 p-10 transition-[box-shadow,transform] duration-300 ease-in-out hover:scale-[1.02] hover:shadow-md active:scale-100">
+            <div className="space-y-1">
+              <h4 className="pb-2 uppercase">Bestsellers</h4>
+              <p className="pb-1 text-muted-foreground">
+                The hottest literary hits
+              </p>
+            </div>
+            <div className="flex max-h-[300px] items-center overflow-hidden rounded-md">
+              <img
+                src="https://wallpapers.com/images/hd/black-and-white-long-boardwalk-dgva6b5fa6cmynyb.webp"
+                alt="test_img"
+                className="w-full object-fill object-center"
+              />
+            </div>
+          </Card>
         </Link>
         <Link
           to={{
             pathname: '/search',
             search: `sort=${sortOptions.PRICE_ASC}`,
           }}
-          className="block cursor-pointer space-y-10 rounded-xl bg-gray900 p-10 shadow-sm transition duration-300 ease-in-out hover:scale-[1.02] hover:shadow-md active:scale-100"
+          className="block cursor-pointer"
         >
-          <div className="space-y-1">
-            <h4 className="pb-2 uppercase">Deals</h4>
-            <p className="pb-1 text-gray500">Prices that’ll make you smile</p>
-          </div>
-          <div className="flex max-h-[300px] items-center overflow-hidden rounded-md">
-            <img
-              src="https://wallpapers.com/images/hd/black-and-white-long-boardwalk-dgva6b5fa6cmynyb.webp"
-              alt="test_img"
-              className="w-full object-fill object-center"
-            />
-          </div>
+          <Card className="space-y-10 p-10 transition-[box-shadow,transform] duration-300 ease-in-out hover:scale-[1.02] hover:shadow-md active:scale-100">
+            <div className="space-y-1">
+              <h4 className="pb-2 uppercase">Deals</h4>
+              <p className="pb-1 text-muted-foreground">
+                Prices that’ll make you smile
+              </p>
+            </div>
+            <div className="flex max-h-[300px] items-center overflow-hidden rounded-md">
+              <img
+                src="https://wallpapers.com/images/hd/black-and-white-long-boardwalk-dgva6b5fa6cmynyb.webp"
+                alt="test_img"
+                className="w-full object-fill object-center"
+              />
+            </div>
+          </Card>
         </Link>
       </div>
     </section>

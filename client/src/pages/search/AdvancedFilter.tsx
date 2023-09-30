@@ -59,9 +59,9 @@ export default function AdvancedFilter({
         />
       </div>
       <div>
-        {/* <div className="relative grid gap-8 bg-white p-7 lg:grid-cols-2"> */}
-        <div className="relative bg-white">
-          <div className="bg-white">
+        {/* <div className="relative grid gap-8 bg-background p-7 lg:grid-cols-2"> */}
+        <div className="relative bg-background">
+          <div className="bg-background">
             <Button variant="link" size="default" onClick={onPriceReset}>
               Clear
             </Button>

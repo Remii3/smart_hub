@@ -25,7 +25,7 @@ function Footer() {
                 <li key={id}>
                   <Link
                     to={link.to}
-                    className="text-base transition-[color] duration-200 ease-out hover:text-primaryText"
+                    className="hover:text-primaryText text-base transition-[color] duration-200 ease-out"
                   >
                     {link.text}
                   </Link>
@@ -40,7 +40,7 @@ function Footer() {
                 <li key={id}>
                   <Link
                     to={link.to}
-                    className="text-base transition-[color] duration-200 ease-out hover:text-primaryText"
+                    className="hover:text-primaryText text-base transition-[color] duration-200 ease-out"
                   >
                     {link.text}
                   </Link>
@@ -57,7 +57,7 @@ function Footer() {
               <li key={id}>
                 <Link
                   to={link.to}
-                  className="text-base transition-[color] duration-200 ease-out hover:text-primaryText"
+                  className="hover:text-primaryText text-base transition-[color] duration-200 ease-out"
                 >
                   {link.text}
                 </Link>

@@ -1,3 +1,4 @@
+import { Card } from '@components/UI/card';
 import MainPageHeading from '@pages/home/MainPageHeading';
 
 export default function IntroductionSection() {
@@ -12,16 +13,16 @@ export default function IntroductionSection() {
         </div>
       </div>
       <div className="mx-auto grid max-w-7xl grid-cols-1 gap-6 px-4 pb-6 pt-7 sm:grid-cols-2">
-        <article className="h-full rounded-md bg-gray900 p-8 text-lg">
+        <Card className="h-full p-8 text-lg">
           Dive into the world of imagination and explore our vast collection of
           books from various genres. Find your next unputdownable read, make
           friends with enchanting characters, and discover hidden gems!
-        </article>
-        <article className="h-full rounded-md bg-gray900 p-8 text-lg">
+        </Card>
+        <Card className="h-full p-8 text-lg">
           Order from anywhere at any time with ease. Enjoy great discounts,
           secure payment options, and swift doorstep delivery. Experience a
           hassle-free book shopping journey at our e-commerce store.
-        </article>
+        </Card>
       </div>
     </section>
   );
