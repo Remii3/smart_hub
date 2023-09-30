@@ -29,16 +29,8 @@ import {
   SelectItem,
   SelectTrigger,
 } from '@components/UI/select';
-import {
-  Alert,
-  AlertDescription,
-  AlertTitle,
-} from '@components/UI/alerts/alert';
-import { Close } from '@radix-ui/react-dialog';
-import { PopoverClose } from '@radix-ui/react-popover';
-import { Cross2Icon } from '@radix-ui/react-icons';
+
 import { useToast } from '@components/UI/use-toast';
-import { Button } from '@components/UI/button';
 
 type TabKeysTypes =
   | 'MY_DATA'
