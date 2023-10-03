@@ -4,6 +4,7 @@ import {
   ArchiveBoxIcon,
   LockClosedIcon,
   Square2StackIcon,
+  RocketLaunchIcon,
 } from '@heroicons/react/24/outline';
 import MainContainer from '@layout/MainContainer';
 import EditUserData from './tabs/EditUserData';
@@ -82,7 +83,7 @@ const TABS_ARRAY: {
   {
     text: 'Admin',
     name: 'admin',
-    icon: <Square2StackIcon height={20} width={20} />,
+    icon: <RocketLaunchIcon height={20} width={20} />,
   },
 ];
 
@@ -109,7 +110,7 @@ export default function MyAccount() {
   const path = useLocation();
   const { userData, fetchUserData } = useContext(UserContext);
   const { toast } = useToast();
-  if (!userData) return;
+  if (!userData) return <p>Please log in</p>;
 
   const changeSelectedTab = (option: TabNamesTypes) => {
     setSelectedtab(option);

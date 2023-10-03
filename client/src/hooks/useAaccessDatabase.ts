@@ -7,6 +7,7 @@ interface GetTypes extends AccessTypes {
 }
 interface PostTypes extends AccessTypes {
   body: any;
+  headers?: any;
 }
 
 const useGetAccessDatabase = async ({ url, params }: GetTypes) => {
@@ -23,9 +24,11 @@ const useGetAccessDatabase = async ({ url, params }: GetTypes) => {
   }
 };
 
-const usePostAccessDatabase = async ({ url, body }: PostTypes) => {
+const usePostAccessDatabase = async ({ url, body, headers }: PostTypes) => {
   try {
-    const { data } = await axios.post(url, body);
+    const { data } = await axios.post(url, body, {
+      headers,
+    });
     return { data, error: null };
   } catch (err) {
     const error = err as Error | AxiosError;

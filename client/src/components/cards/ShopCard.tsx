@@ -118,7 +118,7 @@ export default function ShopCard({
         <div className="flex flex-col gap-3 px-3 pb-3">
           <p className="line-clamp-4 min-h-[80px]">{description}</p>
           <div className="flex justify-between gap-3">
-            <h4 className="flex items-center">{price}€</h4>
+            <h4 className="flex items-center">${price.toFixed(2)}</h4>
             <div>
               <div className="pb-3">stars</div>
               <Button

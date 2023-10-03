@@ -44,7 +44,7 @@ export default function MyProducts({
               title={product.title}
               authors={product.authors}
               description={product.description}
-              img={product.img}
+              img={(product.imgs && product.imgs[0]) || null}
             />
           ) : (
             <AuctionCard
@@ -53,7 +53,7 @@ export default function MyProducts({
               title={product.title}
               authors={product.authors}
               description={product.description}
-              img={product.img}
+              img={(product.imgs && product.imgs[0]) || null}
               startingPrice={product.auction_info.starting_price}
               currentPrice={product.auction_info.current_price}
               auctionEndDate={product.auction_info.auction_end_date}

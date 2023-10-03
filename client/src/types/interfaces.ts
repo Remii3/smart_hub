@@ -165,13 +165,13 @@ export interface ProductSpecialAuctionCardTypes extends ProductCardTypes {
 
 export interface ProductShopCardType extends ProductCardTypes {
   price: number;
-  img?: string;
+  img: string | null;
   description?: string;
   productQuantity: number;
 }
 
 export interface ProductAuctionCardType extends ProductCardTypes {
-  img?: string;
+  img: string | null;
   startingPrice: number;
   currentPrice: number;
   auctionEndDate: Date;

@@ -4,15 +4,14 @@ import MyProducts from './MyProducts';
 
 export default function MyShop() {
   const { userData } = useContext(UserContext);
-
+  if (!userData) return <p>Please log in</p>;
   return (
-    <div>
-      <div>
-        <div className="mb-8">
-          <h5 className="pb-2 text-lg">Latest:</h5>
-          {userData &&
-          userData.role !== 'User' &&
-          userData.author_info.my_products.length > 0 ? (
+    <div className="space-y-4">
+      <h4>My products</h4>
+      <section>
+        <h5 className="pb-2 text-lg">Latest:</h5>
+        <div>
+          {userData.author_info.my_products.length > 0 ? (
             <div>
               <MyProducts
                 myProducts={userData.author_info.my_products}
@@ -21,25 +20,26 @@ export default function MyShop() {
               />
             </div>
           ) : (
-            'No products added.'
+            <p>No products added.</p>
           )}
         </div>
-
+      </section>
+      <section>
         <h5 className="pb-2 text-lg">All:</h5>
-        {userData &&
-        userData.role !== 'User' &&
-        userData.author_info.my_products.length > 0 ? (
-          <div>
-            <MyProducts
-              myProducts={userData.author_info.my_products}
-              quantity={8}
-              unfold
-            />
-          </div>
-        ) : (
-          'No products added.'
-        )}
-      </div>
+        <div>
+          {userData.author_info.my_products.length > 0 ? (
+            <div>
+              <MyProducts
+                myProducts={userData.author_info.my_products}
+                quantity={8}
+                unfold
+              />
+            </div>
+          ) : (
+            <p>No products added.</p>
+          )}
+        </div>
+      </section>
     </div>
   );
 }

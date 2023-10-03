@@ -221,7 +221,6 @@ const addOneProduct = async (req, res) => {
     price,
     title,
     description,
-    imgs,
     categories,
     authors,
     quantity,
@@ -229,38 +228,36 @@ const addOneProduct = async (req, res) => {
     created_at,
     starting_price,
     auction_end_date,
-  } = req.body.newProductData;
-  try {
-    for (const item of categories) {
-      const categoryExists = await Category.find({ _id: item._id });
-      if (categoryExists.length < 1) {
-        await Category.create({
-          value: item.value,
-          label: item.label,
-          description: item.description,
-        });
+  } = req.body;
+  if (categories && categories.length > 0) {
+    try {
+      for (const item of categories) {
+        const categoryExists = await Category.find({ _id: item._id });
+        if (categoryExists.length < 1) {
+          await Category.create({
+            value: item.value,
+            label: item.label,
+            description: item.description,
+          });
+        }
       }
+    } catch (err) {
+      return res
+        .status(500)
+        .json({ message: 'Failed verifying categories', error: err.message });
     }
-  } catch (err) {
-    return res
-      .status(500)
-      .json({ message: 'Failed verifying categories', error: err.message });
   }
   try {
     const _id = new mongoose.Types.ObjectId();
 
     if (market_place === 'Shop') {
-      if (typeof price !== 'number') {
-        return res.status(422).json({ message: 'Price is required' });
-      }
-
       try {
         await Product.create({
           seller_data,
           _id,
           title,
           description,
-          imgs,
+          imgs: [],
           categories,
           authors,
           rating: [],
@@ -290,7 +287,7 @@ const addOneProduct = async (req, res) => {
           _id,
           title,
           description,
-          imgs,
+          imgs: [],
           categories,
           authors,
           rating: [],

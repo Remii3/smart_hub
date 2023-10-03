@@ -1,6 +1,5 @@
 import { storage } from '../firebase';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { v4 } from 'uuid';
 
 type Targets = 'Profile_img' | 'Product_imgs' | 'News_img';
 
