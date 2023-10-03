@@ -257,9 +257,12 @@ export default function ProductPage() {
                 <div className="absolute right-0 top-0 flex gap-3">
                   <Dialog>
                     <DialogTrigger asChild>
-                      <button type="button" className="text-red-400">
+                      <Button
+                        variant={'ghost'}
+                        className="hover:text-400 text-red-400"
+                      >
                         Delete
-                      </button>
+                      </Button>
                     </DialogTrigger>
                     <DialogContent>
                       <DialogHeader>
@@ -270,36 +273,37 @@ export default function ProductPage() {
                         </DialogDescription>
                       </DialogHeader>
                       <DialogFooter>
-                        <button
+                        <Button
                           type="button"
                           onClick={() => deleteItemHandler()}
-                          className="rounded-md bg-red-500 px-3 py-1 text-background"
+                          variant={'destructive'}
                         >
                           Delete
-                        </button>
+                        </Button>
                         <DialogTrigger asChild>
-                          <Button variant={'destructive'} type="button">
+                          <Button variant={'outline'} type="button">
                             Cancel
                           </Button>
                         </DialogTrigger>
                       </DialogFooter>
                     </DialogContent>
                   </Dialog>
-                  <button
+                  <Button
                     type="button"
-                    className="inline-block rounded-md border border-gray-300 px-2"
+                    variant={'outline'}
                     onClick={toggleEditting}
                   >
                     {productEditState.isEditing ? 'Cancel' : 'Edit'}
-                  </button>
+                  </Button>
                   {productEditState.isEditing && (
-                    <button
+                    <Button
                       type="button"
-                      className="inline-block rounded-md border border-gray-300 px-2 text-green-500"
                       onClick={() => updateProductData()}
+                      variant={'outline'}
+                      className="text-green-600 hover:text-green-600"
                     >
                       Accept
-                    </button>
+                    </Button>
                   )}
                 </div>
               )}
