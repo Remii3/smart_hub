@@ -10,59 +10,36 @@ const salt = bcrypt.genSaltSync(12);
 const login = async (req, res) => {
   const { email, password } = req.body;
 
-  if (!email) {
-    return res.status(422).json({ message: 'Email is required' });
-  }
-
-  if (!password) {
-    return res.status(422).json({ message: 'Password is required' });
-  }
-
   const userDoc = await User.findOne({ email });
-
-  if (userDoc) {
-    const passwordVerification = bcrypt.compareSync(password, userDoc.password);
-    if (passwordVerification) {
-      jwt.sign(
-        {
-          email,
-          user_id: userDoc._id,
-        },
-        process.env.JWT_SECRET,
-        {},
-        (err, token) => {
-          if (err) throw 'firts';
-          return res.status(200).cookie('token', token).json({ data: userDoc });
-        },
-      );
-    } else {
-      return res.status(422).json({
-        name: 'password',
-        message: 'Incorrect password',
-      });
-    }
-  } else {
-    return res.status(500).json({
-      name: 'username',
+  if (!userDoc)
+    return res.status(422).json({
+      name: 'email',
+      error: 'No account found',
       message: 'No account found',
     });
-  }
+  const passwordVerification = bcrypt.compareSync(password, userDoc.password);
+  if (!passwordVerification)
+    return res.status(422).json({
+      name: 'password',
+      error: 'Invalid password',
+      message: 'Invalid password',
+    });
+  jwt.sign(
+    {
+      email,
+      user_id: userDoc._id,
+    },
+    process.env.JWT_SECRET,
+    {},
+    (err, token) => {
+      if (err) throw 'firts';
+      return res.status(200).cookie('token', token).json({ data: userDoc });
+    },
+  );
 };
 
 const register = async (req, res) => {
   let { credentials, email, username, password } = req.body;
-
-  if (!password) {
-    return res.status(422).json({ message: 'Password is required' });
-  }
-
-  if (!email) {
-    return res.status(422).json({ message: 'Email is required' });
-  }
-
-  if (!username) {
-    return res.status(422).json({ message: 'Username is required' });
-  }
 
   try {
     const userId = new mongoose.Types.ObjectId();
@@ -133,11 +110,14 @@ const register = async (req, res) => {
     if (err.code === 11000) {
       const responseObject = err.keyValue;
       return res.status(422).json({
-        name: Object.keys(responseObject)[0],
         message: Object.values(responseObject)[0] + ` already exists`,
+        error: err.message,
+        name: 'email',
       });
     }
-    return res.status(500).json({ message: 'Failed to register' });
+    return res
+      .status(500)
+      .json({ message: 'Failed to register', error: err.message });
   }
 };
 

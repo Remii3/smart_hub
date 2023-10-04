@@ -1,181 +1,107 @@
-import { ChangeEvent, FormEvent, useContext, useState } from 'react';
+import { ChangeEvent, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import { SunRiseIcon } from '@assets/icons/Icons';
-import CustomInput from '@components/form/CustomInput';
 import { UserContext } from '@context/UserProvider';
-import PasswordInput from '@components/form/CustomPasswordInput';
 import { Button } from '@components/UI/button';
 import {
   useGetAccessDatabase,
   usePostAccessDatabase,
 } from '../../hooks/useAaccessDatabase';
 import { DATABASE_ENDPOINTS } from '../../data/endpoints';
+import { ZodError, z } from 'zod';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@components/UI/form';
+import { Input } from '@components/UI/input';
+import { useToast } from '@components/UI/use-toast';
+
+const formSchema = z
+  .object({
+    firstName: z.string().nonempty().min(2),
+    lastName: z.string().nonempty().min(2),
+    email: z.string().email().nonempty().min(2),
+    username: z.string().nonempty().min(2),
+    password: z.string().nonempty().min(2),
+    passwordConfirmation: z.string().nonempty().min(2),
+  })
+  .superRefine(({ passwordConfirmation, password }, ctx) => {
+    if (passwordConfirmation !== password) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'The passwords did not match',
+        path: ['passwordConfirmation'],
+      });
+    }
+  });
 
 export default function RegisterPage() {
   const navigate = useNavigate();
   const { changeUserData } = useContext(UserContext);
-
-  const [regUserData, setRegUserData] = useState({
-    data: {
-      credentials: { firstName: '', lastName: '' },
+  const { toast } = useToast();
+  const form = useForm<any>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      firstName: '',
+      lastName: '',
       email: '',
       username: '',
       password: '',
       passwordConfirmation: '',
     },
-
-    errors: {
-      credentials: { firstName: null, lastName: null },
-      email: null,
-      username: null,
-      password: null,
-      passwordConfirmation: null,
-    },
   });
 
-  const registerChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {
-    if (e.target.name === 'firstName' || e.target.name === 'lastName') {
-      setRegUserData((prevState) => {
-        return {
-          ...prevState,
-          data: {
-            ...prevState.data,
-            credentials: {
-              ...prevState.data.credentials,
-              [e.target.name]: e.target.value,
-            },
-          },
-          errors: {
-            ...prevState.errors,
-            credentials: {
-              ...prevState.errors.credentials,
-              [e.target.name]: null,
-            },
-          },
-        };
-      });
-    } else if (
-      e.target.name === 'passwordConfirmation' ||
-      e.target.name === 'password'
-    ) {
-      setRegUserData((prevState) => {
-        return {
-          ...prevState,
-          data: { ...prevState.data, [e.target.name]: e.target.value },
-          errors: {
-            ...prevState.errors,
-            passwordConfirmation: null,
-            password: null,
-          },
-        };
-      });
-    } else {
-      setRegUserData((prevState) => {
-        return {
-          ...prevState,
-          data: { ...prevState.data, [e.target.name]: e.target.value },
-          errors: {
-            ...prevState.errors,
-            [e.target.name]: null,
-          },
-        };
+  const signUpHandler = async (formResponse: z.infer<typeof formSchema>) => {
+    const {
+      email,
+      username,
+      password,
+      passwordConfirmation,
+      firstName,
+      lastName,
+    } = formResponse;
+
+    const { error: registerError, name } = await usePostAccessDatabase({
+      url: DATABASE_ENDPOINTS.USER_REGISTER,
+      body: {
+        credentials: { firstName, lastName },
+        email,
+        username,
+        password,
+        passwordConfirmation,
+      },
+    });
+    if (registerError) {
+      form.setError(name, { type: 'value', message: registerError });
+      return toast({
+        variant: 'destructive',
+        title: 'Uh oh! Something went wrong.',
+        description: registerError,
       });
     }
-  };
-
-  const signUpHandler = async (e: FormEvent) => {
-    e.preventDefault();
-
-    const { credentials, email, username, password, passwordConfirmation } =
-      regUserData.data;
-
-    try {
-      await usePostAccessDatabase({
-        url: DATABASE_ENDPOINTS.USER_REGISTER,
-        body: {
-          credentials,
-          email,
-          username,
-          password,
-          passwordConfirmation,
-        },
+    const { data, error: updateProfileDataError } = await useGetAccessDatabase({
+      url: DATABASE_ENDPOINTS.USER_PROFILE,
+    });
+    if (!updateProfileDataError) {
+      return toast({
+        variant: 'destructive',
+        title: 'Uh oh! Something went wrong.',
+        description: updateProfileDataError,
       });
-      const { data } = await useGetAccessDatabase({
-        url: DATABASE_ENDPOINTS.USER_PROFILE,
-      });
-      changeUserData(data);
-
+    }
+    changeUserData(data);
+    if (data) {
       navigate('/');
-    } catch (err: any) {
-      if (axios.isAxiosError(err)) {
-        if (err.response) {
-          if (typeof Object.values(err.response.data)[0] !== 'string') {
-            err.response.data.forEach(
-              (error: { name: string; message: string }) => {
-                if (error.name === 'firstName' || error.name === 'lastName') {
-                  setRegUserData((prevState) => {
-                    return {
-                      ...prevState,
-
-                      errors: {
-                        ...prevState.errors,
-                        credentials: {
-                          ...prevState.errors.credentials,
-                          [error.name]: error.message,
-                        },
-                      },
-                    };
-                  });
-                } else {
-                  setRegUserData((prevState) => {
-                    return {
-                      ...prevState,
-
-                      errors: {
-                        ...prevState.errors,
-                        [error.name]: error.message,
-                      },
-                    };
-                  });
-                }
-              }
-            );
-          } else if (
-            err.response.data.name === 'firstName' ||
-            err.response.data.name === 'lastName'
-          ) {
-            setRegUserData((prevState) => {
-              return {
-                ...prevState,
-
-                errors: {
-                  ...prevState.errors,
-                  credentials: {
-                    ...prevState.errors.credentials,
-                    [err.response.data.name]: err.response.data.message,
-                  },
-                },
-              };
-            });
-          } else {
-            setRegUserData((prevState) => {
-              return {
-                ...prevState,
-
-                errors: {
-                  ...prevState.errors,
-                  [err.response.data.name]: err.response.data.message,
-                },
-              };
-            });
-          }
-        }
-      } else {
-        alert(err);
-      }
     }
   };
+
   return (
     <section className="bg-background">
       <div className="lg:grid lg:min-h-screen lg:grid-cols-12">
@@ -205,121 +131,148 @@ export default function RegisterPage() {
               Lorem, ipsum dolor sit amet consectetur adipisicing elit. Eligendi
               nam dolorum aliquam, quibusdam aperiam voluptatum.
             </p>
-
-            <form
-              onSubmit={(e) => signUpHandler(e)}
-              className="mt-8 grid grid-cols-6 gap-6"
-              noValidate
-            >
-              <div className="col-span-6 sm:col-span-3">
-                <CustomInput
-                  autoComplete="given-name"
-                  type="text"
+            <Form {...form}>
+              <form
+                onSubmit={form.handleSubmit(signUpHandler)}
+                className="mt-8 grid grid-cols-6 gap-6"
+              >
+                <FormField
                   name="firstName"
-                  hasError={regUserData.errors.credentials.firstName}
-                  errorValue={regUserData.errors.credentials.firstName}
-                  inputValue={regUserData.data.credentials.firstName}
-                  labelValue="First Name"
-                  onChange={(e) => registerChangeHandler(e)}
-                  optional={false}
+                  control={form.control}
+                  render={({ field }) => (
+                    <FormItem className="col-span-6 sm:col-span-3">
+                      <FormLabel>First name</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="text"
+                          placeholder="First name..."
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormDescription>Enter your first name</FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              </div>
-
-              <div className="col-span-6 sm:col-span-3">
-                <CustomInput
-                  autoComplete="family-name"
-                  hasError={regUserData.errors.credentials.lastName}
-                  errorValue={regUserData.errors.credentials.lastName}
-                  inputValue={regUserData.data.credentials.lastName}
-                  labelValue="Last Name"
+                <FormField
                   name="lastName"
-                  onChange={(e) => registerChangeHandler(e)}
-                  optional={false}
-                  type="text"
+                  control={form.control}
+                  render={({ field }) => (
+                    <FormItem className="col-span-6 sm:col-span-3">
+                      <FormLabel>Last name</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="text"
+                          placeholder="Last name..."
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormDescription>Enter your last name</FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              </div>
 
-              <div className="col-span-6">
-                <CustomInput
-                  autoComplete="email"
-                  hasError={regUserData.errors.email}
-                  errorValue={regUserData.errors.email}
-                  inputValue={regUserData.data.email}
-                  labelValue="Email"
+                <FormField
                   name="email"
-                  onChange={(e) => registerChangeHandler(e)}
-                  optional={false}
-                  type="email"
+                  control={form.control}
+                  render={({ field }) => (
+                    <FormItem className="col-span-6">
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <Input type="text" placeholder="Email..." {...field} />
+                      </FormControl>
+                      <FormDescription>Enter your email</FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              </div>
-
-              <div className="col-span-6">
-                <CustomInput
-                  autoComplete="username"
-                  hasError={regUserData.errors.username}
-                  errorValue={regUserData.errors.username}
-                  inputValue={regUserData.data.username}
-                  labelValue="Username"
+                <FormField
                   name="username"
-                  onChange={(e) => registerChangeHandler(e)}
-                  optional={false}
-                  type="text"
+                  control={form.control}
+                  render={({ field }) => (
+                    <FormItem className="col-span-6">
+                      <FormLabel>Username</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="text"
+                          placeholder="Username..."
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormDescription>Enter your username</FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              </div>
-
-              <div className="col-span-6 sm:col-span-3">
-                <PasswordInput
-                  autoComplete="new-password"
-                  hasError={regUserData.errors.password}
-                  errorValue={regUserData.errors.password}
-                  inputValue={regUserData.data.password}
-                  labelValue="Password"
+                <FormField
                   name="password"
-                  onChange={(e) => registerChangeHandler(e)}
-                  optional={false}
+                  control={form.control}
+                  render={({ field }) => (
+                    <FormItem className="col-span-6 sm:col-span-3">
+                      <FormLabel>Password</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="text"
+                          placeholder="Password..."
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormDescription>Enter your password</FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              </div>
-
-              <div className="col-span-6 sm:col-span-3">
-                <PasswordInput
-                  autoComplete="new-password"
-                  hasError={regUserData.errors.passwordConfirmation}
-                  errorValue={regUserData.errors.passwordConfirmation}
-                  inputValue={regUserData.data.passwordConfirmation}
-                  labelValue="Password Confirmation"
+                <FormField
                   name="passwordConfirmation"
-                  onChange={(e) => registerChangeHandler(e)}
-                  optional={false}
+                  control={form.control}
+                  render={({ field }) => (
+                    <FormItem className="col-span-6 sm:col-span-3">
+                      <FormLabel>Password Confirmation</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="text"
+                          placeholder="Password confirmation..."
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormDescription>Confirm your password</FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              </div>
 
-              <div className="col-span-6">
-                <p className="text-sm text-gray-500">
-                  By creating an account, you agree to our{' '}
-                  <Link to="/" className="text-gray-700 underline">
-                    terms and conditions
-                  </Link>{' '}
-                  and{' '}
-                  <Link to="/" className="text-gray-700 underline">
-                    privacy policy
-                  </Link>
-                  .
-                </p>
-              </div>
+                <div className="col-span-6">
+                  <p className="text-sm text-gray-500">
+                    By creating an account, you agree to our{' '}
+                    <Link to="/" className="text-gray-700 underline">
+                      terms and conditions
+                    </Link>{' '}
+                    and{' '}
+                    <Link to="/" className="text-gray-700 underline">
+                      privacy policy
+                    </Link>
+                    .
+                  </p>
+                </div>
 
-              <div className="col-span-6 sm:flex sm:items-center sm:gap-4">
-                <Button variant="default" type="submit" size="default">
-                  Sign up
-                </Button>
-                <p className="mt-4 text-sm text-gray-500 sm:mt-0">
-                  Already have an account?{' '}
-                  <Link to="/account/login" className="text-gray-700 underline">
-                    Log in
-                  </Link>
-                  .
-                </p>
-              </div>
-            </form>
+                <div className="col-span-6 sm:flex sm:items-center sm:gap-4">
+                  <Button variant="default" type="submit" size="default">
+                    Sign up
+                  </Button>
+                  <p className="mt-4 text-sm text-gray-500 sm:mt-0">
+                    Already have an account?{' '}
+                    <Link
+                      to="/account/login"
+                      className="text-gray-700 underline"
+                    >
+                      Log in
+                    </Link>
+                    .
+                  </p>
+                </div>
+              </form>
+            </Form>
           </div>
         </main>
       </div>

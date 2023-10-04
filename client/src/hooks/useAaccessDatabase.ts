@@ -35,7 +35,11 @@ const usePostAccessDatabase = async ({ url, body, headers }: PostTypes) => {
     if (!axios.isAxiosError(error)) {
       return { data: null, error: error || 'An unknown error has occured' };
     } else {
-      return { data: null, error: error.response?.data.message };
+      return {
+        data: null,
+        error: error.response?.data.message,
+        name: error.response?.data.name,
+      };
     }
   }
 };
