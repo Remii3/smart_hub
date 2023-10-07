@@ -14,7 +14,7 @@ import MarketplaceBadge from '@components/UI/badges/MarketplaceBadge';
 import avatarImg from '@assets/img/avataaars.svg';
 import SecurityPermissions from './tabs/SecurityPermissions';
 import OrderHistory from './tabs/OrderHistory';
-import Admin from './tabs/Admin';
+import Admin from './tabs/admin/Admin';
 import { UserRoleTypes } from '@customTypes/types';
 
 import { usePostAccessDatabase } from '@hooks/useAaccessDatabase';

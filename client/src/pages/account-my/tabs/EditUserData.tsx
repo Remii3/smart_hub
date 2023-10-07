@@ -23,7 +23,7 @@ import { z } from 'zod';
 import { useToast } from '@components/UI/use-toast';
 
 type NewDataNameTypes =
-  | 'email'
+  | 'username'
   | 'first_name'
   | 'last_name'
   | 'password'
@@ -34,7 +34,7 @@ type NewDataNameTypes =
   | 'short_description';
 
 const NEWDATA_NAMES: { [key: string]: NewDataNameTypes } = {
-  email: 'email',
+  username: 'username',
   first_name: 'first_name',
   last_name: 'last_name',
   password: 'password',
@@ -59,7 +59,7 @@ export default function EditUserData() {
   if (!userData) return <p>Please log in</p>;
 
   const formSchema = {
-    email: z.object({ email: z.string().nonempty().min(2) }),
+    username: z.object({ username: z.string().nonempty().min(2) }),
     first_name: z.object({ first_name: z.string().nonempty().min(2) }),
     last_name: z.object({ last_name: z.string().nonempty().min(2) }),
     password: z.object({ password: z.string().nonempty().min(2) }),
@@ -76,10 +76,10 @@ export default function EditUserData() {
     pseudonim: z.object({ pseudonim: z.string().nonempty() }),
     short_description: z.object({ short_description: z.string().nonempty() }),
   };
-  const formEmail = useForm<any>({
-    resolver: zodResolver(formSchema.email),
+  const formUsername = useForm<any>({
+    resolver: zodResolver(formSchema.username),
     defaultValues: {
-      email: '',
+      username: '',
     },
   });
   const formFirstname = useForm<any>({
@@ -148,7 +148,7 @@ export default function EditUserData() {
       setOpenDialog({ state: false, element });
     }
     setTimeout(() => {
-      formEmail.reset();
+      formUsername.reset();
       formFirstname.reset();
       formLastname.reset();
       formPassword.reset();
@@ -164,7 +164,7 @@ export default function EditUserData() {
     setOpenDialog({ state: false, element });
 
     setTimeout(() => {
-      formEmail.reset();
+      formUsername.reset();
       formFirstname.reset();
       formLastname.reset();
       formPassword.reset();
@@ -247,26 +247,26 @@ export default function EditUserData() {
             <div>
               <fieldset className="flex flex-col">
                 <label
-                  htmlFor="showcasedEmail"
+                  htmlFor="showcasedUsername"
                   className="text-sm font-medium text-gray-700"
                 >
-                  Email
+                  Username
                 </label>
                 <Input
-                  id="showcasedEmail"
-                  type="email"
+                  id="showcasedUsername"
+                  type="text"
                   disabled
-                  value={userData.email}
+                  value={userData.username}
                 />
               </fieldset>
               <div className="flex justify-between gap-4">
                 <Dialog
                   open={
-                    NEWDATA_NAMES.email === openDialog.element &&
+                    NEWDATA_NAMES.username === openDialog.element &&
                     openDialog.state
                   }
                   onOpenChange={(state) =>
-                    openDialogChangeHandler({ state, element: 'email' })
+                    openDialogChangeHandler({ state, element: 'username' })
                   }
                 >
                   <DialogTrigger asChild>
@@ -276,33 +276,33 @@ export default function EditUserData() {
                       size="sm"
                       className="px-0"
                     >
-                      Change email
+                      Change username
                     </Button>
                   </DialogTrigger>
                   <DialogContent>
-                    <Form {...formEmail}>
+                    <Form {...formUsername}>
                       <form
                         className="mb-4"
-                        name="email"
-                        onSubmit={formEmail.handleSubmit(
+                        name="username"
+                        onSubmit={formUsername.handleSubmit(
                           uploadNewUserDataHandler
                         )}
                       >
                         <FormField
-                          control={formEmail.control}
-                          name="email"
+                          control={formUsername.control}
+                          name="username"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Email</FormLabel>
+                              <FormLabel>Username</FormLabel>
                               <FormControl>
                                 <Input
                                   type="text"
-                                  placeholder={userData.email}
+                                  placeholder={userData.username}
                                   {...field}
                                 />
                               </FormControl>
                               <FormDescription>
-                                This is your account email
+                                This is your account username
                               </FormDescription>
                               <FormMessage />
                             </FormItem>
