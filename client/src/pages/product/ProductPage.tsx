@@ -34,6 +34,9 @@ import {
 } from '../../hooks/useAaccessDatabase';
 import { DATABASE_ENDPOINTS } from '../../data/endpoints';
 import Comments from '@features/comments/Comments';
+import { Skeleton } from '@components/UI/skeleton';
+import { Textarea } from '@components/UI/textarea';
+import { Input } from '@components/UI/input';
 
 interface ProductTypes {
   isLoading: boolean;
@@ -211,40 +214,46 @@ export default function ProductPage() {
     fetchData();
   };
 
-  if (!productState.data && productState.isLoading) return <p>Loading</p>;
-  if (!productState.data && !productState.isLoading) return <p> No data</p>;
   return (
     <section className="relative">
       <div className="relative mx-auto max-w-screen-xl px-4 py-8">
         <div className="grid grid-cols-1 items-start gap-8 md:grid-cols-2">
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4 md:grid-cols-1">
-              {productState.data?.imgs && productState.data?.imgs[0] ? (
-                <img
-                  src={productState.data.imgs[0]}
-                  className="aspect-square w-full rounded-xl object-cover"
-                />
-              ) : (
+              {productState.isLoading && (
+                <Skeleton className="aspect-square w-full rounded-xl object-cover" />
+              )}
+              {!productState.isLoading &&
+                productState.data?.imgs &&
+                productState.data?.imgs[0] && (
+                  <img
+                    src={productState.data.imgs[0]}
+                    className="aspect-square w-full rounded-xl object-cover"
+                  />
+                )}
+              {!productState.isLoading && !productState.data?.imgs && (
                 <ProductImage />
               )}
-              {productState.data?.imgs && productState.data.imgs.length > 1 && (
-                <div className="grid grid-cols-2 gap-4 lg:mt-4">
-                  {productState.data.imgs.map((el, index) => {
-                    if (index !== 0) {
-                      return (
-                        <>
-                          <img
-                            src={el}
-                            key={index}
-                            alt="product_img"
-                            className="aspect-square w-full rounded-xl object-cover"
-                          />
-                        </>
-                      );
-                    }
-                  })}
-                </div>
-              )}
+              {!productState.isLoading &&
+                productState.data?.imgs &&
+                productState.data.imgs.length > 1 && (
+                  <div className="grid grid-cols-2 gap-4 lg:mt-4">
+                    {productState.data.imgs.map((el, index) => {
+                      if (index !== 0) {
+                        return (
+                          <>
+                            <img
+                              src={el}
+                              key={index}
+                              alt="product_img"
+                              className="aspect-square w-full rounded-xl object-cover"
+                            />
+                          </>
+                        );
+                      }
+                    })}
+                  </div>
+                )}
             </div>
           </div>
 
@@ -312,7 +321,7 @@ export default function ProductPage() {
             <div className="mt-8 flex justify-between">
               <div className="max-w-[35ch] space-y-2">
                 {productEditState.isEditing ? (
-                  <input
+                  <Input
                     name="title"
                     type="text"
                     value={productEditState.newData.title || ''}
@@ -320,23 +329,32 @@ export default function ProductPage() {
                     onChange={(e) => newDataChangeHandler(e)}
                   />
                 ) : (
-                  <h1 className="text-xl font-bold sm:text-3xl">
-                    {productState.data && productState.data.title}
-                  </h1>
+                  !productState.isLoading && (
+                    <h1 className="text-xl font-bold sm:text-3xl">
+                      {productState.data && productState.data.title}
+                    </h1>
+                  )
                 )}
+                {productState.isLoading && <Skeleton className="h-9" />}
                 <div>
-                  {productEditState.newData.categories?.map((category) => (
-                    <Link
-                      key={category._id}
-                      to={{
-                        pathname: '/search',
-                        search: `category=${category.value}`,
-                      }}
-                      className="pr-2"
-                    >
-                      {category.label}
-                    </Link>
-                  ))}
+                  {productEditState.newData.categories?.map(
+                    (category) =>
+                      !productState.isLoading && (
+                        <Link
+                          key={category._id}
+                          to={{
+                            pathname: '/search',
+                            search: `category=${category.value}`,
+                          }}
+                          className="pr-2"
+                        >
+                          {category.label}
+                        </Link>
+                      )
+                  )}
+                  {productState.isLoading && (
+                    <Skeleton className="h-4"></Skeleton>
+                  )}
                 </div>
                 <div>
                   Added:{' '}
@@ -345,7 +363,7 @@ export default function ProductPage() {
                 </div>
                 <div>
                   <p>Seller:</p>
-                  {productState.data && (
+                  {productState.data && !productState.isLoading && (
                     <Link
                       key={productState.data.seller_data._id}
                       className="pr-4"
@@ -354,10 +372,12 @@ export default function ProductPage() {
                       {productState.data.seller_data.pseudonim}
                     </Link>
                   )}
+                  {productState.isLoading && <Skeleton className="h-4" />}
                 </div>
                 <div>
                   <p>Authors:</p>
-                  {productState.data &&
+                  {!productState.isLoading &&
+                    productState.data &&
                     productState.data.authors.map((author) => (
                       <Link
                         key={author._id}
@@ -367,6 +387,7 @@ export default function ProductPage() {
                         {author.author_info.pseudonim}
                       </Link>
                     ))}
+                  {productState.isLoading && <Skeleton className="h-4" />}
                 </div>
                 <p className="text-sm">Highest Rated Product</p>
                 <div className="">
@@ -386,59 +407,82 @@ export default function ProductPage() {
                     : 0}
                 </span>
               </div>
-              {productEditState.isEditing ? (
-                <input
-                  name="price"
-                  type="number"
-                  value={productEditState.newData.price || 0}
-                  className="h-min"
-                  onChange={(e) => newDataChangeHandler(e)}
-                />
-              ) : (
-                <p className="text-xl font-bold">
-                  {productState.data &&
-                    productState.data.shop_info &&
-                    productState.data.shop_info.price}
-                  €
-                </p>
-              )}
+              <div>
+                {productEditState.isEditing ? (
+                  <Input
+                    name="price"
+                    type="number"
+                    value={productEditState.newData.price || 0}
+                    className="h-min"
+                    onChange={(e) => newDataChangeHandler(e)}
+                  />
+                ) : (
+                  !productState.isLoading && (
+                    <p className="text-xl font-bold">
+                      {productState.data &&
+                        productState.data.shop_info &&
+                        productState.data.shop_info.price}
+                      €
+                    </p>
+                  )
+                )}
+              </div>
+
+              {productState.isLoading && <Skeleton className="h-6" />}
             </div>
 
             <div className="mt-4">
-              <div className="max-w-none">
+              <div className="inline-block max-w-none">
                 <span>Available: </span>
                 {productEditState.isEditing ? (
-                  <input
+                  <Input
                     name="quantity"
                     value={productEditState.newData.quantity || 0}
                     onChange={(e) => newDataChangeHandler(e)}
                   />
                 ) : (
-                  <span>{productState.data && productState.data.quantity}</span>
+                  !productState.isLoading && (
+                    <span>
+                      {productState.data && productState.data.quantity}
+                    </span>
+                  )
                 )}
+                {productState.isLoading && <Skeleton className="h-4" />}
               </div>
-              <div className="prose max-w-none">
+              <div className="prose  max-w-none pt-4">
+                <h6 className="mb-1">Description: </h6>
+
                 {productEditState.isEditing ? (
-                  <textarea
+                  <Textarea
                     name="description"
                     className="resize-none"
                     value={productEditState.newData.description || ''}
                     onChange={(e) => newDataChangeHandler(e)}
                   />
                 ) : (
-                  <p>{productState.data && productState.data.description}</p>
+                  !productState.isLoading && (
+                    <p>{productState.data && productState.data.description}</p>
+                  )
+                )}
+                {productState.isLoading && (
+                  <>
+                    <Skeleton className="mb-2 h-4 w-10" />
+                    <Skeleton className="mb-1 h-4 w-20" />
+                    <Skeleton className="h-4 w-20" />
+                  </>
                 )}
               </div>
 
               {productState.data &&
                 productState.data.description &&
                 productState.data.description.length > 600 && (
-                  <button
+                  <Button
                     type="button"
+                    variant={'default'}
                     className="mt-2 text-sm font-medium underline"
                   >
                     Read More
-                  </button>
+                  </Button>
                 )}
             </div>
 

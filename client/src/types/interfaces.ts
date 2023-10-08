@@ -168,6 +168,7 @@ export interface ProductShopCardType extends ProductCardTypes {
   img: string | null;
   description?: string;
   productQuantity: number;
+  rating: { rating: number; count: number };
 }
 
 export interface ProductAuctionCardType extends ProductCardTypes {

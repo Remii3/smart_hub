@@ -5,6 +5,7 @@ import { CartProductTypes, ProductShopCardType } from '@customTypes/interfaces';
 import LoadingCircle from '@components/Loaders/LoadingCircle';
 import { Button } from '@components/UI/button';
 import { Skeleton } from '@components/UI/skeleton';
+import StarRating from '@features/starRating/StarRating';
 
 const defaultProps = {
   img: '',
@@ -37,6 +38,7 @@ export default function ShopCard({
   price,
   img,
   productQuantity,
+  rating,
 }: ProductShopCardType) {
   const [isAddingToCart, setIsAddingToCart] = useState(false);
   const { addProductToCart, cartState } = useContext(CartContext);
@@ -120,7 +122,12 @@ export default function ShopCard({
           <div className="flex justify-between gap-3">
             <h4 className="flex items-center">${price.toFixed(2)}</h4>
             <div>
-              <div className="pb-3">stars</div>
+              <div className="pb-3">
+                <StarRating
+                  showOnly
+                  rating={rating.rating ? rating.rating : 0}
+                />
+              </div>
               <Button
                 type="submit"
                 variant="default"

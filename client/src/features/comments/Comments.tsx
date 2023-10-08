@@ -145,12 +145,6 @@ export default function Comments({
   }, [fetchData]);
 
   const deleteCommentHandler = async (commentId: string) => {
-    // setArticleData((prevState) => {
-    //   return {
-    //     ...prevState,
-    //     comments: { ...prevState.comments, isLoading: true },
-    //   };
-    // });
     const { error } = await usePostAccessDatabase({
       url: DATABASE_ENDPOINTS.COMMENT_DELETE,
       body: {
@@ -295,11 +289,7 @@ export default function Comments({
                 userData?.role === 'Admin') && (
                 <Dialog>
                   <DialogTrigger asChild>
-                    <Button
-                      variant={'destructive'}
-                      type="button"
-                      className="text-red-400"
-                    >
+                    <Button variant={'destructive'} type="button">
                       <TrashIcon className="h-6 w-6" />
                     </Button>
                   </DialogTrigger>
@@ -314,8 +304,9 @@ export default function Comments({
                     <DialogFooter>
                       <Button
                         type="button"
+                        variant={'destructive'}
                         onClick={() => deleteCommentHandler(comment._id)}
-                        className="rounded-md bg-red-500 px-3 py-1 text-background hover:bg-red-600"
+                        className="rounded-md px-3 py-1 text-background "
                       >
                         Delete
                       </Button>

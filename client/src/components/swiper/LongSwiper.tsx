@@ -47,14 +47,6 @@ function LongSwiper({
             slidesPerView: 4,
             pagination: false,
           },
-          1652: {
-            slidesPerView: 5,
-            pagination: false,
-          },
-          1943: {
-            slidesPerView: 6,
-            pagination: false,
-          },
         }}
         style={{
           paddingBottom: '40px',
