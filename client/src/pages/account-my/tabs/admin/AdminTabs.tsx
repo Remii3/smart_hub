@@ -176,7 +176,7 @@ export default function AdminTabs({
         <div className="relative px-6 py-3">
           <Link
             to={`/account/${userData?._id === user._id ? 'my' : user._id}`}
-            className="mb-4 inline-block h-full space-x-2"
+            className="mb-6 inline-block h-full space-x-2"
           >
             <Button className="px-0" variant={'link'}>
               <h5 className="inline-block">{user.username}</h5>
@@ -197,225 +197,8 @@ export default function AdminTabs({
               )}
               {fields.map((field, index) => {
                 return (
-                  <section key={field.id} className="space-y-2">
-                    <FormField
-                      control={form.control}
-                      name={`admin.${index}.username`}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Username</FormLabel>
-                          <FormControl>
-                            <Input
-                              type="text"
-                              placeholder={user.username}
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name={`admin.${index}.email`}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Email</FormLabel>
-                          <FormControl>
-                            <Input
-                              type="text"
-                              placeholder={user.email}
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <Controller
-                      name={`admin.${index}.role`}
-                      control={form.control}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Role</FormLabel>
-                          <Select
-                            onValueChange={(e) => {
-                              setCurrentRole(e);
-                              field.onChange(e);
-                            }}
-                            value={currentRole}
-                            defaultValue={currentRole}
-                          >
-                            <FormControl>
-                              <SelectTrigger className="w-[180px]">
-                                <SelectValue placeholder={user.role} />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              {USER_ROLES.map((role) => (
-                                <SelectItem key={role} value={role}>
-                                  {role}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    {/* <FormField
-                      name={`admin.${index}.role`}
-                      control={form.control}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Role</FormLabel>
-                          <Select
-                            onValueChange={field.onChange}
-                            defaultValue={user.role}
-                            {...field}
-                          >
-                            <FormControl>
-                              <SelectTrigger className="w-[180px]">
-                                <SelectValue placeholder={user.role} />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              {USER_ROLES.map((role) => (
-                                <SelectItem key={role} value={role}>
-                                  {role}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    /> */}
-                    <FormField
-                      name={`admin.${index}.firstName`}
-                      control={form.control}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>First name</FormLabel>
-                          <FormControl>
-                            <Input
-                              type="text"
-                              placeholder={
-                                user.user_info.credentials.first_name
-                              }
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      name={`admin.${index}.lastName`}
-                      control={form.control}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Last name</FormLabel>
-                          <FormControl>
-                            <Input
-                              type="text"
-                              placeholder={user.user_info.credentials.last_name}
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      name={`admin.${index}.password`}
-                      control={form.control}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Password</FormLabel>
-                          <FormControl>
-                            <Input type="text" placeholder="***" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      name={`admin.${index}.phone`}
-                      control={form.control}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Phone</FormLabel>
-                          <FormControl>
-                            <Input
-                              type="text"
-                              {...field}
-                              placeholder={
-                                user.user_info.phone || 'No phone number'
-                              }
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      name={`admin.${index}.pseudonim`}
-                      control={form.control}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Pseudonim</FormLabel>
-                          <FormControl>
-                            <Input
-                              type="text"
-                              {...field}
-                              placeholder={
-                                user.author_info.pseudonim || 'No pseudonim'
-                              }
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      name={`admin.${index}.quote`}
-                      control={form.control}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Quote</FormLabel>
-                          <FormControl>
-                            <Input
-                              type="text"
-                              {...field}
-                              placeholder={user.author_info.quote || 'No quote'}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      name={`admin.${index}.shortDescription`}
-                      control={form.control}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Short description</FormLabel>
-                          <FormControl>
-                            <Textarea
-                              {...field}
-                              placeholder={
-                                user.author_info.short_description ||
-                                'No description'
-                              }
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <div>
+                  <section key={field.id}>
+                    <div className="mb-4">
                       <button type="button" className="group relative ">
                         <label
                           className={`absolute flex h-full w-full cursor-pointer items-center justify-center rounded-full bg-slate-200/60 opacity-0 transition duration-150 ease-in-out group-hover:opacity-100`}
@@ -444,16 +227,225 @@ export default function AdminTabs({
                             X
                           </span>
                         )}
-                        <img
-                          className="inline-block h-24 w-24 rounded-full object-cover ring-2 ring-white"
-                          src={
-                            !selectedImgs.url
-                              ? user.user_info.profile_img
-                              : selectedImgs?.url
-                          }
-                          alt="avatar_img"
-                        />
+                        {!user.user_info.profile_img && !selectedImgs?.url && (
+                          <div className="inline-block h-24 w-24 rounded-full bg-blue-400 object-cover ring-2 ring-white"></div>
+                        )}
+                        {(user.user_info.profile_img || selectedImgs?.url) && (
+                          <img
+                            className="inline-block h-24 w-24 rounded-full object-cover ring-2 ring-white"
+                            src={
+                              !selectedImgs.url
+                                ? user.user_info.profile_img
+                                : selectedImgs?.url
+                            }
+                            alt="avatar_img"
+                          />
+                        )}
                       </button>
+                    </div>
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
+                        <FormField
+                          control={form.control}
+                          name={`admin.${index}.username`}
+                          render={({ field }) => (
+                            <FormItem className="col-span-1">
+                              <FormLabel>Username</FormLabel>
+                              <FormControl>
+                                <Input
+                                  type="text"
+                                  placeholder={user.username}
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name={`admin.${index}.email`}
+                          render={({ field }) => (
+                            <FormItem className="col-span-1">
+                              <FormLabel>Email</FormLabel>
+                              <FormControl>
+                                <Input
+                                  type="text"
+                                  placeholder={user.email}
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          name={`admin.${index}.role`}
+                          control={form.control}
+                          render={({ field }) => (
+                            <FormItem className="col-span-1">
+                              <FormLabel>Role</FormLabel>
+                              <Select
+                                onValueChange={(e) => {
+                                  setCurrentRole(e);
+                                  field.onChange(e);
+                                }}
+                                value={currentRole}
+                                defaultValue={currentRole}
+                              >
+                                <FormControl className="w-full">
+                                  <SelectTrigger className="col-span-1">
+                                    <SelectValue placeholder={user.role} />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                  {USER_ROLES.map((role) => (
+                                    <SelectItem key={role} value={role}>
+                                      {role}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          name={`admin.${index}.password`}
+                          control={form.control}
+                          render={({ field }) => (
+                            <FormItem className="col-span-1">
+                              <FormLabel>Password</FormLabel>
+                              <FormControl>
+                                <Input
+                                  type="text"
+                                  placeholder="***"
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
+                        <FormField
+                          name={`admin.${index}.firstName`}
+                          control={form.control}
+                          render={({ field }) => (
+                            <FormItem className="col-span-1">
+                              <FormLabel>First name</FormLabel>
+                              <FormControl>
+                                <Input
+                                  type="text"
+                                  placeholder={
+                                    user.user_info.credentials.first_name
+                                  }
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          name={`admin.${index}.lastName`}
+                          control={form.control}
+                          render={({ field }) => (
+                            <FormItem className="col-span-1">
+                              <FormLabel>Last name</FormLabel>
+                              <FormControl>
+                                <Input
+                                  type="text"
+                                  placeholder={
+                                    user.user_info.credentials.last_name
+                                  }
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          name={`admin.${index}.phone`}
+                          control={form.control}
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Phone</FormLabel>
+                              <FormControl>
+                                <Input
+                                  type="text"
+                                  {...field}
+                                  placeholder={
+                                    user.user_info.phone || 'No phone number'
+                                  }
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
+                        <FormField
+                          name={`admin.${index}.pseudonim`}
+                          control={form.control}
+                          render={({ field }) => (
+                            <FormItem className="col-span-1">
+                              <FormLabel>Pseudonim</FormLabel>
+                              <FormControl>
+                                <Input
+                                  type="text"
+                                  {...field}
+                                  placeholder={
+                                    user.author_info.pseudonim || 'No pseudonim'
+                                  }
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          name={`admin.${index}.quote`}
+                          control={form.control}
+                          render={({ field }) => (
+                            <FormItem className="col-span-1">
+                              <FormLabel>Quote</FormLabel>
+                              <FormControl>
+                                <Input
+                                  type="text"
+                                  {...field}
+                                  placeholder={
+                                    user.author_info.quote || 'No quote'
+                                  }
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          name={`admin.${index}.shortDescription`}
+                          control={form.control}
+                          render={({ field }) => (
+                            <FormItem className="col-span-1">
+                              <FormLabel>Short description</FormLabel>
+                              <FormControl>
+                                <Textarea
+                                  {...field}
+                                  placeholder={
+                                    user.author_info.short_description ||
+                                    'No description'
+                                  }
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
                     </div>
                   </section>
                 );

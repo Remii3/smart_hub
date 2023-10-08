@@ -382,17 +382,17 @@ const removeOneFollow = async (req, res) => {
 const updateOneUser = async (req, res) => {
   const { userEmail, fieldValue } = req.body;
   const { fieldPath } = req;
-  const mainData = {
-    username: fieldValue.username,
-    email: fieldValue.email,
-    role: fieldValue.role,
-  };
-  if (fieldValue.password.trim().length > 0) {
-    mainData.password = bcrypt.hashSync(fieldValue.password, salt);
-  }
 
   try {
     if (fieldPath === null) {
+      const mainData = {
+        username: fieldValue.username,
+        email: fieldValue.email,
+        role: fieldValue.role,
+      };
+      if (fieldValue.password.trim().length > 0) {
+        mainData.password = bcrypt.hashSync(fieldValue.password, salt);
+      }
       await User.updateOne(
         {
           email: userEmail,

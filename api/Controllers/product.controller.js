@@ -410,6 +410,32 @@ const deleteOneProduct = async (req, res) => {
   }
 };
 
+const deleteAllProducts = async (req, res) => {
+  const { userId } = req.body;
+  try {
+    await User.updateOne(
+      { _id: userId },
+      { $set: { 'author_info.my_products': [] } },
+    );
+    let currentDate = new Date();
+    let currentMonth = currentDate.getMonth();
+    let monthFromNow = currentMonth + 6;
+    let futureDate = new Date(currentDate.getFullYear(), monthFromNow, 1);
+    futureDate.setDate(futureDate.getDate() - 1);
+
+    await Product.updateMany(
+      { 'seller_data._id': userId },
+      { deleted: true, expireAt: futureDate },
+    );
+
+    res.status(200).json({ message: 'Successfully deleted all products' });
+  } catch (err) {
+    res
+      .status(500)
+      .json({ message: 'Failed deleting all prodcuts', error: err.message });
+  }
+};
+
 module.exports = {
   getAllProducts,
   getShopProducts,
@@ -419,4 +445,5 @@ module.exports = {
   updateOneProduct,
   deleteOneProduct,
   getSearchedProducts,
+  deleteAllProducts,
 };
