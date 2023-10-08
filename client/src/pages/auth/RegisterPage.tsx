@@ -1,4 +1,4 @@
-import { ChangeEvent, useContext } from 'react';
+import { ChangeEvent, useContext, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { SunRiseIcon } from '@assets/icons/Icons';
 import { UserContext } from '@context/UserProvider';
@@ -22,6 +22,7 @@ import {
 } from '@components/UI/form';
 import { Input } from '@components/UI/input';
 import { useToast } from '@components/UI/use-toast';
+import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
 
 const formSchema = z
   .object({
@@ -45,6 +46,10 @@ const formSchema = z
 export default function RegisterPage() {
   const navigate = useNavigate();
   const { changeUserData } = useContext(UserContext);
+  const [showPasswords, setShowPasswords] = useState({
+    password: false,
+    confirmation: false,
+  });
   const { toast } = useToast();
   const form = useForm<any>({
     resolver: zodResolver(formSchema),
@@ -89,7 +94,7 @@ export default function RegisterPage() {
     const { data, error: updateProfileDataError } = await useGetAccessDatabase({
       url: DATABASE_ENDPOINTS.USER_PROFILE,
     });
-    if (!updateProfileDataError) {
+    if (updateProfileDataError) {
       return toast({
         variant: 'destructive',
         title: 'Uh oh! Something went wrong.',
@@ -195,6 +200,7 @@ export default function RegisterPage() {
                       <FormLabel>Username</FormLabel>
                       <FormControl>
                         <Input
+                          autoComplete="username"
                           type="text"
                           placeholder="Username..."
                           {...field}
@@ -212,11 +218,32 @@ export default function RegisterPage() {
                     <FormItem className="col-span-6 sm:col-span-3">
                       <FormLabel>Password</FormLabel>
                       <FormControl>
-                        <Input
-                          type="text"
-                          placeholder="Password..."
-                          {...field}
-                        />
+                        <div className="relative">
+                          <Input
+                            autoComplete="new-password"
+                            type={showPasswords.password ? 'text' : 'password'}
+                            placeholder="Password..."
+                            {...field}
+                          />
+                          <button
+                            type="button"
+                            className="absolute right-0 top-1/2 -translate-y-1/2 cursor-pointer px-3"
+                            onClick={() =>
+                              setShowPasswords((prevState) => {
+                                return {
+                                  ...prevState,
+                                  password: !prevState.password,
+                                };
+                              })
+                            }
+                          >
+                            {showPasswords.password ? (
+                              <EyeIcon className="h-5 w-5 text-gray-500" />
+                            ) : (
+                              <EyeSlashIcon className="h-5 w-5 text-gray-400" />
+                            )}
+                          </button>
+                        </div>
                       </FormControl>
                       <FormDescription>Enter your password</FormDescription>
                       <FormMessage />
@@ -230,11 +257,34 @@ export default function RegisterPage() {
                     <FormItem className="col-span-6 sm:col-span-3">
                       <FormLabel>Password Confirmation</FormLabel>
                       <FormControl>
-                        <Input
-                          type="text"
-                          placeholder="Password confirmation..."
-                          {...field}
-                        />
+                        <div className="relative">
+                          <Input
+                            autoComplete="new-password"
+                            type={
+                              showPasswords.confirmation ? 'text' : 'password'
+                            }
+                            placeholder="Password confirmation..."
+                            {...field}
+                          />
+                          <button
+                            type="button"
+                            className="absolute right-0 top-1/2 -translate-y-1/2 cursor-pointer px-3"
+                            onClick={() =>
+                              setShowPasswords((prevState) => {
+                                return {
+                                  ...prevState,
+                                  confirmation: !prevState.confirmation,
+                                };
+                              })
+                            }
+                          >
+                            {showPasswords.confirmation ? (
+                              <EyeIcon className="h-5 w-5 text-gray-500" />
+                            ) : (
+                              <EyeSlashIcon className="h-5 w-5 text-gray-400" />
+                            )}
+                          </button>
+                        </div>
                       </FormControl>
                       <FormDescription>Confirm your password</FormDescription>
                       <FormMessage />

@@ -11,6 +11,9 @@ const userPathUpdate = (req, res, next) => {
   let fieldPath = fieldKey;
 
   switch (fieldKey) {
+    case null:
+      fieldPath = null;
+      break;
     case 'phone':
       fieldPath = `user_info.${fieldKey}`;
       break;
