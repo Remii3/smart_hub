@@ -122,12 +122,14 @@ export default function ShopCard({
           <div className="flex justify-between gap-3">
             <h4 className="flex items-center">${price.toFixed(2)}</h4>
             <div>
-              <div className="pb-3">
-                <StarRating
-                  showOnly
-                  rating={rating.rating ? rating.rating : 0}
-                />
-              </div>
+              {rating && (
+                <div className="pb-3">
+                  <StarRating
+                    showOnly
+                    rating={rating.rating ? rating.rating : 0}
+                  />
+                </div>
+              )}
               <Button
                 type="submit"
                 variant="default"

@@ -184,8 +184,9 @@ export default function OtherUserPage() {
                           authors={product.authors}
                           description={product.description}
                           price={product.shop_info.price}
-                          img={product.imgs[0]}
+                          img={product.imgs && product.imgs[0]}
                           productQuantity={product.quantity}
+                          rating={product.rating}
                         />
                       </SwiperSlide>
                     )
@@ -214,7 +215,7 @@ export default function OtherUserPage() {
                           title={product.title}
                           authors={product.authors}
                           description={product.description}
-                          img={product.imgs[0]}
+                          img={product.imgs && product.imgs[0]}
                           auctionEndDate={product.auction_info.auction_end_date}
                           currentPrice={product.auction_info.current_price}
                           startingPrice={product.auction_info.starting_price}

@@ -45,6 +45,7 @@ export default function MyProducts({
               authors={product.authors}
               description={product.description}
               img={(product.imgs && product.imgs[0]) || null}
+              rating={product.rating}
             />
           ) : (
             <AuctionCard
