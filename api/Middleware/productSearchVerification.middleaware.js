@@ -52,7 +52,7 @@ const productSearchVerification = async (req, res, next) => {
     }
     if (key === 'category') {
       const category = await Category.findOne({ value });
-      finalQuery['categories'] = category._id;
+      finalQuery['categories'] = category ? category._id : null;
       finalRawData.queries = [...finalRawData.queries, { key, value }];
     }
     if (key === 'special') {
