@@ -439,6 +439,19 @@ const updateOneUser = async (req, res) => {
   }
 };
 
+const deleteOneUser = async (req, res) => {
+  const { userId } = req.body;
+  try {
+    await User.deleteOne({ _id: userId });
+    await Cart.deleteOne({ user_id: userId });
+    res.status(200).json({ message: 'Success' });
+  } catch (err) {
+    res
+      .status(500)
+      .json({ message: 'Failed deleting user', error: err.message });
+  }
+};
+
 module.exports = {
   login,
   register,
@@ -450,4 +463,5 @@ module.exports = {
   addOneFollow,
   removeOneFollow,
   updateOneUser,
+  deleteOneUser,
 };

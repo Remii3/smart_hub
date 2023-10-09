@@ -43,6 +43,7 @@ export const DATABASE_ENDPOINTS = {
   USER_FOLLOW_ADD: `${MAIN_ROUTES.USER}/follow-add`,
   USER_FOLLOW_REMOVE: `${MAIN_ROUTES.USER}/follow-remove`,
   USER_UPDATE: `${MAIN_ROUTES.USER}/update`,
+  USER_DELETE_ONE: `${MAIN_ROUTES.USER}/delete-one`,
   NEWS_ALL: `${MAIN_ROUTES.NEWS}/all`,
   NEWS_ONE: `${MAIN_ROUTES.NEWS}/one`,
   NEWS_DELETE: `${MAIN_ROUTES.NEWS}/delete`,

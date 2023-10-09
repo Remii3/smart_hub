@@ -34,7 +34,6 @@ export default function Nav({ scrollFlag }: { scrollFlag: boolean }) {
     { to: '/news', text: 'news' },
     { to: '/shop', text: 'shop' },
     { to: '/collections', text: 'collections' },
-    { to: '/auctions', text: 'auctions' },
   ];
   const { userData, changeUserData } = useContext(UserContext);
   const { cartState } = useContext(CartContext);

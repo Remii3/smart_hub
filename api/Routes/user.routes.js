@@ -13,6 +13,7 @@ const {
   addOneFollow,
   removeOneFollow,
   updateOneUser,
+  deleteOneUser,
 } = require('../Controllers/user.controller');
 const checkSignUpData = require('../Middleware/checkSignUpData.middleware');
 const checkSignInData = require('../Middleware/checkSignInData.middleware');
@@ -29,5 +30,6 @@ router.post('/register', checkSignUpData, register);
 router.post('/follow-add', addOneFollow);
 router.post('/follow-remove', removeOneFollow);
 router.post('/update', userPathUpdate, updateOneUser);
+router.post('/delete-one', deleteOneUser);
 
 module.exports = router;

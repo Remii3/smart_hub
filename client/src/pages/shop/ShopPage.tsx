@@ -13,19 +13,19 @@ export default function ShopPage() {
       <div className="mx-auto flex max-w-7xl flex-col gap-10 py-10">
         <BasicProductCollection
           category="action"
-          title="New collection"
+          title="Action"
           marketPlace="Shop"
         />
         <BasicProductCollection
           category="adventure"
-          title="New title"
+          title="Adventure"
           showMore
           subTitle="adsasd asdasd"
           marketPlace="Shop"
         />
         <BasicProductCollection
           category="science"
-          title="New series"
+          title="Science"
           showMore
           subTitle="
             Lorem, ipsum dolor sit amet consectetur adipisicing elit. Iste

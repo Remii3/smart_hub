@@ -33,6 +33,15 @@ import useUploadImg from '@hooks/useUploadImg';
 import { usePostAccessDatabase } from '@hooks/useAaccessDatabase';
 import { DATABASE_ENDPOINTS } from '@data/endpoints';
 import { useToast } from '@components/UI/use-toast';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@components/UI/dialog';
+import { DialogClose } from '@radix-ui/react-dialog';
 
 export default function AdminTabs({
   user,
@@ -43,6 +52,7 @@ export default function AdminTabs({
   userData: AuthorTypes;
   fetchData: () => void;
 }) {
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const { toast } = useToast();
   const [currentRole, setCurrentRole] = useState(user.role);
   const adminSchema = z.object({
@@ -167,6 +177,21 @@ export default function AdminTabs({
     setSelectedImgs({ data: null, id: null, url: null });
     fetchData();
   };
+  const deleteUserHandler = async () => {
+    const { error } = await usePostAccessDatabase({
+      url: DATABASE_ENDPOINTS.USER_DELETE_ONE,
+      body: { userId: user._id },
+    });
+    if (error) {
+      return toast({
+        variant: 'destructive',
+        title: 'Uh oh! Something went wrong.',
+        description: 'Failed deleting user',
+      });
+    }
+    fetchData();
+  };
+
   return (
     <AccordionItem value={`${user._id}`}>
       <AccordionTrigger className="mt-3 flex w-full justify-between px-3 py-4 first:mt-0 hover:bg-transparent hover:no-underline">
@@ -185,16 +210,54 @@ export default function AdminTabs({
 
           <Form {...form}>
             <form onSubmit={form.handleSubmit(updateDataHandler)}>
-              {editedCheck() && (
-                <div className={`absolute right-6 top-3`}>
-                  <Button variant={'ghost'} onClick={resetFields} type="button">
-                    Reset
+              <div className={`absolute right-6 top-3`}>
+                <Dialog
+                  open={showDeleteDialog}
+                  onOpenChange={() => setShowDeleteDialog(false)}
+                >
+                  <Button
+                    variant={'destructive'}
+                    onClick={() => setShowDeleteDialog(true)}
+                  >
+                    Delete
                   </Button>
-                  <Button variant={'default'} type="submit">
-                    Submit
-                  </Button>
-                </div>
-              )}
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Are you sure?</DialogTitle>
+                      <DialogDescription>
+                        Deleting this will permamently remove the item from the
+                        database.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter>
+                      <Button
+                        variant={'destructive'}
+                        onClick={deleteUserHandler}
+                      >
+                        Delete
+                      </Button>
+                      <DialogClose asChild>
+                        <Button variant={'outline'}>Cancel</Button>
+                      </DialogClose>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+                {editedCheck() && (
+                  <>
+                    <Button
+                      variant={'ghost'}
+                      onClick={resetFields}
+                      type="button"
+                    >
+                      Reset
+                    </Button>
+                    <Button variant={'default'} type="submit">
+                      Submit
+                    </Button>
+                  </>
+                )}
+              </div>
+
               {fields.map((field, index) => {
                 return (
                   <section key={field.id}>

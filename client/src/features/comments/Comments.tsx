@@ -7,7 +7,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from '@components/UI/dialog';
 import { Skeleton } from '@components/UI/skeleton';
 import { UserContext } from '@context/UserProvider';
@@ -20,6 +19,7 @@ import {
   useGetAccessDatabase,
   usePostAccessDatabase,
 } from '@hooks/useAaccessDatabase';
+import { DialogClose } from '@radix-ui/react-dialog';
 import { useCallback, useContext, useEffect, useState } from 'react';
 
 type CommentTargetTypes = 'Product' | 'News';
@@ -69,7 +69,7 @@ export default function Comments({
     isLoading: false,
     error: null,
   });
-
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const { userData } = useContext(UserContext);
 
   const fetchData = useCallback(async () => {
@@ -287,12 +287,17 @@ export default function Comments({
               </div>
               {(userData?._id === comment.user._id ||
                 userData?.role === 'Admin') && (
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <Button variant={'destructive'} type="button">
-                      <TrashIcon className="h-6 w-6" />
-                    </Button>
-                  </DialogTrigger>
+                <Dialog
+                  open={showDeleteDialog}
+                  onOpenChange={() => setShowDeleteDialog(false)}
+                >
+                  <Button
+                    variant={'destructive'}
+                    onClick={() => setShowDeleteDialog(true)}
+                    type="button"
+                  >
+                    <TrashIcon className="h-6 w-6" />
+                  </Button>
                   <DialogContent>
                     <DialogHeader>
                       <DialogTitle>Are you sure?</DialogTitle>
@@ -306,13 +311,14 @@ export default function Comments({
                         type="button"
                         variant={'destructive'}
                         onClick={() => deleteCommentHandler(comment._id)}
-                        className="rounded-md px-3 py-1 text-background "
                       >
                         Delete
                       </Button>
-                      <DialogTrigger asChild>
-                        <button type="button">Cancel</button>
-                      </DialogTrigger>
+                      <DialogClose asChild>
+                        <Button variant={'outline'} type="button">
+                          Cancel
+                        </Button>
+                      </DialogClose>
                     </DialogFooter>
                   </DialogContent>
                 </Dialog>
