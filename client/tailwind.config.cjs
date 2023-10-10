@@ -20,6 +20,9 @@ module.exports = {
       backgroundImage: {
         mainBanner: 'url("/src/assets/img/parallaxImg.jpg")',
       },
+      boxShadow: {
+        'top-sm': '0 -1px 2px 0 rgba(0, 0, 0,  0.05)',
+      },
       colors: {
         pageBackground: '#0C223B',
         border: 'hsl(var(--border))',
