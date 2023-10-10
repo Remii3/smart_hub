@@ -5,20 +5,17 @@ import {
   useContext,
   useCallback,
 } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
-  Link,
-  useLocation,
-  useNavigate,
-  useSearchParams,
-} from 'react-router-dom';
-import { AuthorTypes, UnknownProductTypes } from '@customTypes/interfaces';
+  AuthorTypes,
+  ProductCategories,
+  UnknownProductTypes,
+} from '@customTypes/interfaces';
 import { UserContext } from '@context/UserProvider';
-import ProductImage from './ProductImage';
 import ProductPill from './ProductPill';
 import StarRating from '@features/starRating/StarRating';
 import ProductForm from '@pages/product/ProductForm';
 import { Button } from '@components/UI/button';
-import LoadingCircle from '@components/Loaders/LoadingCircle';
 import {
   Dialog,
   DialogContent,
@@ -37,15 +34,17 @@ import Comments from '@features/comments/Comments';
 import { Skeleton } from '@components/UI/skeleton';
 import { Textarea } from '@components/UI/textarea';
 import { Input } from '@components/UI/input';
+import { UserRoleTypes } from '@customTypes/types';
+import { useToast } from '@components/UI/use-toast';
+import { ToastAction } from '@components/UI/toast';
 
 interface ProductTypes {
   isLoading: boolean;
   data: null | UnknownProductTypes;
 }
 interface ProductEditTypes {
-  isMyProduct: boolean;
   isEditing: boolean;
-  newData: {
+  data: {
     title: null | string;
     price: null | number;
     categories: null | { value: string; label: string; _id: string }[];
@@ -65,10 +64,10 @@ export default function ProductPage() {
     isLoading: false,
     data: null,
   });
+  const [isMyProduct, setIsMyProduct] = useState(false);
   const [productEditState, setProductEditState] = useState<ProductEditTypes>({
-    isMyProduct: false,
     isEditing: false,
-    newData: {
+    data: {
       title: null,
       price: null,
       categories: null,
@@ -77,14 +76,9 @@ export default function ProductPage() {
       description: null,
     },
   });
-  const [commentState, setCommentState] = useState<CommentTypes>({
-    value: '',
-    isAdding: false,
-  });
 
-  const { fetchUserData } = useContext(UserContext);
-  const { userData } = useContext(UserContext);
-
+  const { userData, fetchUserData } = useContext(UserContext);
+  const { toast } = useToast();
   const navigate = useNavigate();
   const path = useLocation();
 
@@ -96,11 +90,22 @@ export default function ProductPage() {
     setProductState((prevState) => {
       return { ...prevState, isLoading: true };
     });
-    const { data } = await useGetAccessDatabase({
+    const { data, error } = await useGetAccessDatabase({
       url: DATABASE_ENDPOINTS.PRODUCT_ONE,
       params: { productId: prodId },
     });
-
+    if (error) {
+      return toast({
+        variant: 'destructive',
+        title: 'Uh oh! Something went wrong.',
+        description: 'There was a problem with your request.',
+        action: (
+          <ToastAction onClick={() => location.reload()} altText="Try again">
+            Try again
+          </ToastAction>
+        ),
+      });
+    }
     setProductEditState((prevState) => {
       return {
         ...prevState,
@@ -129,9 +134,7 @@ export default function ProductPage() {
         (product: UnknownProductTypes) => product._id === productState.data?._id
       )
     ) {
-      setProductEditState((prevState) => {
-        return { ...prevState, isMyProduct: true };
-      });
+      setIsMyProduct(true);
     }
   }, [userData, productState]);
 
@@ -143,7 +146,7 @@ export default function ProductPage() {
       return {
         ...prevState,
         newData: {
-          ...prevState.newData,
+          ...prevState.data,
           [e.target.name]: e.target.value,
         },
       };
@@ -160,10 +163,10 @@ export default function ProductPage() {
         body: {
           _id: productState.data._id,
           market_place: productState.data.market_place,
-          title: productEditState.newData.title,
-          price: productEditState.newData.price,
-          quantity: productEditState.newData.quantity,
-          description: productEditState.newData.description,
+          title: productEditState.data.title,
+          price: productEditState.data.price,
+          quantity: productEditState.data.quantity,
+          description: productEditState.data.description,
         },
       });
       await fetchData();
@@ -196,24 +199,6 @@ export default function ProductPage() {
       navigate(-1);
     }
   };
-
-  const addNewCommentHandler = async () => {
-    setCommentState((prevState) => {
-      return { ...prevState, isAdding: true };
-    });
-    await usePostAccessDatabase({
-      url: DATABASE_ENDPOINTS.COMMENT_ONE,
-      body: {
-        userId: userData?._id,
-        targetId: prodId,
-        target: 'Product',
-        value: { rating: 2, text: commentState.value },
-      },
-    });
-    setCommentState({ isAdding: false, value: '' });
-    fetchData();
-  };
-
   return (
     <section className="relative">
       <div className="relative mx-auto max-w-screen-xl px-4 py-8">
@@ -231,9 +216,7 @@ export default function ProductPage() {
                     className="aspect-square w-full rounded-xl object-cover"
                   />
                 )}
-              {!productState.isLoading && !productState.data?.imgs && (
-                <ProductImage />
-              )}
+
               {!productState.isLoading &&
                 productState.data?.imgs &&
                 productState.data.imgs.length > 1 && (
@@ -262,7 +245,8 @@ export default function ProductPage() {
               <ProductPill
                 text={productState.data && productState.data.market_place}
               />
-              {productEditState.isMyProduct && (
+              {(isMyProduct ||
+                (userData && userData.role === UserRoleTypes.ADMIN)) && (
                 <div className="absolute right-0 top-0 flex gap-3">
                   <Dialog>
                     <DialogTrigger asChild>
@@ -324,7 +308,7 @@ export default function ProductPage() {
                   <Input
                     name="title"
                     type="text"
-                    value={productEditState.newData.title || ''}
+                    value={productEditState.data.title || ''}
                     className="border-1 border"
                     onChange={(e) => newDataChangeHandler(e)}
                   />
@@ -337,7 +321,7 @@ export default function ProductPage() {
                 )}
                 {productState.isLoading && <Skeleton className="h-9" />}
                 <div>
-                  {productEditState.newData.categories?.map(
+                  {productEditState.data.categories?.map(
                     (category) =>
                       !productState.isLoading && (
                         <Link
@@ -412,7 +396,7 @@ export default function ProductPage() {
                   <Input
                     name="price"
                     type="number"
-                    value={productEditState.newData.price || 0}
+                    value={productEditState.data.price || 0}
                     className="h-min"
                     onChange={(e) => newDataChangeHandler(e)}
                   />
@@ -437,7 +421,7 @@ export default function ProductPage() {
                 {productEditState.isEditing ? (
                   <Input
                     name="quantity"
-                    value={productEditState.newData.quantity || 0}
+                    value={productEditState.data.quantity || 0}
                     onChange={(e) => newDataChangeHandler(e)}
                   />
                 ) : (
@@ -456,7 +440,7 @@ export default function ProductPage() {
                   <Textarea
                     name="description"
                     className="resize-none"
-                    value={productEditState.newData.description || ''}
+                    value={productEditState.data.description || ''}
                     onChange={(e) => newDataChangeHandler(e)}
                   />
                 ) : (
