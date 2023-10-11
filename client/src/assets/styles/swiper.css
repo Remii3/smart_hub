@@ -1,26 +1,5 @@
 /* swiper styles */
 
-.swiper-button-next,
-.swiper-button-prev {
+.swiper-button-disabled {
   display: none !important;
-}
-
-@media screen and (min-width: 1002px) {
-  .swiper-button-next,
-  .swiper-button-prev {
-    display: flex !important;
-  }
-  .swiper-button-disabled {
-    display: none !important;
-  }
-}
-
-/* Special slider !! */
-
-.test .swiper-slide {
-  filter: blur(1px) brightness(0.8) !important;
-}
-
-.test .swiper-slide-active {
-  filter: blur(0px) !important;
 }

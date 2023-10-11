@@ -81,7 +81,7 @@ export default function ShopCard({
   }
 
   return (
-    <div id={`${_id}`} className="mx-auto h-full w-full max-w-[400px]">
+    <div id={`${_id}`} className="mx-auto h-full w-full max-w-[350px]">
       <form
         onSubmit={(e) => addToCartHandler(e)}
         className=" flex h-full flex-col justify-between gap-5 rounded-lg bg-background shadow transition duration-200 ease-in-out hover:shadow-md"

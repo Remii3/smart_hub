@@ -157,6 +157,7 @@ export default function Comments({
     if (error === null) {
       await fetchData();
       updateProductStatus();
+      setShowDeleteDialog(false);
     }
   };
 
@@ -241,7 +242,7 @@ export default function Comments({
         </div>
       </section>
       <section>
-        {comments.isLoading && (
+        {comments.isLoading && !comments.data && (
           <div className="space-y-8">
             <Skeleton className="flex h-[92px] w-full items-center px-4">
               <div className="space-y-3">

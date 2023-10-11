@@ -1,12 +1,12 @@
 import { ReactNode } from 'react';
 import { Swiper } from 'swiper/react';
 import { Navigation, Pagination } from 'swiper';
-import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/solid';
 import SuspenseComponent from '@components/suspense/SuspenseComponent';
 import LoadingCircle from '@components/Loaders/LoadingCircle';
 
-import 'swiper/swiper-bundle.css';
-
+import 'swiper/css';
+import 'swiper/css/pagination';
+import 'swiper/css/navigation';
 function ShortSwiper({
   children,
   swiperCategory,
@@ -15,50 +15,49 @@ function ShortSwiper({
   swiperCategory: string;
 }) {
   return (
-    <div className="relative md:px-10">
+    <div className="relative">
       <Swiper
-        pagination
         navigation={{
-          nextEl: `.${swiperCategory}-next`,
-          prevEl: `.${swiperCategory}-prev`,
+          nextEl: `.swiper-${swiperCategory}-button-next`,
+          prevEl: `.swiper-${swiperCategory}-button-prev`,
         }}
-        modules={[Navigation, Pagination]}
-        spaceBetween={24}
-        slidesPerView={1}
-        setWrapperSize
-        grabCursor
-        watchOverflow
+        slidesPerView={1.2}
+        pagination={{
+          clickable: true,
+        }}
         breakpoints={{
-          388: {
-            slidesPerView: 1,
+          640: {
+            slidesPerView: 2.2,
+            navigation: {
+              enabled: false,
+            },
           },
-          679: {
-            slidesPerView: 2,
-            pagination: false,
+          1024: {
+            slidesPerView: 3.2,
+            navigation: {
+              enabled: true,
+            },
           },
-          970: {
-            slidesPerView: 3,
-            pagination: false,
+          1280: {
+            slidesPerView: 4.2,
+            navigation: {
+              enabled: true,
+            },
           },
         }}
-        style={{
-          paddingBottom: '40px',
-          paddingLeft: '10px',
-          paddingRight: '10px',
-        }}
+        modules={[Pagination, Navigation]}
+        className="-mr-4 pb-14"
       >
         <SuspenseComponent fallback={<LoadingCircle isLoading />}>
           {children}
         </SuspenseComponent>
+        <div
+          className={`swiper-button-next swiper-${swiperCategory}-button-next color-primary right-0 flex items-center justify-center rounded-full bg-white p-8 opacity-90 backdrop-blur-sm`}
+        ></div>
+        <div
+          className={`swiper-button-prev swiper-${swiperCategory}-button-prev color-primary left-0 flex items-center justify-center rounded-full bg-white p-8 opacity-90 backdrop-blur-sm`}
+        ></div>
       </Swiper>
-      <div className="hidden md:block">
-        <button type="button" className={`${swiperCategory}-prev`}>
-          <ChevronLeftIcon className="absolute -left-2 top-1/2 h-11 w-11 -translate-y-10 text-primary transition duration-150 ease-out hover:text-blue-700 active:text-blue-800" />
-        </button>
-        <button type="button" className={`${swiperCategory}-next`}>
-          <ChevronRightIcon className="absolute -right-2 top-1/2 h-11 w-11 -translate-y-10 text-primary transition duration-150 ease-out hover:text-blue-700 active:text-blue-800" />
-        </button>
-      </div>
     </div>
   );
 }

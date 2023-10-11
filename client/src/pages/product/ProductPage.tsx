@@ -224,14 +224,12 @@ export default function ProductPage() {
                     {productState.data.imgs.map((el, index) => {
                       if (index !== 0) {
                         return (
-                          <>
-                            <img
-                              src={el}
-                              key={index}
-                              alt="product_img"
-                              className="aspect-square w-full rounded-xl object-cover"
-                            />
-                          </>
+                          <img
+                            src={el}
+                            key={index}
+                            alt="product_img"
+                            className="aspect-square w-full rounded-xl object-cover"
+                          />
                         );
                       }
                     })}
@@ -321,9 +319,11 @@ export default function ProductPage() {
                 )}
                 {productState.isLoading && <Skeleton className="h-9" />}
                 <div>
-                  {productEditState.data.categories?.map(
-                    (category) =>
-                      !productState.isLoading && (
+                  {productState.data &&
+                    !productState.isLoading &&
+                    productState.data.categories &&
+                    productState.data.categories.map((category) => {
+                      return (
                         <Link
                           key={category._id}
                           to={{
@@ -334,8 +334,8 @@ export default function ProductPage() {
                         >
                           {category.label}
                         </Link>
-                      )
-                  )}
+                      );
+                    })}
                   {productState.isLoading && (
                     <Skeleton className="h-4"></Skeleton>
                   )}

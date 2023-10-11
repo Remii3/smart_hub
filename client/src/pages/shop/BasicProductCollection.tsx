@@ -5,8 +5,6 @@ import { UnknownProductTypes } from '@customTypes/interfaces';
 import PriceSelector from './PriceSelector';
 import SortProducts from '../../features/sortProducts/SortProducts';
 import ShopCard, { SkeletonShopCard } from '@components/cards/ShopCard';
-import LongSwiper from '@components/swiper/LongSwiper';
-import AuctionCard from '@components/cards/AuctionCard';
 import useSortProducts, {
   SortType,
   sortOptions,
@@ -15,7 +13,7 @@ import useSortProducts, {
 import useFilterProducts from '@hooks/useFilterProducts';
 import { useGetAccessDatabase } from '@hooks/useAaccessDatabase';
 import { DATABASE_ENDPOINTS } from '@data/endpoints';
-import { Skeleton } from '@components/UI/skeleton';
+import ShortSwiper from '@components/swiper/ShortSwiper';
 
 type PropsTypes = {
   title: string;
@@ -194,37 +192,22 @@ export default function BasicProductCollection({
         {!products.isLoading &&
           products.filteredData &&
           products.filteredData.length > 0 && (
-            <LongSwiper swiperCategory={category}>
+            <ShortSwiper swiperCategory={category}>
               {products.filteredData.map((product, id) => (
-                <SwiperSlide key={id}>
-                  <div>
-                    {marketPlace === 'Shop' ? (
-                      <ShopCard
-                        _id={product._id}
-                        price={product.shop_info.price}
-                        productQuantity={product.quantity}
-                        title={product.title}
-                        authors={product.authors}
-                        description={product.description}
-                        img={product.imgs && product.imgs[0]}
-                        rating={product.rating}
-                      />
-                    ) : (
-                      <AuctionCard
-                        _id={product._id}
-                        title={product.title}
-                        authors={product.authors}
-                        description={product.description}
-                        img={product.imgs && product.imgs[0]}
-                        startingPrice={product.auction_info.starting_price}
-                        currentPrice={product.auction_info.current_price}
-                        auctionEndDate={product.auction_info.auction_end_date}
-                      />
-                    )}
-                  </div>
+                <SwiperSlide key={id} className="pr-8">
+                  <ShopCard
+                    _id={product._id}
+                    price={product.shop_info.price}
+                    productQuantity={product.quantity}
+                    title={product.title}
+                    authors={product.authors}
+                    description={product.description}
+                    img={product.imgs && product.imgs[0]}
+                    rating={product.rating}
+                  />
                 </SwiperSlide>
               ))}
-            </LongSwiper>
+            </ShortSwiper>
           )}
       </div>
     </section>
