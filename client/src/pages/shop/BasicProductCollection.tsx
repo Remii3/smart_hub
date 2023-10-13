@@ -139,14 +139,14 @@ export default function BasicProductCollection({
     setMaxPrice(Number(e.target.value));
   };
   return (
-    <section>
-      <header className="px-4">
+    <section className="mb-4">
+      <header className="mb-8">
         <h2 className="inline-block text-xl font-bold text-gray-900 sm:text-3xl">
           {title}
         </h2>
         {showMore && (
           <Link
-            to={{ pathname: '/search', search: 'category=New-series' }}
+            to={{ pathname: '/search', search: `category=${category}` }}
             className="pl-4 text-sm"
           >
             Show more
@@ -154,7 +154,7 @@ export default function BasicProductCollection({
         )}
         {subTitle && <p className="mt-4 max-w-md text-gray-500">{subTitle}</p>}
       </header>
-      <div className="mt-8 flex items-center justify-between px-4">
+      <div className="mb-4 flex items-center justify-between">
         <div className="flex flex-grow gap-4">
           <PriceSelector
             highestPrice={highestPrice || 0}
@@ -174,42 +174,40 @@ export default function BasicProductCollection({
           />
         </div>
       </div>
-      <div className="mt-4">
-        {products.isLoading && (
-          <div className="mx-8 flex flex-col items-center gap-4 sm:flex-row">
-            {[...Array(3)].map((el, index) => (
-              <SkeletonShopCard
-                key={index}
-                height="h-[330px]"
-                width="w-[280px]"
-              />
+      {products.isLoading && (
+        <div className="mx-8 flex flex-col items-center gap-4 sm:flex-row">
+          {[...Array(3)].map((el, index) => (
+            <SkeletonShopCard
+              key={index}
+              height="h-[330px]"
+              width="w-[280px]"
+            />
+          ))}
+        </div>
+      )}
+      {!products.isLoading && !products.filteredData && (
+        <p className="mx-8">No products</p>
+      )}
+      {!products.isLoading &&
+        products.filteredData &&
+        products.filteredData.length > 0 && (
+          <ShortSwiper swiperCategory={category}>
+            {products.filteredData.map((product, id) => (
+              <SwiperSlide key={id} className="pr-8">
+                <ShopCard
+                  _id={product._id}
+                  price={product.shop_info.price}
+                  productQuantity={product.quantity}
+                  title={product.title}
+                  authors={product.authors}
+                  description={product.description}
+                  img={product.imgs && product.imgs[0]}
+                  rating={product.rating}
+                />
+              </SwiperSlide>
             ))}
-          </div>
+          </ShortSwiper>
         )}
-        {!products.isLoading && !products.filteredData && (
-          <p className="mx-8">No products</p>
-        )}
-        {!products.isLoading &&
-          products.filteredData &&
-          products.filteredData.length > 0 && (
-            <ShortSwiper swiperCategory={category}>
-              {products.filteredData.map((product, id) => (
-                <SwiperSlide key={id} className="pr-8">
-                  <ShopCard
-                    _id={product._id}
-                    price={product.shop_info.price}
-                    productQuantity={product.quantity}
-                    title={product.title}
-                    authors={product.authors}
-                    description={product.description}
-                    img={product.imgs && product.imgs[0]}
-                    rating={product.rating}
-                  />
-                </SwiperSlide>
-              ))}
-            </ShortSwiper>
-          )}
-      </div>
     </section>
   );
 }
