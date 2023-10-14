@@ -214,7 +214,6 @@ export default function NewProduct() {
           ownerId: data.id,
           selectedFile: selectedImgs[i].data,
           targetLocation: 'Product_imgs',
-          iteration: i,
         });
         urls.push(url);
       }

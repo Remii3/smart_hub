@@ -3,11 +3,13 @@ import { ShoppingBagIcon } from '@heroicons/react/24/solid';
 import { CartContext } from '@context/CartProvider';
 import { Button } from '@components/UI/button';
 import LoadingCircle from '@components/Loaders/LoadingCircle';
+import { boolean } from 'zod';
 
 type ProductFormType = {
   productId?: string;
   productQuantity?: number;
   sold: boolean;
+  isLoading: boolean;
 };
 
 const defaultProps = {
@@ -19,6 +21,7 @@ export default function ProductForm({
   productId,
   productQuantity,
   sold,
+  isLoading,
 }: ProductFormType) {
   const [selectedQuantity, setSelectedQuantity] = useState(1);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
@@ -106,7 +109,7 @@ export default function ProductForm({
           <Button
             variant="default"
             type="submit"
-            disabled={isAddingToCart || itemBtnCapacity}
+            disabled={isAddingToCart || itemBtnCapacity || isLoading}
           >
             <LoadingCircle isLoading={isAddingToCart}>
               Add to cart
