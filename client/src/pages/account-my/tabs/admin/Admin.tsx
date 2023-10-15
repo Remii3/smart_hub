@@ -40,9 +40,9 @@ export default function Admin() {
   if (!userData) return <div>Please log in</div>;
 
   return (
-    <div className="w-full">
+    <div className="sm:px-3">
       <h4 className="mb-4">Users</h4>
-      <div className="w-full">
+      <div className="sm:px-2">
         <Accordion type="multiple">
           {!newDataAllUsers.users && newDataAllUsers.fetchingStatus && (
             <div>Loading</div>

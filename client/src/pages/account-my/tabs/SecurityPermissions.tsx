@@ -47,9 +47,9 @@ export default function SecurityPermissions() {
     });
   };
   return (
-    <div>
+    <div className="px-3">
       <h4 className="mb-4">Security options</h4>
-      <div>
+      <div className="px-2">
         {availableSettings.map((item) => {
           return (
             <div key={item.name} className="flex items-center space-x-2">

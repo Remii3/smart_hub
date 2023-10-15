@@ -37,12 +37,12 @@ export default function MyShop() {
     setDeleteDialog(false);
   };
   return (
-    <div className="relative w-full space-y-4">
+    <div className="relative px-3">
       {userData.author_info.my_products.length > 0 && (
         <Dialog open={deleteDialog} onOpenChange={() => setDeleteDialog(false)}>
           <Button
             type="button"
-            className="absolute right-6 top-4"
+            className="absolute right-3 top-0"
             variant={'destructive'}
             onClick={() => setDeleteDialog(true)}
           >
@@ -73,39 +73,41 @@ export default function MyShop() {
           </DialogContent>
         </Dialog>
       )}
-      <h4>My products</h4>
-      <section>
-        <h5 className="pb-2 text-lg">Latest:</h5>
-        <div>
-          {userData.author_info.my_products.length > 0 ? (
-            <div>
-              <MyProducts
-                myProducts={userData.author_info.my_products}
-                quantity={4}
-                unfold={false}
-              />
-            </div>
-          ) : (
-            <p>No products added.</p>
-          )}
-        </div>
-      </section>
-      <section>
-        <h5 className="pb-2 text-lg">All:</h5>
-        <div>
-          {userData.author_info.my_products.length > 0 ? (
-            <div>
-              <MyProducts
-                myProducts={userData.author_info.my_products}
-                quantity={8}
-                unfold
-              />
-            </div>
-          ) : (
-            <p>No products added.</p>
-          )}
-        </div>
-      </section>
+      <h4 className="mb-4">My products</h4>
+      <div className="space-y-4">
+        <section className="px-2">
+          <h5 className="mb-2">Latest:</h5>
+          <div>
+            {userData.author_info.my_products.length > 0 ? (
+              <div>
+                <MyProducts
+                  myProducts={userData.author_info.my_products}
+                  quantity={4}
+                  unfold={false}
+                />
+              </div>
+            ) : (
+              <p>No products added.</p>
+            )}
+          </div>
+        </section>
+        <section className="px-2">
+          <h5 className="mb-2">All:</h5>
+          <div>
+            {userData.author_info.my_products.length > 0 ? (
+              <div>
+                <MyProducts
+                  myProducts={userData.author_info.my_products}
+                  quantity={8}
+                  unfold
+                />
+              </div>
+            ) : (
+              <p>No products added.</p>
+            )}
+          </div>
+        </section>
+      </div>
     </div>
   );
 }
