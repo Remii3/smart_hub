@@ -282,7 +282,7 @@ export default function SearchPage() {
                       title={item.title}
                       authors={item.authors}
                       description={item.description}
-                      img={item.imgs && item.imgs[0]}
+                      img={item.imgs && item.imgs[0].url}
                       rating={item.rating}
                     />
                   ) : (
@@ -292,7 +292,7 @@ export default function SearchPage() {
                       title={item.title}
                       authors={item.authors}
                       description={item.description}
-                      img={item.imgs && item.imgs[0]}
+                      img={item.imgs && item.imgs[0].url}
                       auctionEndDate={item.auction_info.auction_end_date}
                       currentPrice={item.auction_info.current_price}
                       startingPrice={item.auction_info.starting_price}
