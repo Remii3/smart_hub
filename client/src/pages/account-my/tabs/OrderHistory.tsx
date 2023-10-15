@@ -6,9 +6,9 @@ export default function OrderHistory() {
   const { userData } = useContext(UserContext);
   if (!userData) return <p>Please log in</p>;
   return (
-    <div>
+    <div className="px-3">
       <h4 className="mb-4">Order history</h4>
-      <div>
+      <div className="px-2">
         {userData.orders.map((item) => (
           <Link
             key={item._id}

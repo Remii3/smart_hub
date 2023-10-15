@@ -342,7 +342,7 @@ export default function NewProduct() {
                               onChange={(e) => onImageChange(e)}
                               className="hidden"
                             />
-                            <div className="cursor-pointer p-1 transition-colors duration-150 ease-out hover:bg-slate-100">
+                            <div className="cursor-pointer rounded-md p-1 transition-colors duration-150 ease-out hover:bg-slate-100">
                               <PlusCircleIcon className="h-12 w-12" />
                             </div>
                           </Label>
@@ -354,14 +354,14 @@ export default function NewProduct() {
                       {selectedImgs.map((item) => (
                         <div
                           key={item.id}
-                          className="group relative me-2 inline-block cursor-pointer"
+                          className="group relative me-2 inline-block cursor-pointer rounded-md"
                           onClick={() => removeImg(item.id)}
                         >
                           <img
                             key={item.id}
                             id={item.id}
                             alt="preview_image"
-                            className="aspect-square h-24 w-24"
+                            className="aspect-square h-24 w-24 rounded-md"
                             src={item.url}
                           />
                           <div className="absolute inset-0 flex items-center justify-center bg-slate-100/80 opacity-0 transition duration-150 ease-out group-hover:opacity-90">

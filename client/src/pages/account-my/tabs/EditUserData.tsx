@@ -54,7 +54,7 @@ export default function EditUserData() {
     element: null,
   });
 
-  const { userData, changeUserData, fetchUserData } = useContext(UserContext);
+  const { userData, changeUserData } = useContext(UserContext);
 
   if (!userData) return <p>Please log in</p>;
 
@@ -239,10 +239,10 @@ export default function EditUserData() {
     }
   };
   return (
-    <div>
+    <div className="px-3">
       <h4 className="mb-4">My data</h4>
-      <div className="flex flex-col justify-around gap-8 sm:flex-row">
-        <section className="w-full">
+      <div className="flex flex-col justify-start gap-8 px-2 sm:flex-row">
+        <section className="basis-full sm:basis-3/6 lg:basis-2/6">
           <div className="flex flex-col gap-4">
             <div>
               <fieldset className="flex flex-col">
@@ -836,7 +836,7 @@ export default function EditUserData() {
         </section>
 
         {userData.role !== 'User' && (
-          <section className="w-full">
+          <section className="basis-full sm:basis-3/6 lg:basis-2/6">
             <div className="flex flex-col gap-4">
               <div>
                 <fieldset className="flex flex-col">

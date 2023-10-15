@@ -199,64 +199,69 @@ export default function AdminTabs({
       </AccordionTrigger>
       <AccordionContent className="bg-slate-100/50">
         <div className="relative px-6 py-3">
-          <Link
-            to={`/account/${userData?._id === user._id ? 'my' : user._id}`}
-            className="mb-6 inline-block h-full space-x-2"
-          >
-            <Button className="px-0" variant={'link'}>
-              <h5 className="inline-block">{user.username}</h5>
-            </Button>
-          </Link>
-
           <Form {...form}>
             <form onSubmit={form.handleSubmit(updateDataHandler)}>
-              <div className={`absolute right-6 top-3`}>
-                <Dialog
-                  open={showDeleteDialog}
-                  onOpenChange={() => setShowDeleteDialog(false)}
+              <header className="relative mb-4 flex flex-wrap justify-between">
+                <Link
+                  to={`/account/${
+                    userData?._id === user._id ? 'my' : user._id
+                  }`}
+                  className="inline-block h-full space-x-2"
                 >
-                  <Button
-                    variant={'destructive'}
-                    onClick={() => setShowDeleteDialog(true)}
-                  >
-                    Delete
+                  <Button className="px-0" variant={'link'}>
+                    <h5 className="inline-block">{user.username}</h5>
                   </Button>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>Are you sure?</DialogTitle>
-                      <DialogDescription>
-                        Deleting this will permamently remove the item from the
-                        database.
-                      </DialogDescription>
-                    </DialogHeader>
-                    <DialogFooter>
-                      <Button
-                        variant={'destructive'}
-                        onClick={deleteUserHandler}
-                      >
-                        Delete
+                </Link>
+                <div
+                  className={`absolute right-0 top-0 flex flex-col-reverse gap-3 py-2 sm:flex-row`}
+                >
+                  {editedCheck() && (
+                    <>
+                      <Button variant={'default'} type="submit">
+                        Submit
                       </Button>
-                      <DialogClose asChild>
-                        <Button variant={'outline'}>Cancel</Button>
-                      </DialogClose>
-                    </DialogFooter>
-                  </DialogContent>
-                </Dialog>
-                {editedCheck() && (
-                  <>
+                      <Button
+                        variant={'ghost'}
+                        onClick={resetFields}
+                        type="button"
+                      >
+                        Reset
+                      </Button>
+                    </>
+                  )}
+                  <Dialog
+                    open={showDeleteDialog}
+                    onOpenChange={() => setShowDeleteDialog(false)}
+                  >
                     <Button
-                      variant={'ghost'}
-                      onClick={resetFields}
-                      type="button"
+                      variant={'destructive'}
+                      onClick={() => setShowDeleteDialog(true)}
                     >
-                      Reset
+                      Delete
                     </Button>
-                    <Button variant={'default'} type="submit">
-                      Submit
-                    </Button>
-                  </>
-                )}
-              </div>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Are you sure?</DialogTitle>
+                        <DialogDescription>
+                          Deleting this will permamently remove the item from
+                          the database.
+                        </DialogDescription>
+                      </DialogHeader>
+                      <DialogFooter>
+                        <Button
+                          variant={'destructive'}
+                          onClick={deleteUserHandler}
+                        >
+                          Delete
+                        </Button>
+                        <DialogClose asChild>
+                          <Button variant={'outline'}>Cancel</Button>
+                        </DialogClose>
+                      </DialogFooter>
+                    </DialogContent>
+                  </Dialog>
+                </div>
+              </header>
 
               {fields.map((field, index) => {
                 return (
@@ -264,7 +269,7 @@ export default function AdminTabs({
                     <div className="mb-4">
                       <button type="button" className="group relative ">
                         <label
-                          className={`absolute flex h-full w-full cursor-pointer items-center justify-center rounded-full bg-slate-200/60 opacity-0 transition duration-150 ease-in-out group-hover:opacity-100`}
+                          className={`absolute flex h-full w-full cursor-pointer items-center justify-center rounded-full bg-slate-200 object-cover opacity-0 transition duration-150 ease-in-out group-hover:opacity-100`}
                         >
                           <div className="block">
                             <Input
@@ -276,7 +281,7 @@ export default function AdminTabs({
                           </div>
                           <PlusCircleIcon className="h-10 w-10 text-slate-800" />
                         </label>
-                        {selectedImgs.url && (
+                        {/* {selectedImgs.url && (
                           <span
                             className="absolute"
                             onClick={() =>
@@ -289,10 +294,10 @@ export default function AdminTabs({
                           >
                             X
                           </span>
-                        )}
-                        {!user.user_info.profile_img && !selectedImgs?.url && (
-                          <div className="inline-block h-24 w-24 rounded-full bg-blue-400 object-cover ring-2 ring-white"></div>
-                        )}
+                        )} */}
+                        {/* {!user.user_info.profile_img && !selectedImgs?.url && (
+                          <div className="inline-block h-24 w-24 rounded-full bg-slate-200 object-cover ring-2 ring-white"></div>
+                        )} */}
                         {(user.user_info.profile_img || selectedImgs?.url) && (
                           <img
                             className="inline-block h-24 w-24 rounded-full object-cover ring-2 ring-white"
