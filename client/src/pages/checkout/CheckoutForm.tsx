@@ -21,7 +21,7 @@ import { useNavigate } from 'react-router-dom';
 export default function CheckoutForm() {
   const stripe = useStripe();
   const elements = useElements();
-  const { userData } = useContext(UserContext);
+  const { userData, fetchUserData } = useContext(UserContext);
   const { fetchCartData, cartState } = useContext(CartContext);
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
@@ -118,6 +118,7 @@ export default function CheckoutForm() {
       });
 
       fetchCartData();
+      fetchUserData();
       navigate('/thankyou');
     }
     setIsLoading(false);

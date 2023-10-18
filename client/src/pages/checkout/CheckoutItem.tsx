@@ -11,7 +11,7 @@ export default function CheckoutItem({
       <Link to={`/product/${productData._id}`}>
         {productData.imgs && productData.imgs[0] ? (
           <img
-            src={productData.imgs[0]}
+            src={productData.imgs[0].url}
             alt="product_img"
             className="h-16 w-16 rounded object-cover"
           />
