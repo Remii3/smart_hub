@@ -51,10 +51,7 @@ const register = async (req, res) => {
       username,
       password: bcrypt.hashSync(password, salt),
       user_info: {
-        profile_img: '',
-        profile_img_type: '',
-        background_img: '',
-        background_img_type: '',
+        profile_img: {},
         credentials: {
           first_name: credentials.firstName,
           last_name: credentials.lastName,
@@ -382,7 +379,6 @@ const removeOneFollow = async (req, res) => {
 const updateOneUser = async (req, res) => {
   const { userEmail, fieldValue } = req.body;
   const { fieldPath } = req;
-
   try {
     if (fieldPath === null) {
       const mainData = {

@@ -212,15 +212,16 @@ export default function Nav({ scrollFlag }: { scrollFlag: boolean }) {
               <Popover>
                 <PopoverTrigger>
                   {userData ? (
-                    userData.user_info.profile_img ? (
+                    userData.user_info.profile_img.url ? (
                       <div className="h-8 w-8">
                         <img
-                          src={userData.user_info.profile_img}
-                          className="h-full w-full rounded-full object-cover"
+                          src={userData.user_info.profile_img.url}
+                          className="h-8 w-8 rounded-full object-cover"
+                          alt="profile_img"
                         />
                       </div>
                     ) : (
-                      <UserCircleIcon className={`$ h-8 w-8`} />
+                      <UserCircleIcon className={`h-8 w-8`} />
                     )
                   ) : (
                     <OutlinedUserIcon className={`h-8 w-8`} />

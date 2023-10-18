@@ -178,11 +178,11 @@ export default function Comments({
             <div className="flex gap-4">
               {userData ? (
                 <>
-                  {userData.user_info.profile_img ? (
+                  {userData.user_info.profile_img.url ? (
                     <div className="h-14 w-14">
                       <img
-                        src={userData?.user_info.profile_img}
-                        className="h-full w-full rounded-md object-cover"
+                        src={userData.user_info.profile_img.url}
+                        className="h-8 w-8 rounded-full object-cover"
                         alt="profile_img"
                       />
                     </div>
@@ -269,11 +269,15 @@ export default function Comments({
                 )}
                 <div className="flex gap-4">
                   <div className="h-14 w-14">
-                    <img
-                      src={comment.user.user_info.profile_img}
-                      alt="profile_img"
-                      className="h-full w-full rounded-lg object-cover"
-                    />
+                    {comment.user.user_info.profile_img.url ? (
+                      <img
+                        src={comment.user.user_info.profile_img.url}
+                        alt="profile_img"
+                        className="h-8 w-8 rounded-full object-cover"
+                      />
+                    ) : (
+                      <UserCircleIcon className="h-8 w-8 rounded-full object-cover" />
+                    )}
                   </div>
                   <p className="font-semibold">{comment.user.username}</p>
                 </div>

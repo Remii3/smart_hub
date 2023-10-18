@@ -42,6 +42,7 @@ import {
   DialogTitle,
 } from '@components/UI/dialog';
 import { DialogClose } from '@radix-ui/react-dialog';
+import useDeleteImg from '@hooks/useDeleteImg';
 
 export default function AdminTabs({
   user,
@@ -96,17 +97,24 @@ export default function AdminTabs({
     id: string | null;
     data: File | null;
     url: string | null;
+    isDeleted: boolean;
   };
   const resetFields = () => {
     form.reset();
     setCurrentRole(user.role);
-    setSelectedImgs({ data: null, id: null, url: null });
+    setSelectedImgs({
+      data: null,
+      id: user.user_info.profile_img.id || null,
+      url: user.user_info.profile_img.url || null,
+      isDeleted: false,
+    });
   };
   const { fields } = useFieldArray({ name: 'admin', control: form.control });
   const [selectedImgs, setSelectedImgs] = useState<SelectedImgsTypes>({
     data: null,
-    id: null,
-    url: null,
+    id: user.user_info.profile_img.id || null,
+    url: user.user_info.profile_img.url || null,
+    isDeleted: false,
   });
 
   const editedCheck = () => {
@@ -129,6 +137,7 @@ export default function AdminTabs({
       password ||
       phone !== user.user_info.phone ||
       selectedImgs.data ||
+      selectedImgs.isDeleted ||
       pseudonim !== user.author_info.pseudonim ||
       quote !== user.author_info.quote ||
       role !== user.role ||
@@ -148,6 +157,7 @@ export default function AdminTabs({
         id: eventFiles[0].name,
         data: eventFiles[0],
         url: URL.createObjectURL(eventFiles[0]),
+        isDeleted: false,
       });
     }
   };
@@ -156,12 +166,22 @@ export default function AdminTabs({
   ) => {
     const response = formResponse.admin[0];
     if (selectedImgs.data) {
-      const url = await useUploadImg({
+      console.log('first');
+      const uploadData = await useUploadImg({
         ownerId: user._id,
         selectedFile: selectedImgs.data,
         targetLocation: 'Profile_img',
+        currentId: user.user_info.profile_img.id,
       });
-      response.profileImg = url;
+      if (uploadData) {
+        response.profileImg = uploadData;
+      }
+    } else if (selectedImgs.url === null) {
+      const uploadData = await useDeleteImg({
+        imgId: user.user_info.profile_img.id,
+        ownerId: user._id,
+        targetLocation: 'Profile_img',
+      });
     }
     const { error } = await usePostAccessDatabase({
       url: DATABASE_ENDPOINTS.USER_UPDATE,
@@ -174,8 +194,15 @@ export default function AdminTabs({
         description: 'Failed adding profile img',
       });
     }
-    setSelectedImgs({ data: null, id: null, url: null });
     fetchData();
+    setSelectedImgs((prevState) => {
+      return {
+        data: null,
+        id: prevState.id,
+        url: prevState.url,
+        isDeleted: false,
+      };
+    });
   };
   const deleteUserHandler = async () => {
     const { error } = await usePostAccessDatabase({
@@ -266,48 +293,48 @@ export default function AdminTabs({
               {fields.map((field, index) => {
                 return (
                   <section key={field.id}>
-                    <div className="mb-4">
-                      <button type="button" className="group relative ">
+                    <div className="mb-4 h-24">
+                      <button type="button" className="group relative">
                         <label
-                          className={`absolute flex h-full w-full cursor-pointer items-center justify-center rounded-full bg-slate-200 object-cover opacity-0 transition duration-150 ease-in-out group-hover:opacity-100`}
+                          className={`absolute inset-0 flex h-full w-full cursor-pointer items-center justify-center rounded-full object-cover opacity-0 ring-2 ring-white transition-opacity duration-150 ease-in-out group-hover:opacity-100`}
                         >
-                          <div className="block">
-                            <Input
-                              accept=".jpg, .jpeg, .png"
-                              type="file"
-                              className="hidden"
-                              onChange={(e) => onImageChange(e)}
-                            />
-                          </div>
-                          <PlusCircleIcon className="h-10 w-10 text-slate-800" />
+                          <Input
+                            accept=".jpg, .jpeg, .png"
+                            type="file"
+                            className="hidden"
+                            onChange={(e) => onImageChange(e)}
+                          />
+                          {!selectedImgs.url && (
+                            <PlusCircleIcon className="h-10 w-10 text-slate-800" />
+                          )}
                         </label>
-                        {/* {selectedImgs.url && (
+
+                        {selectedImgs.url && (
                           <span
-                            className="absolute"
+                            className="absolute block"
                             onClick={() =>
                               setSelectedImgs({
                                 data: null,
                                 id: null,
                                 url: null,
+                                isDeleted: true,
                               })
                             }
                           >
                             X
                           </span>
-                        )} */}
-                        {/* {!user.user_info.profile_img && !selectedImgs?.url && (
+                        )}
+                        {!user.user_info.profile_img && !selectedImgs?.url && (
                           <div className="inline-block h-24 w-24 rounded-full bg-slate-200 object-cover ring-2 ring-white"></div>
-                        )} */}
-                        {(user.user_info.profile_img || selectedImgs?.url) && (
+                        )}
+                        {selectedImgs.url ? (
                           <img
                             className="inline-block h-24 w-24 rounded-full object-cover ring-2 ring-white"
-                            src={
-                              !selectedImgs.url
-                                ? user.user_info.profile_img
-                                : selectedImgs?.url
-                            }
+                            src={selectedImgs.url}
                             alt="avatar_img"
                           />
+                        ) : (
+                          <div className="h-24 w-24 rounded-full bg-slate-200"></div>
                         )}
                       </button>
                     </div>

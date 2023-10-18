@@ -46,7 +46,7 @@ interface ArticleDataTypes {
     _id: string;
     title: string;
     subtitle: string;
-    img: null | string;
+    img: null | { id: string; url: string };
     content: string;
     rating: {
       votes: { user: string; vote: number }[];
@@ -307,18 +307,14 @@ export default function NewsArticle({
               )}
               <p>Likes: {vote.quantity?.like}</p>
               <p>Dislikes: {vote.quantity?.dislike}</p>
-              {articleData.data.img && (
-                <img src={articleData.data.img} alt="article_img" />
+              {articleData.data.img?.url && (
+                <img src={articleData.data.img.url} alt="article_img" />
               )}
               <h3>{articleData.data.title}</h3>
               <h6 className="text-slate-600">{articleData.data.subtitle}</h6>
               <Dialog>
                 <DialogTrigger asChild>
-                  <Button
-                    variant={'destructive'}
-                    type="button"
-                    className="text-red-400"
-                  >
+                  <Button variant={'destructive'} type="button">
                     Delete
                     <TrashIcon className="h-6 w-6" />
                   </Button>
@@ -334,8 +330,8 @@ export default function NewsArticle({
                   <DialogFooter>
                     <Button
                       type="button"
+                      variant={'destructive'}
                       onClick={() => deleteArticleHandler(newsId)}
-                      className="rounded-md bg-red-500 px-3 py-1 text-background hover:bg-red-600"
                     >
                       Delete
                     </Button>

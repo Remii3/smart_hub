@@ -59,14 +59,14 @@ export default function NewsPage() {
       body: { userId: userData?._id, ...newArticleData },
     });
     if (selectedImgs) {
-      const url = await useUploadImg({
+      const imgResData = await useUploadImg({
         ownerId: data.id,
         targetLocation: 'News_img',
         selectedFile: selectedImgs[0],
       });
       await usePostAccessDatabase({
         url: DATABASE_ENDPOINTS.NEWS_UPDATE,
-        body: { img: url, _id: data.id },
+        body: { img: imgResData, _id: data.id },
       });
     }
     await fetchData();

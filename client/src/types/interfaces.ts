@@ -63,7 +63,7 @@ export interface UserTypes {
   email: string;
   username: string;
   user_info: {
-    profile_img: any;
+    profile_img: { url: string; id: string };
     background_img: any;
     credentials: { first_name: string; last_name: string; full_name: string };
     address: {

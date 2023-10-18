@@ -32,6 +32,7 @@ import {
 } from '@components/UI/select';
 
 import { useToast } from '@components/UI/use-toast';
+import { UserCircleIcon } from '@heroicons/react/24/solid';
 
 enum Test {
   'TEST' = 'Tesst',
@@ -135,18 +136,18 @@ export default function MyAccount() {
       return { ...prevState, isLoading: true };
     });
 
-    const url = await useUploadImg({
+    const uploadData = await useUploadImg({
       selectedFile: e.target.files[0],
       ownerId: userData._id,
       targetLocation: 'Profile_img',
     });
 
-    if (url) {
+    if (uploadData) {
       await usePostAccessDatabase({
         url: DATABASE_ENDPOINTS.USER_UPDATE,
         body: {
           userEmail: userData.email,
-          fieldValue: url,
+          fieldValue: uploadData,
           fieldKey: e.target.name,
         },
       });
@@ -184,7 +185,7 @@ export default function MyAccount() {
               <label
                 className={`${
                   selecteProfiledImg.isLoading && 'opacity-100'
-                } absolute flex h-full w-full cursor-pointer items-center justify-center rounded-full bg-slate-200/60 opacity-0 transition duration-150 ease-in-out group-hover:opacity-100`}
+                } absolute flex h-full w-full cursor-pointer items-center justify-center rounded-full bg-slate-200/60 opacity-50 transition duration-150 ease-in-out group-hover:opacity-100`}
               >
                 <input
                   type="file"
@@ -206,15 +207,15 @@ export default function MyAccount() {
                   </div>
                 )}
               </label>
-              <img
-                className="inline-block h-24 w-24 rounded-full object-cover ring-2 ring-white"
-                src={
-                  userData.user_info.profile_img
-                    ? userData.user_info.profile_img
-                    : avatarImg
-                }
-                alt="avatar_img"
-              />
+              {userData.user_info.profile_img.url ? (
+                <img
+                  className="inline-block h-24 w-24 rounded-full object-cover ring-2 ring-white"
+                  src={userData.user_info.profile_img.url}
+                  alt="avatar_img"
+                />
+              ) : (
+                <UserCircleIcon className="inline-block h-24 w-24 rounded-full object-cover ring-2 ring-white" />
+              )}
             </button>
 
             <div className="pt-1 text-center sm:text-left">
