@@ -19,8 +19,7 @@ import ProductPage from './pages/product/ProductPage';
 import SearchPage from './pages/search/SearchPage';
 import OtherUserPage from './pages/account-other/OtherUserPage';
 import OrderPage from './pages/OrderPage';
-import ThankYouPage from '@pages/ThankYouPage';
-import MainContainer from '@layout/MainContainer';
+import ThankYouPage from '@pages/checkout/ThankYouPage';
 
 export default function AppRoutes() {
   const { userData } = useContext(UserContext);

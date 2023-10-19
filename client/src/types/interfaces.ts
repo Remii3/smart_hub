@@ -121,7 +121,7 @@ export interface OrderTypes {
 
 // * Fetch types
 
-export interface SimpleFetchDataTypes {
+export interface FetchDataTypes {
   isLoading: boolean;
   hasError: null | string;
 }
