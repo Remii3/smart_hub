@@ -141,7 +141,6 @@ export default function CheckoutForm({
         onChange={(e: StripeLinkAuthenticationElementChangeEvent) =>
           setEmail(e.value.email)
         }
-        onReady={() => readyToShowHandler(true)}
         options={{ defaultValues: { email: userData?.email || email } }}
       />
       <PaymentElement
@@ -163,6 +162,7 @@ export default function CheckoutForm({
             setBuyerData({ name, address, phone });
           }
         }}
+        onReady={() => readyToShowHandler(true)}
       />
       {readyToShow && (
         <Button
