@@ -1,5 +1,4 @@
 import { useEffect } from 'react';
-import axios from 'axios';
 import { useLocation } from 'react-router-dom';
 import Footer from './Footer';
 import Header from './Header';
@@ -9,8 +8,7 @@ import { DATABASE_ENDPOINTS } from '../data/endpoints';
 
 export default function MainLayout() {
   const { pathname } = useLocation();
-
-  window.onunload = () => {
+  window.onpagehide = () => {
     window.scrollTo(0, 0);
   };
 

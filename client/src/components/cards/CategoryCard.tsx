@@ -18,7 +18,7 @@ function CategoryCard({ _id, label, value, description }: ProductCategories) {
     <Link id={_id} to={{ pathname: `/search`, search: finalQuery }}>
       <Card className="relative flex h-full cursor-pointer flex-col gap-4 transition-[transform,box-shadow] duration-300 ease-in-out hover:scale-105 hover:shadow-md active:scale-100">
         <CardHeader className="pb-0">
-          <h4 className="text-foreground">{label}</h4>
+          <h3 className="text-foreground">{label}</h3>
         </CardHeader>
         <CardContent>
           <p className="line-clamp-2 text-muted-foreground sm:text-lg lg:text-xl">

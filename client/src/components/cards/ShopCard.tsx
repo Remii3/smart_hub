@@ -135,9 +135,7 @@ export default function ShopCard({
                 variant="default"
                 disabled={isAddingToCart || itemBtnCapacity}
               >
-                <LoadingCircle isLoading={isAddingToCart}>
-                  Add to cart
-                </LoadingCircle>
+                {isAddingToCart ? <LoadingCircle /> : 'Add to cart'}
               </Button>
             </div>
           </div>

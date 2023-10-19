@@ -3,7 +3,6 @@ import { ShoppingBagIcon } from '@heroicons/react/24/solid';
 import { CartContext } from '@context/CartProvider';
 import { Button } from '@components/UI/button';
 import LoadingCircle from '@components/Loaders/LoadingCircle';
-import { boolean } from 'zod';
 
 type ProductFormType = {
   productId?: string;
@@ -111,14 +110,18 @@ export default function ProductForm({
             type="submit"
             disabled={isAddingToCart || itemBtnCapacity || isLoading}
           >
-            <LoadingCircle isLoading={isAddingToCart}>
-              Add to cart
-              <ShoppingBagIcon
-                className="ml-2 inline-block"
-                height={24}
-                width={24}
-              />
-            </LoadingCircle>
+            {isAddingToCart ? (
+              <LoadingCircle />
+            ) : (
+              <span>
+                Add to cart
+                <ShoppingBagIcon
+                  className="ml-2 inline-block"
+                  height={24}
+                  width={24}
+                />
+              </span>
+            )}
           </Button>
         </div>
       )}

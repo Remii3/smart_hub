@@ -11,7 +11,6 @@ import EditUserData from './tabs/EditUserData';
 import MyShop from './tabs/my_products/MyShop';
 import { UserContext } from '@context/UserProvider';
 import MarketplaceBadge from '@components/UI/badges/MarketplaceBadge';
-import avatarImg from '@assets/img/avataaars.svg';
 import SecurityPermissions from './tabs/SecurityPermissions';
 import OrderHistory from './tabs/OrderHistory';
 import Admin from './tabs/admin/Admin';
@@ -116,7 +115,10 @@ export default function MyAccount() {
   const { userData, fetchUserData } = useContext(UserContext);
   const { toast } = useToast();
 
-  if (!userData) return navigate('/register');
+  if (!userData) {
+    navigate('/register');
+    return <></>;
+  }
 
   const changeSelectedTab = (option: TabNamesTypes) => {
     setSelectedtab(option);

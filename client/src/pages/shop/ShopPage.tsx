@@ -1,3 +1,4 @@
+import LoadingCircle from '@components/Loaders/LoadingCircle';
 import MainContainer from '@layout/MainContainer';
 import BasicProductCollection from '@pages/shop/BasicProductCollection';
 

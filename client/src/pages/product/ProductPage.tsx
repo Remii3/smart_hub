@@ -534,7 +534,7 @@ export default function ProductPage() {
                   }}
                   className="-mr-4"
                 >
-                  <SuspenseComponent fallback={<LoadingCircle isLoading />}>
+                  <SuspenseComponent fallback={<LoadingCircle />}>
                     {productEditState.isEditing ? (
                       <div>
                         {selectedImgs.map((el, index) => {
@@ -617,7 +617,7 @@ export default function ProductPage() {
                                       modules={[Pagination, Navigation]}
                                     >
                                       <SuspenseComponent
-                                        fallback={<LoadingCircle isLoading />}
+                                        fallback={<LoadingCircle />}
                                       >
                                         {!productState.data && 'No items'}
                                         {productState.data &&

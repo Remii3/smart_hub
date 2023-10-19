@@ -1,3 +1,4 @@
+import { toast } from '@components/UI/use-toast';
 import axios, { AxiosError } from 'axios';
 interface AccessTypes {
   url: string;
@@ -16,6 +17,11 @@ const useGetAccessDatabase = async ({ url, params }: GetTypes) => {
     return { data: data.data, error: null };
   } catch (err) {
     const error = err as Error | AxiosError;
+    toast({
+      variant: 'destructive',
+      title: 'Uh oh! Something went wrong.',
+      description: 'We failed finishing your request.',
+    });
     if (!axios.isAxiosError(error)) {
       return { data: null, error: error || 'An unknown error has occured' };
     } else {
@@ -32,6 +38,11 @@ const usePostAccessDatabase = async ({ url, body, headers }: PostTypes) => {
     return { data, error: null };
   } catch (err) {
     const error = err as Error | AxiosError;
+    toast({
+      variant: 'destructive',
+      title: 'Uh oh! Something went wrong.',
+      description: 'We failed finishing your request.',
+    });
     if (!axios.isAxiosError(error)) {
       return { data: null, error: error || 'An unknown error has occured' };
     } else {

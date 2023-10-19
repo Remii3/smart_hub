@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { useCallback, useEffect, useState } from 'react';
 import { ProductTypes } from '@customTypes/interfaces';
 import MainPageHeading from '@pages/home/MainPageHeading';
@@ -38,16 +37,18 @@ export default function CollectionSection() {
         <Link to="/shop" className="block cursor-pointer sm:col-span-2">
           <Card className="space-y-10 p-10 transition-[box-shadow,transform] duration-300 ease-in-out hover:scale-[1.02] hover:shadow-md active:scale-100 ">
             <div className="space-y-1">
-              <h4 className="pb-2 uppercase">Variety</h4>
+              <h3 className="pb-2 uppercase">Variety</h3>
               <p className="pb-1 text-muted-foreground">
                 Genres galore, for every bookworm
               </p>
             </div>
             <div className="flex max-h-[300px] items-center overflow-hidden rounded-md">
               <img
-                src="https://wallpapers.com/images/hd/black-and-white-long-boardwalk-dgva6b5fa6cmynyb.webp"
+                src="https://firebasestorage.googleapis.com/v0/b/smarthub-75eab.appspot.com/o/static_imgs%2FcolectionsImg.webp?alt=media&token=7a56ac77-da7f-4b8b-b65b-396b53d5a278"
                 alt="test_img"
                 className="w-full object-fill object-center"
+                height="900"
+                width="1600"
               />
             </div>
           </Card>
@@ -58,16 +59,18 @@ export default function CollectionSection() {
         >
           <Card className="space-y-10 p-10 transition-[box-shadow,transform] duration-300 ease-in-out hover:scale-[1.02] hover:shadow-md active:scale-100">
             <div className="space-y-1">
-              <h4 className="pb-2 uppercase">Bestsellers</h4>
+              <h3 className="pb-2 uppercase">Bestsellers</h3>
               <p className="pb-1 text-muted-foreground">
                 The hottest literary hits
               </p>
             </div>
             <div className="flex max-h-[300px] items-center overflow-hidden rounded-md">
               <img
-                src="https://wallpapers.com/images/hd/black-and-white-long-boardwalk-dgva6b5fa6cmynyb.webp"
+                src="https://firebasestorage.googleapis.com/v0/b/smarthub-75eab.appspot.com/o/static_imgs%2FcolectionsImg.webp?alt=media&token=7a56ac77-da7f-4b8b-b65b-396b53d5a278"
                 alt="test_img"
                 className="w-full object-fill object-center"
+                height="900"
+                width="1600"
               />
             </div>
           </Card>
@@ -81,16 +84,18 @@ export default function CollectionSection() {
         >
           <Card className="space-y-10 p-10 transition-[box-shadow,transform] duration-300 ease-in-out hover:scale-[1.02] hover:shadow-md active:scale-100">
             <div className="space-y-1">
-              <h4 className="pb-2 uppercase">Deals</h4>
+              <h3 className="pb-2 uppercase">Deals</h3>
               <p className="pb-1 text-muted-foreground">
                 Prices that’ll make you smile
               </p>
             </div>
             <div className="flex max-h-[300px] items-center overflow-hidden rounded-md">
               <img
-                src="https://wallpapers.com/images/hd/black-and-white-long-boardwalk-dgva6b5fa6cmynyb.webp"
+                src="https://firebasestorage.googleapis.com/v0/b/smarthub-75eab.appspot.com/o/static_imgs%2FcolectionsImg.webp?alt=media&token=7a56ac77-da7f-4b8b-b65b-396b53d5a278"
                 alt="test_img"
                 className="w-full object-fill object-center"
+                height="900"
+                width="1600"
               />
             </div>
           </Card>

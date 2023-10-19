@@ -233,9 +233,7 @@ export default function Comments({
                 className={`${!userData && 'bg-slate-300'}`}
                 onClick={() => addNewCommentHandler()}
               >
-                <LoadingCircle isLoading={newComment.isLoading}>
-                  Publish
-                </LoadingCircle>
+                {newComment.isLoading ? <LoadingCircle /> : 'Publish'}
               </Button>
             </div>
           </div>
