@@ -29,7 +29,11 @@ export default function CheckoutPage() {
     isLoading: false,
     hasError: null,
   });
-  const [readyToShow, setReadyToShow] = useState(false);
+  const [readyToShow, setReadyToShow] = useState({
+    linkAuth: false,
+    payment: false,
+    address: false,
+  });
   const fetchData = useCallback(async () => {
     setClientSecret((prevState) => {
       return { ...prevState, isLoading: true };
@@ -60,7 +64,6 @@ export default function CheckoutPage() {
 
   const options = {
     clientSecret: clientSecret.data,
-    loader: 'never',
     appearance,
   };
   return (
@@ -68,7 +71,10 @@ export default function CheckoutPage() {
       <div className="mx-auto grid max-w-screen-2xl grid-cols-1 md:grid-cols-2">
         <div className="bg-gray-50 py-12 md:min-h-[632px] md:py-24">
           <div className="mx-auto max-w-lg space-y-4 px-4 lg:px-8">
-            {!readyToShow || clientSecret.isLoading ? (
+            {(!readyToShow.address &&
+              !readyToShow.linkAuth &&
+              !readyToShow.payment) ||
+            clientSecret.isLoading ? (
               <>
                 <Skeleton className="h-12 w-full" />
                 <Skeleton className="h-12 w-full" />
@@ -84,15 +90,6 @@ export default function CheckoutPage() {
           <div className="mx-auto h-full max-w-lg px-4 lg:px-8">
             {!clientSecret.isLoading && clientSecret.hasError && (
               <p className="text-red-500">{clientSecret.hasError}</p>
-            )}
-            {(!clientSecret.data || clientSecret.isLoading || !readyToShow) && (
-              <div className="space-y-4 pb-4">
-                <Skeleton className="h-12 w-full" />
-                <Skeleton className="h-12 w-full" />
-                <Skeleton className="h-12 w-full" />
-                <Skeleton className="h-12 w-full" />
-                <Skeleton className="h-12 w-full" />
-              </div>
             )}
             {!clientSecret.isLoading &&
               clientSecret.data &&

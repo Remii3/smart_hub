@@ -19,8 +19,18 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@components/UI/button';
 
 interface PropsTypes {
-  readyToShow: boolean;
-  readyToShowHandler: React.Dispatch<React.SetStateAction<boolean>>;
+  readyToShow: {
+    linkAuth: boolean;
+    payment: boolean;
+    address: boolean;
+  };
+  readyToShowHandler: React.Dispatch<
+    React.SetStateAction<{
+      linkAuth: boolean;
+      payment: boolean;
+      address: boolean;
+    }>
+  >;
 }
 
 export default function CheckoutForm({
@@ -142,11 +152,21 @@ export default function CheckoutForm({
           setEmail(e.value.email)
         }
         options={{ defaultValues: { email: userData?.email || email } }}
+        onReady={() =>
+          readyToShowHandler((prevState) => {
+            return { ...prevState, linkAuth: true };
+          })
+        }
       />
       <PaymentElement
         id="payment-element"
         className="mb-6"
         options={paymentElementOptions}
+        onReady={() =>
+          readyToShowHandler((prevState) => {
+            return { ...prevState, payment: true };
+          })
+        }
       />
       <AddressElement
         options={{
@@ -162,7 +182,11 @@ export default function CheckoutForm({
             setBuyerData({ name, address, phone });
           }
         }}
-        onReady={() => readyToShowHandler(true)}
+        onReady={() =>
+          readyToShowHandler((prevState) => {
+            return { ...prevState, address: true };
+          })
+        }
       />
       {readyToShow && (
         <Button

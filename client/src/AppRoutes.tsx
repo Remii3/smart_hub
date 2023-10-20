@@ -25,7 +25,7 @@ export default function AppRoutes() {
   const { userData } = useContext(UserContext);
 
   return (
-    <Suspense fallback={<LoadingCircle isLoading />}>
+    <Suspense fallback={<LoadingCircle />}>
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/news" element={<NewsPage />} />

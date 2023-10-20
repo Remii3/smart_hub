@@ -3,11 +3,12 @@ import { useContext } from 'react';
 import { CartContext } from '@context/CartProvider';
 import CartProdList from './CartProdList';
 import { TicketIcon } from '@heroicons/react/24/outline';
+import MainContainer from '@layout/MainContainer';
 
 export default function CartPage() {
   const { cartState } = useContext(CartContext);
   return (
-    <section>
+    <MainContainer>
       <div className="mx-auto max-w-screen-xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
         <div className="mx-auto max-w-3xl">
           <header className="text-center">
@@ -70,6 +71,6 @@ export default function CartPage() {
           </div>
         </div>
       </div>
-    </section>
+    </MainContainer>
   );
 }
