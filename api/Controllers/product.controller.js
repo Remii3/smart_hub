@@ -37,10 +37,10 @@ const getAllProducts = async (req, res) => {
 const getShopProducts = async (req, res) => {
   try {
     const products = await Product.find({
-      market_place: 'Shop',
+      market_place: "Shop",
       quantity: { $gt: 0 },
       deleted: false,
-    });
+    }).populate("authors");
 
     const preparedProducts = [];
     for (let product of products) {

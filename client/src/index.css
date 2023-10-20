@@ -113,3 +113,7 @@
     content: counter(step);
   }
 }
+
+.swiper-button-disabled {
+  display: none !important;
+}

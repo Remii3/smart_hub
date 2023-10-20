@@ -68,8 +68,8 @@ export default function SearchPage() {
         isChecked: true,
       },
       {
-        name: 'auction',
-        isChecked: true,
+        name: 'collection',
+        isChecked: false,
       },
     ],
     price: {

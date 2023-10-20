@@ -1,13 +1,6 @@
 import { Link } from 'react-router-dom';
 
-function Footer() {
-  const leftColumnLinks = [
-    { to: '/terms_conditions', text: 'Terms and conditions' },
-    { to: '/privacy_policy', text: 'Privacy Policy' },
-    { to: '/about_us', text: 'About us' },
-    { to: '/contact_us', text: 'Contact us' },
-  ];
-
+export default function Footer() {
   return (
     <footer className="relative w-full bg-transparent px-4 py-10 shadow-top-sm backdrop-blur-sm">
       <div className="mx-auto max-w-[1200px] text-center">
@@ -57,16 +50,38 @@ function Footer() {
             </li>
           </ul>
           <ul className="flex flex-col justify-center gap-4 sm:flex-row">
-            {leftColumnLinks.map((link, id) => (
-              <li key={id + link.text}>
-                <Link
-                  to={link.to}
-                  className="text-base text-foreground transition-[color] duration-200 ease-out hover:text-primary"
-                >
-                  {link.text}
-                </Link>
-              </li>
-            ))}
+            <li>
+              <Link
+                to="/terms_conditions"
+                className="text-base text-foreground transition-[color] duration-200 ease-out hover:text-primary"
+              >
+                Terms and conditions
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/privacy_policy"
+                className="text-base text-foreground transition-[color] duration-200 ease-out hover:text-primary"
+              >
+                Privacy Policy
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/about_us"
+                className="text-base text-foreground transition-[color] duration-200 ease-out hover:text-primary"
+              >
+                About us
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/contact_us"
+                className="text-base text-foreground transition-[color] duration-200 ease-out hover:text-primary"
+              >
+                Contact us
+              </Link>
+            </li>
           </ul>
         </nav>
         <p className="pt-1 text-base text-slate-600">
@@ -77,4 +92,3 @@ function Footer() {
   );
 }
 
-export default Footer;

@@ -81,47 +81,47 @@ export default function ShopCard({
   }
 
   return (
-    <div id={`${_id}`} className="mx-auto h-full w-full max-w-[350px]">
+    <div id={`${_id}`} className="mx-auto h-full w-full max-w-[280px]">
       <form
         onSubmit={(e) => addToCartHandler(e)}
-        className=" flex h-full flex-col justify-between gap-5 rounded-lg bg-background shadow transition duration-200 ease-in-out hover:shadow-md"
+        className="flex h-full flex-col justify-between gap-3 rounded-lg bg-background shadow transition duration-200 ease-in-out hover:shadow-md"
       >
-        <div className="flex flex-col gap-3">
-          <Link to={`/product/${_id}`}>
+        <div>
+          <Link to={`/product/${_id}`} className="block overflow-hidden">
             {img ? (
               <img
-                className="h-[240px] max-h-[240px] w-full rounded-t-lg object-cover"
+                className="h-[160px] w-full rounded-t-lg object-cover"
                 src={img}
                 alt="product_cover"
+                height={760}
+                width={760}
               />
             ) : (
               <img
                 src="https://images.unsplash.com/photo-1523381210434-271e8be1f52b?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80"
                 alt="img"
-                className="h-[240px] max-h-[240px] w-full rounded-t-lg object-cover"
+                className="h-full max-h-[160px] w-full rounded-t-lg object-cover"
               />
             )}
           </Link>
-          <div className="px-3">
-            <Link to={`/product/${_id}`}>
-              <h6 className="m-0 line-clamp-2 inline-block min-h-[32px] pb-1">
-                {titleShortened}
-              </h6>
+          <div className="px-3 pt-3">
+            <Link to={`/product/${_id}`} className="inline-block">
+              <h6 className="m-0 line-clamp-1">{titleShortened}</h6>
             </Link>
-            <div className="line-clamp-1 h-[24px]">
-              {authors?.map((author, id) => (
+            <div className="line-clamp-1 pb-1 text-sm">
+              {authors.map((author, id) => (
                 <span key={id} className="mr-3">
                   {author.author_info && author.author_info.pseudonim}
                 </span>
               ))}
             </div>
+            <p className="line-clamp-3 min-h-[72px]">{description}</p>
           </div>
         </div>
         <div className="flex flex-col gap-3 px-3 pb-3">
-          <p className="line-clamp-4 min-h-[80px]">{description}</p>
-          <div className="flex justify-between gap-3">
+          <div className="flex items-end justify-between gap-3">
             <h4 className="flex items-center">${price.toFixed(2)}</h4>
-            <div>
+            <div className="text-center">
               {rating && (
                 <div className="pb-3">
                   <StarRating

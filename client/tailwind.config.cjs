@@ -17,10 +17,6 @@ module.exports = {
       },
     },
     extend: {
-      backgroundImage: {
-        mainBanner:
-          'url("https://firebasestorage.googleapis.com/v0/b/smarthub-75eab.appspot.com/o/static_imgs%2Fparallaximg.webp?alt=media&token=e3cddb7a-faed-4228-b335-c42c34d540fa")',
-      },
       boxShadow: {
         'top-sm': '0 -1px 2px 0 rgba(0, 0, 0,  0.05)',
       },

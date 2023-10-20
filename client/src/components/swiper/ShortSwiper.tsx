@@ -46,9 +46,9 @@ function ShortSwiper({
           },
         }}
         modules={[Pagination, Navigation]}
-        className="-mr-4 pb-14"
+        style={{ paddingBottom: '56px', marginRight: '-16px' }}
       >
-        <SuspenseComponent fallback={<LoadingCircle isLoading />}>
+        <SuspenseComponent fallback={<LoadingCircle />}>
           {children}
         </SuspenseComponent>
         <div

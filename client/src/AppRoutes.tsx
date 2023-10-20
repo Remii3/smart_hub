@@ -2,10 +2,8 @@ import { Suspense, lazy, useContext } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import { UserContext } from './context/UserProvider';
 
-const ShopPage = lazy(() => import('./pages/shop/ShopPage'));
 const LoginPage = lazy(() => import('./pages/auth/LoginPage'));
 const RegisterPage = lazy(() => import('./pages/auth/RegisterPage'));
-const HomePage = lazy(() => import('./pages/home/HomePage'));
 const MyAccount = lazy(() => import('./pages/account_my/MyAccount'));
 const NewsPage = lazy(() => import('./pages/news/NewsPage'));
 const CollectionsPage = lazy(() => import('./pages/CollectionsPage'));
@@ -17,15 +15,23 @@ const ProductPage = lazy(() => import('./pages/product/ProductPage'));
 const SearchPage = lazy(() => import('./pages/search/SearchPage'));
 const OtherUserPage = lazy(() => import('./pages/account_other/OtherUserPage'));
 const OrderPage = lazy(() => import('./pages/OrderPage'));
-const ThankYouPage = lazy(() => import('@pages/checkout/ThankYouPage'));
+const ThankYouPage = lazy(() => import('./pages/checkout/ThankYouPage'));
+const ShopPage = lazy(() => import('./pages/shop/ShopPage'));
 
 import LoadingCircle from '@components/Loaders/LoadingCircle';
+import HomePage from '@pages/home/HomePage';
 
 export default function AppRoutes() {
   const { userData } = useContext(UserContext);
 
   return (
-    <Suspense fallback={<LoadingCircle />}>
+    <Suspense
+      fallback={
+        <div className="relative h-full min-h-screen w-full">
+          <LoadingCircle />
+        </div>
+      }
+    >
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/news" element={<NewsPage />} />
