@@ -25,7 +25,7 @@ export default function MainLayout() {
 
   return (
     <div id="mainContainer" className="relative overflow-clip bg-background">
-      {/* <Header currentPathname={pathname} /> */}
+      <Header currentPathname={pathname} />
       <main className="h-full min-h-[calc(100vh-64px-284px)] w-full">
         <AppRoutes />
       </main>

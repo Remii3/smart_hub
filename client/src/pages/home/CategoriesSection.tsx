@@ -66,11 +66,13 @@ export default function CategoriesSection() {
           ))}
         {!shopList.isLoading && shopList.hasError && (
           <div>
-            <h4>Error</h4>
-            <p>{shopList.hasError}</p>
+            <strong className="font-semibold">Error</strong>
+            <p>Couldn't get the categories</p>
           </div>
         )}
-        {!shopList.isLoading && !shopList.data && <p>No categories</p>}
+        {!shopList.isLoading && !shopList.data && !shopList.hasError && (
+          <p>No categories</p>
+        )}
         {!shopList.isLoading &&
           shopList.data &&
           shopList.data

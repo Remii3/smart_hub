@@ -21,7 +21,6 @@ const ShoppingBagIcon = lazy(
 const OutlinedUserIcon = lazy(
   () => import('@heroicons/react/24/outline/UserCircleIcon')
 );
-
 const MagnifyingGlassIcon = lazy(
   () => import('@heroicons/react/24/solid/MagnifyingGlassIcon')
 );
@@ -202,7 +201,7 @@ export default function Nav({ scrollFlag }: { scrollFlag: boolean }) {
 
           <div className="flex gap-4">
             <Popover>
-              <PopoverTrigger className="relative">
+              <PopoverTrigger className="relative" aria-label="Shopping cart">
                 <Suspense fallback={<LoadingCircle />}>
                   <ShoppingBagIcon className={` h-7 w-7`} />
                 </Suspense>
@@ -210,9 +209,9 @@ export default function Nav({ scrollFlag }: { scrollFlag: boolean }) {
                   <span
                     className={`${
                       scrollFlag
-                        ? 'bg-foreground/95 text-background'
-                        : 'bg-background text-foreground'
-                    } absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full transition-colors duration-200 ease-in-out`}
+                        ? 'bg-foreground/90 text-background'
+                        : 'bg-background/90 text-foreground'
+                    } absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full`}
                   >
                     {cartState.products.length}
                   </span>
@@ -228,7 +227,7 @@ export default function Nav({ scrollFlag }: { scrollFlag: boolean }) {
             </Popover>
             <div className="hidden items-center lg:flex">
               <Popover>
-                <PopoverTrigger>
+                <PopoverTrigger aria-label="Profile dropdown">
                   <Suspense fallback={<LoadingCircle />}>
                     {userData ? (
                       userData.user_info.profile_img.url ? (

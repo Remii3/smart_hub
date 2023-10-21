@@ -6,16 +6,16 @@ export default function MainBanner() {
   return (
     <ParallaxBanner
       style={{
-        height: '110vh',
+        height: 'calc(100vh + 64px)',
       }}
     >
-      <ParallaxBannerLayer speed={-20}>
+      <ParallaxBannerLayer speed={-15}>
         <img
           src="https://firebasestorage.googleapis.com/v0/b/smarthub-75eab.appspot.com/o/static_imgs%2Fparallaximg.webp?alt=media&token=e3cddb7a-faed-4228-b335-c42c34d540fa"
           alt="banner img"
           height={800}
           width={1336}
-          className="h-[140vh] w-full object-cover object-center brightness-50"
+          className="h-[calc(100vh+64px+19vh)]  w-full object-cover object-center brightness-50"
         />
       </ParallaxBannerLayer>
       <ParallaxBannerLayer>
@@ -23,7 +23,7 @@ export default function MainBanner() {
           <div className="mx-auto max-w-screen-xl px-4 py-[20%] sm:py-32 lg:flex lg:h-screen lg:items-center">
             <section
               id="mainPageTitle"
-              className="mx-auto max-w-xl text-center lg:max-w-3xl"
+              className="mx-auto max-w-xl text-left lg:max-w-3xl"
             >
               <h1 className=" font-extrabold text-background ">
                 Understand User Flow.
