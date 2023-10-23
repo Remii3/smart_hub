@@ -69,9 +69,8 @@ export default function Comments({
     isLoading: false,
     error: null,
   });
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState<null | string>(null);
   const { userData } = useContext(UserContext);
-
   const fetchData = useCallback(async () => {
     setComments((prevState) => {
       return { ...prevState, isLoading: true };
@@ -144,7 +143,11 @@ export default function Comments({
     fetchData();
   }, [fetchData]);
 
-  const deleteCommentHandler = async (commentId: string) => {
+  const deleteCommentHandler = async (
+    commentId: string,
+    value: { text: string; rating: number }
+  ) => {
+    console.log('comment id: ', commentId);
     const { error } = await usePostAccessDatabase({
       url: DATABASE_ENDPOINTS.COMMENT_DELETE,
       body: {
@@ -152,15 +155,15 @@ export default function Comments({
         targetId,
         commentId,
         userId: userData?._id,
+        value,
       },
     });
     if (error === null) {
       await fetchData();
       updateProductStatus();
-      setShowDeleteDialog(false);
+      setShowDeleteDialog(null);
     }
   };
-
   return (
     <div className="mt-8">
       <h5 className="pb-2">Comments</h5>
@@ -170,8 +173,12 @@ export default function Comments({
             {withRating && (
               <div className="mb-3">
                 <StarRating
-                  rating={newComment.rating ? newComment.rating : 0}
-                  setRating={setNewComment}
+                  rating={newComment.rating || 0}
+                  changeRatingHandler={(e) =>
+                    setNewComment((prevState) => {
+                      return { ...prevState, rating: e };
+                    })
+                  }
                 />
               </div>
             )}
@@ -288,44 +295,43 @@ export default function Comments({
                 </div>
                 <div>{comment.value.text}</div>
               </div>
-              {(userData?._id === comment.user._id ||
-                userData?.role === 'Admin') && (
-                <Dialog
-                  open={showDeleteDialog}
-                  onOpenChange={() => setShowDeleteDialog(false)}
+              <Dialog
+                open={showDeleteDialog === comment._id}
+                onOpenChange={() => setShowDeleteDialog(null)}
+              >
+                <Button
+                  variant={'destructive'}
+                  onClick={() => setShowDeleteDialog(comment._id)}
+                  type="button"
                 >
-                  <Button
-                    variant={'destructive'}
-                    onClick={() => setShowDeleteDialog(true)}
-                    type="button"
-                  >
-                    <TrashIcon className="h-6 w-6" />
-                  </Button>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>Are you sure?</DialogTitle>
-                      <DialogDescription>
-                        Deleting this will permamently remove the item from the
-                        database.
-                      </DialogDescription>
-                    </DialogHeader>
-                    <DialogFooter>
-                      <Button
-                        type="button"
-                        variant={'destructive'}
-                        onClick={() => deleteCommentHandler(comment._id)}
-                      >
-                        Delete
+                  <TrashIcon className="h-6 w-6" />
+                </Button>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Are you sure?</DialogTitle>
+                    <DialogDescription>
+                      Deleting this will permamently remove the item from the
+                      database.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <DialogFooter>
+                    <Button
+                      type="button"
+                      variant={'destructive'}
+                      onClick={() =>
+                        deleteCommentHandler(comment._id, comment.value)
+                      }
+                    >
+                      Delete
+                    </Button>
+                    <DialogClose asChild>
+                      <Button variant={'outline'} type="button">
+                        Cancel
                       </Button>
-                      <DialogClose asChild>
-                        <Button variant={'outline'} type="button">
-                          Cancel
-                        </Button>
-                      </DialogClose>
-                    </DialogFooter>
-                  </DialogContent>
-                </Dialog>
-              )}
+                    </DialogClose>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
             </div>
           ))}
       </section>

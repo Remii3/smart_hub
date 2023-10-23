@@ -68,7 +68,7 @@ export default function Pagination({
                   onClick={() => onPageChange(Number(pageNumber))}
                   className={`${
                     currentPage === pageNumber
-                      ? 'bg-blue-500 '
+                      ? 'bg-blue-500 text-background'
                       : 'hover:bg-blue-300'
                   } flex items-center justify-center rounded-lg px-3 py-2 transition-all duration-200 ease-in-out`}
                 >

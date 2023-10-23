@@ -20,7 +20,9 @@ export const SkeletonShopCard = ({
   height: string;
 }) => {
   return (
-    <Skeleton className={`${width} ${height} flex flex-col gap-8 p-3`}>
+    <Skeleton
+      className={`${width} ${height} flex min-w-[200px] max-w-[250px] flex-col gap-8 p-3`}
+    >
       <Skeleton className="h-3/5 w-full" />
       <div className="flex flex-col gap-2">
         <Skeleton className="h-3 w-3/4 md:w-1/2" />
@@ -118,25 +120,25 @@ export default function ShopCard({
             <p className="line-clamp-3 min-h-[72px]">{description}</p>
           </div>
         </div>
-        <div className="flex flex-col gap-3 px-3 pb-3">
-          <div className="flex items-end justify-between gap-3">
-            <h4 className="flex items-center">${price.toFixed(2)}</h4>
-            <div className="text-center">
-              {rating && (
-                <div className="pb-3">
-                  <StarRating
-                    showOnly
-                    rating={rating.rating ? rating.rating : 0}
-                  />
-                </div>
-              )}
-              <Button
-                type="submit"
-                variant="default"
-                disabled={isAddingToCart || itemBtnCapacity}
-              >
-                {isAddingToCart ? <LoadingCircle /> : 'Add to cart'}
-              </Button>
+        <div className="px-3 pb-3">
+          {rating && (
+            <div className="pb-1">
+              <StarRating showOnly rating={rating.rating ? rating.rating : 0} />
+            </div>
+          )}
+
+          <div className="flex flex-col gap-3">
+            <div className="flex items-end justify-between gap-3">
+              <h4 className="flex items-center">${price.toFixed(2)}</h4>
+              <div className="text-center">
+                <Button
+                  type="submit"
+                  variant="default"
+                  disabled={isAddingToCart || itemBtnCapacity}
+                >
+                  {isAddingToCart ? <LoadingCircle /> : 'Add to cart'}
+                </Button>
+              </div>
             </div>
           </div>
         </div>

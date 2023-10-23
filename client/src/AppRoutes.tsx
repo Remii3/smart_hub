@@ -1,5 +1,5 @@
 import { Suspense, lazy, useContext } from 'react';
-import { Route, Routes } from 'react-router-dom';
+import { Navigate, Route, Routes } from 'react-router-dom';
 import { UserContext } from './context/UserProvider';
 
 const LoginPage = lazy(() => import('./pages/auth/LoginPage'));
@@ -20,9 +20,11 @@ const ShopPage = lazy(() => import('./pages/shop/ShopPage'));
 
 import LoadingCircle from '@components/Loaders/LoadingCircle';
 import HomePage from '@pages/home/HomePage';
+import { CartContext } from '@context/CartProvider';
 
 export default function AppRoutes() {
   const { userData } = useContext(UserContext);
+  const { cartState } = useContext(CartContext);
 
   return (
     <Suspense
@@ -41,14 +43,25 @@ export default function AppRoutes() {
         <Route path="/search" element={<SearchPage />} />
         <Route path="/contact" element={<ContactPage />} />
         <Route path="/cart" element={<CartPage />} />
-        <Route path="/checkout" element={<CheckoutPage />} />
+        <Route
+          path="/checkout"
+          element={
+            cartState.products.length > 0 ? (
+              <CheckoutPage />
+            ) : (
+              <Navigate to={'/cart'} />
+            )
+          }
+        />
         <Route path="/thankyou" element={<ThankYouPage />} />
         <Route path="/account/register" element={<RegisterPage />} />
         <Route path="/account/login" element={<LoginPage />} />
         <Route path="/account/my/order/:id" element={<OrderPage />} />
         <Route
           path="/account/my"
-          element={userData ? <MyAccount /> : <RegisterPage />}
+          element={
+            userData ? <MyAccount /> : <Navigate to={'/account/register'} />
+          }
         />
         <Route path="/account/:userId" element={<OtherUserPage />} />
         <Route path="/*" element={<NoPage404 />} />

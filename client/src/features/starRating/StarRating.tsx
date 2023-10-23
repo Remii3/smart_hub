@@ -1,36 +1,23 @@
 import { useState } from 'react';
 import { StarIcon } from '@heroicons/react/24/solid';
 
-interface NewCommentTypes {
-  rating: null | number;
-  value: string;
-  isLoading: boolean;
-  error: null | string;
-}
-
 export default function StarRating({
-  initialValue,
   showOnly = false,
   rating,
-  setRating,
+  changeRatingHandler,
 }: {
-  initialValue?: number | null;
   showOnly?: boolean;
   rating: number;
-  setRating?: React.Dispatch<React.SetStateAction<NewCommentTypes>>;
+  changeRatingHandler?: (rateValue: number) => void;
 }) {
   const [hoveredValue, setHoveredValue] = useState(0);
 
   const handleStarClick = (value: number) => {
-    if (!showOnly && setRating) {
+    if (!showOnly && changeRatingHandler) {
       if (value === rating) {
-        setRating((prevState) => {
-          return { ...prevState, rating: 0 };
-        });
+        changeRatingHandler(0);
       } else {
-        setRating((prevState) => {
-          return { ...prevState, rating: value };
-        });
+        changeRatingHandler(value);
       }
     }
   };

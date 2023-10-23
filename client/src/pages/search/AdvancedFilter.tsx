@@ -1,112 +1,82 @@
 import { Button } from '@components/UI/button';
 import MarketplaceSelector from './MarketplaceSelector';
+import { Input } from '@components/UI/input';
+import { Label } from '@components/UI/label';
+import RatingFilter from './RatingFilter';
+import { SearchActionKind, SearchActions, SearchState } from './SearchPage';
+import PriceRangeFilter from './PriceRangeFilter';
 
 type AdvancedFilterTypes = {
+  searchState: SearchState;
+  dispatch: (e: SearchActions) => void;
   highestPrice: number;
-  filtersData: {
-    marketplace: {
-      name: string;
-      isChecked: boolean;
-    }[];
-    price: {
-      maxPrice: string | number;
-      minPrice: string | number;
-    };
-  };
-  onSelectMarketplace: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  onPriceChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  onMarketplaceReset: () => void;
-  onPriceReset: () => void;
 };
 
 export default function AdvancedFilter({
-  filtersData,
-  onSelectMarketplace,
-  onPriceChange,
-  onMarketplaceReset,
-  onPriceReset,
+  searchState,
+  dispatch,
   highestPrice,
 }: AdvancedFilterTypes) {
-  const { marketplace, price } = filtersData;
-
-  const clearAllSelectors = () => {
-    onMarketplaceReset();
-    onPriceReset();
+  const clearSelectedMarketplace = () => {
+    dispatch({ type: SearchActionKind.RESET_SELECTED_MARKETPLACE });
   };
-
+  const clearSelectedPriceRange = () => {
+    dispatch({ type: SearchActionKind.RESET_SELECT_PRICE_RANGE });
+  };
+  const clearSelectedSearch = () => {
+    dispatch({ type: SearchActionKind.RESET_SELECT_RATING });
+  };
+  const clearAll = () => {
+    clearSelectedMarketplace();
+    clearSelectedPriceRange();
+    clearSelectedSearch();
+  };
   return (
-    <div className="sticky top-20">
-      <div>
-        <p>Advanced filter</p>
-        <Button
-          variant="link"
-          size="default"
-          onClick={() => clearAllSelectors()}
-        >
+    <aside className="sticky top-20 w-full md:max-w-[250px]">
+      <section className="mb-2 flex items-center justify-between">
+        <p className="inline-block font-semibold">Advanced filter</p>
+        <Button variant="link" onClick={clearAll}>
           Clear all
         </Button>
-      </div>
-      <div>
-        <div>
-          <h6>Type of offer</h6>
-          <Button variant="link" size="default" onClick={onMarketplaceReset}>
+      </section>
+      <section className="mb-1">
+        <div className="flex items-center justify-between">
+          <p className="inline-block font-medium">Type of offer</p>
+          <Button variant="link" onClick={clearSelectedMarketplace}>
             Clear
           </Button>
         </div>
         <MarketplaceSelector
-          options={marketplace}
-          selectMarketplace={onSelectMarketplace}
+          options={searchState.marketplace}
+          dispatch={dispatch}
         />
-      </div>
-      <div>
-        {/* <div className="relative grid gap-8 bg-background p-7 lg:grid-cols-2"> */}
-        <div className="relative bg-background">
-          <div className="bg-background">
-            <Button variant="link" size="default" onClick={onPriceReset}>
-              Clear
-            </Button>
-
-            <div className="flex flex-wrap justify-between gap-4 sm:flex-nowrap">
-              <div className="w-full ">
-                <p>Min</p>
-                <label className="flex w-full items-center gap-2">
-                  <span className="text-sm text-gray-600">€</span>
-                  <input
-                    id="search-Min-PriceSelector"
-                    type="number"
-                    name="minPrice"
-                    placeholder={`From ${1}`}
-                    className="w-full rounded-md border-gray-200 shadow-sm sm:text-sm"
-                    min={1}
-                    value={price.minPrice}
-                    onChange={(e) => onPriceChange(e)}
-                  />
-                </label>
-              </div>
-              <div className="w-full">
-                <p>Max </p>
-                <label className="flex w-full items-center gap-2">
-                  <span className="text-sm text-gray-600">€</span>
-
-                  <input
-                    id="search-Max-PriceSelector"
-                    type="number"
-                    name="maxPrice"
-                    placeholder={`To ${highestPrice}`}
-                    className="w-full rounded-md border-gray-200 shadow-sm sm:text-sm"
-                    value={price.maxPrice}
-                    min={1}
-                    max={highestPrice}
-                    onChange={(e) => onPriceChange(e)}
-                  />
-                </label>
-              </div>
-            </div>
-          </div>
+      </section>
+      <section className="mb-1">
+        <div className="flex items-center justify-between">
+          <p className="inline-block font-medium">Price range</p>
+          <Button variant="link" onClick={clearSelectedPriceRange}>
+            Clear
+          </Button>
         </div>
-      </div>
-      <div>{/* Add price filter */}</div>
-      <div>{/* Add star filter */}</div>
-    </div>
+
+        <PriceRangeFilter
+          dispatch={dispatch}
+          highestPrice={highestPrice.toString()}
+          selectedPriceRange={searchState.selectedPriceRange}
+        />
+      </section>
+      <section className="mb-1">
+        <div className="flex items-center justify-between">
+          <p className="inline-block font-medium">Rating</p>
+          <Button variant="link" onClick={clearSelectedSearch}>
+            Clear
+          </Button>
+        </div>
+        <RatingFilter
+          selectedRating={searchState.selectedRating}
+          dispatch={dispatch}
+        />
+      </section>
+    </aside>
   );
 }

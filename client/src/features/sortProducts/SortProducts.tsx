@@ -3,7 +3,7 @@ import { sortOptionsArray } from '@hooks/useSortProducts';
 
 type SortProductsPropsTypes = {
   category: string;
-  sortOption: string;
+  sortOption: string | null;
   sortOptionChangeHandler: (e: ChangeEvent<HTMLSelectElement>) => void;
 };
 
@@ -12,6 +12,7 @@ export default function SortProducts({
   sortOption,
   sortOptionChangeHandler,
 }: SortProductsPropsTypes) {
+  if (!sortOption) return null;
   return (
     <div>
       <label htmlFor={`${category}-SortProducts`} className="sr-only">

@@ -29,18 +29,32 @@ const addOneComment = async (req, res) => {
   const { userId, targetId, value, target } = req.body;
 
   if (!userId) {
-    return res.status(422).json({ message: 'Provide user id' });
+    return res.status(422).json({ message: "Provide user id" });
   }
 
   if (!targetId) {
-    return res.status(422).json({ message: 'Provide target id' });
+    return res.status(422).json({ message: "Provide target id" });
   }
 
   try {
     const created_at = new Date().getTime();
     const _id = new mongoose.Types.ObjectId();
 
-    if (target === 'Product') {
+    const product = await Product.findOne({ _id: targetId });
+    const { rating } = product;
+
+    let preparedRating = 0;
+    let count = 0;
+    for (let i = 0; i < rating.length; i++) {
+      if (rating[i].value) {
+        count += rating[i].value;
+      }
+    }
+    count += value.rating;
+
+    preparedRating = count / (rating.length + 1);
+    const avgRating = Math.ceil(preparedRating);
+    if (target === "Product") {
       await Comment.create({
         _id,
         user: userId,
@@ -53,16 +67,17 @@ const addOneComment = async (req, res) => {
         await Product.updateOne(
           { _id: targetId },
           {
+            avgRating,
             $push: {
               rating: { value: value.rating, userId, commentId: _id },
             },
-          },
+          }
         );
       }
 
-      return res.status(201).json({ message: 'Success' });
+      return res.status(201).json({ message: "Success" });
     }
-    if (target === 'News') {
+    if (target === "News") {
       await Comment.create({
         _id,
         user: userId,
@@ -82,38 +97,51 @@ const addOneComment = async (req, res) => {
       //   );
       // }
 
-      return res.status(201).json({ message: 'Success' });
+      return res.status(201).json({ message: "Success" });
     }
   } catch (err) {
     return res
       .status(500)
-      .json({ message: 'Failed adding new comment', error: err.message });
+      .json({ message: "Failed adding new comment", error: err.message });
   }
 };
 
 const deleteOneComment = async (req, res) => {
-  const { commentId, userId, target, targetId } = req.body;
+  const { commentId, userId, target, targetId, value } = req.body;
   if (!commentId) {
-    return res.status(422).json({ message: 'Provide comment id' });
+    return res.status(422).json({ message: "Provide comment id" });
   }
   if (!userId) {
-    return res.status(422).json({ message: 'Provide user id' });
+    return res.status(422).json({ message: "Provide user id" });
   }
+  const product = await Product.findOne({ _id: targetId });
+  const { rating } = product;
+
+  let preparedRating = 0;
+  let count = 0;
+  for (let i = 0; i < rating.length; i++) {
+    if (rating[i].value) {
+      count += rating[i].value;
+    }
+  }
+  count -= value.rating;
+  preparedRating = count / (rating.length - 1);
+  const avgRating = Math.ceil(preparedRating);
   try {
     await User.updateOne({ _id: userId }, { $pull: { news: commentId } });
     await Comment.deleteOne({ _id: commentId });
-    if (target === 'Product') {
-      const test = await Product.updateOne(
+    if (target === "Product") {
+      await Product.updateOne(
         { _id: targetId },
-        { $pull: { rating: { commentId } } },
+        { avgRating, $pull: { rating: { commentId } } }
       );
     }
 
-    return res.status(200).json({ message: 'Success' });
+    return res.status(200).json({ message: "Success" });
   } catch (err) {
     return res
       .status(500)
-      .json({ message: 'Failed deleting a comment', error: err.message });
+      .json({ message: "Failed deleting a comment", error: err.message });
   }
 };
 

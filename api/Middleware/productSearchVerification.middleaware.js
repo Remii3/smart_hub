@@ -73,30 +73,37 @@ const productSearchVerification = async (req, res, next) => {
   finalQuery['market_place'] = { $in: names };
 
   if (
-    filtersData.price.minPrice !== '' &&
-    filtersData.price.minPrice >= 1 &&
-    filtersData.price.maxPrice !== '' &&
-    filtersData.price.maxPrice >= 1
+    filtersData.selectedPriceRange.minPrice !== "" &&
+    filtersData.selectedPriceRange.minPrice >= 1 &&
+    filtersData.selectedPriceRange.maxPrice !== "" &&
+    filtersData.selectedPriceRange.maxPrice >= 1
   ) {
-    finalQuery['shop_info.price'] = {
-      $gte: Number(filtersData.price.minPrice),
-      $lte: Number(filtersData.price.maxPrice),
+    finalQuery["shop_info.price"] = {
+      $gte: Number(filtersData.selectedPriceRange.minPrice),
+      $lte: Number(filtersData.selectedPriceRange.maxPrice),
     };
   } else if (
-    filtersData.price.minPrice !== '' &&
-    filtersData.price.minPrice >= 1
+    filtersData.selectedPriceRange.minPrice !== "" &&
+    filtersData.selectedPriceRange.minPrice >= 1
   ) {
-    finalQuery['shop_info.price'] = {
-      $gte: Number(filtersData.price.minPrice),
+    finalQuery["shop_info.price"] = {
+      $gte: Number(filtersData.selectedPriceRange.minPrice),
     };
   } else if (
-    filtersData.price.maxPrice !== '' &&
-    filtersData.price.maxPrice >= 1
+    filtersData.selectedPriceRange.maxPrice !== "" &&
+    filtersData.selectedPriceRange.maxPrice >= 1
   ) {
-    finalQuery['shop_info.price'] = {
-      $lte: Number(filtersData.price.maxPrice),
+    finalQuery["shop_info.price"] = {
+      $lte: Number(filtersData.selectedPriceRange.maxPrice),
     };
   }
+
+if (filtersData.selectedRating) {
+  finalQuery["avgRating"] = {
+    $lte: filtersData.selectedRating,
+  };
+}
+
   req.finalSearchData = {
     searchQuery: finalQuery,
     sortMetod: sort,

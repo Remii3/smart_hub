@@ -1,27 +1,44 @@
-import React from 'react';
+import { Checkbox } from '@components/UI/checkbox';
+import { Label } from '@components/UI/label';
+import { SearchActionKind, SearchActions } from './SearchPage';
+
+interface DispatchTypes extends SearchActions {
+  payload: { name: string; state: boolean | string };
+}
 
 type MarketplaceSelectorTypes = {
   options: { name: string; isChecked: boolean }[];
-  selectMarketplace: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  dispatch: (e: DispatchTypes) => void;
 };
 
 export default function MarketplaceSelector({
   options,
-  selectMarketplace,
+  dispatch,
 }: MarketplaceSelectorTypes) {
+  const selectHandler = (state: boolean | string, name: string) => {
+    dispatch({
+      type: SearchActionKind.CHANGE_SELECTED_MARKETPLACE,
+      payload: { state, name },
+    });
+  };
   return (
-    <div>
+    <>
       {options.map((option) => (
-        <div key={option.name}>
-          <span className="first-letter:uppercase">{option.name}</span>
-          <input
-            type="checkbox"
+        <div key={option.name} className="mb-2 flex items-center gap-1">
+          <Label
+            htmlFor={`filter-${option.name}`}
+            className="font-normal first-letter:uppercase"
+          >
+            {option.name}
+          </Label>
+          <Checkbox
+            id={`filter-${option.name}`}
             name={option.name}
-            onChange={(e) => selectMarketplace(e)}
+            onCheckedChange={(state) => selectHandler(state, option.name)}
             checked={option.isChecked}
           />
         </div>
       ))}
-    </div>
+    </>
   );
 }

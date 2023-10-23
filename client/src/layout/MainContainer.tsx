@@ -22,6 +22,9 @@ export default function MainContainer({
   ...props
 }: ContainerProps) {
   return (
-    <div className={cn(containerVariants({ variant }), className)} {...props} />
+    <div
+      className={'pt-6 ' + cn(containerVariants({ variant }), className)}
+      {...props}
+    />
   );
 }

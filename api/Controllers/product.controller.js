@@ -265,6 +265,7 @@ const addOneProduct = async (req, res) => {
           market_place,
           created_at,
           comments: [],
+          avgRating: 0,
           shop_info: {
             price: price.toString(),
           },
