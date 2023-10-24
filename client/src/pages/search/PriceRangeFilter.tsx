@@ -9,7 +9,11 @@ interface PropsTypes {
 export default function ({ highestPrice }: PropsTypes) {
   const [searchParams, setSearchParams] = useSearchParams();
   const changePriceRangeHandler = (name: string, value: string) => {
-    searchParams.set(name, value);
+    if (value.trim() === '') {
+      searchParams.delete(name);
+    } else {
+      searchParams.set(name, value);
+    }
     setSearchParams(searchParams, { replace: true });
   };
   return (

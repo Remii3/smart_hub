@@ -1,11 +1,11 @@
-import { ReactNode } from 'react';
+import { ReactNode, useRef } from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
 
 import { cn } from '@lib/utils';
 const containerVariants = cva('', {
   variants: {
     variant: {
-      default: 'container relative mx-auto px-4',
+      default: 'container relative mx-auto px-4 2xl:px-0',
     },
   },
   defaultVariants: {
@@ -23,7 +23,9 @@ export default function MainContainer({
 }: ContainerProps) {
   return (
     <div
-      className={'pt-6 ' + cn(containerVariants({ variant }), className)}
+      className={
+        'relative py-6 ' + cn(containerVariants({ variant }), className)
+      }
       {...props}
     />
   );

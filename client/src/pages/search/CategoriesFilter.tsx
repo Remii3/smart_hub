@@ -28,7 +28,6 @@ export default function CategoriesFilter() {
   }, [fetchCategories]);
 
   const selectHandler = (newValue: any, actionMeta: any) => {
-    console.log(actionMeta);
     switch (actionMeta.action) {
       case 'select-option': {
         searchParams.append('category', actionMeta.option.value);
@@ -60,8 +59,9 @@ export default function CategoriesFilter() {
   });
 
   return (
-    <div className={`${menuOpen && 'h-[300px]'}`}>
+    <div>
       <Select
+        menuPlacement="top"
         maxMenuHeight={250}
         onMenuOpen={() => setMenuOpen(true)}
         onMenuClose={() => setMenuOpen(false)}

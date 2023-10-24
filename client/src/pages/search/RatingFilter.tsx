@@ -11,7 +11,7 @@ export default function RatingFilter() {
   return (
     <div className="flex items-end gap-1">
       <StarRating
-        rating={Number(searchParams.get('rating')) || 5}
+        rating={Number(searchParams.get('rating'))}
         changeRatingHandler={handleChange}
       />
       <span className="block text-sm text-slate-400">

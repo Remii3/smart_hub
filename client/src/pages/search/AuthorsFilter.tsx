@@ -18,7 +18,6 @@ export default function AuthorsFilter() {
     if (error) {
       return;
     }
-    console.log(data);
     setAuthorsState((prevState) => {
       return { ...prevState, options: [...data] };
     });
@@ -60,8 +59,9 @@ export default function AuthorsFilter() {
   });
 
   return (
-    <div className={`${menuOpen && 'h-[300px]'}`}>
+    <div>
       <Select
+        menuPlacement="top"
         maxMenuHeight={250}
         onMenuOpen={() => setMenuOpen(true)}
         onMenuClose={() => setMenuOpen(false)}

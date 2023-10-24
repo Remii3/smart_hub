@@ -1,10 +1,10 @@
 const Category = require('../Models/category');
-const User = require("../Models/user");
+const User = require('../Models/user');
 
 const productSearchVerification = async (req, res, next) => {
-  let { phrase, page, pageSize, filtersData, sortOption } = req.query;
+  let { pageSize, filtersData } = req.query;
 
-  let currentPage = page;
+  let currentPage = filtersData.page;
   if (!currentPage) {
     currentPage = 1;
   }
@@ -17,7 +17,7 @@ const productSearchVerification = async (req, res, next) => {
   const skip = (currentPage - 1) * currentPageSize;
 
   let sort = {};
-  switch (sortOption) {
+  switch (filtersData.sortOption) {
     case 'Date, ASC':
       sort.created_at = 1;
       break;
@@ -41,62 +41,59 @@ const productSearchVerification = async (req, res, next) => {
       sort['shop_info.price'] = 1;
       break;
   }
-console.log("filtersData: ", filtersData);
-const searchParams = new URLSearchParams(phrase);
-const finalQuery = {};
-const finalRawData = { queries: [] };
-let specialQuery = null;
-for (const [key, value] of searchParams.entries()) {
-  if (key === "phrase") {
-    finalQuery["$text"] = { $search: `${value}` };
-    finalRawData.queries = [...finalRawData.queries, { key, value }];
+  const finalQuery = {};
+  const finalRawData = { queries: [] };
+  let specialQuery = null;
+
+  if (filtersData.searchedPhrase) {
+    finalQuery['$text'] = { $search: `${filtersData.searchedPhrase}` };
+    finalRawData.queries = [...finalRawData.queries];
   }
 
-  if (key === "special") {
-    specialQuery = value;
-    finalRawData.queries = [...finalRawData.queries, { key, value }];
+  if (filtersData.searchedSpecial) {
+    specialQuery = filtersData.searchedSpecial;
+    finalRawData.queries = [...finalRawData.queries];
   }
-}
-if (filtersData.selectedAuthors && filtersData.selectedAuthors.length > 0) {
-  const authors = [];
+  if (filtersData.selectedAuthors && filtersData.selectedAuthors.length > 0) {
+    const authors = [];
 
-  for (let i = 0; i < filtersData.selectedAuthors.length; i++) {
-    const author = await User.findOne({
-      "author_info.pseudonim": filtersData.selectedAuthors[i],
+    for (let i = 0; i < filtersData.selectedAuthors.length; i++) {
+      const author = await User.findOne({
+        'author_info.pseudonim': filtersData.selectedAuthors[i],
+      });
+      authors.push(author._id);
+    }
+
+    finalQuery['authors'] = { $in: authors };
+    finalRawData.queries = [...finalRawData.queries];
+  }
+
+  if (
+    filtersData.selectedCategories &&
+    filtersData.selectedCategories.length > 0
+  ) {
+    const categories = [];
+
+    for (let i = 0; i < filtersData.selectedCategories.length; i++) {
+      const category = await Category.findOne({
+        value: filtersData.selectedCategories[i],
+      });
+      categories.push(category._id);
+    }
+
+    finalQuery['categories'] = { $in: categories };
+    finalRawData.queries = [...finalRawData.queries];
+  }
+
+  const marketplaces = filtersData.marketplace;
+  const names = [];
+  if (marketplaces) {
+    marketplaces.forEach(item => {
+      names.push(item.charAt(0).toUpperCase() + item.slice(1));
     });
-    authors.push(author._id);
   }
 
-  finalQuery["authors"] = { $in: authors };
-  finalRawData.queries = [...finalRawData.queries];
-}
-
-if (
-  filtersData.selectedCategories &&
-  filtersData.selectedCategories.length > 0
-) {
-  const categories = [];
-
-  for (let i = 0; i < filtersData.selectedCategories.length; i++) {
-    const category = await Category.findOne({
-      value: filtersData.selectedCategories[i],
-    });
-    categories.push(category._id);
-  }
-
-  finalQuery["categories"] = { $in: categories };
-  finalRawData.queries = [...finalRawData.queries];
-}
-
-const marketplaces = filtersData.marketplace;
-const names = [];
-if (marketplaces) {
-  marketplaces.forEach((item) => {
-    names.push(item.charAt(0).toUpperCase() + item.slice(1));
-  });
-}
-
-finalQuery["market_place"] = { $in: names };
+  finalQuery['market_place'] = { $in: names };
 
   if (
     filtersData.selectedPriceRange.minPrice &&

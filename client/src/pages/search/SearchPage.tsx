@@ -1,14 +1,8 @@
-import {
-  useState,
-  useEffect,
-  ChangeEvent,
-  useCallback,
-  useReducer,
-} from 'react';
-import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
+import { useState, useEffect, ChangeEvent, useCallback, useRef } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import AdvancedFilter from '@pages/search/AdvancedFilter';
 import { UnknownProductTypes } from '@customTypes/interfaces';
-import ShopCard, { SkeletonShopCard } from '@components/cards/ShopCard';
+import ShopCard from '@components/cards/ShopCard';
 import MainContainer from '@layout/MainContainer';
 import Pagination from '@components/paginations/Pagination';
 import SortProducts from '@features/sortProducts/SortProducts';
@@ -16,48 +10,47 @@ import { useGetAccessDatabase } from '../../hooks/useAaccessDatabase';
 import { DATABASE_ENDPOINTS } from '../../data/endpoints';
 import { sortOptions, sortOptionsArray } from '@hooks/useSortProducts';
 import { Badge } from '@components/UI/badge';
+import LoadingCircle from '@components/Loaders/LoadingCircle';
+import { toast } from '@components/UI/use-toast';
 
 interface SearchedProductsDataTypes {
-  products: UnknownProductTypes[] | null;
+  products: UnknownProductTypes[];
   rawData: {
-    queries: [{ key: 'author' | 'category' | 'special'; value: string }] | null;
-    author: string;
+    queries: {
+      phrase: string;
+      authors: string[];
+      categories: string[];
+      page: string;
+      marketplace: string[];
+      minPrice: string;
+      maxPrice: string;
+      rating: string;
+    } | null;
     totalPages: number;
     totalProducts: number;
     highestPrice: number;
-    newCurrentPage: number;
   };
   isLoading: boolean;
 }
+type FilterParams = 'phrase' | 'category' | 'author';
 
 export default function SearchPage() {
-  const urlParams = new URLSearchParams();
   const [searchParams, setSearchParams] = useSearchParams();
-  const searchPhrase = searchParams.get('phrase') || null;
-  const searchCategory = searchParams.get('category') || null;
-  const searchAuthor = searchParams.get('author') || null;
-  const searchPage = searchParams.get('page') || 1;
-  const searchSortMethod =
-    searchParams.get('sortMethod') || sortOptions.DATE_DESC;
+  const currentSortMethod = searchParams.get('sortMethod');
 
-  const searchQuery = useLocation();
   const pageIteration = 5;
 
   const [searchedProductsData, setSearchedProductsData] =
     useState<SearchedProductsDataTypes>({
-      products: null,
+      products: [],
       rawData: {
         queries: null,
-        author: '',
         totalPages: 0,
         totalProducts: 0,
         highestPrice: 0,
-        newCurrentPage: Number(searchPage),
       },
       isLoading: false,
     });
-  const defaultSearch = searchParams.get('sortMethod');
-  const updatedQuery = searchQuery.search.slice(1);
 
   const fetchData = useCallback(async () => {
     setSearchedProductsData((prevState) => {
@@ -73,52 +66,77 @@ export default function SearchPage() {
       selectedRating: searchParams.get('rating') || 5,
       selectedCategories: searchParams.getAll('category'),
       selectedAuthors: searchParams.getAll('author'),
+      searchedPhrase: searchParams.get('phrase'),
+      page: searchParams.get('page'),
+      sortOption: searchParams.get('sortMethod'),
     };
-    const { data } = await useGetAccessDatabase({
+    const { data, error } = await useGetAccessDatabase({
       url: DATABASE_ENDPOINTS.PRODUCT_SEARCHED,
       params: {
-        phrase: updatedQuery,
-        page: searchPage,
         pageSize: pageIteration,
         filtersData: newFilters,
-        sortOption: searchSortMethod,
       },
     });
 
+    if (error) {
+      setSearchedProductsData((prevState) => {
+        return { ...prevState, isLoading: false };
+      });
+      return toast({
+        variant: 'destructive',
+        title: 'Uh oh! Something went wrong.',
+        description: 'We failed downloading the products',
+      });
+    }
     setSearchedProductsData({
-      products: (data && data.products) || [],
-      rawData: data && data.finalRawData,
+      products: data.products,
+      rawData: data.finalRawData,
       isLoading: false,
     });
-  }, [updatedQuery, searchParams]);
+  }, [searchParams]);
 
-  const removeQueryHandler = (paramValue: any, paramKey: string) => {
+  const removeQueryHandler = (paramValue: string, paramKey: FilterParams) => {
     switch (paramKey) {
-      case 'category':
-        {
-          const categories = searchParams
-            .getAll('category')
-            .filter((item) => item !== paramValue);
-          searchParams.delete('category');
-          if (categories) {
-            categories.forEach((item) => searchParams.append('category', item));
-          }
+      case 'phrase': {
+        searchParams.delete('phrase');
+        setSearchParams(searchParams);
+        break;
+      }
+      case 'category': {
+        const categories = searchParams
+          .getAll('category')
+          .filter((item) => item !== paramValue);
+        searchParams.delete('category');
+        if (categories) {
+          categories.forEach((item) => searchParams.append('category', item));
         }
         break;
-      case 'author':
-        {
-          const authors = searchParams
-            .getAll('author')
-            .filter((item) => item !== paramValue);
-          searchParams.delete('author');
-          if (authors) {
-            authors.forEach((item) => searchParams.append('author', item));
-          }
+      }
+      case 'author': {
+        const authors = searchParams
+          .getAll('author')
+          .filter((item) => item !== paramValue);
+        searchParams.delete('author');
+        if (authors) {
+          authors.forEach((item) => searchParams.append('author', item));
         }
         break;
+      }
+      default:
+        return;
     }
     setSearchParams(searchParams, { replace: true });
   };
+
+  const ref = useRef(document.getElementById('mainContainer'));
+  useEffect(() => {
+    if (searchedProductsData.products) {
+      ref.current?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      });
+    }
+  }, [searchedProductsData.products]);
 
   const changeCurrentPageHandler = (newPageNumber: number) => {
     searchParams.set('page', `${newPageNumber}`);
@@ -140,42 +158,31 @@ export default function SearchPage() {
   }, [fetchData]);
 
   useEffect(() => {
-    if (!defaultSearch) {
-      const newUrl = window.location;
-      let preparedUrl = `${newUrl.origin}${newUrl.pathname}?`;
+    if (!currentSortMethod) {
+      const searchPage = searchParams.get('page');
+      const searchMarketplace = searchParams.get('marketplace');
+      const searchRating = searchParams.get('rating');
+      const searchSortMethod = searchParams.get('sortMethod');
 
-      if (searchCategory) {
-        urlParams.set('category', `${searchCategory}`);
-        searchParams.set('category', `${searchCategory}`);
+      if (!searchMarketplace) {
+        searchParams.set('marketplace', 'shop');
       }
-      if (searchPhrase) {
-        urlParams.set('phrase', `${searchPhrase}`);
+
+      if (!searchRating) {
+        searchParams.set('rating', '5');
       }
-      if (searchAuthor) {
-        urlParams.set('author', `${searchAuthor}`);
+      if (!searchPage) {
+        searchParams.set('page', '1');
       }
-      searchParams.set('marketplace', `shop`);
-      urlParams.set('marketplace', `shop`);
-
-      searchParams.set('maxPrice', ``);
-      urlParams.set('maxPrice', ``);
-
-      searchParams.set('minPrice', ``);
-      urlParams.set('minPrice', ``);
-
-      searchParams.set('rating', `5`);
-      urlParams.set('rating', `5`);
-      searchParams.set('page', `${searchPage}`);
-      urlParams.set('page', `${searchPage}`);
-      searchParams.set('sortMethod', `${searchSortMethod}`);
-      urlParams.set('sortMethod', `${searchSortMethod}`);
+      if (!searchSortMethod) {
+        searchParams.set('sortMethod', sortOptions.DATE_DESC);
+      }
       setSearchParams(searchParams, { replace: true });
-      window.history.replaceState(null, '', preparedUrl + urlParams);
     }
   }, []);
   return (
     <MainContainer>
-      <div className="mb-2 flex justify-between">
+      <div className="fixed left-7 right-7 top-16 z-10 flex justify-between bg-background pt-2 md:static md:mb-2 md:pt-0">
         <p>
           Results:{' '}
           {searchedProductsData.rawData &&
@@ -184,11 +191,12 @@ export default function SearchPage() {
         <div>
           <SortProducts
             category="search"
-            sortOption={searchSortMethod}
+            sortOption={currentSortMethod}
             sortOptionChangeHandler={sortOptionChangeHandler}
           />
         </div>
       </div>
+
       <div className="flex flex-col justify-between gap-8 md:flex-row">
         <AdvancedFilter
           highestPrice={
@@ -197,24 +205,29 @@ export default function SearchPage() {
             0
           }
         />
-        <section className="w-full space-y-1">
+        <section className="h-full w-full space-y-2 pt-[calc(58px+48px+8px)] md:pt-0">
           {(searchParams.get('phrase') ||
             searchParams.get('category') ||
             searchParams.get('author')) && (
             <>
               {searchParams.get('phrase') && (
-                <ul className="grid auto-cols-max grid-flow-col auto-rows-max gap-5 py-1">
+                <ul className="grid auto-cols-max grid-flow-col auto-rows-max gap-5 px-2 py-1">
                   {searchParams.getAll('phrase').map((query) => (
                     <li key={query}>
-                      <Badge variant={'outline'} className="p-0">
+                      <Badge variant={'outline'} className="bg-sky-100 p-0">
                         <button
                           name={query}
                           type="button"
                           onClick={() => removeQueryHandler(query, 'phrase')}
-                          className="space-x-2 px-[10px] py-[1px]"
+                          className="group relative px-[10px] py-1"
                         >
-                          <span className=" text-sm">{query}</span>
-                          <span>X</span>
+                          <div className="absolute inset-0 h-full w-full rounded-md bg-black opacity-0 transition-opacity ease-out group-hover:opacity-10" />
+                          <span className="text-sm text-sky-700 group-hover:brightness-90">
+                            {query}
+                          </span>
+                          <div className="absolute -left-2 -top-1 box-border h-4 w-4 rounded-full border bg-sky-100 text-sky-600">
+                            X
+                          </div>
                         </button>
                       </Badge>
                     </li>
@@ -222,7 +235,7 @@ export default function SearchPage() {
                 </ul>
               )}
               {searchParams.get('author') && (
-                <ul className="grid auto-cols-max grid-flow-col auto-rows-max gap-5 py-1">
+                <ul className="grid auto-cols-max grid-flow-col auto-rows-max gap-5 px-2 py-1">
                   {searchParams.getAll('author').map((query) => (
                     <li key={query}>
                       <Badge variant={'outline'} className="bg-purple-100 p-0">
@@ -230,7 +243,7 @@ export default function SearchPage() {
                           name={query}
                           type="button"
                           onClick={() => removeQueryHandler(query, 'author')}
-                          className="group relative px-[10px] py-[1px]"
+                          className="group relative px-[10px] py-1"
                         >
                           <div className="absolute inset-0 h-full w-full rounded-md bg-black opacity-0 transition-opacity ease-out group-hover:opacity-10" />
                           <span className="text-sm text-purple-700 group-hover:brightness-90">
@@ -246,7 +259,7 @@ export default function SearchPage() {
                 </ul>
               )}
               {searchParams.get('category') && (
-                <ul className="grid auto-cols-max grid-flow-col auto-rows-max gap-5 py-1">
+                <ul className="grid auto-cols-max grid-flow-col auto-rows-max gap-5 px-2 py-1">
                   {searchParams.getAll('category').map((query) => (
                     <li key={query}>
                       <Badge variant={'outline'} className="bg-green-100 p-0">
@@ -254,7 +267,7 @@ export default function SearchPage() {
                           name={query}
                           type="button"
                           onClick={() => removeQueryHandler(query, 'category')}
-                          className="group relative px-[10px] py-[1px]"
+                          className="group relative px-[10px] py-1"
                         >
                           <div className="absolute inset-0 h-full w-full rounded-md bg-black opacity-0 transition-opacity ease-out group-hover:opacity-10" />
                           <span className="text-sm text-green-700 group-hover:brightness-90">
@@ -279,53 +292,51 @@ export default function SearchPage() {
                 No products
               </div>
             )}
-          <div>
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {searchedProductsData.isLoading &&
-                [...Array(5)].map((el, index) => (
-                  <SkeletonShopCard
-                    key={index}
-                    height="h-[300px]"
-                    width="w-full"
+          <div className="relative h-full">
+            {searchedProductsData.isLoading && (
+              <div className="h-full w-full">
+                <LoadingCircle />
+              </div>
+            )}
+            <div className="md:min-h-[400px]">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                {!searchedProductsData.isLoading &&
+                  searchedProductsData.products &&
+                  searchedProductsData.products.map((item) => {
+                    return (
+                      item.market_place === 'Shop' && (
+                        <ShopCard
+                          key={item._id}
+                          _id={item._id}
+                          price={item.shop_info.price}
+                          productQuantity={item.quantity}
+                          title={item.title}
+                          authors={item.authors}
+                          description={item.description}
+                          img={
+                            item.imgs && item.imgs.length > 0
+                              ? item.imgs[0].url
+                              : null
+                          }
+                          rating={item.rating}
+                        />
+                      )
+                    );
+                  })}
+              </div>
+              <div className="my-3 flex w-full justify-center">
+                {searchedProductsData.rawData && (
+                  <Pagination
+                    currentPage={Number(searchParams.get('page')) || 1}
+                    totalCount={searchedProductsData.rawData.totalProducts}
+                    pageSize={pageIteration}
+                    onPageChange={(newPageNumber: number) =>
+                      changeCurrentPageHandler(newPageNumber)
+                    }
+                    siblingCount={1}
                   />
-                ))}
-
-              {!searchedProductsData.isLoading &&
-                searchedProductsData.products &&
-                searchedProductsData.products.map((item) => {
-                  return (
-                    item.market_place === 'Shop' && (
-                      <ShopCard
-                        key={item._id}
-                        _id={item._id}
-                        price={item.shop_info.price}
-                        productQuantity={item.quantity}
-                        title={item.title}
-                        authors={item.authors}
-                        description={item.description}
-                        img={
-                          item.imgs && item.imgs.length > 0
-                            ? item.imgs[0].url
-                            : null
-                        }
-                        rating={item.rating}
-                      />
-                    )
-                  );
-                })}
-            </div>
-            <div className="my-3 flex w-full justify-center">
-              {searchedProductsData.rawData && (
-                <Pagination
-                  currentPage={Number(searchPage)}
-                  totalCount={searchedProductsData.rawData.totalProducts}
-                  pageSize={pageIteration}
-                  onPageChange={(newPageNumber: number) =>
-                    changeCurrentPageHandler(newPageNumber)
-                  }
-                  siblingCount={1}
-                />
-              )}
+                )}
+              </div>
             </div>
           </div>
         </section>
