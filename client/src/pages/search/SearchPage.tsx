@@ -58,7 +58,6 @@ export default function SearchPage() {
     });
   const defaultSearch = searchParams.get('sortMethod');
   const updatedQuery = searchQuery.search.slice(1);
-  const navigate = useNavigate();
 
   const fetchData = useCallback(async () => {
     setSearchedProductsData((prevState) => {
@@ -72,6 +71,8 @@ export default function SearchPage() {
         minPrice: searchParams.get('minPrice') || '',
       },
       selectedRating: searchParams.get('rating') || 5,
+      selectedCategories: searchParams.getAll('category'),
+      selectedAuthors: searchParams.getAll('author'),
     };
     const { data } = await useGetAccessDatabase({
       url: DATABASE_ENDPOINTS.PRODUCT_SEARCHED,
@@ -91,13 +92,32 @@ export default function SearchPage() {
     });
   }, [updatedQuery, searchParams]);
 
-  const removeQueryHandler = (e: any) => {
-    const currentQueryParams = new URLSearchParams(searchQuery.search);
-    currentQueryParams.delete(e.currentTarget.name);
-    navigate({
-      pathname: '/search',
-      search: currentQueryParams.toString(),
-    });
+  const removeQueryHandler = (paramValue: any, paramKey: string) => {
+    switch (paramKey) {
+      case 'category':
+        {
+          const categories = searchParams
+            .getAll('category')
+            .filter((item) => item !== paramValue);
+          searchParams.delete('category');
+          if (categories) {
+            categories.forEach((item) => searchParams.append('category', item));
+          }
+        }
+        break;
+      case 'author':
+        {
+          const authors = searchParams
+            .getAll('author')
+            .filter((item) => item !== paramValue);
+          searchParams.delete('author');
+          if (authors) {
+            authors.forEach((item) => searchParams.append('author', item));
+          }
+        }
+        break;
+    }
+    setSearchParams(searchParams, { replace: true });
   };
 
   const changeCurrentPageHandler = (newPageNumber: number) => {
@@ -177,29 +197,79 @@ export default function SearchPage() {
             0
           }
         />
-        <section className="w-full space-y-2">
+        <section className="w-full space-y-1">
           {(searchParams.get('phrase') ||
             searchParams.get('category') ||
             searchParams.get('author')) && (
-            <ul className="grid auto-cols-max grid-flow-col auto-rows-max gap-5 py-1">
-              {searchedProductsData.rawData &&
-                searchedProductsData.rawData.queries &&
-                searchedProductsData.rawData.queries.map((query) => (
-                  <li key={query.key}>
-                    <Badge variant={'outline'} className="p-0">
-                      <button
-                        name={query.key}
-                        type="button"
-                        onClick={(e) => removeQueryHandler(e)}
-                        className="space-x-2 px-[10px] py-[1px]"
-                      >
-                        <span className=" text-sm">{query.value}</span>
-                        <span>X</span>
-                      </button>
-                    </Badge>
-                  </li>
-                ))}
-            </ul>
+            <>
+              {searchParams.get('phrase') && (
+                <ul className="grid auto-cols-max grid-flow-col auto-rows-max gap-5 py-1">
+                  {searchParams.getAll('phrase').map((query) => (
+                    <li key={query}>
+                      <Badge variant={'outline'} className="p-0">
+                        <button
+                          name={query}
+                          type="button"
+                          onClick={() => removeQueryHandler(query, 'phrase')}
+                          className="space-x-2 px-[10px] py-[1px]"
+                        >
+                          <span className=" text-sm">{query}</span>
+                          <span>X</span>
+                        </button>
+                      </Badge>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              {searchParams.get('author') && (
+                <ul className="grid auto-cols-max grid-flow-col auto-rows-max gap-5 py-1">
+                  {searchParams.getAll('author').map((query) => (
+                    <li key={query}>
+                      <Badge variant={'outline'} className="bg-purple-100 p-0">
+                        <button
+                          name={query}
+                          type="button"
+                          onClick={() => removeQueryHandler(query, 'author')}
+                          className="group relative px-[10px] py-[1px]"
+                        >
+                          <div className="absolute inset-0 h-full w-full rounded-md bg-black opacity-0 transition-opacity ease-out group-hover:opacity-10" />
+                          <span className="text-sm text-purple-700 group-hover:brightness-90">
+                            {query}
+                          </span>
+                          <div className="absolute -left-2 -top-1 box-border h-4 w-4 rounded-full border bg-purple-100 text-purple-600">
+                            X
+                          </div>
+                        </button>
+                      </Badge>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              {searchParams.get('category') && (
+                <ul className="grid auto-cols-max grid-flow-col auto-rows-max gap-5 py-1">
+                  {searchParams.getAll('category').map((query) => (
+                    <li key={query}>
+                      <Badge variant={'outline'} className="bg-green-100 p-0">
+                        <button
+                          name={query}
+                          type="button"
+                          onClick={() => removeQueryHandler(query, 'category')}
+                          className="group relative px-[10px] py-[1px]"
+                        >
+                          <div className="absolute inset-0 h-full w-full rounded-md bg-black opacity-0 transition-opacity ease-out group-hover:opacity-10" />
+                          <span className="text-sm text-green-700 group-hover:brightness-90">
+                            {query}
+                          </span>
+                          <div className="absolute -left-2 -top-1 box-border h-4 w-4 rounded-full border bg-green-100 text-green-600">
+                            X
+                          </div>
+                        </button>
+                      </Badge>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </>
           )}
 
           {!searchedProductsData.isLoading &&

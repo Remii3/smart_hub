@@ -201,7 +201,11 @@ export default function BasicProductCollection({
                   title={product.title}
                   authors={product.authors}
                   description={product.description}
-                  img={product.imgs && product.imgs[0].url}
+                  img={
+                    product.imgs && product.imgs.length > 0
+                      ? product.imgs[0].url
+                      : ''
+                  }
                   rating={product.rating}
                 />
               </SwiperSlide>

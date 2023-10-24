@@ -184,11 +184,13 @@ const getSearchedProducts = async (req, res) => {
       let flag = false;
 
       let newSkip = skipPages;
+      console.log("searchQuery: ", searchQuery);
       do {
         products = await Product.find(searchQuery)
           .sort(sortMetod)
           .skip(newSkip)
-          .limit(limitPages);
+          .limit(limitPages)
+          .populate("authors");
         if (products.length <= 0 && skipPages > 1 && newCurrentPage > 1) {
           flag = true;
           newSkip -= skipPages;

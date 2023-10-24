@@ -81,7 +81,6 @@ export default function ShopCard({
   } else {
     itemBtnCapacity = productQuantity! < 1 || false;
   }
-
   return (
     <div id={`${_id}`} className="mx-auto h-full w-full max-w-[280px]">
       <form
