@@ -1,41 +1,45 @@
 import { Checkbox } from '@components/UI/checkbox';
 import { Label } from '@components/UI/label';
-import { SearchActionKind, SearchActions } from './SearchPage';
+import { useSearchParams } from 'react-router-dom';
 
-interface DispatchTypes extends SearchActions {
-  payload: { name: string; state: boolean | string };
-}
+export default function MarketplaceSelector() {
+  const [searchParams, setSearchParams] = useSearchParams();
 
-type MarketplaceSelectorTypes = {
-  options: { name: string; isChecked: boolean }[];
-  dispatch: (e: DispatchTypes) => void;
-};
+  const marketplaces = ['shop', 'collection'];
 
-export default function MarketplaceSelector({
-  options,
-  dispatch,
-}: MarketplaceSelectorTypes) {
   const selectHandler = (state: boolean | string, name: string) => {
-    dispatch({
-      type: SearchActionKind.CHANGE_SELECTED_MARKETPLACE,
-      payload: { state, name },
-    });
+    const all = searchParams.getAll('marketplace');
+    if (all.includes(name)) {
+      const newList = all.filter((item) => item !== name);
+      console.log('newList', newList);
+      if (newList.length > 0) {
+        newList.forEach((item) => searchParams.set('marketplace', item));
+      } else {
+        searchParams.delete('marketplace');
+      }
+    } else {
+      searchParams.append('marketplace', name);
+    }
+    setSearchParams(searchParams, { replace: true });
   };
+
   return (
     <>
-      {options.map((option) => (
-        <div key={option.name} className="mb-2 flex items-center gap-1">
+      {marketplaces.map((option) => (
+        <div key={option} className="mb-2 flex items-center gap-1">
           <Label
-            htmlFor={`filter-${option.name}`}
+            htmlFor={`filter-${option}`}
             className="font-normal first-letter:uppercase"
           >
-            {option.name}
+            {option}
           </Label>
           <Checkbox
-            id={`filter-${option.name}`}
-            name={option.name}
-            onCheckedChange={(state) => selectHandler(state, option.name)}
-            checked={option.isChecked}
+            id={`filter-${option}`}
+            name={option}
+            onCheckedChange={(state) => selectHandler(state, option)}
+            checked={
+              searchParams.getAll('marketplace').includes(option) || false
+            }
           />
         </div>
       ))}

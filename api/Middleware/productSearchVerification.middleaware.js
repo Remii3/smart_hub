@@ -61,48 +61,49 @@ const productSearchVerification = async (req, res, next) => {
     }
   }
 
-  const marketplaces = filtersData.marketplace.filter(item => {
-    return item.isChecked === 'true';
-  });
-
+  const marketplaces = filtersData.marketplace;
+  console.log(marketplaces);
   const names = [];
-  marketplaces.forEach(item => {
-    names.push(item.name.charAt(0).toUpperCase() + item.name.slice(1));
-  });
+  if (marketplaces) {
+    marketplaces.forEach(item => {
+      names.push(item.charAt(0).toUpperCase() + item.slice(1));
+    });
+  }
 
   finalQuery['market_place'] = { $in: names };
+  console.log(filtersData);
 
   if (
-    filtersData.selectedPriceRange.minPrice !== "" &&
+    filtersData.selectedPriceRange.minPrice &&
     filtersData.selectedPriceRange.minPrice >= 1 &&
-    filtersData.selectedPriceRange.maxPrice !== "" &&
+    filtersData.selectedPriceRange.maxPrice &&
     filtersData.selectedPriceRange.maxPrice >= 1
   ) {
-    finalQuery["shop_info.price"] = {
+    finalQuery['shop_info.price'] = {
       $gte: Number(filtersData.selectedPriceRange.minPrice),
       $lte: Number(filtersData.selectedPriceRange.maxPrice),
     };
   } else if (
-    filtersData.selectedPriceRange.minPrice !== "" &&
+    filtersData.selectedPriceRange.minPrice &&
     filtersData.selectedPriceRange.minPrice >= 1
   ) {
-    finalQuery["shop_info.price"] = {
+    finalQuery['shop_info.price'] = {
       $gte: Number(filtersData.selectedPriceRange.minPrice),
     };
   } else if (
-    filtersData.selectedPriceRange.maxPrice !== "" &&
+    filtersData.selectedPriceRange.maxPrice &&
     filtersData.selectedPriceRange.maxPrice >= 1
   ) {
-    finalQuery["shop_info.price"] = {
+    finalQuery['shop_info.price'] = {
       $lte: Number(filtersData.selectedPriceRange.maxPrice),
     };
   }
 
-if (filtersData.selectedRating) {
-  finalQuery["avgRating"] = {
-    $lte: filtersData.selectedRating,
-  };
-}
+  if (filtersData.selectedRating) {
+    finalQuery['avgRating'] = {
+      $lte: filtersData.selectedRating,
+    };
+  }
 
   req.finalSearchData = {
     searchQuery: finalQuery,
@@ -112,6 +113,7 @@ if (filtersData.selectedRating) {
     pageSize: currentPageSize,
     finalRawData: finalRawData,
     specialQuery: specialQuery,
+    currentPage,
   };
   next();
 };

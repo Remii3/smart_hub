@@ -1,22 +1,22 @@
 import StarRating from '@features/starRating/StarRating';
-import { SearchActionKind, SearchActions } from './SearchPage';
+import { useSearchParams } from 'react-router-dom';
 
-interface PropsTypes {
-  selectedRating: number;
-  dispatch: (e: SearchActions) => void;
-}
+export default function RatingFilter() {
+  const [searchParams, setSearchParams] = useSearchParams();
 
-export default function RatingFilter({ selectedRating, dispatch }: PropsTypes) {
   const handleChange = (rateValue: number) => {
-    dispatch({
-      type: SearchActionKind.CHANGE_SELECTED_RATING,
-      payload: rateValue,
-    });
+    searchParams.set('rating', `${rateValue}`);
+    setSearchParams(searchParams, { replace: true });
   };
   return (
     <div className="flex items-end gap-1">
-      <StarRating rating={selectedRating} changeRatingHandler={handleChange} />
-      <span className="block text-sm text-slate-400">{selectedRating}/5</span>
+      <StarRating
+        rating={Number(searchParams.get('rating')) || 5}
+        changeRatingHandler={handleChange}
+      />
+      <span className="block text-sm text-slate-400">
+        {searchParams.get('rating') || 5}/5
+      </span>
     </div>
   );
 }

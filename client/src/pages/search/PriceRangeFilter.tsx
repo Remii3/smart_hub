@@ -1,23 +1,16 @@
 import { Input } from '@components/UI/input';
 import { Label } from '@components/UI/label';
-import { SearchActionKind, SearchActions } from './SearchPage';
+import { useSearchParams } from 'react-router-dom';
 
 interface PropsTypes {
-  selectedPriceRange: { minPrice: string | number; maxPrice: string | number };
-  dispatch: (e: SearchActions) => void;
   highestPrice: string;
 }
 
-export default function ({
-  selectedPriceRange,
-  dispatch,
-  highestPrice,
-}: PropsTypes) {
+export default function ({ highestPrice }: PropsTypes) {
+  const [searchParams, setSearchParams] = useSearchParams();
   const changePriceRangeHandler = (name: string, value: string) => {
-    dispatch({
-      type: SearchActionKind.CHANGE_SELECTED_PRICE_RANGE,
-      payload: { name, value },
-    });
+    searchParams.set(name, value);
+    setSearchParams(searchParams, { replace: true });
   };
   return (
     <div className="flex flex-col justify-between gap-4 sm:flex-nowrap">
@@ -34,14 +27,7 @@ export default function ({
             placeholder="0.00"
             step="0.01"
             type="number"
-            value={selectedPriceRange.minPrice}
-            onBlur={(e) => {
-              if (e.target.value.trim().length > 0) {
-                e.target.value = e.target.value
-                  ? parseFloat(e.target.value).toFixed(2)
-                  : 0;
-              }
-            }}
+            value={searchParams.get('minPrice') || ''}
             onKeyDown={(e) => {
               if (['.'].includes(e.key)) {
                 e.preventDefault();
@@ -67,14 +53,7 @@ export default function ({
             max={highestPrice}
             step="0.01"
             type="number"
-            value={selectedPriceRange.maxPrice}
-            onBlur={(e) => {
-              if (e.target.value.trim().length > 0) {
-                e.target.value = e.target.value
-                  ? parseFloat(e.target.value).toFixed(2)
-                  : 0;
-              }
-            }}
+            value={searchParams.get('maxPrice') || ''}
             onKeyDown={(e) => {
               if (['.'].includes(e.key)) {
                 e.preventDefault();

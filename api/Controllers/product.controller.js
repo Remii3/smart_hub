@@ -37,10 +37,10 @@ const getAllProducts = async (req, res) => {
 const getShopProducts = async (req, res) => {
   try {
     const products = await Product.find({
-      market_place: "Shop",
+      market_place: 'Shop',
       quantity: { $gt: 0 },
       deleted: false,
-    }).populate("authors");
+    }).populate('authors');
 
     const preparedProducts = [];
     for (let product of products) {
@@ -118,6 +118,7 @@ const getSearchedProducts = async (req, res) => {
     limitPages,
     pageSize,
     specialQuery,
+    currentPage,
   } = req.finalSearchData;
 
   try {
@@ -179,10 +180,25 @@ const getSearchedProducts = async (req, res) => {
           break;
       }
     } else {
-      products = await Product.find(searchQuery)
-        .sort(sortMetod)
-        .skip(skipPages)
-        .limit(limitPages);
+      let newCurrentPage = currentPage;
+      let flag = false;
+
+      let newSkip = skipPages;
+      do {
+        products = await Product.find(searchQuery)
+          .sort(sortMetod)
+          .skip(newSkip)
+          .limit(limitPages);
+        if (products.length <= 0 && skipPages > 1 && newCurrentPage > 1) {
+          flag = true;
+          newSkip -= skipPages;
+          newCurrentPage -= 1;
+        } else {
+          flag = false;
+        }
+      } while (flag);
+
+      finalRawData.newCurrentPage = newCurrentPage;
       highestPrice = await Product.find({ deleted: false })
         .sort({ 'shop_info.price': -1 })
         .limit(1);

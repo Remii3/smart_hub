@@ -1,35 +1,32 @@
 import { Button } from '@components/UI/button';
 import MarketplaceSelector from './MarketplaceSelector';
-import { Input } from '@components/UI/input';
-import { Label } from '@components/UI/label';
 import RatingFilter from './RatingFilter';
-import { SearchActionKind, SearchActions, SearchState } from './SearchPage';
 import PriceRangeFilter from './PriceRangeFilter';
+import { useSearchParams } from 'react-router-dom';
 
 type AdvancedFilterTypes = {
-  searchState: SearchState;
-  dispatch: (e: SearchActions) => void;
   highestPrice: number;
 };
 
-export default function AdvancedFilter({
-  searchState,
-  dispatch,
-  highestPrice,
-}: AdvancedFilterTypes) {
+export default function AdvancedFilter({ highestPrice }: AdvancedFilterTypes) {
+  const [searchParams, setSearchParams] = useSearchParams();
   const clearSelectedMarketplace = () => {
-    dispatch({ type: SearchActionKind.RESET_SELECTED_MARKETPLACE });
+    searchParams.set('marketplace', 'shop');
+    setSearchParams(searchParams, { replace: true });
   };
   const clearSelectedPriceRange = () => {
-    dispatch({ type: SearchActionKind.RESET_SELECT_PRICE_RANGE });
+    searchParams.delete('minPrice');
+    searchParams.delete('maxPrice');
+    setSearchParams(searchParams, { replace: true });
   };
-  const clearSelectedSearch = () => {
-    dispatch({ type: SearchActionKind.RESET_SELECT_RATING });
+  const clearSelectedRating = () => {
+    searchParams.delete('rating');
+    setSearchParams(searchParams, { replace: true });
   };
   const clearAll = () => {
     clearSelectedMarketplace();
     clearSelectedPriceRange();
-    clearSelectedSearch();
+    clearSelectedRating();
   };
   return (
     <aside className="sticky top-20 w-full md:max-w-[250px]">
@@ -46,10 +43,7 @@ export default function AdvancedFilter({
             Clear
           </Button>
         </div>
-        <MarketplaceSelector
-          options={searchState.marketplace}
-          dispatch={dispatch}
-        />
+        <MarketplaceSelector />
       </section>
       <section className="mb-1">
         <div className="flex items-center justify-between">
@@ -59,23 +53,16 @@ export default function AdvancedFilter({
           </Button>
         </div>
 
-        <PriceRangeFilter
-          dispatch={dispatch}
-          highestPrice={highestPrice.toString()}
-          selectedPriceRange={searchState.selectedPriceRange}
-        />
+        <PriceRangeFilter highestPrice={highestPrice.toString()} />
       </section>
       <section className="mb-1">
         <div className="flex items-center justify-between">
           <p className="inline-block font-medium">Rating</p>
-          <Button variant="link" onClick={clearSelectedSearch}>
+          <Button variant="link" onClick={clearSelectedRating}>
             Clear
           </Button>
         </div>
-        <RatingFilter
-          selectedRating={searchState.selectedRating}
-          dispatch={dispatch}
-        />
+        <RatingFilter />
       </section>
     </aside>
   );

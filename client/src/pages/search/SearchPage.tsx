@@ -25,114 +25,23 @@ interface SearchedProductsDataTypes {
     totalPages: number;
     totalProducts: number;
     highestPrice: number;
+    newCurrentPage: number;
   };
   isLoading: boolean;
 }
-export enum SearchActionKind {
-  CHANGE_SELECTED_MARKETPLACE = 'CHANGE_SELECTED_MARKETPLACE',
-  CHANGE_SELECTED_PRICE_RANGE = 'CHANGE_SELECTED_PRICE_RANGE',
-  CHANGE_SELECTED_RATING = 'CHANGE_SELECTED_RATING',
-  RESET_SELECT_RATING = 'RESET_SELECT_RATING',
-  RESET_SELECT_PRICE_RANGE = 'RESET_SELECT_PRICE_RANGE',
-  RESET_SELECTED_MARKETPLACE = 'RESET_SELECTED_MARKETPLACE',
-}
-export interface SearchActions {
-  type: SearchActionKind;
-  payload?: any;
-}
-export interface SearchState {
-  marketplace: {
-    name: string;
-    isChecked: boolean;
-  }[];
-  selectedPriceRange: {
-    maxPrice: string | number;
-    minPrice: string | number;
-  };
-  selectedRating: number;
-}
 
 export default function SearchPage() {
+  const urlParams = new URLSearchParams();
   const [searchParams, setSearchParams] = useSearchParams();
+  const searchPhrase = searchParams.get('phrase') || null;
+  const searchCategory = searchParams.get('category') || null;
+  const searchAuthor = searchParams.get('author') || null;
+  const searchPage = searchParams.get('page') || 1;
+  const searchSortMethod =
+    searchParams.get('sortMethod') || sortOptions.DATE_DESC;
+
   const searchQuery = useLocation();
-
   const pageIteration = 5;
-
-  const initialSearchState = {
-    marketplace: [
-      {
-        name: 'shop',
-        isChecked: true,
-      },
-      {
-        name: 'collection',
-        isChecked: false,
-      },
-    ],
-    selectedPriceRange: {
-      minPrice: '',
-      maxPrice: '',
-    },
-    selectedRating: 5,
-  } as SearchState;
-
-  const searchReducer = (state: SearchState, action: SearchActions) => {
-    const { type, payload } = action;
-
-    switch (type) {
-      case SearchActionKind.CHANGE_SELECTED_MARKETPLACE: {
-        return {
-          ...state,
-          marketplace: [
-            ...state.marketplace.map((el) =>
-              el.name === payload.name
-                ? { ...el, isChecked: payload.state }
-                : el
-            ),
-          ],
-        };
-      }
-      case SearchActionKind.CHANGE_SELECTED_PRICE_RANGE: {
-        return {
-          ...state,
-          selectedPriceRange: {
-            ...state.selectedPriceRange,
-            [payload.name]: payload.value,
-          },
-        };
-      }
-      case SearchActionKind.CHANGE_SELECTED_RATING: {
-        return {
-          ...state,
-          selectedRating: payload,
-        };
-      }
-      case SearchActionKind.RESET_SELECTED_MARKETPLACE:
-        return {
-          ...state,
-          marketplace: [
-            {
-              name: 'shop',
-              isChecked: true,
-            },
-            {
-              name: 'collection',
-              isChecked: false,
-            },
-          ],
-        };
-      case SearchActionKind.RESET_SELECT_PRICE_RANGE:
-        return { ...state, selectedPriceRange: { minPrice: '', maxPrice: '' } };
-      case SearchActionKind.RESET_SELECT_RATING:
-        return {
-          ...state,
-          selectedRating: 5,
-        };
-      default:
-        return { ...state };
-    }
-  };
-  const [searchState, dispatch] = useReducer(searchReducer, initialSearchState);
 
   const [searchedProductsData, setSearchedProductsData] =
     useState<SearchedProductsDataTypes>({
@@ -143,6 +52,7 @@ export default function SearchPage() {
         totalPages: 0,
         totalProducts: 0,
         highestPrice: 0,
+        newCurrentPage: Number(searchPage),
       },
       isLoading: false,
     });
@@ -154,22 +64,32 @@ export default function SearchPage() {
     setSearchedProductsData((prevState) => {
       return { ...prevState, isLoading: true };
     });
+
+    const newFilters = {
+      marketplace: searchParams.getAll('marketplace'),
+      selectedPriceRange: {
+        maxPrice: searchParams.get('maxPrice') || '',
+        minPrice: searchParams.get('minPrice') || '',
+      },
+      selectedRating: searchParams.get('rating') || 5,
+    };
     const { data } = await useGetAccessDatabase({
       url: DATABASE_ENDPOINTS.PRODUCT_SEARCHED,
       params: {
         phrase: updatedQuery,
-        page: searchParams.get('page'),
+        page: searchPage,
         pageSize: pageIteration,
-        filtersData: searchState,
-        sortOption: searchParams.get('sortMethod'),
+        filtersData: newFilters,
+        sortOption: searchSortMethod,
       },
     });
+
     setSearchedProductsData({
       products: (data && data.products) || [],
       rawData: data && data.finalRawData,
       isLoading: false,
     });
-  }, [updatedQuery, searchParams, searchState]);
+  }, [updatedQuery, searchParams]);
 
   const removeQueryHandler = (e: any) => {
     const currentQueryParams = new URLSearchParams(searchQuery.search);
@@ -181,13 +101,8 @@ export default function SearchPage() {
   };
 
   const changeCurrentPageHandler = (newPageNumber: number) => {
-    setSearchParams((prevState) => {
-      return {
-        ...prevState,
-        page: newPageNumber,
-        sortMethod: searchParams.get('sortMethod'),
-      };
-    });
+    searchParams.set('page', `${newPageNumber}`);
+    setSearchParams(searchParams);
   };
 
   const sortOptionChangeHandler = (e: ChangeEvent<HTMLSelectElement>) => {
@@ -195,13 +110,8 @@ export default function SearchPage() {
       return item.value === e.target.value;
     });
     if (selectedSortOption) {
-      setSearchParams((prevState) => {
-        return {
-          ...prevState,
-          sortMethod: selectedSortOption.value,
-          page: 1,
-        };
-      });
+      searchParams.set('sortMethod', selectedSortOption.value);
+      setSearchParams(searchParams, { replace: true });
     }
   };
 
@@ -211,26 +121,38 @@ export default function SearchPage() {
 
   useEffect(() => {
     if (!defaultSearch) {
-      window.history.replaceState(null, '', 'hello');
+      const newUrl = window.location;
+      let preparedUrl = `${newUrl.origin}${newUrl.pathname}?`;
 
-      // setSearchParams((prevState) => {
-      //   if (searchParams.get('category')) {
-      //     return {
-      //       ...prevState,
-      //       page: searchParams.get('page') || 1,
-      //       sortMethod: sortOptions.DATE_DESC,
-      //       category: searchParams.get('category'),
-      //     };
-      //   } else {
-      //     return {
-      //       ...prevState,
-      //       page: searchParams.get('page') || 1,
-      //       sortMethod: sortOptions.DATE_DESC,
-      //     };
-      //   }
-      // });
+      if (searchCategory) {
+        urlParams.set('category', `${searchCategory}`);
+        searchParams.set('category', `${searchCategory}`);
+      }
+      if (searchPhrase) {
+        urlParams.set('phrase', `${searchPhrase}`);
+      }
+      if (searchAuthor) {
+        urlParams.set('author', `${searchAuthor}`);
+      }
+      searchParams.set('marketplace', `shop`);
+      urlParams.set('marketplace', `shop`);
+
+      searchParams.set('maxPrice', ``);
+      urlParams.set('maxPrice', ``);
+
+      searchParams.set('minPrice', ``);
+      urlParams.set('minPrice', ``);
+
+      searchParams.set('rating', `5`);
+      urlParams.set('rating', `5`);
+      searchParams.set('page', `${searchPage}`);
+      urlParams.set('page', `${searchPage}`);
+      searchParams.set('sortMethod', `${searchSortMethod}`);
+      urlParams.set('sortMethod', `${searchSortMethod}`);
+      setSearchParams(searchParams, { replace: true });
+      window.history.replaceState(null, '', preparedUrl + urlParams);
     }
-  }, [window.location.search]);
+  }, []);
   return (
     <MainContainer>
       <div className="mb-2 flex justify-between">
@@ -242,15 +164,13 @@ export default function SearchPage() {
         <div>
           <SortProducts
             category="search"
-            sortOption={searchParams.get('sortMethod')}
+            sortOption={searchSortMethod}
             sortOptionChangeHandler={sortOptionChangeHandler}
           />
         </div>
       </div>
       <div className="flex flex-col justify-between gap-8 md:flex-row">
         <AdvancedFilter
-          searchState={searchState}
-          dispatch={dispatch}
           highestPrice={
             (searchedProductsData.rawData &&
               searchedProductsData.rawData.highestPrice) ||
@@ -327,7 +247,7 @@ export default function SearchPage() {
             <div className="my-3 flex w-full justify-center">
               {searchedProductsData.rawData && (
                 <Pagination
-                  currentPage={Number(searchParams.get('page'))}
+                  currentPage={Number(searchPage)}
                   totalCount={searchedProductsData.rawData.totalProducts}
                   pageSize={pageIteration}
                   onPageChange={(newPageNumber: number) =>
