@@ -107,7 +107,7 @@ export default function ShopCard({
           </Link>
           <div className="px-3 pt-3">
             <Link to={`/product/${_id}`} className="inline-block">
-              <h6 className="m-0 line-clamp-1">{titleShortened}</h6>
+              <strong className="m-0 line-clamp-1">{titleShortened}</strong>
             </Link>
             <div className="line-clamp-1 pb-1 text-sm">
               {authors.map((author, id) => (

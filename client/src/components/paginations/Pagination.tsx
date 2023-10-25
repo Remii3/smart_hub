@@ -39,6 +39,7 @@ export default function Pagination({
     <div className="flex space-x-2">
       <button
         type="button"
+        aria-label="Show previous products"
         onClick={onPrevious}
         disabled={currentPage <= 1}
         className={`${
@@ -82,6 +83,7 @@ export default function Pagination({
         type="button"
         onClick={onNext}
         disabled={currentPage >= lastPage}
+        aria-label="Show next products"
         className={`${
           currentPage >= lastPage && 'opacity-40'
         } px-3 transition duration-200 ease-in-out`}

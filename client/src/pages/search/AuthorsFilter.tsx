@@ -9,7 +9,6 @@ export default function AuthorsFilter() {
   const [authorsState, setAuthorsState] = useState<{ options: any }>({
     options: [],
   });
-  const [menuOpen, setMenuOpen] = useState(false);
 
   const fetchCategories = useCallback(async () => {
     const { data, error } = await useGetAccessDatabase({
@@ -63,8 +62,6 @@ export default function AuthorsFilter() {
       <Select
         menuPlacement="top"
         maxMenuHeight={250}
-        onMenuOpen={() => setMenuOpen(true)}
-        onMenuClose={() => setMenuOpen(false)}
         isMulti
         options={authorsState.options}
         defaultValue={defaultValue && defaultValue}

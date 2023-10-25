@@ -1,0 +1,16 @@
+{
+  "name": "Smarthub",
+  "short_name": "Smarthub",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#fff",
+  "description": "An ecommerce app for books.",
+  "theme_color": "#fff",
+  "icons": [
+    {
+      "src": "public/vite.svg",
+      "sizes": "48x48",
+      "type": "image/svg"
+    }
+  ]
+}
