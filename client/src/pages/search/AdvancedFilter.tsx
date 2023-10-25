@@ -105,7 +105,9 @@ export default function AdvancedFilter({ highestPrice }: AdvancedFilterTypes) {
         </section>
       </aside>
       <Collapsible
-        className="fixed left-7 right-7 top-[calc(64px+48px)] z-10 block bg-background py-2 md:hidden"
+        className={`${
+          openCollapsible && 'h-full'
+        } fixed left-7 right-7 top-[calc(64px+48px)] z-10 block bg-background py-2 md:hidden`}
         open={openCollapsible}
         onOpenChange={setOpenCollapsible}
       >

@@ -293,50 +293,44 @@ export default function SearchPage() {
               </div>
             )}
           <div className="relative h-full">
-            {searchedProductsData.isLoading && (
-              <div className="h-full w-full">
-                <LoadingCircle />
-              </div>
-            )}
-            <div className="md:min-h-[400px]">
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                {!searchedProductsData.isLoading &&
-                  searchedProductsData.products &&
-                  searchedProductsData.products.map((item) => {
-                    return (
-                      item.market_place === 'Shop' && (
-                        <ShopCard
-                          key={item._id}
-                          _id={item._id}
-                          price={item.shop_info.price}
-                          productQuantity={item.quantity}
-                          title={item.title}
-                          authors={item.authors}
-                          description={item.description}
-                          img={
-                            item.imgs && item.imgs.length > 0
-                              ? item.imgs[0].url
-                              : null
-                          }
-                          rating={item.rating}
-                        />
-                      )
-                    );
-                  })}
-              </div>
-              <div className="my-3 flex w-full justify-center">
-                {searchedProductsData.rawData && (
-                  <Pagination
-                    currentPage={Number(searchParams.get('page')) || 1}
-                    totalCount={searchedProductsData.rawData.totalProducts}
-                    pageSize={pageIteration}
-                    onPageChange={(newPageNumber: number) =>
-                      changeCurrentPageHandler(newPageNumber)
-                    }
-                    siblingCount={1}
-                  />
-                )}
-              </div>
+            <div className="relative grid min-h-[400px] grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {searchedProductsData.isLoading && <LoadingCircle />}
+              {!searchedProductsData.isLoading &&
+                searchedProductsData.products &&
+                searchedProductsData.products.map((item) => {
+                  return (
+                    item.market_place === 'Shop' && (
+                      <ShopCard
+                        key={item._id}
+                        _id={item._id}
+                        price={item.shop_info.price}
+                        productQuantity={item.quantity}
+                        title={item.title}
+                        authors={item.authors}
+                        description={item.description}
+                        img={
+                          item.imgs && item.imgs.length > 0
+                            ? item.imgs[0].url
+                            : null
+                        }
+                        rating={item.rating}
+                      />
+                    )
+                  );
+                })}
+            </div>
+            <div className="my-3 flex w-full justify-center">
+              {searchedProductsData.rawData && (
+                <Pagination
+                  currentPage={Number(searchParams.get('page')) || 1}
+                  totalCount={searchedProductsData.rawData.totalProducts}
+                  pageSize={pageIteration}
+                  onPageChange={(newPageNumber: number) =>
+                    changeCurrentPageHandler(newPageNumber)
+                  }
+                  siblingCount={1}
+                />
+              )}
             </div>
           </div>
         </section>
