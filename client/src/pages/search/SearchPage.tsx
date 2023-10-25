@@ -25,6 +25,7 @@ interface SearchedProductsDataTypes {
       minPrice: string;
       maxPrice: string;
       rating: string;
+      special: string;
     } | null;
     totalPages: number;
     totalProducts: number;
@@ -32,7 +33,7 @@ interface SearchedProductsDataTypes {
   };
   isLoading: boolean;
 }
-type FilterParams = 'phrase' | 'category' | 'author';
+type FilterParams = 'phrase' | 'category' | 'author' | 'special';
 
 export default function SearchPage() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -90,7 +91,7 @@ export default function SearchPage() {
     }
     setSearchedProductsData({
       products: data.products,
-      rawData: data.finalRawData,
+      rawData: data.rawData,
       isLoading: false,
     });
   }, [searchParams]);
@@ -99,6 +100,11 @@ export default function SearchPage() {
     switch (paramKey) {
       case 'phrase': {
         searchParams.delete('phrase');
+        setSearchParams(searchParams);
+        break;
+      }
+      case 'special': {
+        searchParams.delete('special');
         setSearchParams(searchParams);
         break;
       }
@@ -206,11 +212,32 @@ export default function SearchPage() {
         />
         <section className="h-full w-full space-y-2 md:pt-0">
           {(searchParams.get('phrase') ||
+            searchParams.get('special') ||
             searchParams.get('category') ||
             searchParams.get('author')) && (
             <>
-              {searchParams.get('phrase') && (
+              {(searchParams.get('phrase') || searchParams.get('special')) && (
                 <ul className="grid auto-cols-max grid-flow-col auto-rows-max gap-5 px-2 py-1">
+                  {searchParams.getAll('special').map((query) => (
+                    <li key={query}>
+                      <Badge variant={'outline'} className="bg-sky-100 p-0">
+                        <button
+                          name={query}
+                          type="button"
+                          onClick={() => removeQueryHandler(query, 'special')}
+                          className="group relative px-[10px] py-1"
+                        >
+                          <div className="absolute inset-0 h-full w-full rounded-md bg-black opacity-0 transition-opacity ease-out group-hover:opacity-10" />
+                          <span className="text-sm text-sky-700 group-hover:brightness-90">
+                            {query}
+                          </span>
+                          <div className="absolute -left-2 -top-1 box-border h-4 w-4 rounded-full border bg-sky-100 text-sky-600">
+                            X
+                          </div>
+                        </button>
+                      </Badge>
+                    </li>
+                  ))}
                   {searchParams.getAll('phrase').map((query) => (
                     <li key={query}>
                       <Badge variant={'outline'} className="bg-sky-100 p-0">

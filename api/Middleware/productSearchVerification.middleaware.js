@@ -3,7 +3,16 @@ const User = require('../Models/user');
 
 const productSearchVerification = async (req, res, next) => {
   let { pageSize, filtersData } = req.query;
+  
+  if (!filtersData) {
+    return res.status(422).json({
+      message: "No filters provided",
+      error: "Please provide filters data",
+    });
+  }
+
   let currentPage = filtersData.page;
+
   if (!currentPage) {
     currentPage = 1;
   }
@@ -13,46 +22,47 @@ const productSearchVerification = async (req, res, next) => {
     currentPageSize = 10;
   }
 
-  const skip = (currentPage - 1) * currentPageSize;
+  const skipPages = (currentPage - 1) * currentPageSize;
 
-  let sort = {};
+  let sortMethod = {};
   switch (filtersData.sortOption) {
     case "Date, ASC":
-      sort.created_at = 1;
+      sortMethod.created_at = 1;
       break;
     case "Date, DESC":
-      sort.created_at = -1;
+      sortMethod.created_at = -1;
       break;
-
     case "Title, ASC":
-      sort.title = 1;
+      sortMethod.title = 1;
       break;
-
     case "Title, DESC":
-      sort.title = -1;
+      sortMethod.title = -1;
       break;
-
     case "Price, DESC":
-      sort["shop_info.price"] = -1;
+      sortMethod["shop_info.price"] = -1;
       break;
-
     case "Price, ASC":
-      sort["shop_info.price"] = 1;
+      sortMethod["shop_info.price"] = 1;
       break;
+    default:
+      return (sortMethod.created_at = -1);
   }
-  const finalQuery = {};
-  const finalRawData = { queries: [] };
+
+  const searchQuery = {};
   let specialQuery = null;
 
+  const rawData = { queries: {} };
+
   if (filtersData.searchedPhrase) {
-    finalQuery["$text"] = { $search: `${filtersData.searchedPhrase}` };
-    finalRawData.queries = [...finalRawData.queries];
+    searchQuery["$text"] = { $search: `${filtersData.searchedPhrase}` };
+    rawData.queries.phrase = filtersData.searchedPhrase;
   }
 
   if (filtersData.searchedSpecial) {
     specialQuery = filtersData.searchedSpecial;
-    finalRawData.queries = [...finalRawData.queries];
+    rawData.queries.special = filtersData.searchedSpecial;
   }
+
   if (filtersData.selectedAuthors && filtersData.selectedAuthors.length > 0) {
     const authors = [];
 
@@ -65,8 +75,8 @@ const productSearchVerification = async (req, res, next) => {
       }
     }
 
-    finalQuery["authors"] = { $in: authors };
-    finalRawData.queries = [...finalRawData.queries];
+    searchQuery["authors"] = { $in: authors };
+    rawData.queries.authors = authors;
   }
 
   if (
@@ -84,19 +94,18 @@ const productSearchVerification = async (req, res, next) => {
       }
     }
 
-    finalQuery["categories"] = { $in: categories };
-    finalRawData.queries = [...finalRawData.queries];
+    searchQuery["categories"] = { $in: categories };
+    rawData.queries.categories = categories;
   }
 
-  const marketplaces = filtersData.marketplace;
-  const names = [];
-  if (marketplaces) {
-    marketplaces.forEach(item => {
-      names.push(item.charAt(0).toUpperCase() + item.slice(1));
+  if (filtersData.marketplace) {
+    const marketplaces = [];
+    filtersData.marketplace.forEach((item) => {
+      marketplaces.push(item.charAt(0).toUpperCase() + item.slice(1));
     });
+    searchQuery["market_place"] = { $in: marketplaces };
+    rawData.queries.marketplace = marketplaces;
   }
-
-  finalQuery['market_place'] = { $in: names };
 
   if (
     filtersData.selectedPriceRange.minPrice &&
@@ -104,40 +113,44 @@ const productSearchVerification = async (req, res, next) => {
     filtersData.selectedPriceRange.maxPrice &&
     filtersData.selectedPriceRange.maxPrice >= 1
   ) {
-    finalQuery['shop_info.price'] = {
+    searchQuery["shop_info.price"] = {
       $gte: Number(filtersData.selectedPriceRange.minPrice),
       $lte: Number(filtersData.selectedPriceRange.maxPrice),
     };
+    rawData.queries.minPrice = filtersData.selectedPriceRange.minPrice;
+    rawData.queries.maxPrice = filtersData.selectedPriceRange.maxPrice;
   } else if (
     filtersData.selectedPriceRange.minPrice &&
     filtersData.selectedPriceRange.minPrice >= 1
   ) {
-    finalQuery['shop_info.price'] = {
+    searchQuery["shop_info.price"] = {
       $gte: Number(filtersData.selectedPriceRange.minPrice),
     };
+    rawData.queries.minPrice = filtersData.selectedPriceRange.minPrice;
   } else if (
     filtersData.selectedPriceRange.maxPrice &&
     filtersData.selectedPriceRange.maxPrice >= 1
   ) {
-    finalQuery['shop_info.price'] = {
+    searchQuery["shop_info.price"] = {
       $lte: Number(filtersData.selectedPriceRange.maxPrice),
     };
+    rawData.queries.maxPrice = filtersData.selectedPriceRange.maxPrice;
   }
 
   if (filtersData.selectedRating) {
-    finalQuery['avgRating'] = {
+    searchQuery["avgRating"] = {
       $lte: filtersData.selectedRating,
     };
+    rawData.queries.rating = filtersData.selectedRating;
   }
 
   req.finalSearchData = {
-    searchQuery: finalQuery,
-    sortMetod: sort,
-    skipPages: skip,
-    limitPages: currentPageSize,
-    pageSize: currentPageSize,
-    finalRawData: finalRawData,
-    specialQuery: specialQuery,
+    searchQuery,
+    sortMethod,
+    skipPages,
+    currentPageSize,
+    rawData,
+    specialQuery,
     currentPage,
   };
   next();

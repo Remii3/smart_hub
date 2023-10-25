@@ -111,12 +111,11 @@ const getOneProduct = async (req, res) => {
 
 const getSearchedProducts = async (req, res) => {
   let {
-    finalRawData,
+    rawData,
     searchQuery,
-    sortMetod,
+    sortMethod,
     skipPages,
-    limitPages,
-    pageSize,
+    currentPageSize,
     specialQuery,
     currentPage,
   } = req.finalSearchData;
@@ -130,23 +129,23 @@ const getSearchedProducts = async (req, res) => {
     searchQuery.deleted = false;
     if (specialQuery) {
       switch (specialQuery) {
-        case 'bestseller':
+        case "bestseller":
           {
             const top_selling_products = await Order.aggregate([
-              { $unwind: '$products' },
+              { $unwind: "$products" },
               {
                 $lookup: {
-                  from: 'products',
-                  localField: 'products.product',
-                  foreignField: '_id',
-                  as: 'product_doc',
+                  from: "products",
+                  localField: "products.product",
+                  foreignField: "_id",
+                  as: "product_doc",
                 },
               },
-              { $unwind: '$product_doc' },
+              { $unwind: "$product_doc" },
               {
                 $group: {
-                  _id: '$product_doc._id',
-                  sum: { $sum: '$products.in_cart_quantity' },
+                  _id: "$product_doc._id",
+                  sum: { $sum: "$products.in_cart_quantity" },
                 },
               },
               { $sort: { sum: -1 } },
@@ -155,7 +154,7 @@ const getSearchedProducts = async (req, res) => {
                 $group: {
                   _id: null,
                   top_selling_products: {
-                    $push: '$_id',
+                    $push: "$_id",
                   },
                 },
               },
@@ -165,51 +164,47 @@ const getSearchedProducts = async (req, res) => {
                 $in: top_selling_products[0].top_selling_products,
               };
             }
-            products = await Product.find(searchQuery).sort(sortMetod);
+            products = await Product.find(searchQuery).sort(sortMethod);
             const products_copy = [...products];
             highestPrice =
               products_copy.length >= 1
                 ? products_copy.sort(
                     (a, b) =>
-                      Number(b.shop_info.price) - Number(a.shop_info.price),
+                      Number(b.shop_info.price) - Number(a.shop_info.price)
                   )
                 : null;
             totalDocuments = products.length;
-            totalPages = Math.ceil(totalDocuments / pageSize);
+            totalPages = Math.ceil(totalDocuments / currentPageSize);
           }
           break;
       }
     } else {
-      let newCurrentPage = currentPage;
       let flag = false;
-
-      let newSkip = skipPages;
-      console.log("searchQuery: ", searchQuery);
+      let skipPagesCopy = skipPages;
       do {
         products = await Product.find(searchQuery)
-          .sort(sortMetod)
-          .skip(newSkip)
-          .limit(limitPages)
+          .sort(sortMethod)
+          .skip(skipPagesCopy)
+          .limit(currentPageSize)
           .populate("authors");
-        if (products.length <= 0 && skipPages > 1 && newCurrentPage > 1) {
+        if (products.length <= 0 && skipPages > 1 && currentPage > 1) {
           flag = true;
-          newSkip -= skipPages;
-          newCurrentPage -= 1;
+          skipPagesCopy -= skipPages;
+          currentPage -= 1;
         } else {
           flag = false;
         }
       } while (flag);
 
-      finalRawData.newCurrentPage = newCurrentPage;
       highestPrice = await Product.find({ deleted: false })
-        .sort({ 'shop_info.price': -1 })
+        .sort({ "shop_info.price": -1 })
         .limit(1);
       totalDocuments = await Product.find(searchQuery).countDocuments();
-      totalPages = Math.ceil(totalDocuments / pageSize);
+      totalPages = Math.ceil(totalDocuments / currentPageSize);
     }
-    finalRawData.totalPages = totalPages;
-    finalRawData.totalProducts = totalDocuments;
-    finalRawData.highestPrice =
+    rawData.totalPages = totalPages;
+    rawData.totalProducts = totalDocuments;
+    rawData.highestPrice =
       highestPrice && highestPrice.length > 0
         ? Number(highestPrice[0].shop_info.price)
         : 0;
@@ -223,13 +218,13 @@ const getSearchedProducts = async (req, res) => {
     return res.status(200).json({
       data: {
         products: preparedProducts,
-        finalRawData,
+        rawData,
       },
     });
   } catch (err) {
     return res
       .status(500)
-      .json({ message: 'Faield fetching searched query', error: err.message });
+      .json({ message: "Faield fetching searched query", error: err.message });
   }
 };
 
