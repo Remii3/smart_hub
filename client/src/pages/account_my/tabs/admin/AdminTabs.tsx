@@ -165,8 +165,8 @@ export default function AdminTabs({
     formResponse: z.infer<typeof adminSchema>
   ) => {
     const response = formResponse.admin[0];
+
     if (selectedImgs.data) {
-      console.log('first');
       const uploadData = await useUploadImg({
         ownerId: user._id,
         selectedFile: selectedImgs.data,
@@ -176,13 +176,15 @@ export default function AdminTabs({
       if (uploadData) {
         response.profileImg = uploadData;
       }
-    } else if (selectedImgs.url === null) {
-      const uploadData = await useDeleteImg({
+    } else if (selectedImgs.isDeleted) {
+      await useDeleteImg({
         imgId: user.user_info.profile_img.id,
         ownerId: user._id,
         targetLocation: 'Profile_img',
       });
+      response.profileImg = { _id: response.profileImg._id };
     }
+
     const { error } = await usePostAccessDatabase({
       url: DATABASE_ENDPOINTS.USER_UPDATE,
       body: { userEmail: user.email, fieldKey: null, fieldValue: response },
@@ -334,7 +336,11 @@ export default function AdminTabs({
                             alt="avatar_img"
                           />
                         ) : (
-                          <div className="h-24 w-24 rounded-full bg-slate-200"></div>
+                          <img
+                            src="https://firebasestorage.googleapis.com/v0/b/smarthub-75eab.appspot.com/o/static_imgs%2Fnophoto.webp?alt=media&token=a974d32e-108a-4c21-be71-de358368a167"
+                            alt="no_photo"
+                            className="inline-block h-24 w-24 rounded-full object-cover ring-2 ring-white"
+                          />
                         )}
                       </button>
                     </div>

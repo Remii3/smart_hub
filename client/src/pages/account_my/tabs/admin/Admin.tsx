@@ -37,7 +37,7 @@ export default function Admin() {
     fetchData();
   }, [fetchData]);
 
-  if (!userData) return <div>Please log in</div>;
+  if (!userData.data) return <div>Please log in</div>;
 
   return (
     <div className="sm:px-3">
@@ -56,7 +56,7 @@ export default function Admin() {
               <AdminTabs
                 key={user._id}
                 user={user}
-                userData={userData}
+                userData={userData.data}
                 fetchData={fetchData}
               />
             ))}

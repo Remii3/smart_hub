@@ -231,9 +231,9 @@ export default function ProductPage() {
 
   useEffect(() => {
     if (
-      userData &&
-      userData.role !== 'User' &&
-      userData.author_info.my_products.find(
+      userData.data &&
+      userData.data.role !== 'User' &&
+      userData.data.author_info.my_products.find(
         (product: UnknownProductTypes) => product._id === productState.data?._id
       )
     ) {
@@ -266,7 +266,7 @@ export default function ProductPage() {
         description: productState.data.description,
       });
     }
-  }, [userData, productState]);
+  }, [userData.data, productState]);
   const removeImg = (clieckedId: string) => {
     const updatedImgs = [...selectedImgs];
     const indexToRemove = updatedImgs.findIndex(
@@ -389,7 +389,6 @@ export default function ProductPage() {
           }
         }
       }
-      console.log('formResponse', formResponse);
       await usePostAccessDatabase({
         url: DATABASE_ENDPOINTS.PRODUCT_UPDATE,
         body: {
@@ -417,7 +416,7 @@ export default function ProductPage() {
     if (productState.data) {
       await usePostAccessDatabase({
         url: DATABASE_ENDPOINTS.PRODUCT_DELETE,
-        body: { _id: productState.data._id, userId: userData?._id },
+        body: { _id: productState.data._id, userId: userData.data?._id },
       });
       fetchUserData();
       navigate(-1);
@@ -680,7 +679,8 @@ export default function ProductPage() {
                 />
 
                 {(isMyProduct ||
-                  (userData && userData.role === UserRoleTypes.ADMIN)) && (
+                  (userData.data &&
+                    userData.data.role === UserRoleTypes.ADMIN)) && (
                   <div className="absolute right-0 top-0 flex gap-3">
                     <Dialog>
                       <DialogTrigger asChild>

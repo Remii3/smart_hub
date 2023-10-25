@@ -33,10 +33,6 @@ import {
 import { useToast } from '@components/UI/use-toast';
 import { UserCircleIcon } from '@heroicons/react/24/solid';
 
-enum Test {
-  'TEST' = 'Tesst',
-}
-
 type TabKeysTypes =
   | 'MY_DATA'
   | 'SECURITY_PERMISSIONS'
@@ -115,11 +111,6 @@ export default function MyAccount() {
   const { userData, fetchUserData } = useContext(UserContext);
   const { toast } = useToast();
 
-  if (!userData) {
-    navigate('/register');
-    return <></>;
-  }
-
   const changeSelectedTab = (option: TabNamesTypes) => {
     setSelectedtab(option);
     navigate(
@@ -137,10 +128,16 @@ export default function MyAccount() {
     setSelectedProfileImg((prevState) => {
       return { ...prevState, isLoading: true };
     });
+    if (!userData.data && !userData.isLoading) {
+      navigate('/account/register');
+    }
+    if (!userData.data) {
+      return <></>;
+    }
 
     const uploadData = await useUploadImg({
       selectedFile: e.target.files[0],
-      ownerId: userData._id,
+      ownerId: userData.data._id,
       targetLocation: 'Profile_img',
     });
 
@@ -148,7 +145,7 @@ export default function MyAccount() {
       await usePostAccessDatabase({
         url: DATABASE_ENDPOINTS.USER_UPDATE,
         body: {
-          userEmail: userData.email,
+          userEmail: userData.data.email,
           fieldValue: uploadData,
           fieldKey: e.target.name,
         },
@@ -170,9 +167,9 @@ export default function MyAccount() {
   };
 
   const subtitle =
-    userData.role === UserRoleTypes.ADMIN ? (
+    userData.data.role === UserRoleTypes.ADMIN ? (
       <span>Let&apos; put some things in order!</span>
-    ) : userData.role === UserRoleTypes.AUTHOR ? (
+    ) : userData.data.role === UserRoleTypes.AUTHOR ? (
       <p>Let&apos; add some new books! </p>
     ) : (
       <p>Let&apos;s see some books! 🎉</p>
@@ -209,10 +206,10 @@ export default function MyAccount() {
                   </div>
                 )}
               </label>
-              {userData.user_info.profile_img.url ? (
+              {userData.data.user_info.profile_img.url ? (
                 <img
                   className="inline-block h-24 w-24 rounded-full object-cover ring-2 ring-white"
-                  src={userData.user_info.profile_img.url}
+                  src={userData.data.user_info.profile_img.url}
                   alt="avatar_img"
                 />
               ) : (
@@ -222,21 +219,21 @@ export default function MyAccount() {
 
             <div className="pt-1 text-center sm:text-left">
               <h1 className="text-2xl font-bold text-foreground sm:text-5xl">
-                Welcome Back, {userData.username}!
+                Welcome Back, {userData.data.username}!
               </h1>
 
               <p className="mt-1.5 space-x-2 text-lg text-gray-500">
                 {subtitle}
-                {userData && userData.role !== 'User' && (
+                {userData.data && userData.data.role !== 'User' && (
                   <MarketplaceBadge
-                    message={userData.role}
+                    message={userData.data.role}
                     color={
-                      userData.role === 'Author'
+                      userData.data.role === 'Author'
                         ? 'text-purple-700'
                         : 'text-cyan-700'
                     }
                     bgColor={
-                      userData.role === 'Author'
+                      userData.data.role === 'Author'
                         ? 'bg-purple-100'
                         : 'bg-cyan-100'
                     }
@@ -245,7 +242,7 @@ export default function MyAccount() {
               </p>
             </div>
           </div>
-          {userData.role !== UserRoleTypes.USER && <NewProduct />}
+          {userData.data.role !== UserRoleTypes.USER && <NewProduct />}
         </div>
       </header>
       <div className="pb-8 sm:pb-12">
@@ -267,13 +264,13 @@ export default function MyAccount() {
                 {TABS_ARRAY.map((tab) => {
                   if (
                     tab.name === 'admin' &&
-                    userData.role !== UserRoleTypes.ADMIN
+                    userData.data.role !== UserRoleTypes.ADMIN
                   )
                     return null;
                   if (
                     tab.name === 'my_products' &&
-                    userData.role !== UserRoleTypes.ADMIN &&
-                    userData.role !== UserRoleTypes.AUTHOR
+                    userData.data.role !== UserRoleTypes.ADMIN &&
+                    userData.data.role !== UserRoleTypes.AUTHOR
                   )
                     return null;
                   return (
@@ -296,14 +293,14 @@ export default function MyAccount() {
                   {TABS_ARRAY.map((option) => {
                     if (
                       option.name === 'admin' &&
-                      userData.role !== UserRoleTypes.ADMIN
+                      userData.data.role !== UserRoleTypes.ADMIN
                     ) {
                       return null;
                     }
                     if (
                       option.name === 'my_products' &&
-                      userData.role !== UserRoleTypes.ADMIN &&
-                      userData.role !== UserRoleTypes.AUTHOR
+                      userData.data.role !== UserRoleTypes.ADMIN &&
+                      userData.data.role !== UserRoleTypes.AUTHOR
                     ) {
                       return null;
                     }

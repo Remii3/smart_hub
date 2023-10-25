@@ -20,11 +20,11 @@ export default function MyShop() {
   const { userData, fetchUserData } = useContext(UserContext);
   const { toast } = useToast();
   const [deleteDialog, setDeleteDialog] = useState(false);
-  if (!userData) return <p>Please log in</p>;
+  if (!userData.data) return <p>Please log in</p>;
   const deleteAllItemsHandler = async () => {
     const { error } = await usePostAccessDatabase({
       url: DATABASE_ENDPOINTS.PRODUCT_DELETE_ALL,
-      body: { userId: userData._id },
+      body: { userId: userData.data._id },
     });
     if (error) {
       return toast({
@@ -38,7 +38,7 @@ export default function MyShop() {
   };
   return (
     <div className="relative px-3">
-      {userData.author_info.my_products.length > 0 && (
+      {userData.data.author_info.my_products.length > 0 && (
         <Dialog open={deleteDialog} onOpenChange={() => setDeleteDialog(false)}>
           <Button
             type="button"
@@ -78,10 +78,10 @@ export default function MyShop() {
         <section className="px-2">
           <h5 className="mb-2">Latest:</h5>
           <div>
-            {userData.author_info.my_products.length > 0 ? (
+            {userData.data.author_info.my_products.length > 0 ? (
               <div>
                 <MyProducts
-                  myProducts={userData.author_info.my_products}
+                  myProducts={userData.data.author_info.my_products}
                   quantity={4}
                   unfold={false}
                 />
@@ -94,10 +94,10 @@ export default function MyShop() {
         <section className="px-2">
           <h5 className="mb-2">All:</h5>
           <div>
-            {userData.author_info.my_products.length > 0 ? (
+            {userData.data.author_info.my_products.length > 0 ? (
               <div>
                 <MyProducts
-                  myProducts={userData.author_info.my_products}
+                  myProducts={userData.data.author_info.my_products}
                   quantity={8}
                   unfold
                 />

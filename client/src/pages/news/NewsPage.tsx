@@ -56,7 +56,7 @@ export default function NewsPage() {
     e.preventDefault();
     const { data } = await usePostAccessDatabase({
       url: DATABASE_ENDPOINTS.NEWS_ONE,
-      body: { userId: userData?._id, ...newArticleData },
+      body: { userId: userData.data?._id, ...newArticleData },
     });
     if (selectedImgs) {
       const imgResData = await useUploadImg({
@@ -81,7 +81,7 @@ export default function NewsPage() {
   const deleteArticleHandler = async (newsId: string) => {
     await usePostAccessDatabase({
       url: DATABASE_ENDPOINTS.NEWS_DELETE,
-      body: { userId: userData?._id, newsId },
+      body: { userId: userData.data?._id, newsId },
     });
     await fetchData();
   };
@@ -95,7 +95,7 @@ export default function NewsPage() {
       <div>
         <span>News</span>
         <Dialog>
-          {userData && userData.role !== 'User' && (
+          {userData.data && userData.data.role !== 'User' && (
             <DialogTrigger asChild>
               <Button variant="default">+Add new</Button>
             </DialogTrigger>

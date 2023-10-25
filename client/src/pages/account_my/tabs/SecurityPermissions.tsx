@@ -14,12 +14,12 @@ interface SecurityOptionType {
 
 export default function SecurityPermissions() {
   const { userData } = useContext(UserContext);
-  if (!userData) return <p>Please log in</p>;
+  if (!userData.data) return <p>Please log in</p>;
   const initialData = [
     {
       name: 'hide_private_information',
       labelName: 'Hide private information',
-      value: userData.security_settings.hide_private_information || false,
+      value: userData.data.security_settings.hide_private_information || false,
     },
   ] as SecurityOptionType[];
 

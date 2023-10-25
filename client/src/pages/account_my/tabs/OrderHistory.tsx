@@ -4,12 +4,12 @@ import { UserContext } from '@context/UserProvider';
 
 export default function OrderHistory() {
   const { userData } = useContext(UserContext);
-  if (!userData) return <p>Please log in</p>;
+  if (!userData.data) return <p>Please log in</p>;
   return (
     <div className="px-3">
       <h4 className="mb-4">Order history</h4>
       <div className="px-2">
-        {userData.orders.map((item) => (
+        {userData.data.orders.map((item) => (
           <Link
             key={item._id}
             to={`order/${item._id}`}

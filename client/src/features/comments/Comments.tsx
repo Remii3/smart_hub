@@ -118,7 +118,7 @@ export default function Comments({
     const { error } = await usePostAccessDatabase({
       url: DATABASE_ENDPOINTS.COMMENT_ONE,
       body: {
-        userId: userData?._id,
+        userId: userData.data?._id,
         targetId,
         target: target,
         value: preparedValue,
@@ -148,14 +148,13 @@ export default function Comments({
     commentId: string,
     value: { text: string; rating: number }
   ) => {
-    console.log('comment id: ', commentId);
     const { error } = await usePostAccessDatabase({
       url: DATABASE_ENDPOINTS.COMMENT_DELETE,
       body: {
         target,
         targetId,
         commentId,
-        userId: userData?._id,
+        userId: userData.data?._id,
         value,
       },
     });
@@ -165,7 +164,6 @@ export default function Comments({
       setShowDeleteDialog(null);
     }
   };
-  console.log(comments);
   return (
     <div className="mt-8">
       <h5 className="pb-2">Comments</h5>
@@ -185,12 +183,12 @@ export default function Comments({
               </div>
             )}
             <div className="flex gap-4">
-              {userData ? (
+              {userData.data ? (
                 <>
-                  {userData.user_info.profile_img.url ? (
+                  {userData.data.user_info.profile_img.url ? (
                     <div className="h-14 w-14">
                       <img
-                        src={userData.user_info.profile_img.url}
+                        src={userData.data.user_info.profile_img.url}
                         className="h-8 w-8 rounded-full object-cover"
                         alt="profile_img"
                       />
@@ -199,7 +197,7 @@ export default function Comments({
                     <UserIcon className="h-8 w-8" />
                   )}
 
-                  <p>{userData?.username}</p>
+                  <p>{userData.data?.username}</p>
                 </>
               ) : (
                 <>
@@ -219,8 +217,8 @@ export default function Comments({
                 className="w-full resize-none border-none align-top focus:ring-0 sm:text-sm"
                 name="newComment"
                 rows={4}
-                disabled={!userData}
-                placeholder={userData ? 'Enter new comment...' : ''}
+                disabled={!userData.data}
+                placeholder={userData.data ? 'Enter new comment...' : ''}
                 value={newComment.value}
                 onChange={(e) =>
                   setNewComment((prevState) => {
@@ -228,7 +226,7 @@ export default function Comments({
                   })
                 }
               />
-              {!userData && (
+              {!userData.data && (
                 <div className="absolute top-0 flex h-full w-full items-center justify-center bg-slate-300/20">
                   <span className="text-lg">Register to upload a message</span>
                 </div>
@@ -238,8 +236,8 @@ export default function Comments({
             <div className="flex items-center justify-end gap-2 bg-background p-3">
               <Button
                 variant="default"
-                disabled={!userData}
-                className={`${!userData && 'bg-slate-300'}`}
+                disabled={!userData.data}
+                className={`${!userData.data && 'bg-slate-300'}`}
                 onClick={() => addNewCommentHandler()}
               >
                 {newComment.isLoading ? <LoadingCircle /> : 'Publish'}
@@ -297,8 +295,8 @@ export default function Comments({
                 </div>
                 <div>{comment.value.text}</div>
               </div>
-              {(userData?._id === comment.user._id ||
-                userData?.role == UserRoleTypes.ADMIN) && (
+              {(userData.data?._id === comment.user._id ||
+                userData.data?.role == UserRoleTypes.ADMIN) && (
                 <Dialog
                   open={showDeleteDialog === comment._id}
                   onOpenChange={() => setShowDeleteDialog(null)}

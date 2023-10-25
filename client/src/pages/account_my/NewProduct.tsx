@@ -129,7 +129,7 @@ export default function NewProduct() {
     });
   }, []);
 
-  if (!userData) return <div>Please log in!</div>;
+  if (!userData.data) return <div>Please log in!</div>;
 
   useEffect(() => {
     fetchAllAuthors();
@@ -195,8 +195,8 @@ export default function NewProduct() {
       url: DATABASE_ENDPOINTS.PRODUCT_ONE,
       body: {
         seller_data: {
-          _id: userData._id,
-          pseudonim: userData.author_info.pseudonim,
+          _id: userData.data?._id,
+          pseudonim: userData.data?.author_info.pseudonim,
         },
         title,
         description,

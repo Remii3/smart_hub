@@ -42,8 +42,8 @@ export default function OtherUserPage() {
   userId = userId[userId.length - 1];
 
   const [isFollowing, setIsFollowing] = useState<boolean>(
-    userData
-      ? userData.following.some((id: string) => id === userId) || false
+    userData.data
+      ? userData.data.following.some((id: string) => id === userId) || false
       : false
   );
 
@@ -98,27 +98,28 @@ export default function OtherUserPage() {
 
     if (data && data.role !== 'User') {
       setIsFollowing(
-        data.author_info.followers.some((id: string) => id === userData?._id) ||
-          false
+        data.author_info.followers.some(
+          (id: string) => id === userData.data?._id
+        ) || false
       );
     }
   }, []);
 
   useEffect(() => {
-    if (userId === userData?._id) {
+    if (userId === userData.data?._id) {
       return navigate('/account/my', { replace: true });
     }
     getOtherUserData();
   }, [getOtherUserData]);
 
   const followHandler = async () => {
-    if (userData === null) return;
+    if (userData.data === null) return;
     if (isFollowing) {
       const { error } = await usePostAccessDatabase({
         url: DATABASE_ENDPOINTS.USER_FOLLOW_REMOVE,
         body: {
           followReceiverId: userId,
-          followGiverId: userData._id,
+          followGiverId: userData.data._id,
         },
       });
       if (error) {
@@ -134,7 +135,7 @@ export default function OtherUserPage() {
         url: DATABASE_ENDPOINTS.USER_FOLLOW_ADD,
         body: {
           followReceiverId: userId,
-          followGiverId: userData._id,
+          followGiverId: userData.data._id,
         },
       });
       if (error) {
@@ -197,7 +198,7 @@ export default function OtherUserPage() {
               <div>
                 <Button
                   variant={isFollowing ? 'outline' : 'default'}
-                  disabled={userData === null}
+                  disabled={userData.data === null}
                   onClick={() => followHandler()}
                   className="relative w-[96px] transition-all ease-out"
                 >

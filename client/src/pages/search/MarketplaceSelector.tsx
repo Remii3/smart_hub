@@ -11,7 +11,6 @@ export default function MarketplaceSelector() {
     const all = searchParams.getAll('marketplace');
     if (all.includes(name)) {
       const newList = all.filter((item) => item !== name);
-      console.log('newList', newList);
       if (newList.length > 0) {
         newList.forEach((item) => searchParams.set('marketplace', item));
       } else {

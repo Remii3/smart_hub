@@ -230,11 +230,11 @@ export default function Nav({ scrollFlag }: { scrollFlag: boolean }) {
               <Popover>
                 <PopoverTrigger aria-label="Profile dropdown">
                   <Suspense fallback={<LoadingCircle />}>
-                    {userData ? (
-                      userData.user_info.profile_img.url ? (
+                    {userData.data ? (
+                      userData.data.user_info.profile_img.url ? (
                         <div className="h-8 w-8">
                           <img
-                            src={userData.user_info.profile_img.url}
+                            src={userData.data.user_info.profile_img.url}
                             className="h-8 w-8 rounded-full object-cover"
                             alt="profile_img"
                           />
@@ -253,7 +253,7 @@ export default function Nav({ scrollFlag }: { scrollFlag: boolean }) {
                   } mt-3 w-auto bg-background p-0`}
                 >
                   <ul>
-                    {!userData && (
+                    {!userData.data && (
                       <>
                         <li>
                           <PopoverClose asChild>
@@ -281,7 +281,7 @@ export default function Nav({ scrollFlag }: { scrollFlag: boolean }) {
                         </li>
                       </>
                     )}
-                    {userData && (
+                    {userData.data && (
                       <>
                         <li>
                           <PopoverClose asChild>
@@ -354,7 +354,7 @@ export default function Nav({ scrollFlag }: { scrollFlag: boolean }) {
             <Separator className="mx-auto my-4 w-3/4 bg-slate-300" />
           </li>
           <li>
-            {!userData ? (
+            {!userData.data ? (
               <div className="flex-col">
                 <Link
                   to={{ pathname: '/account/login' }}

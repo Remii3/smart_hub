@@ -56,7 +56,7 @@ export default function EditUserData() {
 
   const { userData, changeUserData } = useContext(UserContext);
 
-  if (!userData) return <p>Please log in</p>;
+  if (!userData.data) return <p>Please log in</p>;
 
   const formSchema = {
     username: z.object({ username: z.string().nonempty().min(2) }),
@@ -198,7 +198,7 @@ export default function EditUserData() {
     const { error } = await usePostAccessDatabase({
       url: DATABASE_ENDPOINTS.USER_UPDATE,
       body: {
-        userEmail: userData.email,
+        userEmail: userData.data.email,
         fieldKey: selectedElementName,
         fieldValue:
           selectedElementName === 'address'
@@ -256,7 +256,7 @@ export default function EditUserData() {
                   id="showcasedUsername"
                   type="text"
                   disabled
-                  value={userData.username}
+                  value={userData.data.username}
                 />
               </fieldset>
               <div className="flex justify-between gap-4">
@@ -297,7 +297,7 @@ export default function EditUserData() {
                               <FormControl>
                                 <Input
                                   type="text"
-                                  placeholder={userData.username}
+                                  placeholder={userData.data.username}
                                   {...field}
                                 />
                               </FormControl>
@@ -336,7 +336,7 @@ export default function EditUserData() {
                     id="showcasedFirstName"
                     type="text"
                     disabled
-                    value={userData.user_info.credentials.first_name}
+                    value={userData.data.user_info.credentials.first_name}
                   />
                 </fieldset>
 
@@ -374,7 +374,8 @@ export default function EditUserData() {
                                   <Input
                                     type="text"
                                     placeholder={
-                                      userData.user_info.credentials.first_name
+                                      userData.data.user_info.credentials
+                                        .first_name
                                     }
                                     {...field}
                                   />
@@ -413,7 +414,7 @@ export default function EditUserData() {
                     id="showcasedLastName"
                     type="text"
                     disabled
-                    value={userData.user_info.credentials.last_name}
+                    value={userData.data.user_info.credentials.last_name}
                   />
                 </fieldset>
 
@@ -451,7 +452,8 @@ export default function EditUserData() {
                                   <Input
                                     type="text"
                                     placeholder={
-                                      userData.user_info.credentials.last_name
+                                      userData.data.user_info.credentials
+                                        .last_name
                                     }
                                     {...field}
                                   />
@@ -577,7 +579,7 @@ export default function EditUserData() {
                   type="tel"
                   disabled
                   placeholder="000-000-000"
-                  value={userData.user_info.phone}
+                  value={userData.data.user_info.phone}
                 />
               </fieldset>
               <div className="flex justify-between">
@@ -663,11 +665,11 @@ export default function EditUserData() {
                   type="text"
                   disabled
                   placeholder="Address"
-                  value={`${userData.user_info.address.line1 || 'Street'}, ${
-                    userData.user_info.address.city || 'City'
-                  }, ${userData.user_info.address.state || 'State'}, ${
-                    userData.user_info.address.country || 'Country'
-                  }`}
+                  value={`${
+                    userData.data.user_info.address.line1 || 'Street'
+                  }, ${userData.data.user_info.address.city || 'City'}, ${
+                    userData.data.user_info.address.state || 'State'
+                  }, ${userData.data.user_info.address.country || 'Country'}`}
                 />
               </fieldset>
               <div className="flex justify-between">
@@ -702,7 +704,9 @@ export default function EditUserData() {
                               <FormControl>
                                 <Input
                                   type="text"
-                                  placeholder={userData.user_info.address.line1}
+                                  placeholder={
+                                    userData.data.user_info.address.line1
+                                  }
                                   {...field}
                                 />
                               </FormControl>
@@ -722,7 +726,9 @@ export default function EditUserData() {
                               <FormControl>
                                 <Input
                                   type="text"
-                                  placeholder={userData.user_info.address.line2}
+                                  placeholder={
+                                    userData.data.user_info.address.line2
+                                  }
                                   {...field}
                                 />
                               </FormControl>
@@ -742,7 +748,9 @@ export default function EditUserData() {
                               <FormControl>
                                 <Input
                                   type="text"
-                                  placeholder={userData.user_info.address.city}
+                                  placeholder={
+                                    userData.data.user_info.address.city
+                                  }
                                   {...field}
                                 />
                               </FormControl>
@@ -762,7 +770,9 @@ export default function EditUserData() {
                               <FormControl>
                                 <Input
                                   type="text"
-                                  placeholder={userData.user_info.address.state}
+                                  placeholder={
+                                    userData.data.user_info.address.state
+                                  }
                                   {...field}
                                 />
                               </FormControl>
@@ -783,7 +793,7 @@ export default function EditUserData() {
                                 <Input
                                   type="text"
                                   placeholder={
-                                    userData.user_info.address.postal_code
+                                    userData.data.user_info.address.postal_code
                                   }
                                   {...field}
                                 />
@@ -805,7 +815,7 @@ export default function EditUserData() {
                                 <Input
                                   type="text"
                                   placeholder={
-                                    userData.user_info.address.country
+                                    userData.data.user_info.address.country
                                   }
                                   {...field}
                                 />
@@ -835,7 +845,7 @@ export default function EditUserData() {
           </div>
         </section>
 
-        {userData.role !== 'User' && (
+        {userData.data.role !== 'User' && (
           <section className="basis-full sm:basis-3/6 lg:basis-2/6">
             <div className="flex flex-col gap-4">
               <div>
@@ -850,8 +860,10 @@ export default function EditUserData() {
                     id="showcasedQuote"
                     type="text"
                     disabled
-                    placeholder={userData.author_info.quote || 'No quote ...'}
-                    value={userData.author_info.quote}
+                    placeholder={
+                      userData.data.author_info.quote || 'No quote ...'
+                    }
+                    value={userData.data.author_info.quote}
                   />
                 </fieldset>
                 <div className="flex justify-between">
@@ -886,7 +898,9 @@ export default function EditUserData() {
                                 <FormControl>
                                   <Input
                                     type="text"
-                                    placeholder={userData.author_info.quote}
+                                    placeholder={
+                                      userData.data.author_info.quote
+                                    }
                                     {...field}
                                   />
                                 </FormControl>
@@ -924,8 +938,8 @@ export default function EditUserData() {
                     id="showcasedPseudonim"
                     type="text"
                     disabled
-                    placeholder={userData.author_info.pseudonim}
-                    value={userData.author_info.pseudonim}
+                    placeholder={userData.data.author_info.pseudonim}
+                    value={userData.data.author_info.pseudonim}
                   />
                 </fieldset>
                 <div className="flex justify-between">
@@ -960,7 +974,9 @@ export default function EditUserData() {
                                 <FormControl>
                                   <Input
                                     type="text"
-                                    placeholder={userData.author_info.pseudonim}
+                                    placeholder={
+                                      userData.data.author_info.pseudonim
+                                    }
                                     {...field}
                                   />
                                 </FormControl>
@@ -998,8 +1014,8 @@ export default function EditUserData() {
                     id="showcasedShortDescription"
                     type="text"
                     disabled
-                    placeholder={userData.author_info.short_description}
-                    value={userData.author_info.short_description}
+                    placeholder={userData.data.author_info.short_description}
+                    value={userData.data.author_info.short_description}
                   />
                 </fieldset>
                 <div className="flex justify-between">
@@ -1038,7 +1054,8 @@ export default function EditUserData() {
                                   <Input
                                     type="text"
                                     placeholder={
-                                      userData.author_info.short_description
+                                      userData.data.author_info
+                                        .short_description
                                     }
                                     {...field}
                                   />

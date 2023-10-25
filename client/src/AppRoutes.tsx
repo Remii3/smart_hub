@@ -25,7 +25,6 @@ import { CartContext } from '@context/CartProvider';
 export default function AppRoutes() {
   const { userData } = useContext(UserContext);
   const { cartState } = useContext(CartContext);
-
   return (
     <Suspense
       fallback={
@@ -60,7 +59,11 @@ export default function AppRoutes() {
         <Route
           path="/account/my"
           element={
-            userData ? <MyAccount /> : <Navigate to={'/account/register'} />
+            !userData.data && !userData.isLoading ? (
+              <Navigate to={'/account/register'} />
+            ) : (
+              <MyAccount />
+            )
           }
         />
         <Route path="/account/:userId" element={<OtherUserPage />} />

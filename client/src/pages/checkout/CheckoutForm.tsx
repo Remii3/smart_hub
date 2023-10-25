@@ -118,7 +118,7 @@ export default function CheckoutForm({
         setMessage('An unexpected error occurred.');
       }
     } else {
-      const currentUserId = userData?._id || getCookie('guestToken');
+      const currentUserId = userData.data?._id || getCookie('guestToken');
       await usePostAccessDatabase({
         url: DATABASE_ENDPOINTS.ORDER_ONE,
         body: {
@@ -151,7 +151,7 @@ export default function CheckoutForm({
         onChange={(e: StripeLinkAuthenticationElementChangeEvent) =>
           setEmail(e.value.email)
         }
-        options={{ defaultValues: { email: userData?.email || email } }}
+        options={{ defaultValues: { email: userData.data?.email || email } }}
         onReady={() =>
           readyToShowHandler((prevState) => {
             return { ...prevState, linkAuth: true };

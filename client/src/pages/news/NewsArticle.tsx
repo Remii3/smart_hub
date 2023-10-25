@@ -103,7 +103,7 @@ export default function NewsArticle({
   });
 
   const checkUserVoted = (votes: { user: string; vote: number }[]) => {
-    const voted = votes.find((item) => item.user === userData?._id);
+    const voted = votes.find((item) => item.user === userData.data?._id);
     let result = null;
     if (voted) {
       result = voted.vote === 1 ? 'like' : 'dislike';
@@ -167,7 +167,7 @@ export default function NewsArticle({
       await usePostAccessDatabase({
         url: DATABASE_ENDPOINTS.COMMENT_ONE,
         body: {
-          userId: userData?._id,
+          userId: userData.data?._id,
           targetId: newsId,
           value: newCommentState.data,
           target: COMMENT_TARGET.NEWS,
@@ -195,7 +195,7 @@ export default function NewsArticle({
       url: DATABASE_ENDPOINTS.COMMENT_DELETE,
       body: {
         commentId,
-        userId: userData?._id,
+        userId: userData.data?._id,
       },
     });
     if (error === null) {
@@ -237,13 +237,13 @@ export default function NewsArticle({
     if (voteType === vote.vote) {
       await usePostAccessDatabase({
         url: DATABASE_ENDPOINTS.NEWS_VOTE_REMOVE,
-        body: { userId: userData?._id, newsId, vote: voteType },
+        body: { userId: userData.data?._id, newsId, vote: voteType },
       });
       await fetchVotes();
     } else {
       await usePostAccessDatabase({
         url: DATABASE_ENDPOINTS.NEWS_VOTE_ADD,
-        body: { userId: userData?._id, newsId, vote: voteType },
+        body: { userId: userData.data?._id, newsId, vote: voteType },
       });
       await fetchVotes();
     }
