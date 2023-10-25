@@ -53,6 +53,7 @@ export default function SearchPage() {
     });
 
   const fetchData = useCallback(async () => {
+    if (!currentSortMethod) return;
     setSearchedProductsData((prevState) => {
       return { ...prevState, isLoading: true };
     });
@@ -77,7 +78,6 @@ export default function SearchPage() {
         filtersData: newFilters,
       },
     });
-
     if (error) {
       setSearchedProductsData((prevState) => {
         return { ...prevState, isLoading: false };
@@ -156,7 +156,6 @@ export default function SearchPage() {
   useEffect(() => {
     fetchData();
   }, [fetchData]);
-
   useEffect(() => {
     if (!currentSortMethod) {
       const searchPage = searchParams.get('page');
@@ -182,7 +181,7 @@ export default function SearchPage() {
   }, []);
   return (
     <MainContainer>
-      <div className="fixed left-7 right-7 top-16 z-10 flex justify-between bg-background pt-2 md:static md:mb-2 md:pt-0">
+      <div className="fixed left-0 right-0 top-16 z-10 flex w-full justify-between bg-background px-4 pt-2 md:static md:mb-2 md:px-0 md:pt-0">
         <p>
           Results:{' '}
           {searchedProductsData.rawData &&
@@ -205,7 +204,7 @@ export default function SearchPage() {
             0
           }
         />
-        <section className="h-full w-full space-y-2 pt-[calc(58px+48px+8px)] md:pt-0">
+        <section className="h-full w-full space-y-2 md:pt-0">
           {(searchParams.get('phrase') ||
             searchParams.get('category') ||
             searchParams.get('author')) && (
@@ -286,6 +285,7 @@ export default function SearchPage() {
           )}
 
           {!searchedProductsData.isLoading &&
+            searchedProductsData.rawData.queries &&
             searchedProductsData.products &&
             searchedProductsData.products.length === 0 && (
               <div className="flex h-full w-full items-center justify-center">

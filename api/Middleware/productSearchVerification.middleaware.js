@@ -3,7 +3,6 @@ const User = require('../Models/user');
 
 const productSearchVerification = async (req, res, next) => {
   let { pageSize, filtersData } = req.query;
-
   let currentPage = filtersData.page;
   if (!currentPage) {
     currentPage = 1;
@@ -18,27 +17,27 @@ const productSearchVerification = async (req, res, next) => {
 
   let sort = {};
   switch (filtersData.sortOption) {
-    case 'Date, ASC':
+    case "Date, ASC":
       sort.created_at = 1;
       break;
-    case 'Date, DESC':
+    case "Date, DESC":
       sort.created_at = -1;
       break;
 
-    case 'Title, ASC':
+    case "Title, ASC":
       sort.title = 1;
       break;
 
-    case 'Title, DESC':
+    case "Title, DESC":
       sort.title = -1;
       break;
 
-    case 'Price, DESC':
-      sort['shop_info.price'] = -1;
+    case "Price, DESC":
+      sort["shop_info.price"] = -1;
       break;
 
-    case 'Price, ASC':
-      sort['shop_info.price'] = 1;
+    case "Price, ASC":
+      sort["shop_info.price"] = 1;
       break;
   }
   const finalQuery = {};
@@ -46,7 +45,7 @@ const productSearchVerification = async (req, res, next) => {
   let specialQuery = null;
 
   if (filtersData.searchedPhrase) {
-    finalQuery['$text'] = { $search: `${filtersData.searchedPhrase}` };
+    finalQuery["$text"] = { $search: `${filtersData.searchedPhrase}` };
     finalRawData.queries = [...finalRawData.queries];
   }
 
@@ -59,12 +58,14 @@ const productSearchVerification = async (req, res, next) => {
 
     for (let i = 0; i < filtersData.selectedAuthors.length; i++) {
       const author = await User.findOne({
-        'author_info.pseudonim': filtersData.selectedAuthors[i],
+        "author_info.pseudonim": filtersData.selectedAuthors[i],
       });
-      authors.push(author._id);
+      if (author) {
+        authors.push(author._id);
+      }
     }
 
-    finalQuery['authors'] = { $in: authors };
+    finalQuery["authors"] = { $in: authors };
     finalRawData.queries = [...finalRawData.queries];
   }
 
@@ -78,10 +79,12 @@ const productSearchVerification = async (req, res, next) => {
       const category = await Category.findOne({
         value: filtersData.selectedCategories[i],
       });
-      categories.push(category._id);
+      if (category) {
+        categories.push(category._id);
+      }
     }
 
-    finalQuery['categories'] = { $in: categories };
+    finalQuery["categories"] = { $in: categories };
     finalRawData.queries = [...finalRawData.queries];
   }
 

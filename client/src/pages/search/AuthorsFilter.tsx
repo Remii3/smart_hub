@@ -1,3 +1,4 @@
+import { Label } from '@components/UI/label';
 import { DATABASE_ENDPOINTS } from '@data/endpoints';
 import { useGetAccessDatabase } from '@hooks/useAaccessDatabase';
 import { useCallback, useEffect, useState } from 'react';
@@ -59,10 +60,12 @@ export default function AuthorsFilter() {
 
   return (
     <div>
+      <Label htmlFor="filterAuthors">Authors filter</Label>
       <Select
         menuPlacement="top"
         maxMenuHeight={250}
         isMulti
+        inputId="filterAuthors"
         options={authorsState.options}
         defaultValue={defaultValue && defaultValue}
         onChange={(newValue, actionMeta) => selectHandler(actionMeta)}

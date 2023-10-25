@@ -35,6 +35,7 @@ export default function MarketplaceSelector() {
           </Label>
           <Checkbox
             id={`filter-${option}`}
+            aria-label={`Show marketplace ${option}`}
             name={option}
             onCheckedChange={(state) => selectHandler(state, option)}
             checked={

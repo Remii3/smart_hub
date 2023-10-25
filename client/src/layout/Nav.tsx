@@ -203,19 +203,20 @@ export default function Nav({ scrollFlag }: { scrollFlag: boolean }) {
             <Popover>
               <PopoverTrigger className="relative" aria-label="Shopping cart">
                 <Suspense fallback={<LoadingCircle />}>
-                  <ShoppingBagIcon className={` h-7 w-7`} />
+                  <ShoppingBagIcon className={`h-7 w-7`} />
+                  {cartState && cartState.products.length > 0 && (
+                    <span
+                      aria-hidden="true"
+                      className={`${
+                        scrollFlag
+                          ? 'bg-foreground/90 text-background'
+                          : 'bg-background/90 text-foreground'
+                      } absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full`}
+                    >
+                      {cartState.products.length}
+                    </span>
+                  )}
                 </Suspense>
-                {cartState && cartState.products.length > 0 && (
-                  <span
-                    className={`${
-                      scrollFlag
-                        ? 'bg-foreground/90 text-background'
-                        : 'bg-background/90 text-foreground'
-                    } absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full`}
-                  >
-                    {cartState.products.length}
-                  </span>
-                )}
               </PopoverTrigger>
               <PopoverContent
                 className={`${

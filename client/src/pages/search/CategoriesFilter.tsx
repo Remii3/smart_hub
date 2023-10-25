@@ -1,3 +1,4 @@
+import { Label } from '@components/UI/label';
 import { DATABASE_ENDPOINTS } from '@data/endpoints';
 import { useGetAccessDatabase } from '@hooks/useAaccessDatabase';
 import { useCallback, useEffect, useState } from 'react';
@@ -58,7 +59,9 @@ export default function CategoriesFilter() {
 
   return (
     <div>
+      <Label htmlFor="filterAuthors">Categories filter</Label>
       <Select
+        inputId="filterCategories"
         menuPlacement="top"
         maxMenuHeight={250}
         isMulti
