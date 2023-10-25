@@ -7,6 +7,7 @@ import { buttonVariants } from '@components/UI/button';
 import { Skeleton } from '@components/UI/skeleton';
 import { useGetAccessDatabase } from '@hooks/useAaccessDatabase';
 import { DATABASE_ENDPOINTS } from '@data/endpoints';
+import { sortOptions } from '@hooks/useSortProducts';
 
 interface ProductCategoriesFullTypes extends FetchDataTypes {
   data: ProductCategories[] | null;
@@ -90,7 +91,10 @@ export default function CategoriesSection() {
       {!shopList.isLoading && !shopList.hasError && shopList.data && (
         <footer className="w-full text-center">
           <Link
-            to="/shop/categories"
+            to={{
+              pathname: '/search',
+              search: `sort=${sortOptions.PRICE_ASC}`,
+            }}
             className={buttonVariants({ variant: 'default' })}
           >
             Show more

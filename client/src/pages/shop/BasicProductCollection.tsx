@@ -78,7 +78,6 @@ export default function BasicProductCollection({
     setProducts((prevState) => {
       return { ...prevState, isLoading: true };
     });
-
     const { data } = await useGetAccessDatabase({
       url: DATABASE_ENDPOINTS.PRODUCT_SHOP_ALL,
       params: {

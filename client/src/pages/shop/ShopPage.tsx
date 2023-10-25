@@ -1,4 +1,3 @@
-import LoadingCircle from '@components/Loaders/LoadingCircle';
 import MainContainer from '@layout/MainContainer';
 import BasicProductCollection from '@pages/shop/BasicProductCollection';
 
@@ -14,8 +13,8 @@ export default function ShopPage() {
       </div>
       <MainContainer>
         <BasicProductCollection
-          category="action"
-          title="Action"
+          category="fiction"
+          title="Fiction"
           marketPlace="Shop"
         />
         <BasicProductCollection
@@ -26,8 +25,8 @@ export default function ShopPage() {
           marketPlace="Shop"
         />
         <BasicProductCollection
-          category="science"
-          title="Science"
+          category="romance"
+          title="Romance"
           showMore
           subTitle="
             Lorem, ipsum dolor sit amet consectetur adipisicing elit. Iste

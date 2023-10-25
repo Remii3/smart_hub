@@ -11,6 +11,7 @@ import {
 import { Skeleton } from '@components/UI/skeleton';
 import { UserContext } from '@context/UserProvider';
 import { UserTypes } from '@customTypes/interfaces';
+import { UserRoleTypes } from '@customTypes/types';
 import { DATABASE_ENDPOINTS } from '@data/endpoints';
 import StarRating from '@features/starRating/StarRating';
 import { TrashIcon, UserCircleIcon } from '@heroicons/react/24/outline';
@@ -164,6 +165,7 @@ export default function Comments({
       setShowDeleteDialog(null);
     }
   };
+  console.log(comments);
   return (
     <div className="mt-8">
       <h5 className="pb-2">Comments</h5>
@@ -295,43 +297,48 @@ export default function Comments({
                 </div>
                 <div>{comment.value.text}</div>
               </div>
-              <Dialog
-                open={showDeleteDialog === comment._id}
-                onOpenChange={() => setShowDeleteDialog(null)}
-              >
-                <Button
-                  variant={'destructive'}
-                  onClick={() => setShowDeleteDialog(comment._id)}
-                  type="button"
+              {(userData?._id === comment.user._id ||
+                userData?.role == UserRoleTypes.ADMIN) && (
+                <Dialog
+                  open={showDeleteDialog === comment._id}
+                  onOpenChange={() => setShowDeleteDialog(null)}
                 >
-                  <TrashIcon className="h-6 w-6" />
-                </Button>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Are you sure?</DialogTitle>
-                    <DialogDescription>
-                      Deleting this will permamently remove the item from the
-                      database.
-                    </DialogDescription>
-                  </DialogHeader>
-                  <DialogFooter>
+                  <div className="flex items-center">
                     <Button
-                      type="button"
                       variant={'destructive'}
-                      onClick={() =>
-                        deleteCommentHandler(comment._id, comment.value)
-                      }
+                      onClick={() => setShowDeleteDialog(comment._id)}
+                      type="button"
                     >
-                      Delete
+                      <TrashIcon className="h-6 w-6" />
                     </Button>
-                    <DialogClose asChild>
-                      <Button variant={'outline'} type="button">
-                        Cancel
+                  </div>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Are you sure?</DialogTitle>
+                      <DialogDescription>
+                        Deleting this will permamently remove the item from the
+                        database.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter>
+                      <Button
+                        type="button"
+                        variant={'destructive'}
+                        onClick={() =>
+                          deleteCommentHandler(comment._id, comment.value)
+                        }
+                      >
+                        Delete
                       </Button>
-                    </DialogClose>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
+                      <DialogClose asChild>
+                        <Button variant={'outline'} type="button">
+                          Cancel
+                        </Button>
+                      </DialogClose>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+              )}
             </div>
           ))}
       </section>

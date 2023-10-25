@@ -3,11 +3,11 @@ const User = require('../Models/user');
 
 const productSearchVerification = async (req, res, next) => {
   let { pageSize, filtersData } = req.query;
-  
+
   if (!filtersData) {
     return res.status(422).json({
-      message: "No filters provided",
-      error: "Please provide filters data",
+      message: 'No filters provided',
+      error: 'Please provide filters data',
     });
   }
 
@@ -26,23 +26,23 @@ const productSearchVerification = async (req, res, next) => {
 
   let sortMethod = {};
   switch (filtersData.sortOption) {
-    case "Date, ASC":
+    case 'Date, ASC':
       sortMethod.created_at = 1;
       break;
-    case "Date, DESC":
+    case 'Date, DESC':
       sortMethod.created_at = -1;
       break;
-    case "Title, ASC":
+    case 'Title, ASC':
       sortMethod.title = 1;
       break;
-    case "Title, DESC":
+    case 'Title, DESC':
       sortMethod.title = -1;
       break;
-    case "Price, DESC":
-      sortMethod["shop_info.price"] = -1;
+    case 'Price, DESC':
+      sortMethod['shop_info.price'] = -1;
       break;
-    case "Price, ASC":
-      sortMethod["shop_info.price"] = 1;
+    case 'Price, ASC':
+      sortMethod['shop_info.price'] = 1;
       break;
     default:
       return (sortMethod.created_at = -1);
@@ -54,10 +54,9 @@ const productSearchVerification = async (req, res, next) => {
   const rawData = { queries: {} };
 
   if (filtersData.searchedPhrase) {
-    searchQuery["$text"] = { $search: `${filtersData.searchedPhrase}` };
+    searchQuery['$text'] = { $search: `${filtersData.searchedPhrase}` };
     rawData.queries.phrase = filtersData.searchedPhrase;
   }
-
   if (filtersData.searchedSpecial) {
     specialQuery = filtersData.searchedSpecial;
     rawData.queries.special = filtersData.searchedSpecial;
@@ -68,14 +67,14 @@ const productSearchVerification = async (req, res, next) => {
 
     for (let i = 0; i < filtersData.selectedAuthors.length; i++) {
       const author = await User.findOne({
-        "author_info.pseudonim": filtersData.selectedAuthors[i],
+        'author_info.pseudonim': filtersData.selectedAuthors[i],
       });
       if (author) {
         authors.push(author._id);
       }
     }
 
-    searchQuery["authors"] = { $in: authors };
+    searchQuery['authors'] = { $in: authors };
     rawData.queries.authors = authors;
   }
 
@@ -94,16 +93,16 @@ const productSearchVerification = async (req, res, next) => {
       }
     }
 
-    searchQuery["categories"] = { $in: categories };
+    searchQuery['categories'] = { $in: categories };
     rawData.queries.categories = categories;
   }
 
   if (filtersData.marketplace) {
     const marketplaces = [];
-    filtersData.marketplace.forEach((item) => {
+    filtersData.marketplace.forEach(item => {
       marketplaces.push(item.charAt(0).toUpperCase() + item.slice(1));
     });
-    searchQuery["market_place"] = { $in: marketplaces };
+    searchQuery['market_place'] = { $in: marketplaces };
     rawData.queries.marketplace = marketplaces;
   }
 
@@ -113,7 +112,7 @@ const productSearchVerification = async (req, res, next) => {
     filtersData.selectedPriceRange.maxPrice &&
     filtersData.selectedPriceRange.maxPrice >= 1
   ) {
-    searchQuery["shop_info.price"] = {
+    searchQuery['shop_info.price'] = {
       $gte: Number(filtersData.selectedPriceRange.minPrice),
       $lte: Number(filtersData.selectedPriceRange.maxPrice),
     };
@@ -123,7 +122,7 @@ const productSearchVerification = async (req, res, next) => {
     filtersData.selectedPriceRange.minPrice &&
     filtersData.selectedPriceRange.minPrice >= 1
   ) {
-    searchQuery["shop_info.price"] = {
+    searchQuery['shop_info.price'] = {
       $gte: Number(filtersData.selectedPriceRange.minPrice),
     };
     rawData.queries.minPrice = filtersData.selectedPriceRange.minPrice;
@@ -131,14 +130,14 @@ const productSearchVerification = async (req, res, next) => {
     filtersData.selectedPriceRange.maxPrice &&
     filtersData.selectedPriceRange.maxPrice >= 1
   ) {
-    searchQuery["shop_info.price"] = {
+    searchQuery['shop_info.price'] = {
       $lte: Number(filtersData.selectedPriceRange.maxPrice),
     };
     rawData.queries.maxPrice = filtersData.selectedPriceRange.maxPrice;
   }
 
   if (filtersData.selectedRating) {
-    searchQuery["avgRating"] = {
+    searchQuery['avgRating'] = {
       $lte: filtersData.selectedRating,
     };
     rawData.queries.rating = filtersData.selectedRating;

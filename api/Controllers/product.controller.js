@@ -35,11 +35,34 @@ const getAllProducts = async (req, res) => {
 };
 
 const getShopProducts = async (req, res) => {
+  const { category, minPrice, maxPrice } = req.query;
   try {
+    const findData = {};
+    if (category) {
+      const categoryLabel =
+        category.charAt(0).toUpperCase() + category.slice(1);
+      const categoryData = await Category.findOne({
+        label: categoryLabel,
+      });
+      if (!categoryData) {
+        return res.status(422).json({
+          message: 'Invalid category',
+          error: 'This category in not in database: ' + category,
+        });
+      }
+      findData.categories = categoryData._id;
+    }
+    if (minPrice) {
+      findData.shop_info = { price: { $gte: minPrice } };
+    }
+    if (maxPrice) {
+      findData.shop_info = { price: { $lte: maxPrice } };
+    }
     const products = await Product.find({
       market_place: 'Shop',
       quantity: { $gt: 0 },
       deleted: false,
+      ...findData,
     }).populate('authors');
 
     const preparedProducts = [];
@@ -129,23 +152,23 @@ const getSearchedProducts = async (req, res) => {
     searchQuery.deleted = false;
     if (specialQuery) {
       switch (specialQuery) {
-        case "bestseller":
+        case 'bestseller':
           {
             const top_selling_products = await Order.aggregate([
-              { $unwind: "$products" },
+              { $unwind: '$products' },
               {
                 $lookup: {
-                  from: "products",
-                  localField: "products.product",
-                  foreignField: "_id",
-                  as: "product_doc",
+                  from: 'products',
+                  localField: 'products.product',
+                  foreignField: '_id',
+                  as: 'product_doc',
                 },
               },
-              { $unwind: "$product_doc" },
+              { $unwind: '$product_doc' },
               {
                 $group: {
-                  _id: "$product_doc._id",
-                  sum: { $sum: "$products.in_cart_quantity" },
+                  _id: '$product_doc._id',
+                  sum: { $sum: '$products.in_cart_quantity' },
                 },
               },
               { $sort: { sum: -1 } },
@@ -154,7 +177,7 @@ const getSearchedProducts = async (req, res) => {
                 $group: {
                   _id: null,
                   top_selling_products: {
-                    $push: "$_id",
+                    $push: '$_id',
                   },
                 },
               },
@@ -170,7 +193,7 @@ const getSearchedProducts = async (req, res) => {
               products_copy.length >= 1
                 ? products_copy.sort(
                     (a, b) =>
-                      Number(b.shop_info.price) - Number(a.shop_info.price)
+                      Number(b.shop_info.price) - Number(a.shop_info.price),
                   )
                 : null;
             totalDocuments = products.length;
@@ -186,7 +209,7 @@ const getSearchedProducts = async (req, res) => {
           .sort(sortMethod)
           .skip(skipPagesCopy)
           .limit(currentPageSize)
-          .populate("authors");
+          .populate('authors');
         if (products.length <= 0 && skipPages > 1 && currentPage > 1) {
           flag = true;
           skipPagesCopy -= skipPages;
@@ -197,7 +220,7 @@ const getSearchedProducts = async (req, res) => {
       } while (flag);
 
       highestPrice = await Product.find({ deleted: false })
-        .sort({ "shop_info.price": -1 })
+        .sort({ 'shop_info.price': -1 })
         .limit(1);
       totalDocuments = await Product.find(searchQuery).countDocuments();
       totalPages = Math.ceil(totalDocuments / currentPageSize);
@@ -224,7 +247,7 @@ const getSearchedProducts = async (req, res) => {
   } catch (err) {
     return res
       .status(500)
-      .json({ message: "Faield fetching searched query", error: err.message });
+      .json({ message: 'Faield fetching searched query', error: err.message });
   }
 };
 

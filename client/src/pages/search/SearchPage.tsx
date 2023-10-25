@@ -71,6 +71,7 @@ export default function SearchPage() {
       searchedPhrase: searchParams.get('phrase'),
       page: searchParams.get('page'),
       sortOption: searchParams.get('sortMethod'),
+      searchedSpecial: searchParams.get('special'),
     };
     const { data, error } = await useGetAccessDatabase({
       url: DATABASE_ENDPOINTS.PRODUCT_SEARCHED,
