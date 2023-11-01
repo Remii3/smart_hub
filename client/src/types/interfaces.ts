@@ -16,7 +16,7 @@ export interface ProductTypes {
   _id: string;
   title: string;
   description?: string;
-  imgs?: string[];
+  imgs: { id: string; url: string }[];
   categories?: { value: string; label: string; _id: string }[];
   authors: AuthorTypes[];
   rating: { rating: number; count: number };
@@ -63,7 +63,7 @@ export interface UserTypes {
   email: string;
   username: string;
   user_info: {
-    profile_img: any;
+    profile_img: { url: string; id: string };
     background_img: any;
     credentials: { first_name: string; last_name: string; full_name: string };
     address: {
@@ -121,7 +121,7 @@ export interface OrderTypes {
 
 // * Fetch types
 
-export interface SimpleFetchDataTypes {
+export interface FetchDataTypes {
   isLoading: boolean;
   hasError: null | string;
 }
@@ -165,13 +165,14 @@ export interface ProductSpecialAuctionCardTypes extends ProductCardTypes {
 
 export interface ProductShopCardType extends ProductCardTypes {
   price: number;
-  img?: string;
+  img: string | null;
   description?: string;
   productQuantity: number;
+  rating: { rating: number; count: number };
 }
 
 export interface ProductAuctionCardType extends ProductCardTypes {
-  img?: string;
+  img: string | null;
   startingPrice: number;
   currentPrice: number;
   auctionEndDate: Date;
@@ -184,4 +185,8 @@ export interface NewsTypes {
   title: string;
   subtitle?: string;
   content: string;
+  img?: {
+    id: string;
+    url: string;
+  };
 }

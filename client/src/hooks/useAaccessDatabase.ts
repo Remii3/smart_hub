@@ -1,3 +1,4 @@
+import { toast } from '@components/UI/use-toast';
 import axios, { AxiosError } from 'axios';
 interface AccessTypes {
   url: string;
@@ -7,6 +8,7 @@ interface GetTypes extends AccessTypes {
 }
 interface PostTypes extends AccessTypes {
   body: any;
+  headers?: any;
 }
 
 const useGetAccessDatabase = async ({ url, params }: GetTypes) => {
@@ -15,6 +17,11 @@ const useGetAccessDatabase = async ({ url, params }: GetTypes) => {
     return { data: data.data, error: null };
   } catch (err) {
     const error = err as Error | AxiosError;
+    toast({
+      variant: 'destructive',
+      title: 'Uh oh! Something went wrong.',
+      description: 'We failed finishing your request.',
+    });
     if (!axios.isAxiosError(error)) {
       return { data: null, error: error || 'An unknown error has occured' };
     } else {
@@ -23,16 +30,27 @@ const useGetAccessDatabase = async ({ url, params }: GetTypes) => {
   }
 };
 
-const usePostAccessDatabase = async ({ url, body }: PostTypes) => {
+const usePostAccessDatabase = async ({ url, body, headers }: PostTypes) => {
   try {
-    const { data } = await axios.post(url, body);
+    const { data } = await axios.post(url, body, {
+      headers,
+    });
     return { data, error: null };
   } catch (err) {
     const error = err as Error | AxiosError;
+    toast({
+      variant: 'destructive',
+      title: 'Uh oh! Something went wrong.',
+      description: 'We failed finishing your request.',
+    });
     if (!axios.isAxiosError(error)) {
       return { data: null, error: error || 'An unknown error has occured' };
     } else {
-      return { data: null, error: error.response?.data.message };
+      return {
+        data: null,
+        error: error.response?.data.message,
+        name: error.response?.data.name,
+      };
     }
   }
 };

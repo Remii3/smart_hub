@@ -39,9 +39,9 @@ export default function PriceSelector({
             />
           </summary>
         </PopoverTrigger>
-        <PopoverContent className="relative bg-white">
+        <PopoverContent className="relative bg-background">
           <div>
-            <div className="bg-white">
+            <div className="bg-background">
               <header className="flex  flex-wrap justify-between p-4">
                 <span className="text-sm text-gray-700">
                   The highest price is {highestPrice && highestPrice}€
@@ -107,7 +107,7 @@ export default function PriceSelector({
           >
             <Popover.Panel className="absolute left-1/2 z-10 -translate-x-10 transform px-4 sm:px-0 lg:max-w-3xl">
               <div className="z-50 group-open:absolute group-open:top-auto group-open:mt-2 ltr:group-open:start-0">
-                <div className="w-96 rounded border border-gray-200 bg-white">
+                <div className="w-96 rounded border border-gray-200 bg-background">
                   <header className="flex items-center justify-between p-4">
                     <span className="text-sm text-gray-700">
                       The highest price is {highestPrice}

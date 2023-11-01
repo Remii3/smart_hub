@@ -32,11 +32,19 @@ export default function CartItem({
   return (
     <li className="flex items-center gap-4">
       <Link to={`/product/${productData._id}`}>
-        <img
-          src="https://images.unsplash.com/photo-1618354691373-d851c5c3a990?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=830&q=80"
-          alt="product_img"
-          className="h-16 w-16 rounded object-cover"
-        />
+        {productData.imgs && productData.imgs[0] ? (
+          <img
+            src={productData.imgs[0].url}
+            alt="product_img"
+            className="h-16 w-16 rounded object-cover"
+          />
+        ) : (
+          <img
+            src="https://images.unsplash.com/photo-1618354691373-d851c5c3a990?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=830&q=80"
+            alt="product_img"
+            className="h-16 w-16 rounded object-cover"
+          />
+        )}
       </Link>
       <div>
         <Link to={`/product/${productData._id}`}>

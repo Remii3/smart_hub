@@ -1,14 +1,26 @@
 import LoadingCircle from '@components/Loaders/LoadingCircle';
 import { Button } from '@components/UI/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@components/UI/dialog';
+import { Skeleton } from '@components/UI/skeleton';
 import { UserContext } from '@context/UserProvider';
 import { UserTypes } from '@customTypes/interfaces';
+import { UserRoleTypes } from '@customTypes/types';
 import { DATABASE_ENDPOINTS } from '@data/endpoints';
 import StarRating from '@features/starRating/StarRating';
-import { UserCircleIcon } from '@heroicons/react/24/outline';
+import { TrashIcon, UserCircleIcon } from '@heroicons/react/24/outline';
+import { UserCircleIcon as UserIcon } from '@heroicons/react/24/solid';
 import {
   useGetAccessDatabase,
   usePostAccessDatabase,
 } from '@hooks/useAaccessDatabase';
+import { DialogClose } from '@radix-ui/react-dialog';
 import { useCallback, useContext, useEffect, useState } from 'react';
 
 type CommentTargetTypes = 'Product' | 'News';
@@ -38,12 +50,14 @@ interface PropsTypes {
   targetId: string;
   target: CommentTargetTypes;
   updateProductStatus: () => void;
+  withRating: boolean;
 }
 
 export default function Comments({
   targetId,
   target,
   updateProductStatus,
+  withRating,
 }: PropsTypes) {
   const [comments, setComments] = useState<CommentsTypes>({
     data: null,
@@ -56,9 +70,8 @@ export default function Comments({
     isLoading: false,
     error: null,
   });
-
+  const [showDeleteDialog, setShowDeleteDialog] = useState<null | string>(null);
   const { userData } = useContext(UserContext);
-
   const fetchData = useCallback(async () => {
     setComments((prevState) => {
       return { ...prevState, isLoading: true };
@@ -85,16 +98,30 @@ export default function Comments({
   }, []);
 
   const addNewCommentHandler = async () => {
+    const preparedValue = {} as {
+      text?: string;
+      rating?: number;
+    };
+
+    if (newComment.rating) {
+      preparedValue.rating = newComment.rating;
+    }
+    if (newComment.value) {
+      preparedValue.text = newComment.value;
+    }
+    if (!preparedValue.rating && !preparedValue.text) return;
+
     setNewComment((prevState) => {
       return { ...prevState, isLoading: true };
     });
+
     const { error } = await usePostAccessDatabase({
       url: DATABASE_ENDPOINTS.COMMENT_ONE,
       body: {
-        userId: userData?._id,
+        userId: userData.data?._id,
         targetId,
         target: target,
-        value: { rating: newComment.rating, text: newComment.value },
+        value: preparedValue,
       },
     });
     if (error) {
@@ -117,28 +144,60 @@ export default function Comments({
     fetchData();
   }, [fetchData]);
 
+  const deleteCommentHandler = async (
+    commentId: string,
+    value: { text: string; rating: number }
+  ) => {
+    const { error } = await usePostAccessDatabase({
+      url: DATABASE_ENDPOINTS.COMMENT_DELETE,
+      body: {
+        target,
+        targetId,
+        commentId,
+        userId: userData.data?._id,
+        value,
+      },
+    });
+    if (error === null) {
+      await fetchData();
+      updateProductStatus();
+      setShowDeleteDialog(null);
+    }
+  };
   return (
     <div className="mt-8">
       <h5 className="pb-2">Comments</h5>
       <section className="mb-16">
         <div className="flex flex-col-reverse gap-8 md:flex-row">
           <div>
-            <div className="mb-3">
-              <StarRating
-                rating={newComment.rating ? newComment.rating : 0}
-                setRating={setNewComment}
-              />
-            </div>
+            {withRating && (
+              <div className="mb-3">
+                <StarRating
+                  rating={newComment.rating || 0}
+                  changeRatingHandler={(e) =>
+                    setNewComment((prevState) => {
+                      return { ...prevState, rating: e };
+                    })
+                  }
+                />
+              </div>
+            )}
             <div className="flex gap-4">
-              {userData ? (
+              {userData.data ? (
                 <>
-                  <img
-                    src={userData?.user_info.profile_img}
-                    className="h-14 w-14 rounded-md"
-                    alt="profile_img"
-                  />
+                  {userData.data.user_info.profile_img.url ? (
+                    <div className="h-14 w-14">
+                      <img
+                        src={userData.data.user_info.profile_img.url}
+                        className="h-8 w-8 rounded-full object-cover"
+                        alt="profile_img"
+                      />
+                    </div>
+                  ) : (
+                    <UserIcon className="h-8 w-8" />
+                  )}
 
-                  <p>{userData?.username}</p>
+                  <p>{userData.data?.username}</p>
                 </>
               ) : (
                 <>
@@ -158,8 +217,8 @@ export default function Comments({
                 className="w-full resize-none border-none align-top focus:ring-0 sm:text-sm"
                 name="newComment"
                 rows={4}
-                disabled={!userData}
-                placeholder={userData ? 'Enter new comment...' : ''}
+                disabled={!userData.data}
+                placeholder={userData.data ? 'Enter new comment...' : ''}
                 value={newComment.value}
                 onChange={(e) =>
                   setNewComment((prevState) => {
@@ -167,30 +226,38 @@ export default function Comments({
                   })
                 }
               />
-              {!userData && (
+              {!userData.data && (
                 <div className="absolute top-0 flex h-full w-full items-center justify-center bg-slate-300/20">
                   <span className="text-lg">Register to upload a message</span>
                 </div>
               )}
             </div>
 
-            <div className="flex items-center justify-end gap-2 bg-white p-3">
+            <div className="flex items-center justify-end gap-2 bg-background p-3">
               <Button
                 variant="default"
-                disabled={!userData}
-                className={`${!userData && 'bg-slate-300'}`}
+                disabled={!userData.data}
+                className={`${!userData.data && 'bg-slate-300'}`}
                 onClick={() => addNewCommentHandler()}
               >
-                <LoadingCircle isLoading={newComment.isLoading}>
-                  Publish
-                </LoadingCircle>
+                {newComment.isLoading ? <LoadingCircle /> : 'Publish'}
               </Button>
             </div>
           </div>
         </div>
       </section>
       <section>
-        {comments.isLoading && <div>loading</div>}
+        {comments.isLoading && !comments.data && (
+          <div className="space-y-8">
+            <Skeleton className="flex h-[92px] w-full items-center px-4">
+              <div className="space-y-3">
+                <Skeleton className="h-3 w-5" />
+                <Skeleton className="h-3 w-10" />
+                <Skeleton className="h-3 w-14" />
+              </div>
+            </Skeleton>
+          </div>
+        )}
         {!comments.isLoading && !comments.data && <div>No data</div>}
         {!comments.isLoading &&
           comments.data &&
@@ -200,15 +267,25 @@ export default function Comments({
               className="mb-8 flex w-full flex-col-reverse gap-8 rounded-md bg-gray-50 p-4 sm:flex-row"
             >
               <div>
-                <div className="mb-3">
-                  <StarRating rating={comment.value.rating} showOnly />
-                </div>
+                {withRating && (
+                  <div className="mb-3">
+                    {comment.value.rating > 0 && (
+                      <StarRating rating={comment.value.rating} showOnly />
+                    )}
+                  </div>
+                )}
                 <div className="flex gap-4">
-                  <img
-                    src={comment.user.user_info.profile_img}
-                    alt="profile_img"
-                    className="h-14 w-14 rounded-lg"
-                  />
+                  <div className="h-14 w-14">
+                    {comment.user.user_info.profile_img.url ? (
+                      <img
+                        src={comment.user.user_info.profile_img.url}
+                        alt="profile_img"
+                        className="h-8 w-8 rounded-full object-cover"
+                      />
+                    ) : (
+                      <UserCircleIcon className="h-8 w-8 rounded-full object-cover" />
+                    )}
+                  </div>
                   <p className="font-semibold">{comment.user.username}</p>
                 </div>
               </div>
@@ -220,6 +297,48 @@ export default function Comments({
                 </div>
                 <div>{comment.value.text}</div>
               </div>
+              {(userData.data?._id === comment.user._id ||
+                userData.data?.role == UserRoleTypes.ADMIN) && (
+                <Dialog
+                  open={showDeleteDialog === comment._id}
+                  onOpenChange={() => setShowDeleteDialog(null)}
+                >
+                  <div className="flex items-center">
+                    <Button
+                      variant={'destructive'}
+                      onClick={() => setShowDeleteDialog(comment._id)}
+                      type="button"
+                    >
+                      <TrashIcon className="h-6 w-6" />
+                    </Button>
+                  </div>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Are you sure?</DialogTitle>
+                      <DialogDescription>
+                        Deleting this will permamently remove the item from the
+                        database.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter>
+                      <Button
+                        type="button"
+                        variant={'destructive'}
+                        onClick={() =>
+                          deleteCommentHandler(comment._id, comment.value)
+                        }
+                      >
+                        Delete
+                      </Button>
+                      <DialogClose asChild>
+                        <Button variant={'outline'} type="button">
+                          Cancel
+                        </Button>
+                      </DialogClose>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+              )}
             </div>
           ))}
       </section>

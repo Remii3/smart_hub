@@ -5,9 +5,10 @@ import { CartProductTypes, ProductShopCardType } from '@customTypes/interfaces';
 import LoadingCircle from '@components/Loaders/LoadingCircle';
 import { Button } from '@components/UI/button';
 import { Skeleton } from '@components/UI/skeleton';
+import StarRating from '@features/starRating/StarRating';
 
 const defaultProps = {
-  img: [],
+  img: '',
   authors: [],
   description: '',
 };
@@ -19,7 +20,9 @@ export const SkeletonShopCard = ({
   height: string;
 }) => {
   return (
-    <Skeleton className={`${width} ${height} flex flex-col gap-8 p-3`}>
+    <Skeleton
+      className={`${width} ${height} flex min-w-[200px] max-w-[250px] flex-col gap-8 p-3`}
+    >
       <Skeleton className="h-3/5 w-full" />
       <div className="flex flex-col gap-2">
         <Skeleton className="h-3 w-3/4 md:w-1/2" />
@@ -37,6 +40,7 @@ export default function ShopCard({
   price,
   img,
   productQuantity,
+  rating,
 }: ProductShopCardType) {
   const [isAddingToCart, setIsAddingToCart] = useState(false);
   const { addProductToCart, cartState } = useContext(CartContext);
@@ -65,7 +69,6 @@ export default function ShopCard({
       setIsAddingToCart(false);
     }
   };
-
   const currentItem = cartState.products.find(
     (product: CartProductTypes) => product.productData._id === _id
   );
@@ -78,51 +81,63 @@ export default function ShopCard({
   } else {
     itemBtnCapacity = productQuantity! < 1 || false;
   }
-
   return (
-    <div id={`${_id}`} className="mx-auto h-full w-full max-w-[400px]">
+    <div id={`${_id}`} className="mx-auto h-full w-full max-w-[280px]">
       <form
         onSubmit={(e) => addToCartHandler(e)}
-        className=" flex h-full flex-col justify-between gap-5 rounded-lg bg-white shadow transition duration-200 ease-in-out hover:shadow-md"
+        className="flex h-full flex-col justify-between gap-3 rounded-lg bg-background shadow transition duration-200 ease-in-out hover:shadow-md"
       >
-        <div className="flex flex-col gap-3">
-          <Link to={`/product/${_id}`}>
-            <img
-              src="https://images.unsplash.com/photo-1523381210434-271e8be1f52b?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80"
-              alt="img"
-              className=" w-full rounded-t-lg object-cover"
-            />
+        <div>
+          <Link to={`/product/${_id}`} className="block overflow-hidden">
+            {img ? (
+              <img
+                className="h-[160px] w-full rounded-t-lg object-cover"
+                src={img}
+                alt="product_cover"
+                height={760}
+                width={760}
+              />
+            ) : (
+              <img
+                src="https://images.unsplash.com/photo-1523381210434-271e8be1f52b?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80"
+                alt="img"
+                className="h-full max-h-[160px] w-full rounded-t-lg object-cover"
+              />
+            )}
           </Link>
-          <div className="px-3">
-            <Link to={`/product/${_id}`}>
-              <h6 className="m-0 line-clamp-2 inline-block min-h-[32px] pb-1">
-                {titleShortened}
-              </h6>
+          <div className="px-3 pt-3">
+            <Link to={`/product/${_id}`} className="inline-block">
+              <strong className="m-0 line-clamp-1">{titleShortened}</strong>
             </Link>
-            <div className="line-clamp-1 h-[24px]">
-              {authors?.map((author, id) => (
+            <div className="line-clamp-1 pb-1 text-sm">
+              {authors.map((author, id) => (
                 <span key={id} className="mr-3">
                   {author.author_info && author.author_info.pseudonim}
                 </span>
               ))}
             </div>
+            <p className="line-clamp-3 min-h-[72px]">{description}</p>
           </div>
         </div>
-        <div className="flex flex-col gap-3 px-3 pb-3">
-          <p className="line-clamp-4 min-h-[80px]">{description}</p>
-          <div className="flex justify-between gap-3">
-            <h4 className="flex items-center">{price}€</h4>
-            <div>
-              <div className="pb-3">stars</div>
-              <Button
-                type="submit"
-                variant="default"
-                disabled={isAddingToCart || itemBtnCapacity}
-              >
-                <LoadingCircle isLoading={isAddingToCart}>
-                  Add to cart
-                </LoadingCircle>
-              </Button>
+        <div className="px-3 pb-3">
+          {rating && (
+            <div className="pb-1">
+              <StarRating showOnly rating={rating.rating ? rating.rating : 0} />
+            </div>
+          )}
+
+          <div className="flex flex-col gap-3">
+            <div className="flex items-end justify-between gap-3">
+              <h4 className="flex items-center">${price.toFixed(2)}</h4>
+              <div className="text-center">
+                <Button
+                  type="submit"
+                  variant="default"
+                  disabled={isAddingToCart || itemBtnCapacity}
+                >
+                  {isAddingToCart ? <LoadingCircle /> : 'Add to cart'}
+                </Button>
+              </div>
             </div>
           </div>
         </div>

@@ -1,63 +1,65 @@
-import { useEffect, useRef } from 'react';
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { Button } from '@components/UI/button';
+import { buttonVariants } from '@components/UI/button';
 import { Link } from 'react-router-dom';
+import { ParallaxBanner, ParallaxBannerLayer } from 'react-scroll-parallax';
 
 export default function MainBanner() {
-  const imgBg = useRef(null);
-  gsap.registerPlugin(ScrollTrigger);
-
-  useEffect(() => {
-    gsap.to(imgBg.current, {
-      scrollTrigger: {
-        scrub: 1,
-      },
-      duration: 0.5,
-      scale: '1.25',
-      ease: 'sine.out',
-    });
-  }, []);
-
   return (
-    <section className="h-[102vh] w-full">
-      <div
-        ref={imgBg}
-        className="absolute left-0 top-0 h-[110vh] w-full scale-100 bg-mainBanner bg-cover bg-center bg-no-repeat brightness-50"
-      />
-      <section className="relative top-20 lg:-top-16">
-        <div className="mx-auto max-w-screen-xl px-4 py-[20%] sm:py-32 lg:flex lg:h-screen lg:items-center">
-          <div
-            id="mainPageTitle"
-            className="mx-auto max-w-xl text-center lg:max-w-3xl"
-          >
-            <h1 className=" font-extrabold text-white ">
-              Understand User Flow.
-              <strong className="font-extrabold text-primary sm:block">
-                Increase Conversion.
-              </strong>
-            </h1>
+    <ParallaxBanner
+      style={{
+        height: 'calc(100vh + 64px)',
+      }}
+    >
+      <ParallaxBannerLayer speed={-15}>
+        <img
+          src="https://firebasestorage.googleapis.com/v0/b/smarthub-75eab.appspot.com/o/static_imgs%2Fparallaximg.webp?alt=media&token=e3cddb7a-faed-4228-b335-c42c34d540fa"
+          alt="banner img"
+          height={800}
+          width={1336}
+          className="h-[calc(100vh+64px+19vh)]  w-full object-cover object-center brightness-50"
+        />
+      </ParallaxBannerLayer>
+      <ParallaxBannerLayer>
+        <div className="relative top-20 lg:-top-16">
+          <div className="mx-auto max-w-screen-xl px-4 py-[20%] sm:py-32 lg:flex lg:h-screen lg:items-center">
+            <section
+              id="mainPageTitle"
+              className="mx-auto max-w-xl text-left lg:max-w-3xl"
+            >
+              <h1 className=" font-extrabold text-background ">
+                Understand User Flow.
+                <strong className="font-extrabold text-blue-600 sm:block">
+                  Increase Conversion.
+                </strong>
+              </h1>
 
-            <p className="mt-4 text-white sm:text-xl/relaxed">
-              Dive into the world of books and unleash your imagination! Browse
-              through our vast collection and find your next literary escape.
-            </p>
-            <div className="mt-8 space-x-4">
-              <Link to={{ pathname: 'search' }}>
-                <Button variant={'secondary'}>Explore books</Button>
-              </Link>
-              <Link to={{ pathname: 'search', search: 'special=bestseller' }}>
-                <Button variant={'default'}>Best Sellers</Button>
-              </Link>
-            </div>
-          </div>
-          <div className="absolute inset-0 m-auto h-14 w-8 translate-y-96">
-            <div className="mousey box-content h-9 w-1 rounded-3xl border-2 border-solid border-white px-4 py-3 opacity-75">
-              <div className="h-3 w-1 animate-scroll-down rounded-[25%] bg-white" />
+              <p className="mt-4 text-background sm:text-xl/relaxed">
+                Dive into the world of books and unleash your imagination!
+                Browse through our vast collection and find your next literary
+                escape.
+              </p>
+              <div className="mt-8 space-x-4">
+                <Link
+                  to={{ pathname: 'search' }}
+                  className={`${buttonVariants({ variant: 'secondary' })}`}
+                >
+                  Explore books
+                </Link>
+                <Link
+                  to={{ pathname: 'search', search: 'special=bestseller' }}
+                  className={`${buttonVariants({ variant: 'default' })}`}
+                >
+                  Best Sellers
+                </Link>
+              </div>
+            </section>
+            <div className="absolute inset-0 m-auto h-14 w-8 translate-y-96">
+              <div className="mousey box-content h-9 w-1 rounded-3xl border-2 border-solid border-background px-4 py-3 opacity-75">
+                <div className="h-3 w-1 animate-scroll-down rounded-[25%] bg-background" />
+              </div>
             </div>
           </div>
         </div>
-      </section>
-    </section>
+      </ParallaxBannerLayer>
+    </ParallaxBanner>
   );
 }

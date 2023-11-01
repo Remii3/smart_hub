@@ -124,7 +124,7 @@ export default function NoPage404() {
 
       <Link
         to="/"
-        className="fixed bottom-10 right-10 rounded bg-gradient-to-r from-[#71b7e6] via-[#b98acc] to-[#ee8176] px-7 py-4 text-base font-bold uppercase text-white drop-shadow-md transition-[transform,filter,opacity] duration-300 ease-out hover:scale-105 hover:drop-shadow-2xl active:opacity-80"
+        className="fixed bottom-10 right-10 rounded bg-gradient-to-r from-[#71b7e6] via-[#b98acc] to-[#ee8176] px-7 py-4 text-base font-bold uppercase text-background drop-shadow-md transition-[transform,filter,opacity] duration-300 ease-out hover:scale-105 hover:drop-shadow-2xl active:opacity-80"
       >
         Go back
       </Link>

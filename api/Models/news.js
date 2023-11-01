@@ -5,10 +5,10 @@ const NewsSchema = mongoose.Schema({
   created_at: { type: Date, default: Date.now },
   title: { type: String, required: true },
   subtitle: { type: String },
-  head_image: { type: String },
+  img: { type: { id: String, url: String } },
   comments: [{ type: mongoose.Types.ObjectId, ref: 'Comment' }],
   content: { type: String },
-  rating: {
+  voting: {
     type: {
       votes: [
         { user: { type: mongoose.Types.ObjectId, ref: 'User' }, vote: Number },

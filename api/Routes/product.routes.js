@@ -10,11 +10,14 @@ const {
   addOneProduct,
   updateOneProduct,
   deleteOneProduct,
+  deleteAllProducts,
+  getProductRating,
 } = require('../Controllers/product.controller');
 const productSearchVerification = require('../Middleware/productSearchVerification.middleaware');
 
 router.get('/all', getAllProducts);
 router.get('/shop', getShopProducts);
+router.get('/rating', getProductRating);
 router.get('/auction', getAuctionProducts);
 router.get('/one', getOneProduct);
 router.get('/searched', productSearchVerification, getSearchedProducts);
@@ -22,4 +25,5 @@ router.get('/searched', productSearchVerification, getSearchedProducts);
 router.post('/one', addOneProduct);
 router.post('/update', updateOneProduct);
 router.post('/delete', deleteOneProduct);
+router.post('/delete-all', deleteAllProducts);
 module.exports = router;

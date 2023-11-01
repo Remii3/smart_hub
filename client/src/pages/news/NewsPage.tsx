@@ -27,11 +27,11 @@ import { Label } from '@components/UI/label';
 import { Input } from '@components/UI/input';
 import { UserContext } from '@context/UserProvider';
 import NewsArticle from './NewsArticle';
+import useUploadImg from '@hooks/useUploadImg';
 
 interface NewArticleType {
   title: string;
   subtitle: string;
-  headImage: null;
   content: string;
 }
 
@@ -40,9 +40,10 @@ export default function NewsPage() {
   const [newArticleData, setNewArticleData] = useState<NewArticleType>({
     title: '',
     subtitle: '',
-    headImage: null,
     content: '',
   });
+  const [selectedImgs, setSelectedImgs] = useState<null | FileList>(null);
+
   const { userData } = useContext(UserContext);
   const fetchData = useCallback(async () => {
     const { data } = await useGetAccessDatabase({
@@ -53,10 +54,21 @@ export default function NewsPage() {
 
   const addNewNewsHandler = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    await usePostAccessDatabase({
+    const { data } = await usePostAccessDatabase({
       url: DATABASE_ENDPOINTS.NEWS_ONE,
-      body: { userId: userData?._id, ...newArticleData },
+      body: { userId: userData.data?._id, ...newArticleData },
     });
+    if (selectedImgs) {
+      const imgResData = await useUploadImg({
+        ownerId: data.id,
+        targetLocation: 'News_img',
+        selectedFile: selectedImgs[0],
+      });
+      await usePostAccessDatabase({
+        url: DATABASE_ENDPOINTS.NEWS_UPDATE,
+        body: { img: imgResData, _id: data.id },
+      });
+    }
     await fetchData();
   };
 
@@ -69,7 +81,7 @@ export default function NewsPage() {
   const deleteArticleHandler = async (newsId: string) => {
     await usePostAccessDatabase({
       url: DATABASE_ENDPOINTS.NEWS_DELETE,
-      body: { userId: userData?._id, newsId },
+      body: { userId: userData.data?._id, newsId },
     });
     await fetchData();
   };
@@ -83,7 +95,7 @@ export default function NewsPage() {
       <div>
         <span>News</span>
         <Dialog>
-          {userData && userData.role !== 'User' && (
+          {userData.data && userData.data.role !== 'User' && (
             <DialogTrigger asChild>
               <Button variant="default">+Add new</Button>
             </DialogTrigger>
@@ -119,12 +131,13 @@ export default function NewsPage() {
                 </fieldset>
                 <fieldset>
                   <Label>
-                    Head image
+                    Image
                     <Input
                       className="block"
                       type="file"
-                      name="headImage"
-                      onChange={(e) => changeNewArticleHandler(e)}
+                      name="img"
+                      onChange={(e) => setSelectedImgs(e.target.files)}
+                      accept="image/png, image/jpg"
                     />
                   </Label>
                 </fieldset>
@@ -161,6 +174,15 @@ export default function NewsPage() {
                     type="button"
                     className="rounded-md border border-slate-400 p-3 text-start shadow-sm"
                   >
+                    {item.img && (
+                      <div className="flex max-h-[200px]">
+                        <img
+                          src={item.img.url}
+                          className="aspect-auto w-full object-cover object-center"
+                          alt="news_img"
+                        />
+                      </div>
+                    )}
                     <h6>{item.title}</h6>
                     {item.subtitle && (
                       <section className="pt-3">{item.subtitle}</section>

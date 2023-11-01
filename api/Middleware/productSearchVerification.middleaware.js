@@ -1,9 +1,18 @@
 const Category = require('../Models/category');
+const User = require('../Models/user');
 
 const productSearchVerification = async (req, res, next) => {
-  let { phrase, page, pageSize, filtersData, sortOption } = req.query;
+  let { pageSize, filtersData } = req.query;
 
-  let currentPage = page;
+  if (!filtersData) {
+    return res.status(422).json({
+      message: 'No filters provided',
+      error: 'Please provide filters data',
+    });
+  }
+
+  let currentPage = filtersData.page;
+
   if (!currentPage) {
     currentPage = 1;
   }
@@ -13,98 +22,135 @@ const productSearchVerification = async (req, res, next) => {
     currentPageSize = 10;
   }
 
-  const skip = (currentPage - 1) * currentPageSize;
+  const skipPages = (currentPage - 1) * currentPageSize;
 
-  let sort = {};
-  switch (sortOption) {
+  let sortMethod = {};
+  switch (filtersData.sortOption) {
     case 'Date, ASC':
-      sort.created_at = 1;
+      sortMethod.created_at = 1;
       break;
     case 'Date, DESC':
-      sort.created_at = -1;
+      sortMethod.created_at = -1;
       break;
-
     case 'Title, ASC':
-      sort.title = 1;
+      sortMethod.title = 1;
       break;
-
     case 'Title, DESC':
-      sort.title = -1;
+      sortMethod.title = -1;
       break;
-
     case 'Price, DESC':
-      sort['shop_info.price'] = -1;
+      sortMethod['shop_info.price'] = -1;
       break;
-
     case 'Price, ASC':
-      sort['shop_info.price'] = 1;
+      sortMethod['shop_info.price'] = 1;
       break;
+    default:
+      return (sortMethod.created_at = -1);
   }
 
-  const searchParams = new URLSearchParams(phrase);
-  const finalQuery = {};
-  const finalRawData = { queries: [] };
+  const searchQuery = {};
   let specialQuery = null;
-  for (const [key, value] of searchParams.entries()) {
-    if (key === 'phrase') {
-      finalQuery['$text'] = { $search: `${value}` };
-      finalRawData.queries = [...finalRawData.queries, { key, value }];
-    }
-    if (key === 'category') {
-      const category = await Category.findOne({ value });
-      finalQuery['categories'] = category._id;
-      finalRawData.queries = [...finalRawData.queries, { key, value }];
-    }
-    if (key === 'special') {
-      specialQuery = value;
-      finalRawData.queries = [...finalRawData.queries, { key, value }];
-    }
+
+  const rawData = { queries: {} };
+
+  if (filtersData.searchedPhrase) {
+    searchQuery['$text'] = { $search: `${filtersData.searchedPhrase}` };
+    rawData.queries.phrase = filtersData.searchedPhrase;
+  }
+  if (filtersData.searchedSpecial) {
+    specialQuery = filtersData.searchedSpecial;
+    rawData.queries.special = filtersData.searchedSpecial;
   }
 
-  const marketplaces = filtersData.marketplace.filter(item => {
-    return item.isChecked === 'true';
-  });
+  if (filtersData.selectedAuthors && filtersData.selectedAuthors.length > 0) {
+    const authors = [];
 
-  const names = [];
-  marketplaces.forEach(item => {
-    names.push(item.name.charAt(0).toUpperCase() + item.name.slice(1));
-  });
+    for (let i = 0; i < filtersData.selectedAuthors.length; i++) {
+      const author = await User.findOne({
+        'author_info.pseudonim': filtersData.selectedAuthors[i],
+      });
+      if (author) {
+        authors.push(author._id);
+      }
+    }
 
-  finalQuery['market_place'] = { $in: names };
+    searchQuery['authors'] = { $in: authors };
+    rawData.queries.authors = authors;
+  }
 
   if (
-    filtersData.price.minPrice !== '' &&
-    filtersData.price.minPrice >= 1 &&
-    filtersData.price.maxPrice !== '' &&
-    filtersData.price.maxPrice >= 1
+    filtersData.selectedCategories &&
+    filtersData.selectedCategories.length > 0
   ) {
-    finalQuery['shop_info.price'] = {
-      $gte: Number(filtersData.price.minPrice),
-      $lte: Number(filtersData.price.maxPrice),
-    };
-  } else if (
-    filtersData.price.minPrice !== '' &&
-    filtersData.price.minPrice >= 1
-  ) {
-    finalQuery['shop_info.price'] = {
-      $gte: Number(filtersData.price.minPrice),
-    };
-  } else if (
-    filtersData.price.maxPrice !== '' &&
-    filtersData.price.maxPrice >= 1
-  ) {
-    finalQuery['shop_info.price'] = {
-      $lte: Number(filtersData.price.maxPrice),
-    };
+    const categories = [];
+
+    for (let i = 0; i < filtersData.selectedCategories.length; i++) {
+      const category = await Category.findOne({
+        value: filtersData.selectedCategories[i],
+      });
+      if (category) {
+        categories.push(category._id);
+      }
+    }
+
+    searchQuery['categories'] = { $in: categories };
+    rawData.queries.categories = categories;
   }
+
+  if (filtersData.marketplace) {
+    const marketplaces = [];
+    filtersData.marketplace.forEach(item => {
+      marketplaces.push(item.charAt(0).toUpperCase() + item.slice(1));
+    });
+    searchQuery['market_place'] = { $in: marketplaces };
+    rawData.queries.marketplace = marketplaces;
+  }
+
+  if (
+    filtersData.selectedPriceRange.minPrice &&
+    filtersData.selectedPriceRange.minPrice >= 1 &&
+    filtersData.selectedPriceRange.maxPrice &&
+    filtersData.selectedPriceRange.maxPrice >= 1
+  ) {
+    searchQuery['shop_info.price'] = {
+      $gte: Number(filtersData.selectedPriceRange.minPrice),
+      $lte: Number(filtersData.selectedPriceRange.maxPrice),
+    };
+    rawData.queries.minPrice = filtersData.selectedPriceRange.minPrice;
+    rawData.queries.maxPrice = filtersData.selectedPriceRange.maxPrice;
+  } else if (
+    filtersData.selectedPriceRange.minPrice &&
+    filtersData.selectedPriceRange.minPrice >= 1
+  ) {
+    searchQuery['shop_info.price'] = {
+      $gte: Number(filtersData.selectedPriceRange.minPrice),
+    };
+    rawData.queries.minPrice = filtersData.selectedPriceRange.minPrice;
+  } else if (
+    filtersData.selectedPriceRange.maxPrice &&
+    filtersData.selectedPriceRange.maxPrice >= 1
+  ) {
+    searchQuery['shop_info.price'] = {
+      $lte: Number(filtersData.selectedPriceRange.maxPrice),
+    };
+    rawData.queries.maxPrice = filtersData.selectedPriceRange.maxPrice;
+  }
+
+  if (filtersData.selectedRating) {
+    searchQuery['avgRating'] = {
+      $lte: filtersData.selectedRating,
+    };
+    rawData.queries.rating = filtersData.selectedRating;
+  }
+
   req.finalSearchData = {
-    searchQuery: finalQuery,
-    sortMetod: sort,
-    skipPages: skip,
-    limitPages: currentPageSize,
-    pageSize: currentPageSize,
-    finalRawData: finalRawData,
-    specialQuery: specialQuery,
+    searchQuery,
+    sortMethod,
+    skipPages,
+    currentPageSize,
+    rawData,
+    specialQuery,
+    currentPage,
   };
   next();
 };

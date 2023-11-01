@@ -1,206 +1,194 @@
-import { useState, useEffect, ChangeEvent, useCallback } from 'react';
-import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
+import { useState, useEffect, ChangeEvent, useCallback, useRef } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import AdvancedFilter from '@pages/search/AdvancedFilter';
 import { UnknownProductTypes } from '@customTypes/interfaces';
-import ShopCard, { SkeletonShopCard } from '@components/cards/ShopCard';
-import AuctionCard from '@components/cards/AuctionCard';
+import ShopCard from '@components/cards/ShopCard';
 import MainContainer from '@layout/MainContainer';
 import Pagination from '@components/paginations/Pagination';
 import SortProducts from '@features/sortProducts/SortProducts';
 import { useGetAccessDatabase } from '../../hooks/useAaccessDatabase';
 import { DATABASE_ENDPOINTS } from '../../data/endpoints';
-import {
-  SortType,
-  sortOptions,
-  sortOptionsArray,
-} from '@hooks/useSortProducts';
+import { sortOptions, sortOptionsArray } from '@hooks/useSortProducts';
 import { Badge } from '@components/UI/badge';
+import LoadingCircle from '@components/Loaders/LoadingCircle';
+import { toast } from '@components/UI/use-toast';
 
 interface SearchedProductsDataTypes {
-  products: UnknownProductTypes[] | null;
+  products: UnknownProductTypes[];
   rawData: {
-    queries: [{ key: 'author' | 'category' | 'special'; value: string }] | null;
-    author: string;
+    queries: {
+      phrase: string;
+      authors: string[];
+      categories: string[];
+      page: string;
+      marketplace: string[];
+      minPrice: string;
+      maxPrice: string;
+      rating: string;
+      special: string;
+    } | null;
     totalPages: number;
     totalProducts: number;
     highestPrice: number;
   };
   isLoading: boolean;
 }
-interface FilterDataType {
-  marketplace: {
-    name: string;
-    isChecked: boolean;
-  }[];
-  price: {
-    maxPrice: string | number;
-    minPrice: string | number;
-  };
-}
+type FilterParams = 'phrase' | 'category' | 'author' | 'special';
+
 export default function SearchPage() {
-  const [pagesData, setPagesData] = useState({
-    currentPage: 1,
-    pageIteration: 5,
-  });
+  const [searchParams, setSearchParams] = useSearchParams();
+  const currentSortMethod = searchParams.get('sortMethod');
+
+  const pageIteration = 5;
+
   const [searchedProductsData, setSearchedProductsData] =
     useState<SearchedProductsDataTypes>({
-      products: null,
+      products: [],
       rawData: {
         queries: null,
-        author: '',
         totalPages: 0,
         totalProducts: 0,
         highestPrice: 0,
       },
       isLoading: false,
     });
-  const params = new URLSearchParams(window.location.search);
-  const defaultSearch = params.get('sort');
-
-  const [sortOption, setSortOption] = useState<string>(
-    defaultSearch || sortOptions.DATE_DESC
-  );
-
-  const [filtersData, setFiltersData] = useState<FilterDataType>({
-    marketplace: [
-      {
-        name: 'shop',
-        isChecked: true,
-      },
-      {
-        name: 'auction',
-        isChecked: true,
-      },
-    ],
-    price: {
-      minPrice: '',
-      maxPrice: '',
-    },
-  });
-
-  const searchQuery = useLocation();
-  const searchQueryParams = searchQuery.search;
-  const updatedQuery = searchQuery.search.slice(1);
-  const navigate = useNavigate();
 
   const fetchData = useCallback(async () => {
+    if (!currentSortMethod) return;
     setSearchedProductsData((prevState) => {
       return { ...prevState, isLoading: true };
     });
-    const { data } = await useGetAccessDatabase({
+
+    const newFilters = {
+      marketplace: searchParams.getAll('marketplace'),
+      selectedPriceRange: {
+        maxPrice: searchParams.get('maxPrice') || '',
+        minPrice: searchParams.get('minPrice') || '',
+      },
+      selectedRating: searchParams.get('rating') || 5,
+      selectedCategories: searchParams.getAll('category'),
+      selectedAuthors: searchParams.getAll('author'),
+      searchedPhrase: searchParams.get('phrase'),
+      page: searchParams.get('page'),
+      sortOption: searchParams.get('sortMethod'),
+      searchedSpecial: searchParams.get('special'),
+    };
+    const { data, error } = await useGetAccessDatabase({
       url: DATABASE_ENDPOINTS.PRODUCT_SEARCHED,
       params: {
-        phrase: updatedQuery,
-        page: pagesData.currentPage,
-        pageSize: pagesData.pageIteration,
-        filtersData,
-        sortOption,
+        pageSize: pageIteration,
+        filtersData: newFilters,
       },
     });
-
+    if (error) {
+      setSearchedProductsData((prevState) => {
+        return { ...prevState, isLoading: false };
+      });
+      return toast({
+        variant: 'destructive',
+        title: 'Uh oh! Something went wrong.',
+        description: 'We failed downloading the products',
+      });
+    }
     setSearchedProductsData({
-      products: (data && data.products) || [],
-      rawData: data && data.finalRawData,
+      products: data.products,
+      rawData: data.rawData,
       isLoading: false,
     });
-  }, [updatedQuery, pagesData, sortOption, filtersData]);
+  }, [searchParams]);
 
-  const updateSortHandler = (e: SortType) => {
-    params.set('sort', e);
-    const newUrl = `${window.location.pathname}?${params.toString()}`;
-    window.history.replaceState(null, '', newUrl);
+  const removeQueryHandler = (paramValue: string, paramKey: FilterParams) => {
+    switch (paramKey) {
+      case 'phrase': {
+        searchParams.delete('phrase');
+        setSearchParams(searchParams);
+        break;
+      }
+      case 'special': {
+        searchParams.delete('special');
+        setSearchParams(searchParams);
+        break;
+      }
+      case 'category': {
+        const categories = searchParams
+          .getAll('category')
+          .filter((item) => item !== paramValue);
+        searchParams.delete('category');
+        if (categories) {
+          categories.forEach((item) => searchParams.append('category', item));
+        }
+        break;
+      }
+      case 'author': {
+        const authors = searchParams
+          .getAll('author')
+          .filter((item) => item !== paramValue);
+        searchParams.delete('author');
+        if (authors) {
+          authors.forEach((item) => searchParams.append('author', item));
+        }
+        break;
+      }
+      default:
+        return;
+    }
+    setSearchParams(searchParams, { replace: true });
   };
 
-  const changePriceHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFiltersData((prevState) => {
-      return {
-        ...prevState,
-        price: {
-          ...prevState.price,
-          [e.target.name]: Number(e.target.value),
-        },
-      };
-    });
-  };
-
-  const selectMarketplaceHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFiltersData((prevState) => {
-      return {
-        ...prevState,
-        marketplace: prevState.marketplace.map((el) =>
-          el.name === e.target.name ? { ...el, isChecked: !el.isChecked } : el
-        ),
-      };
-    });
-  };
-
-  const resetPriceHandler = () => {
-    setFiltersData((prevState) => {
-      return {
-        ...prevState,
-        price: {
-          maxPrice: '',
-          minPrice: '',
-        },
-      };
-    });
-  };
-
-  const resetMarketplaceHandler = () => {
-    setFiltersData((prevState) => {
-      return {
-        ...prevState,
-        marketplace: prevState.marketplace.map((el) => {
-          return { ...el, isChecked: true };
-        }),
-      };
-    });
-  };
-
-  const removeQueryHandler = (e: any) => {
-    const currentQueryParams = new URLSearchParams(searchQuery.search);
-    currentQueryParams.delete(e.currentTarget.name);
-    navigate({
-      pathname: '/search',
-      search: currentQueryParams.toString(),
-    });
-  };
+  const ref = useRef(document.getElementById('mainContainer'));
+  useEffect(() => {
+    if (searchedProductsData.products) {
+      ref.current?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      });
+    }
+  }, [searchedProductsData.products]);
 
   const changeCurrentPageHandler = (newPageNumber: number) => {
-    setPagesData((prevState) => {
-      return { ...prevState, currentPage: newPageNumber };
-    });
+    searchParams.set('page', `${newPageNumber}`);
+    setSearchParams(searchParams);
   };
 
   const sortOptionChangeHandler = (e: ChangeEvent<HTMLSelectElement>) => {
-    setSortOption(e.target.value);
     const selectedSortOption = sortOptionsArray.find((item) => {
       return item.value === e.target.value;
     });
     if (selectedSortOption) {
-      updateSortHandler(selectedSortOption.value);
+      searchParams.set('sortMethod', selectedSortOption.value);
+      setSearchParams(searchParams, { replace: true });
     }
   };
 
   useEffect(() => {
     fetchData();
   }, [fetchData]);
-
   useEffect(() => {
-    setPagesData((prevState) => {
-      return { ...prevState, currentPage: 1 };
-    });
-  }, [sortOption, filtersData]);
+    if (!currentSortMethod) {
+      const searchPage = searchParams.get('page');
+      const searchMarketplace = searchParams.get('marketplace');
+      const searchRating = searchParams.get('rating');
+      const searchSortMethod = searchParams.get('sortMethod');
 
-  useEffect(() => {
-    if (!defaultSearch) {
-      updateSortHandler(sortOptions.DATE_DESC);
+      if (!searchMarketplace) {
+        searchParams.set('marketplace', 'shop');
+      }
+
+      if (!searchRating) {
+        searchParams.set('rating', '5');
+      }
+      if (!searchPage) {
+        searchParams.set('page', '1');
+      }
+      if (!searchSortMethod) {
+        searchParams.set('sortMethod', sortOptions.DATE_DESC);
+      }
+      setSearchParams(searchParams, { replace: true });
     }
-  }, [window.location.search]);
-
+  }, []);
   return (
     <MainContainer>
-      <div className="flex justify-between">
+      <div className="fixed left-0 right-0 top-16 z-10 flex w-full justify-between bg-background px-4 pt-2 md:static md:mb-2 md:px-0 md:pt-0">
         <p>
           Results:{' '}
           {searchedProductsData.rawData &&
@@ -209,102 +197,162 @@ export default function SearchPage() {
         <div>
           <SortProducts
             category="search"
-            sortOption={sortOption}
+            sortOption={currentSortMethod}
             sortOptionChangeHandler={sortOptionChangeHandler}
           />
         </div>
       </div>
+
       <div className="flex flex-col justify-between gap-8 md:flex-row">
-        <aside className="min-w-[150px]">
-          <AdvancedFilter
-            filtersData={filtersData}
-            onSelectMarketplace={selectMarketplaceHandler}
-            onPriceChange={changePriceHandler}
-            onMarketplaceReset={resetMarketplaceHandler}
-            onPriceReset={resetPriceHandler}
-            highestPrice={
-              (searchedProductsData.rawData &&
-                searchedProductsData.rawData.highestPrice) ||
-              0
-            }
-          />
-        </aside>
-        <section className="w-full space-y-2">
-          {searchQueryParams && (
-            <ul className="grid auto-cols-max grid-flow-col auto-rows-max gap-5">
-              {searchedProductsData.rawData &&
-                searchedProductsData.rawData.queries &&
-                searchedProductsData.rawData.queries.map((query) => (
-                  <li key={query.key}>
-                    <Badge variant={'outline'}>
-                      <button
-                        name={query.key}
-                        type="button"
-                        onClick={(e) => removeQueryHandler(e)}
-                        className="space-x-2"
-                      >
-                        <span className=" text-sm">{query.value}</span>
-                        <span>X</span>
-                      </button>
-                    </Badge>
-                  </li>
-                ))}
-            </ul>
+        <AdvancedFilter
+          highestPrice={
+            (searchedProductsData.rawData &&
+              searchedProductsData.rawData.highestPrice) ||
+            0
+          }
+        />
+        <section className="h-full w-full space-y-2 md:pt-0">
+          {(searchParams.get('phrase') ||
+            searchParams.get('special') ||
+            searchParams.get('category') ||
+            searchParams.get('author')) && (
+            <>
+              {(searchParams.get('phrase') || searchParams.get('special')) && (
+                <ul className="grid auto-cols-max grid-flow-col auto-rows-max gap-5 px-2 py-1">
+                  {searchParams.getAll('special').map((query) => (
+                    <li key={query}>
+                      <Badge variant={'outline'} className="bg-sky-100 p-0">
+                        <button
+                          name={query}
+                          type="button"
+                          onClick={() => removeQueryHandler(query, 'special')}
+                          className="group relative px-[10px] py-1"
+                        >
+                          <div className="absolute inset-0 h-full w-full rounded-md bg-black opacity-0 transition-opacity ease-out group-hover:opacity-10" />
+                          <span className="text-sm text-sky-700 group-hover:brightness-90">
+                            {query}
+                          </span>
+                          <div className="absolute -left-2 -top-1 box-border h-4 w-4 rounded-full border bg-sky-100 text-sky-600">
+                            X
+                          </div>
+                        </button>
+                      </Badge>
+                    </li>
+                  ))}
+                  {searchParams.getAll('phrase').map((query) => (
+                    <li key={query}>
+                      <Badge variant={'outline'} className="bg-sky-100 p-0">
+                        <button
+                          name={query}
+                          type="button"
+                          onClick={() => removeQueryHandler(query, 'phrase')}
+                          className="group relative px-[10px] py-1"
+                        >
+                          <div className="absolute inset-0 h-full w-full rounded-md bg-black opacity-0 transition-opacity ease-out group-hover:opacity-10" />
+                          <span className="text-sm text-sky-700 group-hover:brightness-90">
+                            {query}
+                          </span>
+                          <div className="absolute -left-2 -top-1 box-border h-4 w-4 rounded-full border bg-sky-100 text-sky-600">
+                            X
+                          </div>
+                        </button>
+                      </Badge>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              {searchParams.get('author') && (
+                <ul className="grid auto-cols-max grid-flow-col auto-rows-max gap-5 px-2 py-1">
+                  {searchParams.getAll('author').map((query) => (
+                    <li key={query}>
+                      <Badge variant={'outline'} className="bg-purple-100 p-0">
+                        <button
+                          name={query}
+                          type="button"
+                          onClick={() => removeQueryHandler(query, 'author')}
+                          className="group relative px-[10px] py-1"
+                        >
+                          <div className="absolute inset-0 h-full w-full rounded-md bg-black opacity-0 transition-opacity ease-out group-hover:opacity-10" />
+                          <span className="text-sm text-purple-700 group-hover:brightness-90">
+                            {query}
+                          </span>
+                          <div className="absolute -left-2 -top-1 box-border h-4 w-4 rounded-full border bg-purple-100 text-purple-600">
+                            X
+                          </div>
+                        </button>
+                      </Badge>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              {searchParams.get('category') && (
+                <ul className="grid auto-cols-max grid-flow-col auto-rows-max gap-5 px-2 py-1">
+                  {searchParams.getAll('category').map((query) => (
+                    <li key={query}>
+                      <Badge variant={'outline'} className="bg-green-100 p-0">
+                        <button
+                          name={query}
+                          type="button"
+                          onClick={() => removeQueryHandler(query, 'category')}
+                          className="group relative px-[10px] py-1"
+                        >
+                          <div className="absolute inset-0 h-full w-full rounded-md bg-black opacity-0 transition-opacity ease-out group-hover:opacity-10" />
+                          <span className="text-sm text-green-700 group-hover:brightness-90">
+                            {query}
+                          </span>
+                          <div className="absolute -left-2 -top-1 box-border h-4 w-4 rounded-full border bg-green-100 text-green-600">
+                            X
+                          </div>
+                        </button>
+                      </Badge>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </>
           )}
 
           {!searchedProductsData.isLoading &&
+            searchedProductsData.rawData.queries &&
             searchedProductsData.products &&
             searchedProductsData.products.length === 0 && (
               <div className="flex h-full w-full items-center justify-center">
                 No products
               </div>
             )}
-          <div>
-            <div className="grid grid-flow-row grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {searchedProductsData.isLoading &&
-                [...Array(3)].map((el, index) => (
-                  <SkeletonShopCard
-                    key={index}
-                    height="h-[500px]"
-                    width="w-full"
-                  />
-                ))}
-
+          <div className="relative h-full">
+            <div className="relative grid min-h-[400px] grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {searchedProductsData.isLoading && <LoadingCircle />}
               {!searchedProductsData.isLoading &&
                 searchedProductsData.products &&
                 searchedProductsData.products.map((item) => {
-                  return item.market_place === 'Shop' ? (
-                    <ShopCard
-                      key={item._id}
-                      _id={item._id}
-                      price={item.shop_info.price}
-                      productQuantity={item.quantity}
-                      title={item.title}
-                      authors={item.authors}
-                      description={item.description}
-                      img={item.img}
-                    />
-                  ) : (
-                    <AuctionCard
-                      key={item._id}
-                      _id={item._id}
-                      title={item.title}
-                      authors={item.authors}
-                      description={item.description}
-                      img={item.img}
-                      auctionEndDate={item.auction_info.auction_end_date}
-                      currentPrice={item.auction_info.current_price}
-                      startingPrice={item.auction_info.starting_price}
-                    />
+                  return (
+                    item.market_place === 'Shop' && (
+                      <ShopCard
+                        key={item._id}
+                        _id={item._id}
+                        price={item.shop_info.price}
+                        productQuantity={item.quantity}
+                        title={item.title}
+                        authors={item.authors}
+                        description={item.description}
+                        img={
+                          item.imgs && item.imgs.length > 0
+                            ? item.imgs[0].url
+                            : null
+                        }
+                        rating={item.rating}
+                      />
+                    )
                   );
                 })}
             </div>
             <div className="my-3 flex w-full justify-center">
               {searchedProductsData.rawData && (
                 <Pagination
-                  currentPage={pagesData.currentPage}
+                  currentPage={Number(searchParams.get('page')) || 1}
                   totalCount={searchedProductsData.rawData.totalProducts}
-                  pageSize={pagesData.pageIteration}
+                  pageSize={pageIteration}
                   onPageChange={(newPageNumber: number) =>
                     changeCurrentPageHandler(newPageNumber)
                   }

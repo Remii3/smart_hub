@@ -1,4 +1,3 @@
-import axios from 'axios';
 import {
   createContext,
   ReactNode,
@@ -13,29 +12,34 @@ import { useGetAccessDatabase } from '../hooks/useAaccessDatabase';
 import { DATABASE_ENDPOINTS } from '../data/endpoints';
 
 type ContextTypes = {
-  userData: null | AuthorTypes;
+  userData: { data: null | AuthorTypes; isLoading: boolean };
   changeUserData: (data: null | AuthorTypes) => void;
   fetchUserData: () => void;
 };
 
 export const UserContext = createContext<ContextTypes>({
-  userData: null,
+  userData: { data: null, isLoading: true },
   changeUserData() {},
   fetchUserData() {},
 });
 
 export default function UserProvider({ children }: { children: ReactNode }) {
-  const [userData, setUserData] = useState<null | AuthorTypes>(null);
+  const [userData, setUserData] = useState<{
+    data: null | AuthorTypes;
+    isLoading: boolean;
+  }>({ data: null, isLoading: true });
 
   const fetchUserData = useCallback(async () => {
     const { data } = await useGetAccessDatabase({
       url: DATABASE_ENDPOINTS.USER_PROFILE,
     });
-    setUserData(data);
-  }, []);
+    setUserData({ data, isLoading: false });
+  }, [userData.data]);
 
   const changeUserData = (data: AuthorTypes | null) => {
-    setUserData(data);
+    setUserData((prevState) => {
+      return { ...prevState, data };
+    });
   };
 
   useEffect(() => {
@@ -45,12 +49,14 @@ export default function UserProvider({ children }: { children: ReactNode }) {
       document.cookie =
         'guestToken=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
     }
-
-    if (!userData && token) {
+    if (!userData.data && token) {
       fetchUserData();
+    } else {
+      setUserData((prevState) => {
+        return { ...prevState, isLoading: false };
+      });
     }
-  }, [userData]);
-
+  }, []);
   const userValues = useMemo(
     () => ({ userData, changeUserData, fetchUserData }),
     [userData]

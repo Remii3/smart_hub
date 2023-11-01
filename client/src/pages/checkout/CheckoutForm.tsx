@@ -9,7 +9,6 @@ import {
   Layout,
   StripeLinkAuthenticationElementChangeEvent,
 } from '@stripe/stripe-js';
-import axios from 'axios';
 import { useState, useEffect, useContext, FormEvent } from 'react';
 import { UserContext } from '@context/UserProvider';
 import { getCookie } from '@lib/utils';
@@ -17,11 +16,30 @@ import { CartContext } from '@context/CartProvider';
 import { usePostAccessDatabase } from '../../hooks/useAaccessDatabase';
 import { DATABASE_ENDPOINTS } from '../../data/endpoints';
 import { useNavigate } from 'react-router-dom';
+import { Button } from '@components/UI/button';
 
-export default function CheckoutForm() {
+interface PropsTypes {
+  readyToShow: {
+    linkAuth: boolean;
+    payment: boolean;
+    address: boolean;
+  };
+  readyToShowHandler: React.Dispatch<
+    React.SetStateAction<{
+      linkAuth: boolean;
+      payment: boolean;
+      address: boolean;
+    }>
+  >;
+}
+
+export default function CheckoutForm({
+  readyToShow,
+  readyToShowHandler,
+}: PropsTypes) {
   const stripe = useStripe();
   const elements = useElements();
-  const { userData } = useContext(UserContext);
+  const { userData, fetchUserData } = useContext(UserContext);
   const { fetchCartData, cartState } = useContext(CartContext);
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
@@ -45,7 +63,6 @@ export default function CheckoutForm() {
     address: undefined,
     phone: undefined,
   });
-
   useEffect(() => {
     if (!stripe) {
       return;
@@ -101,7 +118,7 @@ export default function CheckoutForm() {
         setMessage('An unexpected error occurred.');
       }
     } else {
-      const currentUserId = userData?._id || getCookie('guestToken');
+      const currentUserId = userData.data?._id || getCookie('guestToken');
       await usePostAccessDatabase({
         url: DATABASE_ENDPOINTS.ORDER_ONE,
         body: {
@@ -118,6 +135,7 @@ export default function CheckoutForm() {
       });
 
       fetchCartData();
+      fetchUserData();
       navigate('/thankyou');
     }
     setIsLoading(false);
@@ -126,7 +144,6 @@ export default function CheckoutForm() {
   const paymentElementOptions = {
     layout: 'tabs',
   } as { layout: Layout };
-
   return (
     <form id="payment-form" onSubmit={handleSubmit}>
       <LinkAuthenticationElement
@@ -134,12 +151,22 @@ export default function CheckoutForm() {
         onChange={(e: StripeLinkAuthenticationElementChangeEvent) =>
           setEmail(e.value.email)
         }
-        options={{ defaultValues: { email: userData?.email || email } }}
+        options={{ defaultValues: { email: userData.data?.email || email } }}
+        onReady={() =>
+          readyToShowHandler((prevState) => {
+            return { ...prevState, linkAuth: true };
+          })
+        }
       />
       <PaymentElement
         id="payment-element"
         className="mb-6"
         options={paymentElementOptions}
+        onReady={() =>
+          readyToShowHandler((prevState) => {
+            return { ...prevState, payment: true };
+          })
+        }
       />
       <AddressElement
         options={{
@@ -155,35 +182,45 @@ export default function CheckoutForm() {
             setBuyerData({ name, address, phone });
           }
         }}
-      />
-      <button
-        type="submit"
-        disabled={
-          isLoading ||
-          !stripe ||
-          !elements ||
-          (cartState.products && cartState.products.length < 1)
+        onReady={() =>
+          readyToShowHandler((prevState) => {
+            return { ...prevState, address: true };
+          })
         }
-        id="submit"
-        style={{ marginTop: '1rem' }}
-        className="block w-full rounded-md border-0 bg-primary px-4 py-3 font-semibold text-white transition-colors duration-200 ease-out disabled:cursor-auto disabled:opacity-50"
-      >
-        <span id="button-text">
-          {isLoading ? (
-            <div
-              className="mx-auto block h-6 w-6 animate-spin rounded-full border-[3px] border-current border-t-primary text-white"
-              role="status"
-              aria-label="loading"
-            >
-              <span className="sr-only">Loading...</span>
-            </div>
-          ) : (
-            'Pay now'
-          )}
-        </span>
-      </button>
+      />
+      {readyToShow && (
+        <Button
+          type="submit"
+          disabled={
+            isLoading ||
+            !stripe ||
+            !elements ||
+            (cartState.products && cartState.products.length < 1)
+          }
+          id="submit"
+          style={{ marginTop: '1rem' }}
+          variant={'default'}
+          size={'lg'}
+          className="w-full"
+        >
+          <span id="button-text">
+            {isLoading ? (
+              <div
+                className="mx-auto block h-6 w-6 animate-spin rounded-full border-[3px] border-current border-t-primary text-background"
+                role="status"
+                aria-label="loading"
+              >
+                <span className="sr-only">Loading...</span>
+              </div>
+            ) : (
+              'Pay now'
+            )}
+          </span>
+        </Button>
+      )}
+
       {message && (
-        <div id="payment-message" className="pt-3 text-center text-slate-500">
+        <div id="payment-message" className="pt-3 text-center text-red-500">
           {message}
         </div>
       )}

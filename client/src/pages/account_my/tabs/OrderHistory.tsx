@@ -4,11 +4,12 @@ import { UserContext } from '@context/UserProvider';
 
 export default function OrderHistory() {
   const { userData } = useContext(UserContext);
+  if (!userData.data) return <p>Please log in</p>;
   return (
-    <div>
-      <h5>Order history</h5>
-      {userData &&
-        userData.orders.map((item) => (
+    <div className="px-3">
+      <h4 className="mb-4">Order history</h4>
+      <div className="px-2">
+        {userData.data.orders.map((item) => (
           <Link
             key={item._id}
             to={`order/${item._id}`}
@@ -24,6 +25,7 @@ export default function OrderHistory() {
             ))}
           </Link>
         ))}
+      </div>
     </div>
   );
 }

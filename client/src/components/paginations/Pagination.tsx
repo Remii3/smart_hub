@@ -39,6 +39,7 @@ export default function Pagination({
     <div className="flex space-x-2">
       <button
         type="button"
+        aria-label="Show previous products"
         onClick={onPrevious}
         disabled={currentPage <= 1}
         className={`${
@@ -68,7 +69,7 @@ export default function Pagination({
                   onClick={() => onPageChange(Number(pageNumber))}
                   className={`${
                     currentPage === pageNumber
-                      ? 'bg-blue-500 '
+                      ? 'bg-blue-500 text-background'
                       : 'hover:bg-blue-300'
                   } flex items-center justify-center rounded-lg px-3 py-2 transition-all duration-200 ease-in-out`}
                 >
@@ -82,6 +83,7 @@ export default function Pagination({
         type="button"
         onClick={onNext}
         disabled={currentPage >= lastPage}
+        aria-label="Show next products"
         className={`${
           currentPage >= lastPage && 'opacity-40'
         } px-3 transition duration-200 ease-in-out`}

@@ -20,7 +20,9 @@ import {
 import { UserContext } from '@context/UserProvider';
 import { UserTypes } from '@customTypes/interfaces';
 import { COMMENT_TARGET, DATABASE_ENDPOINTS } from '@data/endpoints';
+import Comments from '@features/comments/Comments';
 import { TrashIcon } from '@heroicons/react/24/outline';
+import { UserCircleIcon } from '@heroicons/react/24/solid';
 import {
   useGetAccessDatabase,
   usePostAccessDatabase,
@@ -44,7 +46,7 @@ interface ArticleDataTypes {
     _id: string;
     title: string;
     subtitle: string;
-    headImage: null;
+    img: null | { id: string; url: string };
     content: string;
     rating: {
       votes: { user: string; vote: number }[];
@@ -101,7 +103,7 @@ export default function NewsArticle({
   });
 
   const checkUserVoted = (votes: { user: string; vote: number }[]) => {
-    const voted = votes.find((item) => item.user === userData?._id);
+    const voted = votes.find((item) => item.user === userData.data?._id);
     let result = null;
     if (voted) {
       result = voted.vote === 1 ? 'like' : 'dislike';
@@ -114,8 +116,8 @@ export default function NewsArticle({
       url: DATABASE_ENDPOINTS.NEWS_VOTES_ALL,
       params: { newsId },
     });
-    const userVote = checkUserVoted(data.rating.votes);
-    setVote({ vote: userVote, quantity: data.rating.quantity });
+    const userVote = checkUserVoted(data.voting.votes);
+    setVote({ vote: userVote, quantity: data.voting.quantity });
   };
 
   const commentsQuantity = 5;
@@ -140,8 +142,8 @@ export default function NewsArticle({
         isLoading: false,
       };
     });
-    const userVote = checkUserVoted(data.rating.votes);
-    setVote({ vote: userVote, quantity: data.rating.quantity });
+    const userVote = checkUserVoted(data.voting.votes);
+    setVote({ vote: userVote, quantity: data.voting.quantity });
   }, []);
 
   const fetchUpdateComments = async () => {
@@ -165,7 +167,7 @@ export default function NewsArticle({
       await usePostAccessDatabase({
         url: DATABASE_ENDPOINTS.COMMENT_ONE,
         body: {
-          userId: userData?._id,
+          userId: userData.data?._id,
           targetId: newsId,
           value: newCommentState.data,
           target: COMMENT_TARGET.NEWS,
@@ -193,7 +195,7 @@ export default function NewsArticle({
       url: DATABASE_ENDPOINTS.COMMENT_DELETE,
       body: {
         commentId,
-        userId: userData?._id,
+        userId: userData.data?._id,
       },
     });
     if (error === null) {
@@ -235,13 +237,13 @@ export default function NewsArticle({
     if (voteType === vote.vote) {
       await usePostAccessDatabase({
         url: DATABASE_ENDPOINTS.NEWS_VOTE_REMOVE,
-        body: { userId: userData?._id, newsId, vote: voteType },
+        body: { userId: userData.data?._id, newsId, vote: voteType },
       });
       await fetchVotes();
     } else {
       await usePostAccessDatabase({
         url: DATABASE_ENDPOINTS.NEWS_VOTE_ADD,
-        body: { userId: userData?._id, newsId, vote: voteType },
+        body: { userId: userData.data?._id, newsId, vote: voteType },
       });
       await fetchVotes();
     }
@@ -305,16 +307,14 @@ export default function NewsArticle({
               )}
               <p>Likes: {vote.quantity?.like}</p>
               <p>Dislikes: {vote.quantity?.dislike}</p>
-
+              {articleData.data.img?.url && (
+                <img src={articleData.data.img.url} alt="article_img" />
+              )}
               <h3>{articleData.data.title}</h3>
               <h6 className="text-slate-600">{articleData.data.subtitle}</h6>
               <Dialog>
                 <DialogTrigger asChild>
-                  <Button
-                    variant={'destructive'}
-                    type="button"
-                    className="text-red-400"
-                  >
+                  <Button variant={'destructive'} type="button">
                     Delete
                     <TrashIcon className="h-6 w-6" />
                   </Button>
@@ -330,8 +330,8 @@ export default function NewsArticle({
                   <DialogFooter>
                     <Button
                       type="button"
+                      variant={'destructive'}
                       onClick={() => deleteArticleHandler(newsId)}
-                      className="rounded-md bg-red-500 px-3 py-1 text-white hover:bg-red-600"
                     >
                       Delete
                     </Button>
@@ -350,139 +350,12 @@ export default function NewsArticle({
             </div>
             <p>{articleData.data.content}</p>
             <div className="mt-8">
-              <h5 className="pb-2">Comments</h5>
-              <section className="mb-16">
-                <div className="flex flex-col-reverse gap-8 md:flex-row">
-                  <div>
-                    <p className="mb-3">rating</p>
-                    <div className="flex gap-4">
-                      <img src="#" alt="profile_img" />
-                      <p>{userData?.username}</p>
-                    </div>
-                  </div>
-
-                  <div className="w-full max-w-[580px] overflow-hidden rounded-lg border border-gray-200 shadow-sm focus-within:border-blue-600 focus-within:ring-1 focus-within:ring-blue-600">
-                    <label htmlFor="newComment" className="sr-only">
-                      New comment
-                    </label>
-
-                    <textarea
-                      id="newComment"
-                      className="w-full resize-none border-none align-top focus:ring-0 sm:text-sm"
-                      name="newComment"
-                      rows={4}
-                      placeholder="Enter new comment..."
-                      value={newCommentState.data}
-                      onChange={(e) => newCommentChangeHandler(e)}
-                    />
-
-                    <div className="flex items-center justify-end gap-2 bg-white p-3">
-                      <Button
-                        variant="default"
-                        disabled={!userData?._id || newCommentState.data === ''}
-                        onClick={addCommentHandler}
-                        className="w-1/3"
-                      >
-                        <LoadingCircle isLoading={newCommentState.isLoading}>
-                          Publish
-                        </LoadingCircle>
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </section>
-              {articleData.comments.isLoading && (
-                <div className="space-y-8">
-                  <Skeleton className="flex h-[92px] w-full items-center px-4">
-                    <div className="space-y-3">
-                      <Skeleton className="h-3 w-5" />
-                      <Skeleton className="h-3 w-10" />
-                      <Skeleton className="h-3 w-14" />
-                    </div>
-                  </Skeleton>
-                </div>
-              )}
-              {!articleData.comments.isLoading && articleData.comments.data && (
-                <section>
-                  <div>
-                    {preparedComments &&
-                      preparedComments.map((comment) => (
-                        <div
-                          key={comment._id}
-                          className="mb-8 flex w-full flex-col-reverse gap-8 rounded-md bg-gray-50 p-4 sm:flex-row"
-                        >
-                          <div>
-                            <div className="flex gap-4">
-                              <img src="#" alt="profile_img" />
-                              <p className="font-semibold">
-                                {comment.user.username}
-                              </p>
-                            </div>
-                          </div>
-                          <div className="flex w-full flex-col gap-4">
-                            <div className="flex justify-end">
-                              <small className="text-sm">
-                                {comment.created_at.slice(0, 10)}
-                              </small>
-                            </div>
-                            <div>{comment.value.text}</div>
-                          </div>
-                          {(userData?._id === comment.user._id ||
-                            (articleData.data &&
-                              userData?.news.includes(articleData.data._id)) ||
-                            userData?.role === 'Admin') && (
-                            <Dialog>
-                              <DialogTrigger asChild>
-                                <Button
-                                  variant={'destructive'}
-                                  type="button"
-                                  className="text-red-400"
-                                >
-                                  <TrashIcon className="h-6 w-6" />
-                                </Button>
-                              </DialogTrigger>
-                              <DialogContent>
-                                <DialogHeader>
-                                  <DialogTitle>Are you sure?</DialogTitle>
-                                  <DialogDescription>
-                                    Deleting this will permamently remove the
-                                    item from the database.
-                                  </DialogDescription>
-                                </DialogHeader>
-                                <DialogFooter>
-                                  <Button
-                                    type="button"
-                                    onClick={() =>
-                                      deleteCommentHandler(comment._id)
-                                    }
-                                    className="rounded-md bg-red-500 px-3 py-1 text-white hover:bg-red-600"
-                                  >
-                                    Delete
-                                  </Button>
-                                  <DialogTrigger asChild>
-                                    <button type="button">Cancel</button>
-                                  </DialogTrigger>
-                                </DialogFooter>
-                              </DialogContent>
-                            </Dialog>
-                          )}
-                        </div>
-                      ))}
-                    {articleData.comments.data.length > commentsQuantity && (
-                      <Button
-                        variant={'default'}
-                        onClick={showAllCommentsHandler}
-                      >
-                        {articleData.comments.showAll
-                          ? 'Show less'
-                          : 'Show all'}
-                      </Button>
-                    )}
-                  </div>
-                </section>
-              )}
-              {!articleData.comments.isLoading &&
-                !articleData.comments.data && <div>No data</div>}
+              <Comments
+                target="News"
+                targetId={articleData.data._id}
+                withRating={false}
+                updateProductStatus={fetchUpdateComments}
+              />
             </div>
           </div>
         </div>

@@ -10,59 +10,36 @@ const salt = bcrypt.genSaltSync(12);
 const login = async (req, res) => {
   const { email, password } = req.body;
 
-  if (!email) {
-    return res.status(422).json({ message: 'Email is required' });
-  }
-
-  if (!password) {
-    return res.status(422).json({ message: 'Password is required' });
-  }
-
   const userDoc = await User.findOne({ email });
-
-  if (userDoc) {
-    const passwordVerification = bcrypt.compareSync(password, userDoc.password);
-    if (passwordVerification) {
-      jwt.sign(
-        {
-          email,
-          user_id: userDoc._id,
-        },
-        process.env.JWT_SECRET,
-        {},
-        (err, token) => {
-          if (err) throw 'firts';
-          return res.status(200).cookie('token', token).json({ data: userDoc });
-        },
-      );
-    } else {
-      return res.status(422).json({
-        name: 'password',
-        message: 'Incorrect password',
-      });
-    }
-  } else {
-    return res.status(500).json({
-      name: 'username',
+  if (!userDoc)
+    return res.status(422).json({
+      name: 'email',
+      error: 'No account found',
       message: 'No account found',
     });
-  }
+  const passwordVerification = bcrypt.compareSync(password, userDoc.password);
+  if (!passwordVerification)
+    return res.status(422).json({
+      name: 'password',
+      error: 'Invalid password',
+      message: 'Invalid password',
+    });
+  jwt.sign(
+    {
+      email,
+      user_id: userDoc._id,
+    },
+    process.env.JWT_SECRET,
+    {},
+    (err, token) => {
+      if (err) throw 'firts';
+      return res.status(200).cookie('token', token).json({ data: userDoc });
+    },
+  );
 };
 
 const register = async (req, res) => {
   let { credentials, email, username, password } = req.body;
-
-  if (!password) {
-    return res.status(422).json({ message: 'Password is required' });
-  }
-
-  if (!email) {
-    return res.status(422).json({ message: 'Email is required' });
-  }
-
-  if (!username) {
-    return res.status(422).json({ message: 'Username is required' });
-  }
 
   try {
     const userId = new mongoose.Types.ObjectId();
@@ -74,10 +51,7 @@ const register = async (req, res) => {
       username,
       password: bcrypt.hashSync(password, salt),
       user_info: {
-        profile_img: '',
-        profile_img_type: '',
-        background_img: '',
-        background_img_type: '',
+        profile_img: {},
         credentials: {
           first_name: credentials.firstName,
           last_name: credentials.lastName,
@@ -133,11 +107,14 @@ const register = async (req, res) => {
     if (err.code === 11000) {
       const responseObject = err.keyValue;
       return res.status(422).json({
-        name: Object.keys(responseObject)[0],
         message: Object.values(responseObject)[0] + ` already exists`,
+        error: err.message,
+        name: 'email',
       });
     }
-    return res.status(500).json({ message: 'Failed to register' });
+    return res
+      .status(500)
+      .json({ message: 'Failed to register', error: err.message });
   }
 };
 
@@ -402,8 +379,35 @@ const removeOneFollow = async (req, res) => {
 const updateOneUser = async (req, res) => {
   const { userEmail, fieldValue } = req.body;
   const { fieldPath } = req;
-
   try {
+    if (fieldPath === null) {
+      const mainData = {
+        username: fieldValue.username,
+        email: fieldValue.email,
+        role: fieldValue.role,
+      };
+      if (fieldValue.password.trim().length > 0) {
+        mainData.password = bcrypt.hashSync(fieldValue.password, salt);
+      }
+      await User.updateOne(
+        {
+          email: userEmail,
+        },
+        {
+          $set: {
+            ...mainData,
+            'user_info.phone': fieldValue.phone,
+            'user_info.profile_img': fieldValue.profileImg,
+            'user_info.credentials.first_name': fieldValue.firstName,
+            'user_info.credentials.last_name': fieldValue.lastName,
+            'author_info.quote': fieldValue.quote,
+            'author_info.short_description': fieldValue.shortDescription,
+            'author_info.pseudonim': fieldValue.pseudonim,
+          },
+        },
+        { upsert: true },
+      );
+    }
     if (typeof fieldValue == 'object') {
       await User.updateOne(
         { email: userEmail },
@@ -431,6 +435,19 @@ const updateOneUser = async (req, res) => {
   }
 };
 
+const deleteOneUser = async (req, res) => {
+  const { userId } = req.body;
+  try {
+    await User.deleteOne({ _id: userId });
+    await Cart.deleteOne({ user_id: userId });
+    res.status(200).json({ message: 'Success' });
+  } catch (err) {
+    res
+      .status(500)
+      .json({ message: 'Failed deleting user', error: err.message });
+  }
+};
+
 module.exports = {
   login,
   register,
@@ -442,4 +459,5 @@ module.exports = {
   addOneFollow,
   removeOneFollow,
   updateOneUser,
+  deleteOneUser,
 };

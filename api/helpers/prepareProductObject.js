@@ -23,8 +23,8 @@ const prepareProductObject = product => {
     let preparedRating = 0;
     let count = 0;
     for (let i = 0; i < rating.length; i++) {
-      if (rating[i].rating) {
-        count += rating[i].rating;
+      if (rating[i].value) {
+        count += rating[i].value;
       }
     }
     preparedRating = count / rating.length;

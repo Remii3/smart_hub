@@ -1,27 +1,48 @@
-import React from 'react';
+import { Checkbox } from '@components/UI/checkbox';
+import { Label } from '@components/UI/label';
+import { useSearchParams } from 'react-router-dom';
 
-type MarketplaceSelectorTypes = {
-  options: { name: string; isChecked: boolean }[];
-  selectMarketplace: (e: React.ChangeEvent<HTMLInputElement>) => void;
-};
+export default function MarketplaceSelector() {
+  const [searchParams, setSearchParams] = useSearchParams();
 
-export default function MarketplaceSelector({
-  options,
-  selectMarketplace,
-}: MarketplaceSelectorTypes) {
+  const marketplaces = ['shop', 'collection'];
+
+  const selectHandler = (state: boolean | string, name: string) => {
+    const all = searchParams.getAll('marketplace');
+    if (all.includes(name)) {
+      const newList = all.filter((item) => item !== name);
+      if (newList.length > 0) {
+        newList.forEach((item) => searchParams.set('marketplace', item));
+      } else {
+        searchParams.delete('marketplace');
+      }
+    } else {
+      searchParams.append('marketplace', name);
+    }
+    setSearchParams(searchParams, { replace: true });
+  };
+
   return (
-    <div>
-      {options.map((option) => (
-        <div key={option.name}>
-          <span className="first-letter:uppercase">{option.name}</span>
-          <input
-            type="checkbox"
-            name={option.name}
-            onChange={(e) => selectMarketplace(e)}
-            checked={option.isChecked}
+    <>
+      {marketplaces.map((option) => (
+        <div key={option} className="mb-2 flex items-center gap-1">
+          <Label
+            htmlFor={`filter-${option}`}
+            className="font-normal first-letter:uppercase"
+          >
+            {option}
+          </Label>
+          <Checkbox
+            id={`filter-${option}`}
+            aria-label={`Show marketplace ${option}`}
+            name={option}
+            onCheckedChange={(state) => selectHandler(state, option)}
+            checked={
+              searchParams.getAll('marketplace').includes(option) || false
+            }
           />
         </div>
       ))}
-    </div>
+    </>
   );
 }

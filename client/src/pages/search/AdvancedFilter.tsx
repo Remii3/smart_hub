@@ -1,112 +1,188 @@
 import { Button } from '@components/UI/button';
 import MarketplaceSelector from './MarketplaceSelector';
+import RatingFilter from './RatingFilter';
+import PriceRangeFilter from './PriceRangeFilter';
+import { useSearchParams } from 'react-router-dom';
+import CategoriesFilter from './CategoriesFilter';
+import AuthorsFilter from './AuthorsFilter';
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@components/UI/collapsible';
+import { AdjustmentsHorizontalIcon } from '@heroicons/react/24/outline';
+import { useState } from 'react';
+import { Label } from '@components/UI/label';
 
 type AdvancedFilterTypes = {
   highestPrice: number;
-  filtersData: {
-    marketplace: {
-      name: string;
-      isChecked: boolean;
-    }[];
-    price: {
-      maxPrice: string | number;
-      minPrice: string | number;
-    };
-  };
-  onSelectMarketplace: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  onPriceChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  onMarketplaceReset: () => void;
-  onPriceReset: () => void;
 };
 
-export default function AdvancedFilter({
-  filtersData,
-  onSelectMarketplace,
-  onPriceChange,
-  onMarketplaceReset,
-  onPriceReset,
-  highestPrice,
-}: AdvancedFilterTypes) {
-  const { marketplace, price } = filtersData;
-
-  const clearAllSelectors = () => {
-    onMarketplaceReset();
-    onPriceReset();
+export default function AdvancedFilter({ highestPrice }: AdvancedFilterTypes) {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [openCollapsible, setOpenCollapsible] = useState(false);
+  const clearSelectedMarketplace = () => {
+    searchParams.set('marketplace', 'shop');
+    setSearchParams(searchParams, { replace: true });
   };
-
+  const clearSelectedPriceRange = () => {
+    searchParams.delete('minPrice');
+    searchParams.delete('maxPrice');
+    setSearchParams(searchParams, { replace: true });
+  };
+  const clearSelectedRating = () => {
+    searchParams.set('rating', '5');
+    setSearchParams(searchParams, { replace: true });
+  };
+  const clearSelectedCategories = () => {
+    searchParams.delete('category');
+    setSearchParams(searchParams, { replace: true });
+  };
+  const clearSelectedAuthors = () => {
+    searchParams.delete('author');
+    setSearchParams(searchParams, { replace: true });
+  };
+  const clearAll = () => {
+    clearSelectedMarketplace();
+    clearSelectedPriceRange();
+    clearSelectedRating();
+    clearSelectedCategories();
+    clearSelectedAuthors();
+  };
   return (
-    <div className="sticky top-20">
-      <div>
-        <p>Advanced filter</p>
-        <Button
-          variant="link"
-          size="default"
-          onClick={() => clearAllSelectors()}
-        >
-          Clear all
-        </Button>
-      </div>
-      <div>
-        <div>
-          <h6>Type of offer</h6>
-          <Button variant="link" size="default" onClick={onMarketplaceReset}>
-            Clear
+    <>
+      <aside className="sticky top-20 hidden w-full md:block md:max-w-[250px]">
+        <section className="mb-2 flex items-center justify-between">
+          <p className="inline-block font-semibold">Advanced filter</p>
+          <Button variant="link" onClick={clearAll}>
+            Clear all
           </Button>
-        </div>
-        <MarketplaceSelector
-          options={marketplace}
-          selectMarketplace={onSelectMarketplace}
-        />
-      </div>
-      <div>
-        {/* <div className="relative grid gap-8 bg-white p-7 lg:grid-cols-2"> */}
-        <div className="relative bg-white">
-          <div className="bg-white">
-            <Button variant="link" size="default" onClick={onPriceReset}>
+        </section>
+        <section className="mb-1">
+          <div className="flex items-center justify-between">
+            <p className="inline-block font-medium">Type of offer</p>
+            <Button variant="link" onClick={clearSelectedMarketplace}>
               Clear
             </Button>
-
-            <div className="flex flex-wrap justify-between gap-4 sm:flex-nowrap">
-              <div className="w-full ">
-                <p>Min</p>
-                <label className="flex w-full items-center gap-2">
-                  <span className="text-sm text-gray-600">€</span>
-                  <input
-                    id="search-Min-PriceSelector"
-                    type="number"
-                    name="minPrice"
-                    placeholder={`From ${1}`}
-                    className="w-full rounded-md border-gray-200 shadow-sm sm:text-sm"
-                    min={1}
-                    value={price.minPrice}
-                    onChange={(e) => onPriceChange(e)}
-                  />
-                </label>
-              </div>
-              <div className="w-full">
-                <p>Max </p>
-                <label className="flex w-full items-center gap-2">
-                  <span className="text-sm text-gray-600">€</span>
-
-                  <input
-                    id="search-Max-PriceSelector"
-                    type="number"
-                    name="maxPrice"
-                    placeholder={`To ${highestPrice}`}
-                    className="w-full rounded-md border-gray-200 shadow-sm sm:text-sm"
-                    value={price.maxPrice}
-                    min={1}
-                    max={highestPrice}
-                    onChange={(e) => onPriceChange(e)}
-                  />
-                </label>
-              </div>
-            </div>
           </div>
-        </div>
-      </div>
-      <div>{/* Add price filter */}</div>
-      <div>{/* Add star filter */}</div>
-    </div>
+          <MarketplaceSelector />
+        </section>
+        <section className="mb-1">
+          <div className="flex items-center justify-between">
+            <p className="inline-block font-medium">Price range</p>
+            <Button variant="link" onClick={clearSelectedPriceRange}>
+              Clear
+            </Button>
+          </div>
+
+          <PriceRangeFilter highestPrice={highestPrice.toString()} />
+        </section>
+        <section className="mb-1">
+          <div className="flex items-center justify-between">
+            <p className="inline-block font-medium">Rating</p>
+            <Button variant="link" onClick={clearSelectedRating}>
+              Clear
+            </Button>
+          </div>
+          <RatingFilter />
+        </section>
+        <section className="mb-1">
+          <div className="flex items-center justify-between">
+            <p className="inline-block font-medium">Categories</p>
+            <Button variant="link" onClick={clearSelectedCategories}>
+              Clear
+            </Button>
+          </div>
+          <CategoriesFilter />
+        </section>
+        <section className="mb-1">
+          <div className="flex items-center justify-between">
+            <p className="inline-block font-medium">Authors</p>
+            <Button variant="link" onClick={clearSelectedAuthors}>
+              Clear
+            </Button>
+          </div>
+          <AuthorsFilter />
+        </section>
+      </aside>
+      <Collapsible
+        className={`${
+          openCollapsible && ''
+        } fixed left-0 top-[calc(64px+48px)] z-10 block w-full bg-background px-4 py-2 md:hidden`}
+        open={openCollapsible}
+        onOpenChange={setOpenCollapsible}
+      >
+        <CollapsibleTrigger asChild>
+          <Button variant="outline" className="flex w-full justify-between">
+            <p className="inline-block font-semibold">Advanced filter</p>
+            <AdjustmentsHorizontalIcon
+              className={`h-6 w-6 transition ${
+                openCollapsible ? 'rotate-90' : 'rotate-0'
+              }`}
+            />
+            <span className="sr-only">Toggle</span>
+          </Button>
+        </CollapsibleTrigger>
+        <CollapsibleContent>
+          <form
+            className={`${
+              openCollapsible && 'h-[calc(100vh-64px-48px-8px-42px)]'
+            } overflow-y-scroll pb-4`}
+          >
+            <section className="mb-2 flex items-center justify-end">
+              <Button variant="link" onClick={clearAll}>
+                Clear all
+              </Button>
+            </section>
+            <section className="mb-1">
+              <div className="flex items-center justify-between">
+                <p className="inline-block font-medium">Type of offer</p>
+                <Button variant="link" onClick={clearSelectedMarketplace}>
+                  Clear
+                </Button>
+              </div>
+              <MarketplaceSelector />
+            </section>
+            <section className="mb-1">
+              <div className="flex items-center justify-between">
+                <p className="inline-block font-medium">Price range</p>
+                <Button variant="link" onClick={clearSelectedPriceRange}>
+                  Clear
+                </Button>
+              </div>
+
+              <PriceRangeFilter highestPrice={highestPrice.toString()} />
+            </section>
+            <section className="mb-1">
+              <div className="flex items-center justify-between">
+                <p className="inline-block font-medium">Rating</p>
+                <Button variant="link" onClick={clearSelectedRating}>
+                  Clear
+                </Button>
+              </div>
+              <RatingFilter />
+            </section>
+            <section className="mb-1">
+              <div className="flex items-center justify-between">
+                <p className="inline-block font-medium">Categories</p>
+                <Button variant="link" onClick={clearSelectedCategories}>
+                  Clear
+                </Button>
+              </div>
+              <CategoriesFilter />
+            </section>
+            <section className="mb-1">
+              <div className="flex items-center justify-between">
+                <p className="inline-block font-medium">Authors</p>
+                <Button variant="link" onClick={clearSelectedAuthors}>
+                  Clear
+                </Button>
+              </div>
+              <AuthorsFilter />
+            </section>
+          </form>
+        </CollapsibleContent>
+      </Collapsible>
+    </>
   );
 }

@@ -35,12 +35,35 @@ const getAllProducts = async (req, res) => {
 };
 
 const getShopProducts = async (req, res) => {
+  const { category, minPrice, maxPrice } = req.query;
   try {
+    const findData = {};
+    if (category) {
+      const categoryLabel =
+        category.charAt(0).toUpperCase() + category.slice(1);
+      const categoryData = await Category.findOne({
+        label: categoryLabel,
+      });
+      if (!categoryData) {
+        return res.status(422).json({
+          message: 'Invalid category',
+          error: 'This category in not in database: ' + category,
+        });
+      }
+      findData.categories = categoryData._id;
+    }
+    if (minPrice) {
+      findData.shop_info = { price: { $gte: minPrice } };
+    }
+    if (maxPrice) {
+      findData.shop_info = { price: { $lte: maxPrice } };
+    }
     const products = await Product.find({
       market_place: 'Shop',
       quantity: { $gt: 0 },
       deleted: false,
-    });
+      ...findData,
+    }).populate('authors');
 
     const preparedProducts = [];
     for (let product of products) {
@@ -111,13 +134,13 @@ const getOneProduct = async (req, res) => {
 
 const getSearchedProducts = async (req, res) => {
   let {
-    finalRawData,
+    rawData,
     searchQuery,
-    sortMetod,
+    sortMethod,
     skipPages,
-    limitPages,
-    pageSize,
+    currentPageSize,
     specialQuery,
+    currentPage,
   } = req.finalSearchData;
 
   try {
@@ -164,7 +187,7 @@ const getSearchedProducts = async (req, res) => {
                 $in: top_selling_products[0].top_selling_products,
               };
             }
-            products = await Product.find(searchQuery).sort(sortMetod);
+            products = await Product.find(searchQuery).sort(sortMethod);
             const products_copy = [...products];
             highestPrice =
               products_copy.length >= 1
@@ -174,24 +197,37 @@ const getSearchedProducts = async (req, res) => {
                   )
                 : null;
             totalDocuments = products.length;
-            totalPages = Math.ceil(totalDocuments / pageSize);
+            totalPages = Math.ceil(totalDocuments / currentPageSize);
           }
           break;
       }
     } else {
-      products = await Product.find(searchQuery)
-        .sort(sortMetod)
-        .skip(skipPages)
-        .limit(limitPages);
+      let flag = false;
+      let skipPagesCopy = skipPages;
+      do {
+        products = await Product.find(searchQuery)
+          .sort(sortMethod)
+          .skip(skipPagesCopy)
+          .limit(currentPageSize)
+          .populate('authors');
+        if (products.length <= 0 && skipPages > 1 && currentPage > 1) {
+          flag = true;
+          skipPagesCopy -= skipPages;
+          currentPage -= 1;
+        } else {
+          flag = false;
+        }
+      } while (flag);
+
       highestPrice = await Product.find({ deleted: false })
         .sort({ 'shop_info.price': -1 })
         .limit(1);
       totalDocuments = await Product.find(searchQuery).countDocuments();
-      totalPages = Math.ceil(totalDocuments / pageSize);
+      totalPages = Math.ceil(totalDocuments / currentPageSize);
     }
-    finalRawData.totalPages = totalPages;
-    finalRawData.totalProducts = totalDocuments;
-    finalRawData.highestPrice =
+    rawData.totalPages = totalPages;
+    rawData.totalProducts = totalDocuments;
+    rawData.highestPrice =
       highestPrice && highestPrice.length > 0
         ? Number(highestPrice[0].shop_info.price)
         : 0;
@@ -205,7 +241,7 @@ const getSearchedProducts = async (req, res) => {
     return res.status(200).json({
       data: {
         products: preparedProducts,
-        finalRawData,
+        rawData,
       },
     });
   } catch (err) {
@@ -221,7 +257,6 @@ const addOneProduct = async (req, res) => {
     price,
     title,
     description,
-    imgs,
     categories,
     authors,
     quantity,
@@ -229,38 +264,37 @@ const addOneProduct = async (req, res) => {
     created_at,
     starting_price,
     auction_end_date,
-  } = req.body.newProductData;
-  try {
-    for (const item of categories) {
-      const categoryExists = await Category.find({ _id: item._id });
-      if (categoryExists.length < 1) {
-        await Category.create({
-          value: item.value,
-          label: item.label,
-          description: item.description,
-        });
+  } = req.body;
+
+  if (categories && categories.length > 0) {
+    try {
+      for (const item of categories) {
+        const categoryExists = await Category.find({ _id: item._id });
+        if (categoryExists.length < 1) {
+          await Category.create({
+            value: item.value,
+            label: item.label,
+            description: item.description,
+          });
+        }
       }
+    } catch (err) {
+      return res
+        .status(500)
+        .json({ message: 'Failed verifying categories', error: err.message });
     }
-  } catch (err) {
-    return res
-      .status(500)
-      .json({ message: 'Failed verifying categories', error: err.message });
   }
   try {
     const _id = new mongoose.Types.ObjectId();
 
     if (market_place === 'Shop') {
-      if (typeof price !== 'number') {
-        return res.status(422).json({ message: 'Price is required' });
-      }
-
       try {
         await Product.create({
           seller_data,
           _id,
           title,
           description,
-          imgs,
+          imgs: [],
           categories,
           authors,
           rating: [],
@@ -268,6 +302,7 @@ const addOneProduct = async (req, res) => {
           market_place,
           created_at,
           comments: [],
+          avgRating: 0,
           shop_info: {
             price: price.toString(),
           },
@@ -290,7 +325,7 @@ const addOneProduct = async (req, res) => {
           _id,
           title,
           description,
-          imgs,
+          imgs: [],
           categories,
           authors,
           rating: [],
@@ -311,12 +346,22 @@ const addOneProduct = async (req, res) => {
     }
 
     try {
-      await User.updateOne(
-        {
-          _id: seller_data._id,
-        },
-        { $push: { 'author_info.my_products': _id } },
-      );
+      if (!authors.includes(author => author._id === seller_data._id)) {
+        await User.updateOne(
+          {
+            _id: seller_data._id,
+          },
+          { $push: { 'author_info.my_products': _id } },
+        );
+      }
+      for (let i = 0; i < authors.length; i++) {
+        await User.updateOne(
+          {
+            _id: authors[i]._id,
+          },
+          { $push: { 'author_info.my_products': _id } },
+        );
+      }
     } catch (err) {
       return res
         .status(500)
@@ -347,20 +392,47 @@ const updateOneProduct = async (req, res) => {
     auction_info,
   } = req.body;
   try {
+    const updateData = {};
+    if (title) updateData.title = title;
+    if (description) updateData.description = description;
+    if (price) updateData.shop_info = { price };
+    if (imgs) updateData.imgs = imgs;
+    if (categories) updateData.categories = categories;
+    if (authors) updateData.authors = authors;
+    if (quantity) updateData.quantity = quantity;
     if (market_place === 'Shop') {
-      await Product.updateOne(
-        { _id },
-        {
-          title,
-          description,
-          'shop_info.price': price,
-          imgs,
-          categories,
-          authors,
-          quantity,
-          market_place,
-        },
-      );
+      if (authors) {
+        const productData = await Product.findOne({ _id });
+        const usersToPull = productData.authors.filter(
+          author => !authors.includes(author),
+        );
+        const usersToPush = authors.filter(
+          author => !productData.authors.includes(author),
+        );
+
+        if (usersToPull) {
+          for (let i = 0; i < usersToPull.length; i++) {
+            await User.updateOne(
+              {
+                _id: usersToPull[i]._id,
+              },
+              { $pull: { 'author_info.my_products': _id } },
+            );
+          }
+        }
+        if (usersToPush) {
+          for (let i = 0; i < usersToPush.length; i++) {
+            await User.updateOne(
+              {
+                _id: usersToPush[i]._id,
+              },
+              { $push: { 'author_info.my_products': _id } },
+            );
+          }
+        }
+      }
+
+      await Product.updateOne({ _id }, updateData);
     } else {
       await Product.updateOne(
         { _id },
@@ -394,10 +466,19 @@ const deleteOneProduct = async (req, res) => {
   }
 
   try {
-    await User.updateOne(
-      { _id: userId },
-      { $pull: { 'author_info.my_products': _id } },
-    );
+    const productData = await Product.findOne({ _id });
+    if (!productData.authors.includes(author => author._id === userId)) {
+      await User.updateOne(
+        { _id: userId },
+        { $pull: { 'author_info.my_products': _id } },
+      );
+    }
+    for (let i = 0; i < productData.authors.length; i++) {
+      await User.updateOne(
+        { _id: productData.authors[i]._id },
+        { $pull: { 'author_info.my_products': _id } },
+      );
+    }
     let currentDate = new Date();
     let currentMonth = currentDate.getMonth();
     let monthFromNow = currentMonth + 6;
@@ -413,8 +494,48 @@ const deleteOneProduct = async (req, res) => {
   }
 };
 
+const deleteAllProducts = async (req, res) => {
+  const { userId } = req.body;
+  try {
+    await User.updateOne(
+      { _id: userId },
+      { $set: { 'author_info.my_products': [] } },
+    );
+    let currentDate = new Date();
+    let currentMonth = currentDate.getMonth();
+    let monthFromNow = currentMonth + 6;
+    let futureDate = new Date(currentDate.getFullYear(), monthFromNow, 1);
+    futureDate.setDate(futureDate.getDate() - 1);
+
+    await Product.updateMany(
+      { 'seller_data._id': userId },
+      { deleted: true, expireAt: futureDate },
+    );
+
+    res.status(200).json({ message: 'Successfully deleted all products' });
+  } catch (err) {
+    res
+      .status(500)
+      .json({ message: 'Failed deleting all prodcuts', error: err.message });
+  }
+};
+
+const getProductRating = async (req, res) => {
+  const { _id } = req.query;
+  try {
+    const productRating = await Product.findOne(
+      { _id },
+      { rating: 1, avgRating: 1 },
+    );
+    res.json({ data: productRating });
+  } catch (err) {
+    res.json('error');
+  }
+};
+
 module.exports = {
   getAllProducts,
+  getProductRating,
   getShopProducts,
   getAuctionProducts,
   getOneProduct,
@@ -422,4 +543,5 @@ module.exports = {
   updateOneProduct,
   deleteOneProduct,
   getSearchedProducts,
+  deleteAllProducts,
 };

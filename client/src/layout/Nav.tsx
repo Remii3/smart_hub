@@ -1,16 +1,9 @@
-import React, { useContext, useRef, useState } from 'react';
+import React, { Suspense, lazy, useContext, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import gsap from 'gsap';
-import {
-  ShoppingBagIcon,
-  UserCircleIcon as OutlinedUserIcon,
-} from '@heroicons/react/24/outline';
-import { MagnifyingGlassIcon, UserCircleIcon } from '@heroicons/react/24/solid';
 import { PopoverClose } from '@radix-ui/react-popover';
 import { UserContext } from '@context/UserProvider';
 import CartPopup from '@pages/cart/CartPopup';
 import { CartContext } from '@context/CartProvider';
-
 import {
   Popover,
   PopoverContent,
@@ -20,7 +13,25 @@ import { useGetAccessDatabase } from '../hooks/useAaccessDatabase';
 import { DATABASE_ENDPOINTS } from '../data/endpoints';
 import { Separator } from '@components/UI/separator';
 import { Button } from '@components/UI/button';
-import { HomeLogoIcon } from '@assets/icons/Icons';
+import LoadingCircle from '@components/Loaders/LoadingCircle';
+
+const ShoppingBagIcon = lazy(
+  () => import('@heroicons/react/24/outline/ShoppingBagIcon')
+);
+const OutlinedUserIcon = lazy(
+  () => import('@heroicons/react/24/outline/UserCircleIcon')
+);
+const MagnifyingGlassIcon = lazy(
+  () => import('@heroicons/react/24/solid/MagnifyingGlassIcon')
+);
+const SolidUserIcon = lazy(
+  () => import('@heroicons/react/24/solid/UserCircleIcon')
+);
+const HomeLogoIcon = lazy(() =>
+  import('@assets/icons/Icons').then((module) => ({
+    default: module.HomeLogoIcon,
+  }))
+);
 
 export default function Nav({ scrollFlag }: { scrollFlag: boolean }) {
   const [openedBurger, setOpenedBurger] = useState(false);
@@ -34,12 +45,9 @@ export default function Nav({ scrollFlag }: { scrollFlag: boolean }) {
     { to: '/news', text: 'news' },
     { to: '/shop', text: 'shop' },
     { to: '/collections', text: 'collections' },
-    { to: '/auctions', text: 'auctions' },
   ];
   const { userData, changeUserData } = useContext(UserContext);
   const { cartState } = useContext(CartContext);
-
-  gsap.registerPlugin();
 
   const showMobileOverlay = () => {
     if (
@@ -102,10 +110,10 @@ export default function Nav({ scrollFlag }: { scrollFlag: boolean }) {
     setSearchbarValue(e.target.value);
   };
   const burgerColor = openedBurger
-    ? 'bg-dark'
+    ? 'bg-foreground'
     : scrollFlag
-    ? 'bg-white'
-    : 'bg-dark';
+    ? 'bg-background'
+    : 'bg-foreground';
   return (
     <nav>
       <div className="relative mx-auto flex h-[64px] max-w-[1480px] flex-row items-center justify-between px-4 py-3 sm:px-10">
@@ -116,7 +124,9 @@ export default function Nav({ scrollFlag }: { scrollFlag: boolean }) {
             onClick={() => hideMobileOverlay()}
           >
             <span className="sr-only">Home</span>
-            <HomeLogoIcon />
+            <Suspense fallback={<LoadingCircle />}>
+              <HomeLogoIcon />
+            </Suspense>
           </Link>
           <ul className={`hidden flex-row items-center px-8 lg:flex`}>
             {navLinkList.map((navLink, id) => (
@@ -132,41 +142,43 @@ export default function Nav({ scrollFlag }: { scrollFlag: boolean }) {
             ))}
           </ul>
         </div>
-        <div className="hidden basis-full items-center lg:flex">
-          <form
-            onSubmit={(e) => searchHandler(e)}
-            className="relative mx-auto me-4 flex w-full justify-end text-gray-600"
+        <form
+          onSubmit={(e) => searchHandler(e)}
+          className="relative mx-auto me-4 hidden w-full basis-full items-center justify-end text-gray-600 lg:flex"
+        >
+          <input
+            className="border-1 h-full max-w-[24rem] rounded-lg border-gray-300 bg-background pl-3 pr-12 text-sm transition-[width] duration-200 ease-in-out focus:w-full focus:outline-none sm:w-56"
+            type="text"
+            name="search"
+            placeholder="Search"
+            value={searchbarValue}
+            onChange={(e) => searchbarValueChangeHandler(e)}
+          />
+          <button
+            type="submit"
+            className="absolute right-0 top-1/2 h-[98%] -translate-y-1/2 transform rounded-e-xl border-0 bg-transparent px-2 text-gray-600 transition"
           >
-            <input
-              className="border-1 h-full max-w-[24rem] rounded-lg border-gray-300 bg-white pl-3 pr-12 text-sm transition-[width] duration-200 ease-in-out focus:w-full focus:outline-none sm:w-56"
-              type="text"
-              name="search"
-              placeholder="Search"
-              value={searchbarValue}
-              onChange={(e) => searchbarValueChangeHandler(e)}
-            />
-            <button
-              type="submit"
-              className="absolute right-0 top-1/2 h-[98%] -translate-y-1/2 transform rounded-e-xl border-0 bg-transparent px-2 text-gray-600 transition"
-            >
-              <span className="sr-only">Search</span>
+            <span className="sr-only">Search</span>
+            <Suspense fallback={<LoadingCircle />}>
               <MagnifyingGlassIcon className="h-6 w-6 fill-current font-bold text-gray-600" />
-            </button>
-          </form>
-        </div>
+            </Suspense>
+          </button>
+        </form>
         <div className="flex max-h-[32px] gap-4">
           <div className="block lg:hidden">
             <Popover>
-              <PopoverTrigger>
-                <MagnifyingGlassIcon className={` h-8 w-8`} />
+              <PopoverTrigger aria-label="Search trigger">
+                <Suspense fallback={<LoadingCircle />}>
+                  <MagnifyingGlassIcon className={` h-8 w-8`} />
+                </Suspense>
               </PopoverTrigger>
-              <PopoverContent className="mt-3 block w-screen rounded-t-none bg-white lg:hidden">
+              <PopoverContent className="mt-3 block w-screen rounded-t-none bg-background lg:hidden">
                 <form
                   onSubmit={(e) => searchHandler(e)}
                   className="relative mx-auto w-full max-w-xl text-gray-600"
                 >
                   <input
-                    className="h-full w-full rounded-lg border-2 border-gray-300 bg-white px-3 pr-16 text-sm focus:outline-none"
+                    className="h-full w-full rounded-lg border-2 border-gray-300 bg-background px-3 pr-16 text-sm focus:outline-none"
                     type="text"
                     name="search"
                     placeholder="Search"
@@ -178,7 +190,9 @@ export default function Nav({ scrollFlag }: { scrollFlag: boolean }) {
                     className="absolute right-0 top-1/2 h-full -translate-y-1/2 rounded-e-lg border-b-2 border-r-2 border-t-2 border-transparent bg-transparent px-2 text-gray-600 transition"
                   >
                     <span className="sr-only">Search</span>
-                    <MagnifyingGlassIcon className="h-4 w-4 fill-current font-bold text-gray-600" />
+                    <Suspense fallback={<LoadingCircle />}>
+                      <MagnifyingGlassIcon className="h-4 w-4 fill-current font-bold text-gray-600" />
+                    </Suspense>
                   </PopoverClose>
                 </form>
               </PopoverContent>
@@ -187,53 +201,59 @@ export default function Nav({ scrollFlag }: { scrollFlag: boolean }) {
 
           <div className="flex gap-4">
             <Popover>
-              <PopoverTrigger className="relative">
-                <ShoppingBagIcon className={` h-7 w-7`} />
-                {cartState && cartState.products.length > 0 && (
-                  <span
-                    className={`${
-                      scrollFlag
-                        ? 'bg-dark/95 text-white'
-                        : 'bg-white text-dark'
-                    } absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full transition-colors duration-200 ease-in-out`}
-                  >
-                    {cartState.products.length}
-                  </span>
-                )}
+              <PopoverTrigger className="relative" aria-label="Shopping cart">
+                <Suspense fallback={<LoadingCircle />}>
+                  <ShoppingBagIcon className={`h-7 w-7`} />
+                  {cartState && cartState.products.length > 0 && (
+                    <span
+                      aria-hidden="true"
+                      className={`${
+                        scrollFlag
+                          ? 'bg-foreground/90 text-background'
+                          : 'bg-background/90 text-foreground'
+                      } absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full`}
+                    >
+                      {cartState.products.length}
+                    </span>
+                  )}
+                </Suspense>
               </PopoverTrigger>
               <PopoverContent
                 className={`${
                   !scrollFlag && 'rounded-t-none'
-                } relative mt-3 w-screen max-w-full bg-white px-6 py-8 sm:px-6 md:max-w-sm lg:px-6`}
+                } relative mt-3 w-screen max-w-full bg-background px-6 py-8 sm:px-6 md:max-w-sm lg:px-6`}
               >
                 <CartPopup />
               </PopoverContent>
             </Popover>
             <div className="hidden items-center lg:flex">
               <Popover>
-                <PopoverTrigger>
-                  {userData ? (
-                    userData.user_info.profile_img ? (
-                      <div className="h-8 w-8">
-                        <img
-                          src={userData.user_info.profile_img}
-                          className=" rounded-full bg-cover object-contain"
-                        />
-                      </div>
+                <PopoverTrigger aria-label="Profile dropdown">
+                  <Suspense fallback={<LoadingCircle />}>
+                    {userData.data ? (
+                      userData.data.user_info.profile_img.url ? (
+                        <div className="h-8 w-8">
+                          <img
+                            src={userData.data.user_info.profile_img.url}
+                            className="h-8 w-8 rounded-full object-cover"
+                            alt="profile_img"
+                          />
+                        </div>
+                      ) : (
+                        <SolidUserIcon className={`h-8 w-8`} />
+                      )
                     ) : (
-                      <UserCircleIcon className={`$ h-8 w-8`} />
-                    )
-                  ) : (
-                    <OutlinedUserIcon className={`h-8 w-8`} />
-                  )}
+                      <OutlinedUserIcon className={`h-8 w-8`} />
+                    )}
+                  </Suspense>
                 </PopoverTrigger>
                 <PopoverContent
                   className={`${
                     !scrollFlag && 'rounded-t-none'
-                  } mt-3 w-auto bg-white p-0`}
+                  } mt-3 w-auto bg-background p-0`}
                 >
                   <ul>
-                    {!userData && (
+                    {!userData.data && (
                       <>
                         <li>
                           <PopoverClose asChild>
@@ -261,7 +281,7 @@ export default function Nav({ scrollFlag }: { scrollFlag: boolean }) {
                         </li>
                       </>
                     )}
-                    {userData && (
+                    {userData.data && (
                       <>
                         <li>
                           <PopoverClose asChild>
@@ -315,14 +335,14 @@ export default function Nav({ scrollFlag }: { scrollFlag: boolean }) {
         ref={navMobile}
         className={`${
           openedBurger ? 'left-0 opacity-100' : 'left-[100vw] opacity-0'
-        } mobile-overlay absolute top-[0] z-10 h-screen w-full transform overflow-auto bg-white pt-16 transition-[left,opacity] duration-500 ease-in-out lg:hidden`}
+        } absolute top-[0] z-10 h-screen w-full transform overflow-auto bg-background pt-16 transition-[left,opacity] duration-500 ease-in-out lg:hidden`}
       >
-        <ul className="flex flex-col text-dark">
+        <ul className="flex flex-col text-foreground">
           {navLinkList.map((navLink, id) => (
             <li key={id}>
               <Link
                 to={navLink.to}
-                className="mx-auto block w-1/3 py-3 text-center text-lg transition-[color] duration-200 ease-out hover:text-primaryText"
+                className="hover:text-primaryText mx-auto block w-1/3 py-3 text-center text-lg transition-[color] duration-200 ease-out"
                 onClick={showMobileOverlay}
               >
                 {navLink.text[0].toLocaleUpperCase()}
@@ -330,20 +350,22 @@ export default function Nav({ scrollFlag }: { scrollFlag: boolean }) {
               </Link>
             </li>
           ))}
-          <Separator className="mx-auto my-4 w-3/4 bg-slate-300" />
           <li>
-            {!userData ? (
+            <Separator className="mx-auto my-4 w-3/4 bg-slate-300" />
+          </li>
+          <li>
+            {!userData.data ? (
               <div className="flex-col">
                 <Link
                   to={{ pathname: '/account/login' }}
-                  className="mx-auto block w-1/3 py-3 text-center text-lg transition-[color] duration-200 ease-out hover:text-primaryText"
+                  className="hover:text-primaryText mx-auto block w-1/3 py-3 text-center text-lg transition-[color] duration-200 ease-out"
                   onClick={showMobileOverlay}
                 >
                   Sign in
                 </Link>
                 <Link
                   to={{ pathname: '/account/register' }}
-                  className="mx-auto block w-1/3 py-3 text-center text-lg transition-[color] duration-200 ease-out hover:text-primaryText"
+                  className="hover:text-primaryText mx-auto block w-1/3 py-3 text-center text-lg transition-[color] duration-200 ease-out"
                   onClick={showMobileOverlay}
                 >
                   Sign up
@@ -353,7 +375,7 @@ export default function Nav({ scrollFlag }: { scrollFlag: boolean }) {
               <div className="flex-col">
                 <Link
                   to="/account/my"
-                  className="mx-auto block w-1/3 py-3 text-center text-lg transition-[color] duration-200 ease-out hover:text-primaryText"
+                  className="hover:text-primaryText mx-auto block w-1/3 py-3 text-center text-lg transition-[color] duration-200 ease-out"
                   onClick={showMobileOverlay}
                 >
                   Profile

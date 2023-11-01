@@ -24,16 +24,16 @@ export default function OrderPage() {
   orderId = orderId[orderId.length - 1];
 
   const fetchData = useCallback(async () => {
-    if (userData?._id && orderId) {
+    if (userData.data?._id && orderId) {
       const { data } = await useGetAccessDatabase({
         url: DATABASE_ENDPOINTS.ORDER_ONE,
-        params: { userId: userData?._id, orderId },
+        params: { userId: userData.data?._id, orderId },
       });
       setOrderData((prevState) => {
         return { ...prevState, data };
       });
     }
-  }, [orderId, userData?._id]);
+  }, [orderId, userData.data?._id]);
 
   useEffect(() => {
     setOrderData((prevState) => {

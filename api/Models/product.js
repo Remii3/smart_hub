@@ -6,7 +6,7 @@ const ShopDataSchema = mongoose.Schema({
   },
   title: { type: String, required: true },
   description: { type: String },
-  imgs: { type: [String] },
+  imgs: { type: [{ url: String, id: String }] },
   categories: [
     {
       type: mongoose.Types.ObjectId,
@@ -14,11 +14,13 @@ const ShopDataSchema = mongoose.Schema({
     },
   ],
   authors: [{ type: mongoose.Types.ObjectId, ref: "User" }],
+  avgRating: { type: Number },
   rating: [
     {
       type: {
-        _id: { type: mongoose.Types.ObjectId, ref: "User" },
-        rating: Number,
+        value: Number,
+        commentId: { type: mongoose.Types.ObjectId, ref: "Comment" },
+        userId: { type: mongoose.Types.ObjectId, ref: "User" },
       },
     },
   ],

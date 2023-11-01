@@ -31,7 +31,7 @@ function AuctionCard({
 
   return (
     <div id={`${_id}`} className="mx-auto h-full w-full max-w-[400px]">
-      <form className="flex h-full flex-col justify-between gap-5 rounded-lg bg-white shadow transition duration-200 ease-in-out hover:shadow-md">
+      <form className="flex h-full flex-col justify-between gap-5 rounded-lg bg-background shadow transition duration-200 ease-in-out hover:shadow-md">
         <div className="flex flex-col gap-3">
           <Link to={`/product/${_id}`}>
             <img

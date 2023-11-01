@@ -8,6 +8,7 @@ type ProductFormType = {
   productId?: string;
   productQuantity?: number;
   sold: boolean;
+  isLoading: boolean;
 };
 
 const defaultProps = {
@@ -19,6 +20,7 @@ export default function ProductForm({
   productId,
   productQuantity,
   sold,
+  isLoading,
 }: ProductFormType) {
   const [selectedQuantity, setSelectedQuantity] = useState(1);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
@@ -106,16 +108,20 @@ export default function ProductForm({
           <Button
             variant="default"
             type="submit"
-            disabled={isAddingToCart || itemBtnCapacity}
+            disabled={isAddingToCart || itemBtnCapacity || isLoading}
           >
-            <LoadingCircle isLoading={isAddingToCart}>
-              Add to cart
-              <ShoppingBagIcon
-                className="ml-2 inline-block"
-                height={24}
-                width={24}
-              />
-            </LoadingCircle>
+            {isAddingToCart ? (
+              <LoadingCircle />
+            ) : (
+              <span>
+                Add to cart
+                <ShoppingBagIcon
+                  className="ml-2 inline-block"
+                  height={24}
+                  width={24}
+                />
+              </span>
+            )}
           </Button>
         </div>
       )}

@@ -54,8 +54,33 @@ const deleteOneNews = async (req, res) => {
   }
 };
 
+const updateOne = async (req, res) => {
+  const { _id, title, subtitle, img, content } = req.body;
+  if (!_id) {
+    return res.status(422).json({ message: 'Provide news id' });
+  }
+
+  try {
+    await News.updateOne(
+      { _id },
+      {
+        title,
+        subtitle,
+        img,
+        content,
+      },
+    );
+    return res.status(200).json({ message: 'Successfully updated news' });
+  } catch (err) {
+    return res.status(500).json({
+      message: 'Failed updating news',
+      error: err.message,
+    });
+  }
+};
+
 const addOneNews = async (req, res) => {
-  const { userId, title, subtitle, headImage, content } = req.body;
+  const { userId, title, subtitle, img, content } = req.body;
 
   if (!userId) {
     return res.status(422).json({ message: 'Provide user id' });
@@ -70,12 +95,12 @@ const addOneNews = async (req, res) => {
       _id,
       title,
       subtitle,
-      headImage,
+      img,
       content,
       created_at,
     });
     await User.updateOne({ _id: userId }, { $push: { news: _id } });
-    return res.status(201).json({ message: 'Success' });
+    return res.status(201).json({ message: 'Success', id: _id });
   } catch (err) {
     return res.status(500).json({
       message: 'Failed adding news',
@@ -105,8 +130,8 @@ const addOneVote = async (req, res) => {
     await News.updateOne(
       { _id: newsId },
       {
-        $push: { 'rating.votes': { user: userId, vote: voteValue } },
-        $inc: { [`rating.quantity.${vote}`]: 1 },
+        $push: { 'voting.votes': { user: userId, vote: voteValue } },
+        $inc: { [`voting.quantity.${vote}`]: 1 },
       },
     );
     return res.status(200).json({ message: 'Succesfully added vote' });
@@ -138,8 +163,8 @@ const removeOneVote = async (req, res) => {
     await News.updateOne(
       { _id: newsId },
       {
-        $pull: { 'rating.votes': { user: userId } },
-        $inc: { [`rating.quantity.${vote}`]: -1 },
+        $pull: { 'voting.votes': { user: userId } },
+        $inc: { [`voting.quantity.${vote}`]: -1 },
       },
     );
     return res.status(200).json({ message: 'Succesfully removed vote' });
@@ -157,7 +182,7 @@ const getAllVotes = async (req, res) => {
   }
 
   try {
-    const data = await News.findOne({ _id: newsId }).select('rating');
+    const data = await News.findOne({ _id: newsId }).select('voting');
     return res.json({ data });
   } catch (err) {
     return res.json({ message: 'Failed getting votes', error: err.message });
@@ -172,4 +197,5 @@ module.exports = {
   addOneVote,
   removeOneVote,
   getAllVotes,
+  updateOne,
 };

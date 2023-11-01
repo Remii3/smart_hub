@@ -5,8 +5,6 @@ import { UnknownProductTypes } from '@customTypes/interfaces';
 import PriceSelector from './PriceSelector';
 import SortProducts from '../../features/sortProducts/SortProducts';
 import ShopCard, { SkeletonShopCard } from '@components/cards/ShopCard';
-import LongSwiper from '@components/swiper/LongSwiper';
-import AuctionCard from '@components/cards/AuctionCard';
 import useSortProducts, {
   SortType,
   sortOptions,
@@ -15,7 +13,7 @@ import useSortProducts, {
 import useFilterProducts from '@hooks/useFilterProducts';
 import { useGetAccessDatabase } from '@hooks/useAaccessDatabase';
 import { DATABASE_ENDPOINTS } from '@data/endpoints';
-import { Skeleton } from '@components/UI/skeleton';
+import ShortSwiper from '@components/swiper/ShortSwiper';
 
 type PropsTypes = {
   title: string;
@@ -80,7 +78,6 @@ export default function BasicProductCollection({
     setProducts((prevState) => {
       return { ...prevState, isLoading: true };
     });
-
     const { data } = await useGetAccessDatabase({
       url: DATABASE_ENDPOINTS.PRODUCT_SHOP_ALL,
       params: {
@@ -141,14 +138,14 @@ export default function BasicProductCollection({
     setMaxPrice(Number(e.target.value));
   };
   return (
-    <section>
-      <header className="px-4">
+    <section className="mb-4">
+      <header className="mb-8">
         <h2 className="inline-block text-xl font-bold text-gray-900 sm:text-3xl">
           {title}
         </h2>
         {showMore && (
           <Link
-            to={{ pathname: '/search', search: 'category=New-series' }}
+            to={{ pathname: '/search', search: `category=${category}` }}
             className="pl-4 text-sm"
           >
             Show more
@@ -156,7 +153,7 @@ export default function BasicProductCollection({
         )}
         {subTitle && <p className="mt-4 max-w-md text-gray-500">{subTitle}</p>}
       </header>
-      <div className="mt-8 flex items-center justify-between px-4">
+      <div className="mb-4 flex items-center justify-between">
         <div className="flex flex-grow gap-4">
           <PriceSelector
             highestPrice={highestPrice || 0}
@@ -176,56 +173,44 @@ export default function BasicProductCollection({
           />
         </div>
       </div>
-      <div className="mt-4">
-        {products.isLoading && (
-          <div className="mx-8 flex flex-col items-center gap-4 sm:flex-row">
-            {[...Array(3)].map((el, index) => (
-              <SkeletonShopCard
-                key={index}
-                height="h-[330px]"
-                width="w-[280px]"
-              />
+      {products.isLoading && (
+        <div className="mx-8 flex flex-col items-center gap-4 sm:flex-row">
+          {[...Array(3)].map((el, index) => (
+            <SkeletonShopCard
+              key={index}
+              height="h-[330px]"
+              width="w-[280px]"
+            />
+          ))}
+        </div>
+      )}
+      {!products.isLoading && !products.filteredData && (
+        <p className="mx-8">No products</p>
+      )}
+      {!products.isLoading &&
+        products.filteredData &&
+        products.filteredData.length > 0 && (
+          <ShortSwiper swiperCategory={category}>
+            {products.filteredData.map((product, id) => (
+              <SwiperSlide key={id} className="pr-8">
+                <ShopCard
+                  _id={product._id}
+                  price={product.shop_info.price}
+                  productQuantity={product.quantity}
+                  title={product.title}
+                  authors={product.authors}
+                  description={product.description}
+                  img={
+                    product.imgs && product.imgs.length > 0
+                      ? product.imgs[0].url
+                      : ''
+                  }
+                  rating={product.rating}
+                />
+              </SwiperSlide>
             ))}
-          </div>
+          </ShortSwiper>
         )}
-        {!products.isLoading && !products.filteredData && (
-          <p className="mx-8">No products</p>
-        )}
-        {!products.isLoading &&
-          products.filteredData &&
-          products.filteredData.length > 0 && (
-            <LongSwiper swiperCategory={category}>
-              {products.filteredData.map((product, id) => (
-                <SwiperSlide key={id}>
-                  <div>
-                    {marketPlace === 'Shop' ? (
-                      <ShopCard
-                        _id={product._id}
-                        price={product.shop_info.price}
-                        productQuantity={product.quantity}
-                        title={product.title}
-                        authors={product.authors}
-                        description={product.description}
-                        img={product.img}
-                      />
-                    ) : (
-                      <AuctionCard
-                        _id={product._id}
-                        title={product.title}
-                        authors={product.authors}
-                        description={product.description}
-                        img={product.img}
-                        startingPrice={product.auction_info.starting_price}
-                        currentPrice={product.auction_info.current_price}
-                        auctionEndDate={product.auction_info.auction_end_date}
-                      />
-                    )}
-                  </div>
-                </SwiperSlide>
-              ))}
-            </LongSwiper>
-          )}
-      </div>
     </section>
   );
 }

@@ -1,97 +1,82 @@
-import axios from 'axios';
-import { ChangeEvent, FormEvent, useContext, useState } from 'react';
+import { useContext, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { SunRiseIcon } from '@assets/icons/Icons';
 import { UserContext } from '@context/UserProvider';
-import CustomInput from '@components/form/CustomInput';
-import CustomPasswordInput from '@components/form/CustomPasswordInput';
 import { Button } from '@components/UI/button';
 import {
   useGetAccessDatabase,
   usePostAccessDatabase,
 } from '../../hooks/useAaccessDatabase';
 import { DATABASE_ENDPOINTS } from '../../data/endpoints';
+import { z } from 'zod';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@components/UI/form';
+import { Input } from '@components/UI/input';
+import { useToast } from '@components/UI/use-toast';
+import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
+
+const formSchema = z.object({
+  email: z.string().email().nonempty().min(2),
+  password: z.string().nonempty().min(2),
+});
 
 export default function LoginPage() {
   const navigate = useNavigate();
   const { changeUserData } = useContext(UserContext);
+  const [showPassword, setShowPassword] = useState(false);
+  const { toast } = useToast();
 
-  const [logUserData, setLogUserData] = useState({
-    data: {
+  const form = useForm<any>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
       email: '',
       password: '',
     },
-    errors: {
-      email: null,
-      password: null,
-    },
   });
 
-  const loginHandler = (e: ChangeEvent<HTMLInputElement>) => {
-    setLogUserData((prevState) => {
-      return {
-        ...prevState,
-        data: { ...prevState.data, [e.target.name]: e.target.value },
-        errors: { ...prevState.errors, [e.target.name]: null },
-      };
+  const signInHandler = async (formResponse: z.infer<typeof formSchema>) => {
+    const { email, password } = formResponse;
+    const { error: logInError, name } = await usePostAccessDatabase({
+      url: DATABASE_ENDPOINTS.USER_LOGIN,
+      body: {
+        email,
+        password,
+      },
     });
-  };
-
-  const signInHandler = async (e: FormEvent) => {
-    e.preventDefault();
-
-    const { email, password } = logUserData.data;
-
-    try {
-      await usePostAccessDatabase({
-        url: DATABASE_ENDPOINTS.USER_LOGIN,
-        body: {
-          email,
-          password,
-        },
+    if (logInError) {
+      form.setError(name, { type: 'value', message: logInError });
+      return toast({
+        variant: 'destructive',
+        title: 'Uh oh! Something went wrong.',
+        description: logInError,
       });
-      const { data } = await useGetAccessDatabase({
-        url: DATABASE_ENDPOINTS.USER_PROFILE,
+    }
+    const { data, error: updateProfileDataError } = await useGetAccessDatabase({
+      url: DATABASE_ENDPOINTS.USER_PROFILE,
+    });
+    if (updateProfileDataError) {
+      return toast({
+        variant: 'destructive',
+        title: 'Uh oh! Something went wrong.',
+        description: updateProfileDataError,
       });
-      changeUserData(data);
-
+    }
+    changeUserData(data);
+    if (data) {
       navigate('/');
-    } catch (err: any) {
-      if (axios.isAxiosError(err)) {
-        if (err.response)
-          if (typeof Object.values(err.response.data)[0] !== 'string') {
-            err.response.data.forEach(
-              (error: { name: string; message: string }) => {
-                setLogUserData((prevState) => {
-                  return {
-                    ...prevState,
-
-                    errors: {
-                      ...prevState.errors,
-                      [error.name]: error.message,
-                    },
-                  };
-                });
-              }
-            );
-          } else {
-            setLogUserData((prevState) => {
-              return {
-                ...logUserData,
-                errors: {
-                  ...prevState.errors,
-                  [err.response.data.name]: err.response.data.message,
-                },
-              };
-            });
-          }
-      } else {
-        alert(err);
-      }
     }
   };
   return (
-    <section className="bg-white">
+    <section className="bg-background">
       <div className="lg:grid lg:min-h-screen lg:grid-cols-12">
         <aside className="relative block h-16 lg:order-last lg:col-span-5 lg:h-full xl:col-span-6">
           <img
@@ -119,70 +104,97 @@ export default function LoginPage() {
               Lorem, ipsum dolor sit amet consectetur adipisicing elit. Eligendi
               nam dolorum aliquam, quibusdam aperiam voluptatum.
             </p>
-
-            <form
-              onSubmit={signInHandler}
-              className="mt-8 grid grid-cols-6 gap-6"
-              noValidate
-            >
-              <div className="col-span-6">
-                <CustomInput
-                  autoComplete="email"
-                  hasError={logUserData.errors.email}
-                  inputValue={logUserData.data.email}
-                  labelValue="Email"
+            <Form {...form}>
+              <form
+                onSubmit={form.handleSubmit(signInHandler)}
+                className="mt-8 grid grid-cols-6 gap-6"
+              >
+                <FormField
                   name="email"
-                  onChange={(e) => loginHandler(e)}
-                  optional={false}
-                  type="email"
-                  errorValue={logUserData.errors.email}
+                  control={form.control}
+                  render={({ field }) => (
+                    <FormItem className="col-span-6">
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="text"
+                          placeholder="Email..."
+                          autoComplete="email"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormDescription>Your email</FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              </div>
-
-              <div className="col-span-6">
-                <CustomPasswordInput
-                  autoComplete="current-password"
-                  hasError={logUserData.errors.password}
-                  inputValue={logUserData.data.password}
-                  labelValue="Password"
+                <FormField
                   name="password"
-                  onChange={(e) => loginHandler(e)}
-                  optional={false}
-                  errorValue={logUserData.errors.password}
+                  control={form.control}
+                  render={({ field }) => (
+                    <FormItem className="col-span-6">
+                      <FormLabel>Password</FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <Input
+                            type={showPassword ? 'text' : 'password'}
+                            placeholder="Password..."
+                            autoComplete="current-password"
+                            {...field}
+                          />
+                          <button
+                            type="button"
+                            className="absolute right-0 top-1/2 -translate-y-1/2 cursor-pointer px-3"
+                            onClick={() =>
+                              setShowPassword((prevState) => !prevState)
+                            }
+                          >
+                            {showPassword ? (
+                              <EyeIcon className="h-5 w-5 text-gray-500" />
+                            ) : (
+                              <EyeSlashIcon className="h-5 w-5 text-gray-400" />
+                            )}
+                          </button>
+                        </div>
+                      </FormControl>
+                      <FormDescription>Your password</FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              </div>
 
-              <div className="col-span-6">
-                <p className="text-sm text-gray-500">
-                  By having an account on this site, you agree to our{' '}
-                  <Link to="/" className="text-gray-700 underline">
-                    terms and conditions
-                  </Link>{' '}
-                  and{' '}
-                  <Link to="/" className="text-gray-700 underline">
-                    privacy policy
-                  </Link>
-                  .
-                </p>
-              </div>
+                <div className="col-span-6">
+                  <p className="text-sm text-gray-500">
+                    By having an account on this site, you agree to our{' '}
+                    <Link to="/" className="text-gray-700 underline">
+                      terms and conditions
+                    </Link>{' '}
+                    and{' '}
+                    <Link to="/" className="text-gray-700 underline">
+                      privacy policy
+                    </Link>
+                    .
+                  </p>
+                </div>
 
-              <div className="col-span-6 sm:flex sm:items-center sm:gap-4">
-                <Button variant="default" type="submit" size="default">
-                  Sign in
-                </Button>
+                <div className="col-span-6 sm:flex sm:items-center sm:gap-4">
+                  <Button variant="default" type="submit" size="default">
+                    Sign in
+                  </Button>
 
-                <p className="mt-4 text-sm text-gray-500 sm:mt-0">
-                  No account yet?{' '}
-                  <Link
-                    to="/account/register"
-                    className="text-gray-700 underline"
-                  >
-                    Register
-                  </Link>
-                  .
-                </p>
-              </div>
-            </form>
+                  <p className="mt-4 text-sm text-gray-500 sm:mt-0">
+                    No account yet?{' '}
+                    <Link
+                      to="/account/register"
+                      className="text-gray-700 underline"
+                    >
+                      Register
+                    </Link>
+                    .
+                  </p>
+                </div>
+              </form>
+            </Form>
           </div>
         </main>
       </div>

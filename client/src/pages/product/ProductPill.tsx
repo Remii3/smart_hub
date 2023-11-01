@@ -1,5 +1,5 @@
 type PropsTypes = {
-  text: 'Shop' | 'Auction' | null;
+  text: 'Shop' | 'Auction' | 'Collection' | null;
 };
 
 export default function ProductPill({ text }: PropsTypes) {

@@ -15,9 +15,9 @@ function CollectionCard({
   const colorStyle = () => {
     switch (backcolor) {
       case 'white':
-        return 'text-dark bg-white';
+        return 'text-foreground bg-background';
       case 'pageBackground':
-        return 'text-white bg-pageBackground';
+        return 'text-background bg-pageBackground';
       default:
         return '';
     }
@@ -28,7 +28,7 @@ function CollectionCard({
       className={`${colorStyle()} w-full ${!lastItem && 'pb-12'} text-center`}
     >
       <MainPageHeading
-        color={backcolor === 'white' ? 'dark' : 'white'}
+        color={backcolor === 'white' ? 'foreground' : 'background'}
         usecase="sub"
         mainTitle="Award winning books"
         subTitle="Our most awarded books, interested? Check out our gallery."
