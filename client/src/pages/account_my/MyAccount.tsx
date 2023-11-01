@@ -166,6 +166,8 @@ export default function MyAccount() {
     }
   };
 
+  if (!userData.data || userData.isLoading) return <></>;
+
   const subtitle =
     userData.data.role === UserRoleTypes.ADMIN ? (
       <span>Let&apos; put some things in order!</span>

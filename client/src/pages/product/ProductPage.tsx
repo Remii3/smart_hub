@@ -389,19 +389,80 @@ export default function ProductPage() {
           }
         }
       }
+      function differentAuthors(array1, array2) {
+        if (array1.length === array2.length) {
+          return array1.every((element, index) => {
+            if (element.label === array2[index].author_info.pseudonim) {
+              console.log('false', element);
+              return false;
+            }
+            console.log('true');
+            return true;
+          });
+        }
+        console.log('true');
+        return true;
+      }
+      function differentCategories(array1, array2) {
+        if (array1.length === array2.length) {
+          return array1.every((element, index) => {
+            if (element.value === array2[index].value) {
+              console.log('false', element);
+              return false;
+            }
+            console.log('true');
+            return true;
+          });
+        }
+        console.log('true');
+        return true;
+      }
+      function validImgsArray(array1: SelectedImgsTypes) {
+        array1.forEach((item) => {
+          if (item.data) {
+            return true;
+          }
+        });
+
+        return false;
+      }
+      console.log('formResponse', formResponse);
+      console.log('productState', productState);
+      const productData = {
+        _id: productState.data._id,
+        market_place: productState.data.market_place,
+      } as {
+        _id: string;
+        market_place: string;
+        title?: string;
+        price?: string | number;
+        quantity?: string | number;
+        description?: string;
+        authors?: any[];
+        categories?: any[];
+        imgs?: any[];
+      };
+      if (formResponse.title !== productState.data.title)
+        productData.title = formResponse.title;
+      if (formResponse.price !== productState.data.shop_info.price)
+        productData.price = formResponse.price;
+      if (formResponse.description! == productState.data.description)
+        productData.description = formResponse.description;
+      if (formResponse.quantity !== formResponse.quantity)
+        productData.quantity = formResponse.quantity;
+      if (differentAuthors(formResponse.authors, productState.data.authors))
+        productData.authors = formResponse.authors;
+      if (
+        differentCategories(
+          formResponse.categories,
+          productState.data.categories
+        )
+      )
+        productData.categories = formResponse.categories;
+      if (validImgsArray(filteredImgs)) productData.imgs = filteredImgs;
       await usePostAccessDatabase({
         url: DATABASE_ENDPOINTS.PRODUCT_UPDATE,
-        body: {
-          _id: productState.data._id,
-          market_place: productState.data.market_place,
-          title: formResponse.title,
-          price: formResponse.price,
-          quantity: formResponse.quantity,
-          description: formResponse.description,
-          authors: formResponse.authors,
-          categories: formResponse.categories,
-          imgs: filteredImgs,
-        },
+        body: productData,
       });
       setImgsToAdd([]);
       setImgsToRemove([]);
@@ -422,7 +483,7 @@ export default function ProductPage() {
       navigate(-1);
     }
   };
-  if (!productState.data) return <></>;
+  if (!productState.data || userData.isLoading) return <></>;
   return (
     <MainContainer className="relative py-8">
       <div className="grid grid-cols-1 items-start gap-8 md:grid-cols-2">

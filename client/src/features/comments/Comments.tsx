@@ -269,7 +269,9 @@ export default function Comments({
               <div>
                 {withRating && (
                   <div className="mb-3">
-                    <StarRating rating={comment.value.rating} showOnly />
+                    {comment.value.rating > 0 && (
+                      <StarRating rating={comment.value.rating} showOnly />
+                    )}
                   </div>
                 )}
                 <div className="flex gap-4">

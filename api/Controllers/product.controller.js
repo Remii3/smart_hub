@@ -381,20 +381,43 @@ const updateOneProduct = async (req, res) => {
     auction_info,
   } = req.body;
   try {
+    const updateData = {};
+    if (title) updateData.title = title;
+    if (description) updateData.description = description;
+    if (price) updateData.shop_info = { price };
+    if (imgs) updateData.imgs = imgs;
+    if (categories) updateData.categories = categories;
+    if (authors) updateData.authors = authors;
+    if (quantity) updateData.quantity = quantity;
     if (market_place === 'Shop') {
-      await Product.updateOne(
-        { _id },
-        {
-          title,
-          description,
-          'shop_info.price': price,
-          imgs,
-          categories,
-          authors,
-          quantity,
-          market_place,
-        },
-      );
+      if (authors) {
+        let authorsData = [];
+        for (let i = 0; i < authors.length; i++) {
+          authorsData.push(await User.findOne({ _id: authors[i]._id }));
+        }
+        if (authorsData.length > 0) {
+          const authorsToUpdate = [];
+          authorsToUpdate.push(
+            authorsData.forEach(item => {
+              // console.log('item', item);
+              console.log('_id', _id);
+              console.log('item', item);
+              console.log('status', item.author_info.my_products.includes(_id));
+              if (item.author_info.my_products.includes(_id) === false) {
+                return item;
+              }
+            }),
+          );
+          console.log(authorsToUpdate);
+          for (let i = 0; i < authorsToUpdate.length; i++) {
+            await User.updateOne(authorsToUpdate[i], {
+              author_info: { $push: { my_products: _id } },
+            });
+          }
+        }
+      }
+
+      await Product.updateOne({ _id }, updateData);
     } else {
       await Product.updateOne(
         { _id },
