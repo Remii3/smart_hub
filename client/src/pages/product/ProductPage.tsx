@@ -69,6 +69,10 @@ interface ProductTypes {
   isLoading: boolean;
   data: null | UnknownProductTypes;
 }
+interface ProductRating {
+  quantity: number;
+  value: number;
+}
 interface ProductEditTypes {
   isEditing: boolean;
   isLoading: boolean;
@@ -157,7 +161,7 @@ export default function ProductPage() {
   const { toast } = useToast();
   const navigate = useNavigate();
   const path = useLocation();
-
+  const [productRating, setProductRating] = useState<ProductRating>();
   let unPreparedProdId: string | any[] | null = null;
   unPreparedProdId = path.pathname.split('/');
   const prodId: string = unPreparedProdId[unPreparedProdId.length - 1];
@@ -184,6 +188,15 @@ export default function ProductPage() {
       return { ...prevState, options: [...data] };
     });
   }, []);
+
+  const fetchComments = useCallback(async () => {
+    const { data } = await useGetAccessDatabase({
+      url: DATABASE_ENDPOINTS.PRODUCT_RATING,
+      params: { _id: prodId },
+    });
+    setProductRating({ quantity: data.rating.length, value: data.avgRating });
+  }, []);
+
   const fetchData = useCallback(async () => {
     setProductState((prevState) => {
       return { ...prevState, isLoading: true };
@@ -220,6 +233,10 @@ export default function ProductPage() {
         imgsArray: data.imgs,
       };
     });
+    setProductRating({
+      quantity: data.rating.count,
+      value: data.rating.rating,
+    });
     setProductState({ data, isLoading: false });
   }, [prodId]);
 
@@ -242,7 +259,6 @@ export default function ProductPage() {
       setIsMyProduct(true);
       if (!productState.data) return;
       let preparedAuthors = [];
-      console.log('productState', productState);
       for (let i = 0; i < productState.data.authors.length; i++) {
         if (!productState.data.authors[i].author_info) break;
         preparedAuthors.push({
@@ -335,7 +351,6 @@ export default function ProductPage() {
         };
       });
     } else {
-      console.log('turned editting on');
       setProductEditState((prevState) => {
         return { ...prevState, isEditing: true };
       });
@@ -398,28 +413,22 @@ export default function ProductPage() {
         if (array1.length === array2.length) {
           return array1.every((element, index) => {
             if (element.label === array2[index].author_info.pseudonim) {
-              console.log('false', element);
               return false;
             }
-            console.log('true');
             return true;
           });
         }
-        console.log('true');
         return true;
       }
       function differentCategories(array1, array2) {
         if (array1.length === array2.length) {
           return array1.every((element, index) => {
             if (element.value === array2[index].value) {
-              console.log('false', element);
               return false;
             }
-            console.log('true');
             return true;
           });
         }
-        console.log('true');
         return true;
       }
       function validImgsArray(array1: SelectedImgsTypes) {
@@ -431,8 +440,6 @@ export default function ProductPage() {
 
         return false;
       }
-      console.log('formResponse', formResponse);
-      console.log('productState', productState);
       const productData = {
         _id: productState.data._id,
         market_place: productState.data.market_place,
@@ -951,20 +958,10 @@ export default function ProductPage() {
                   </div>
                   <p className="text-sm">Highest Rated Product</p>
                   <div className="">
-                    <StarRating
-                      showOnly
-                      rating={
-                        productState.data?.rating
-                          ? productState.data.rating.rating
-                          : 0
-                      }
-                    />
+                    <StarRating showOnly rating={productRating?.value} />
                   </div>
                   <span className="text-sm">
-                    votes:{' '}
-                    {productState.data?.rating
-                      ? productState.data.rating.count
-                      : 0}
+                    votes: {productRating?.quantity}
                   </span>
                 </div>
                 <div>
@@ -1139,7 +1136,7 @@ export default function ProductPage() {
           withRating={true}
           target={'Product'}
           targetId={prodId}
-          updateProductStatus={fetchData}
+          updateProductStatus={fetchComments}
         />
       )}
     </MainContainer>

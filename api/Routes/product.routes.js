@@ -11,11 +11,13 @@ const {
   updateOneProduct,
   deleteOneProduct,
   deleteAllProducts,
+  getProductRating,
 } = require('../Controllers/product.controller');
 const productSearchVerification = require('../Middleware/productSearchVerification.middleaware');
 
 router.get('/all', getAllProducts);
 router.get('/shop', getShopProducts);
+router.get('/rating', getProductRating);
 router.get('/auction', getAuctionProducts);
 router.get('/one', getOneProduct);
 router.get('/searched', productSearchVerification, getSearchedProducts);

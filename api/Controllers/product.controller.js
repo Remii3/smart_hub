@@ -520,8 +520,22 @@ const deleteAllProducts = async (req, res) => {
   }
 };
 
+const getProductRating = async (req, res) => {
+  const { _id } = req.query;
+  try {
+    const productRating = await Product.findOne(
+      { _id },
+      { rating: 1, avgRating: 1 },
+    );
+    res.json({ data: productRating });
+  } catch (err) {
+    res.json('error');
+  }
+};
+
 module.exports = {
   getAllProducts,
+  getProductRating,
   getShopProducts,
   getAuctionProducts,
   getOneProduct,
