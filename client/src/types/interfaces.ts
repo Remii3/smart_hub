@@ -185,4 +185,8 @@ export interface NewsTypes {
   title: string;
   subtitle?: string;
   content: string;
+  img?: {
+    id: string;
+    url: string;
+  };
 }

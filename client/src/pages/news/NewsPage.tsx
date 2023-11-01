@@ -174,6 +174,15 @@ export default function NewsPage() {
                     type="button"
                     className="rounded-md border border-slate-400 p-3 text-start shadow-sm"
                   >
+                    {item.img && (
+                      <div className="flex max-h-[200px]">
+                        <img
+                          src={item.img.url}
+                          className="aspect-auto w-full object-cover object-center"
+                          alt="news_img"
+                        />
+                      </div>
+                    )}
                     <h6>{item.title}</h6>
                     {item.subtitle && (
                       <section className="pt-3">{item.subtitle}</section>
