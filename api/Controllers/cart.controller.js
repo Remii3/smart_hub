@@ -84,8 +84,12 @@ const removeItemFromCart = async (req, res) => {
     }
     return res.status(200).json({ message: 'Success' });
   } catch (err) {
+    const errorMessage =
+      productId === 'all'
+        ? "We couldn't remove your items from the cart"
+        : "We couldn't remove your item from the cart";
     return res.status(500).json({
-      message: 'Something went wrong with removing product',
+      message: errorMessage,
       error: err.message,
     });
   }
@@ -130,17 +134,17 @@ const getAllCartItems = async (req, res) => {
 
       cartPrice = cartPrice.toFixed(2);
 
-      cartPrice = `€${cartPrice}`;
+      cartPrice = `${cartPrice}`;
       return res
         .status(200)
         .json({ data: { products: productsData, cartPrice } });
     } else {
-      cartPrice = '€0';
+      cartPrice = '0';
       return res.status(200).json({ data: { products: [], cartPrice } });
     }
   } catch (err) {
     return res.status(500).json({
-      message: 'Something went wrong with fetching cart data',
+      message: "We couldn't update your cart data",
       error: err.message,
     });
   }

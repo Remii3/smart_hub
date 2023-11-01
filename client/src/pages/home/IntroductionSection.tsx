@@ -5,10 +5,10 @@ export default function IntroductionSection() {
     <div className="relative flex w-full flex-col items-center">
       <section className="relative -top-4 left-0 w-full bg-gradient-to-b from-[#0D151C] to-pageBackground shadow-2xl">
         <div className="px-4 py-11 text-center md:py-28">
-          <h1 className={`uppercase text-white`}>
+          <h2 className={`uppercase text-white`}>
             Welcome to the Smart
             <span className="font-bold text-blue-600">HUB</span>
-          </h1>
+          </h2>
         </div>
       </section>
       <section className="mx-auto grid max-w-7xl grid-cols-1 gap-6 px-4 pb-6 pt-7 sm:grid-cols-2">

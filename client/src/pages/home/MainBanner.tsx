@@ -15,7 +15,7 @@ export default function MainBanner() {
           alt="banner img"
           height={800}
           width={1336}
-          className="h-[calc(100vh+64px+19vh)]  w-full object-cover object-center brightness-50"
+          className="h-[calc(100vh+64px+19vh)] w-full bg-pageBackground object-cover object-center brightness-50"
         />
       </ParallaxBannerLayer>
       <ParallaxBannerLayer>
