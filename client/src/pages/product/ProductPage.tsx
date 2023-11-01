@@ -232,15 +232,19 @@ export default function ProductPage() {
   useEffect(() => {
     if (
       userData.data &&
-      userData.data.role !== 'User' &&
-      userData.data.author_info.my_products.find(
-        (product: UnknownProductTypes) => product._id === productState.data?._id
-      )
+      ((userData.data.role == UserRoleTypes.AUTHOR &&
+        userData.data.author_info.my_products.find(
+          (product: UnknownProductTypes) =>
+            product._id === productState.data?._id
+        )) ||
+        userData.data.role == UserRoleTypes.ADMIN)
     ) {
       setIsMyProduct(true);
       if (!productState.data) return;
       let preparedAuthors = [];
+      console.log('productState', productState);
       for (let i = 0; i < productState.data.authors.length; i++) {
+        if (!productState.data.authors[i].author_info) break;
         preparedAuthors.push({
           label: productState.data.authors[i].author_info.pseudonim,
           value: productState.data.authors[i].author_info.pseudonim,
@@ -331,6 +335,7 @@ export default function ProductPage() {
         };
       });
     } else {
+      console.log('turned editting on');
       setProductEditState((prevState) => {
         return { ...prevState, isEditing: true };
       });
@@ -934,7 +939,9 @@ export default function ProductPage() {
                               className="pr-4"
                               to={`/account/${author._id}`}
                             >
-                              {author.author_info.pseudonim}
+                              {author.author_info
+                                ? author.author_info.pseudonim
+                                : ''}
                             </Link>
                           ))}
                         </>

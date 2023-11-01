@@ -265,6 +265,7 @@ const addOneProduct = async (req, res) => {
     starting_price,
     auction_end_date,
   } = req.body;
+
   if (categories && categories.length > 0) {
     try {
       for (const item of categories) {
@@ -345,12 +346,22 @@ const addOneProduct = async (req, res) => {
     }
 
     try {
-      await User.updateOne(
-        {
-          _id: seller_data._id,
-        },
-        { $push: { 'author_info.my_products': _id } },
-      );
+      if (!authors.includes(author => author._id === seller_data._id)) {
+        await User.updateOne(
+          {
+            _id: seller_data._id,
+          },
+          { $push: { 'author_info.my_products': _id } },
+        );
+      }
+      for (let i = 0; i < authors.length; i++) {
+        await User.updateOne(
+          {
+            _id: authors[i]._id,
+          },
+          { $push: { 'author_info.my_products': _id } },
+        );
+      }
     } catch (err) {
       return res
         .status(500)
@@ -391,28 +402,32 @@ const updateOneProduct = async (req, res) => {
     if (quantity) updateData.quantity = quantity;
     if (market_place === 'Shop') {
       if (authors) {
-        let authorsData = [];
-        for (let i = 0; i < authors.length; i++) {
-          authorsData.push(await User.findOne({ _id: authors[i]._id }));
+        const productData = await Product.findOne({ _id });
+        const usersToPull = productData.authors.filter(
+          author => !authors.includes(author),
+        );
+        const usersToPush = authors.filter(
+          author => !productData.authors.includes(author),
+        );
+
+        if (usersToPull) {
+          for (let i = 0; i < usersToPull.length; i++) {
+            await User.updateOne(
+              {
+                _id: usersToPull[i]._id,
+              },
+              { $pull: { 'author_info.my_products': _id } },
+            );
+          }
         }
-        if (authorsData.length > 0) {
-          const authorsToUpdate = [];
-          authorsToUpdate.push(
-            authorsData.forEach(item => {
-              // console.log('item', item);
-              console.log('_id', _id);
-              console.log('item', item);
-              console.log('status', item.author_info.my_products.includes(_id));
-              if (item.author_info.my_products.includes(_id) === false) {
-                return item;
-              }
-            }),
-          );
-          console.log(authorsToUpdate);
-          for (let i = 0; i < authorsToUpdate.length; i++) {
-            await User.updateOne(authorsToUpdate[i], {
-              author_info: { $push: { my_products: _id } },
-            });
+        if (usersToPush) {
+          for (let i = 0; i < usersToPush.length; i++) {
+            await User.updateOne(
+              {
+                _id: usersToPush[i]._id,
+              },
+              { $push: { 'author_info.my_products': _id } },
+            );
           }
         }
       }
@@ -451,10 +466,19 @@ const deleteOneProduct = async (req, res) => {
   }
 
   try {
-    await User.updateOne(
-      { _id: userId },
-      { $pull: { 'author_info.my_products': _id } },
-    );
+    const productData = await Product.findOne({ _id });
+    if (!productData.authors.includes(author => author._id === userId)) {
+      await User.updateOne(
+        { _id: userId },
+        { $pull: { 'author_info.my_products': _id } },
+      );
+    }
+    for (let i = 0; i < productData.authors.length; i++) {
+      await User.updateOne(
+        { _id: productData.authors[i]._id },
+        { $pull: { 'author_info.my_products': _id } },
+      );
+    }
     let currentDate = new Date();
     let currentMonth = currentDate.getMonth();
     let monthFromNow = currentMonth + 6;
