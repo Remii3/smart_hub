@@ -195,13 +195,13 @@ export interface NewsTypes extends FetchDataTypes {
       }[];
 }
 
-export interface VotingType {
+export interface VotesType {
   user: AuthorTypes;
   vote: VoteType;
 }
 
-export type VotingTypes = {
+export interface VotingTypes {
   likes: null | number;
   dislikes: null | number;
-  votes: VotingType[];
+  votes: VotesType[];
 };

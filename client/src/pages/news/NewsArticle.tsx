@@ -19,11 +19,14 @@ import {
   TooltipTrigger,
 } from '@components/UI/tooltip';
 import { UserContext } from '@context/UserProvider';
-import { FetchDataTypes, UserTypes } from '@customTypes/interfaces';
-import { ImgTypes, VotingTypes } from '@customTypes/types';
+import {
+  FetchDataTypes,
+  UserTypes,
+  VotingTypes,
+} from '@customTypes/interfaces';
+import { ImgTypes } from '@customTypes/types';
 import { DATABASE_ENDPOINTS } from '@data/endpoints';
 import Comments from '@features/comments/Comments';
-import StarRating from '@features/starRating/StarRating';
 import { TrashIcon } from '@heroicons/react/24/outline';
 import {
   useGetAccessDatabase,
@@ -68,7 +71,7 @@ export default function NewsArticle({
   const [vote, setVote] = useState<RatingTypes>({
     hasError: null,
     isLoading: false,
-    data: { likes: null, dislikes: null },
+    data: { likes: null, dislikes: null, votes: [] },
   });
 
   const { userData } = useContext(UserContext);

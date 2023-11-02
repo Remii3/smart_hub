@@ -28,7 +28,7 @@ export const MARKETPLACES = [MarketPlaceTypes.AUCTION, MarketPlaceTypes.SHOP];
 
 export type ImgTypes = { id: string; url: string };
 
-export type VoteType = 'Like' | 'Dislike';
+export type VoteType = 'Like' | 'Dislike'; 
 
 export type RatingTypes = {
   value: number;
