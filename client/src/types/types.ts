@@ -1,3 +1,5 @@
+import { AuthorTypes } from './interfaces';
+
 export enum UserRoleTypes {
   USER = 'User',
   AUTHOR = 'Author',
@@ -23,3 +25,12 @@ export const USER_ROLES = [
 export type MarketplaceType = MarketPlaceTypes.AUCTION | MarketPlaceTypes.SHOP;
 
 export const MARKETPLACES = [MarketPlaceTypes.AUCTION, MarketPlaceTypes.SHOP];
+
+export type ImgTypes = { id: string; url: string };
+
+export type VoteType = 'Like' | 'Dislike';
+
+export type RatingTypes = {
+  value: number;
+  quantity: number;
+};

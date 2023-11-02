@@ -8,7 +8,7 @@ import { FetchDataTypes } from '@customTypes/interfaces';
 import { usePostAccessDatabase } from '../../hooks/useAaccessDatabase';
 import { DATABASE_ENDPOINTS } from '../../data/endpoints';
 import MainContainer from '@layout/MainContainer';
-import errorToast from '@components/UI/toasts/errorToast';
+import errorToast from '@components/UI/error/errorToast';
 import { Skeleton } from '@components/UI/skeleton';
 
 interface ClientSecretTypes extends FetchDataTypes {

@@ -1,6 +1,7 @@
 const { default: mongoose } = require('mongoose');
 const News = require('../Models/news');
 const User = require('../Models/user');
+const Comment = require('../Models/comment');
 
 const getAllNews = async (req, res) => {
   try {
@@ -22,11 +23,12 @@ const getOneNews = async (req, res) => {
   }
 
   try {
-    const data = await News.findOne({ _id: newsId }, { comments: 0 }).populate([
+    const data = await News.findOne({ _id: newsId }).populate([
       {
         path: 'user',
       },
     ]);
+
     return res.status(200).json({ data });
   } catch (err) {
     return res.status(500).json({
@@ -94,9 +96,9 @@ const addOneNews = async (req, res) => {
       user: userId,
       _id,
       title,
-      subtitle,
-      img,
-      content,
+      subtitle: subtitle || null,
+      img: img || null,
+      content: content || null,
       created_at,
     });
     await User.updateOne({ _id: userId }, { $push: { news: _id } });

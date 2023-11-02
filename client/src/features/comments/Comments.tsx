@@ -49,7 +49,7 @@ interface NewCommentTypes {
 interface PropsTypes {
   targetId: string;
   target: CommentTargetTypes;
-  updateProductStatus: () => void;
+  updateProductStatus?: () => void;
   withRating: boolean;
 }
 
@@ -137,7 +137,9 @@ export default function Comments({
       });
     }
     await fetchData();
-    updateProductStatus();
+    if (updateProductStatus) {
+      updateProductStatus();
+    }
   };
 
   useEffect(() => {
@@ -160,7 +162,9 @@ export default function Comments({
     });
     if (error === null) {
       await fetchData();
-      updateProductStatus();
+      if (updateProductStatus) {
+        updateProductStatus();
+      }
       setShowDeleteDialog(null);
     }
   };

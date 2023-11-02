@@ -11,7 +11,8 @@ import { sortOptions } from '@hooks/useSortProducts';
 import { CardContent, CardHeader } from '@components/UI/card';
 import MainContainer from '@layout/MainContainer';
 import { toast } from '@components/UI/use-toast';
-import errorToast from '@components/UI/toasts/errorToast';
+import errorToast from '@components/UI/error/errorToast';
+import ErrorMessage from '@components/UI/error/ErrorMessage';
 
 interface ProductCategoriesFullTypes extends FetchDataTypes {
   data: ProductCategories[] | null;
@@ -75,10 +76,7 @@ export default function CategoriesSection() {
               </Skeleton>
             ))}
           {!categoriesList.isLoading && categoriesList.hasError && (
-            <div>
-              <strong className="font-semibold">Error</strong>
-              <p>Couldn't get the categories</p>
-            </div>
+            <ErrorMessage message={categoriesList.hasError} />
           )}
           {!categoriesList.isLoading &&
             !categoriesList.hasError &&

@@ -1,5 +1,5 @@
 // eslint-disable-next-line import/no-cycle
-import { MarketPlaceTypes, UserRoleType } from './types';
+import { MarketPlaceTypes, UserRoleType, VoteType } from './types';
 
 // * Product types
 
@@ -180,13 +180,28 @@ export interface ProductAuctionCardType extends ProductCardTypes {
 
 // * news types
 
-export interface NewsTypes {
-  _id: string;
-  title: string;
-  subtitle?: string;
-  content: string;
-  img?: {
-    id: string;
-    url: string;
-  };
+export interface NewsTypes extends FetchDataTypes {
+  data:
+    | null
+    | {
+        _id: string;
+        title: string;
+        subtitle?: string;
+        content: string;
+        img?: {
+          id: string;
+          url: string;
+        };
+      }[];
 }
+
+export interface VotingType {
+  user: AuthorTypes;
+  vote: VoteType;
+}
+
+export type VotingTypes = {
+  likes: null | number;
+  dislikes: null | number;
+  votes: VotingType[];
+};
