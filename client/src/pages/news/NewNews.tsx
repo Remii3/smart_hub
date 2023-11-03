@@ -166,6 +166,13 @@ export default function NewNews({ updateNewsList }: PropsTypes) {
                       accept="image/png, image/jpg, image/jpeg"
                     />
                   </FormControl>
+                  {selectedImg && selectedImg.length > 0 && (
+                    <img
+                      src={URL.createObjectURL(selectedImg[0])}
+                      alt="preview_img"
+                      className="aspect-square w-full object-cover"
+                    />
+                  )}
                   <FormMessage />
                 </FormItem>
 
