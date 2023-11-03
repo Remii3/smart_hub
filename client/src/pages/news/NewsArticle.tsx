@@ -20,7 +20,7 @@ import {
   FetchDataTypes,
   VotingTypes,
 } from '@customTypes/interfaces';
-import { ImgTypes } from '@customTypes/types';
+import { ImgTypes, UserRoleTypes } from '@customTypes/types';
 import { DATABASE_ENDPOINTS } from '@data/endpoints';
 import Comments from '@features/comments/Comments';
 import VoteRating from '@features/rating/VoteRating';
@@ -217,29 +217,33 @@ export default function NewsArticle({
         <div className={`${articleData.isLoading && 'invisible'}`}>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(uploadNewDataHandler)}>
-              <div>
-                <DeleteDialog
-                  deleteHandler={() => deleteArticleHandler(newsId)}
-                  openState={openedDialog}
-                  openStateHandler={(state) => setOpenedDialog(state)}
-                />
-                <Button
-                  variant={'outline'}
-                  type="button"
-                  onClick={() => editArticleHandler()}
-                >
-                  {isEditing ? 'Cancel' : 'Edit'}
-                </Button>
-                {isEditing && (
-                  <Button
-                    type="submit"
-                    variant={'outline'}
-                    className="text-green-600 hover:text-green-600"
-                  >
-                    Accept
-                  </Button>
+              {userData.data &&
+                (userData.data._id === articleData.data.user._id ||
+                  userData.data.role === UserRoleTypes.ADMIN) && (
+                  <div>
+                    <DeleteDialog
+                      deleteHandler={() => deleteArticleHandler(newsId)}
+                      openState={openedDialog}
+                      openStateHandler={(state) => setOpenedDialog(state)}
+                    />
+                    <Button
+                      variant={'outline'}
+                      type="button"
+                      onClick={() => editArticleHandler()}
+                    >
+                      {isEditing ? 'Cancel' : 'Edit'}
+                    </Button>
+                    {isEditing && (
+                      <Button
+                        type="submit"
+                        variant={'outline'}
+                        className="text-green-600 hover:text-green-600"
+                      >
+                        Accept
+                      </Button>
+                    )}
+                  </div>
                 )}
-              </div>
               <div className="space-y-6">
                 <div className="space-y-2">
                   <VoteRating
