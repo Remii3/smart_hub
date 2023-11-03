@@ -78,6 +78,7 @@ export default function NewNews({ updateNewsList }: PropsTypes) {
         targetLocation: 'News_img',
         selectedFile: selectedImg[0],
       });
+      console.log(imgResData);
       const { error } = await usePostAccessDatabase({
         url: DATABASE_ENDPOINTS.NEWS_UPDATE,
         body: { img: imgResData, _id: data.id },
@@ -95,8 +96,16 @@ export default function NewNews({ updateNewsList }: PropsTypes) {
       form.reset();
     }, 150);
   };
+  const changeDialogVisiblity = () => {
+    setOpenedDialog(false);
+    setTimeout(() => {
+      setPushStatus({ hasError: null, isLoading: false });
+      setSelectedImg(null);
+      form.reset();
+    }, 150);
+  };
   return (
-    <Dialog open={openedDialog} onOpenChange={() => setOpenedDialog(false)}>
+    <Dialog open={openedDialog} onOpenChange={() => changeDialogVisiblity()}>
       <Button variant="default" onClick={() => setOpenedDialog(true)}>
         Add new
       </Button>

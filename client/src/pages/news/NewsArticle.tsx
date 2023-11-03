@@ -30,6 +30,7 @@ import {
   useGetAccessDatabase,
   usePostAccessDatabase,
 } from '@hooks/useAaccessDatabase';
+import useUploadImg from '@hooks/useUploadImg';
 import { useCallback, useContext, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link } from 'react-router-dom';
@@ -57,8 +58,8 @@ interface PropsTypes {
 
 const newArticleDataSchema = z.object({
   title: z.string().nonempty(),
-  subtitle: z.string(),
-  content: z.string(),
+  subtitle: z.string().optional(),
+  content: z.string().optional(),
 });
 
 export default function NewsArticle({
@@ -79,6 +80,7 @@ export default function NewsArticle({
     isLoading: false,
     data: { quantity: { likes: null, dislikes: null }, votes: [] },
   });
+  const [selectedImg, setSelectedImg] = useState<null | FileList>(null);
 
   const { userData } = useContext(UserContext);
 
@@ -173,16 +175,22 @@ export default function NewsArticle({
     formResponse: z.infer<typeof newArticleDataSchema>
   ) => {
     const newArticleData = {} as any;
-
+    let img = null;
     for (const [key, value] of Object.entries(formResponse)) {
       if (form.getFieldState(key).isDirty) {
         newArticleData[key] = value;
       }
     }
-
+    if (selectedImg) {
+      img = await useUploadImg({
+        ownerId: newsId,
+        targetLocation: 'News_img',
+        selectedFile: selectedImg[0],
+      });
+    }
     const { data, error } = await usePostAccessDatabase({
       url: DATABASE_ENDPOINTS.NEWS_UPDATE,
-      body: { _id: newsId, newData: newArticleData },
+      body: { _id: newsId, newData: newArticleData, img },
     });
     if (error) {
       return errorToast(error);
@@ -194,6 +202,7 @@ export default function NewsArticle({
   };
   const editArticleHandler = () => {
     setIsEditing((prevState) => !prevState);
+    setSelectedImg(null);
     form.reset();
   };
   return (
@@ -240,8 +249,30 @@ export default function NewsArticle({
                     quantity={vote.data.quantity}
                     updateVotesHandler={fetchVotes}
                   />
-                  {articleData.data.img?.url && (
-                    <img src={articleData.data.img.url} alt="article_img" />
+                  {isEditing ? (
+                    <>
+                      <FormItem>
+                        <FormControl>
+                          <Input
+                            type="file"
+                            className="block"
+                            name="mainImg"
+                            onChange={(e) => setSelectedImg(e.target.files)}
+                            accept="image/png, image/jpg, image/jpeg"
+                          />
+                        </FormControl>
+                      </FormItem>
+                      {selectedImg && selectedImg.length > 0 && (
+                        <img
+                          src={URL.createObjectURL(selectedImg[0])}
+                          alt="imgPreview"
+                        />
+                      )}
+                    </>
+                  ) : (
+                    articleData.data.img?.url && (
+                      <img src={articleData.data.img.url} alt="article_img" />
+                    )
                   )}
 
                   {isEditing ? (

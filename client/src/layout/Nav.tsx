@@ -120,7 +120,7 @@ export default function Nav({ scrollFlag }: { scrollFlag: boolean }) {
         <div className="z-30 flex items-center">
           <Link
             to="/"
-            className=" block text-blue-600"
+            className="relative block text-blue-600"
             onClick={() => hideMobileOverlay()}
           >
             <span className="sr-only">Home</span>
@@ -156,7 +156,7 @@ export default function Nav({ scrollFlag }: { scrollFlag: boolean }) {
           />
           <button
             type="submit"
-            className="absolute right-0 top-1/2 h-[98%] -translate-y-1/2 transform rounded-e-xl border-0 bg-transparent px-2 text-gray-600 transition"
+            className="absolute right-0 top-1/2 h-full w-auto min-w-[40px] -translate-y-1/2 transform rounded-e-xl border-0 bg-transparent px-2 text-gray-600 transition"
           >
             <span className="sr-only">Search</span>
             <Suspense fallback={<LoadingCircle />}>
@@ -167,9 +167,12 @@ export default function Nav({ scrollFlag }: { scrollFlag: boolean }) {
         <div className="flex max-h-[32px] gap-4">
           <div className="block lg:hidden">
             <Popover>
-              <PopoverTrigger aria-label="Search trigger">
+              <PopoverTrigger
+                aria-label="Search trigger"
+                className="relative h-8 w-8"
+              >
                 <Suspense fallback={<LoadingCircle />}>
-                  <MagnifyingGlassIcon className={` h-8 w-8`} />
+                  <MagnifyingGlassIcon className={`h-8 w-8`} />
                 </Suspense>
               </PopoverTrigger>
               <PopoverContent className="mt-3 block w-screen rounded-t-none bg-background lg:hidden">
@@ -187,7 +190,7 @@ export default function Nav({ scrollFlag }: { scrollFlag: boolean }) {
                   />
                   <PopoverClose
                     type="submit"
-                    className="absolute right-0 top-1/2 h-full -translate-y-1/2 rounded-e-lg border-b-2 border-r-2 border-t-2 border-transparent bg-transparent px-2 text-gray-600 transition"
+                    className="absolute right-0 top-1/2 h-4 w-4 -translate-y-1/2 rounded-e-lg border-b-2 border-r-2 border-t-2 border-transparent bg-transparent px-2 text-gray-600 transition"
                   >
                     <span className="sr-only">Search</span>
                     <Suspense fallback={<LoadingCircle />}>
@@ -201,7 +204,10 @@ export default function Nav({ scrollFlag }: { scrollFlag: boolean }) {
 
           <div className="flex gap-4">
             <Popover>
-              <PopoverTrigger className="relative" aria-label="Shopping cart">
+              <PopoverTrigger
+                className="relative h-8 w-8"
+                aria-label="Shopping cart"
+              >
                 <Suspense fallback={<LoadingCircle />}>
                   <ShoppingBagIcon className={`h-7 w-7`} />
                   {cartState && cartState.products.length > 0 && (
@@ -228,7 +234,10 @@ export default function Nav({ scrollFlag }: { scrollFlag: boolean }) {
             </Popover>
             <div className="hidden items-center lg:flex">
               <Popover>
-                <PopoverTrigger aria-label="Profile dropdown">
+                <PopoverTrigger
+                  aria-label="Profile dropdown"
+                  className="relative h-8 w-8"
+                >
                   <Suspense fallback={<LoadingCircle />}>
                     {userData.data ? (
                       userData.data.user_info.profile_img.url ? (

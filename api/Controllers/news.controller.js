@@ -60,27 +60,25 @@ const updateOne = async (req, res) => {
   if (!_id) {
     return res.status(422).json({ message: "Provide news id" });
   }
+const preparedData = { ...newData };
 
-  const preparedData = newData;
-
-  if (img) {
-    preparedData.img = img;
-  }
-
-  try {
-    await News.updateOne(
-      { _id },
-      {
-        ...newData,
-      }
-    );
-    return res.status(200).json({ message: "Successfully updated news" });
-  } catch (err) {
-    return res.status(500).json({
-      message: "Failed updating news",
-      error: err.message,
-    });
-  }
+if (img) {
+  preparedData.img = img;
+}
+try {
+  await News.updateOne(
+    { _id },
+    {
+      ...preparedData,
+    }
+  );
+  return res.status(200).json({ message: "Successfully updated news" });
+} catch (err) {
+  return res.status(500).json({
+    message: "Failed updating news",
+    error: err.message,
+  });
+}
 };
 
 const addOneNews = async (req, res) => {
