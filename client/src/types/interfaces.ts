@@ -206,4 +206,4 @@ export interface VotingTypes {
     dislikes: null | number;
   };
   votes: VotesType[];
-};
+}

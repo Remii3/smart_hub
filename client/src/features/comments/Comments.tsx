@@ -11,7 +11,7 @@ import {
 import errorToast from '@components/UI/error/errorToast';
 import { Skeleton } from '@components/UI/skeleton';
 import { UserContext } from '@context/UserProvider';
-import { UserTypes } from '@customTypes/interfaces';
+import { AuthorTypes, UserTypes } from '@customTypes/interfaces';
 import { UserRoleTypes } from '@customTypes/types';
 import { DATABASE_ENDPOINTS } from '@data/endpoints';
 import StarRating from '@features/rating/StarRating';
@@ -34,7 +34,7 @@ type CommentsTypes = {
     | {
         _id: string;
         product_id: string;
-        user: UserTypes;
+        user: AuthorTypes;
         value: { rating: number; text: string };
         created_at: string;
       }[];
@@ -146,7 +146,6 @@ export default function Comments({
   useEffect(() => {
     fetchData();
   }, [fetchData]);
-
   const deleteCommentHandler = async (
     commentId: string,
     value: { text: string; rating: number }
@@ -172,6 +171,7 @@ export default function Comments({
       fetchData();
     }, 150);
   };
+  console.log(comments);
   return (
     <div className="mt-8">
       <h5 className="pb-2">Comments</h5>
@@ -206,7 +206,7 @@ export default function Comments({
                   )}
 
                   <p>
-                    {userData.data.author_info
+                    {userData.data.role !== UserRoleTypes.USER
                       ? userData.data.author_info.pseudonim
                       : userData.data.username}
                   </p>
@@ -305,7 +305,11 @@ export default function Comments({
                       <UserCircleIcon className="h-8 w-8 rounded-full object-cover" />
                     )}
                   </div>
-                  <p className="font-semibold">{comment.user.username}</p>
+                  <p className="font-semibold">
+                    {comment.user.role !== UserRoleTypes.USER
+                      ? comment.user.author_info.pseudonim
+                      : comment.user.username}
+                  </p>
                 </div>
               </div>
               <div className="flex w-full flex-col gap-4">
