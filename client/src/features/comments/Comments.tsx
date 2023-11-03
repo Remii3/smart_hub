@@ -205,7 +205,11 @@ export default function Comments({
                     <UserIcon className="h-8 w-8" />
                   )}
 
-                  <p>{userData.data?.username}</p>
+                  <p>
+                    {userData.data.author_info
+                      ? userData.data.author_info.pseudonim
+                      : userData.data.username}
+                  </p>
                 </>
               ) : (
                 <>

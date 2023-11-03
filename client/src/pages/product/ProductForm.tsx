@@ -108,7 +108,13 @@ export default function ProductForm({
           <Button
             variant="default"
             type="submit"
-            disabled={isAddingToCart || itemBtnCapacity || isLoading}
+            disabled={
+              isAddingToCart ||
+              itemBtnCapacity ||
+              isLoading ||
+              cartState.isLoading
+            }
+            className={`${isAddingToCart && 'bg-slate-200'}`}
           >
             {isAddingToCart ? (
               <LoadingCircle />

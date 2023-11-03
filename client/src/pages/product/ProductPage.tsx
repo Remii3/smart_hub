@@ -958,7 +958,10 @@ export default function ProductPage() {
                   </div>
                   <p className="text-sm">Highest Rated Product</p>
                   <div className="">
-                    <StarRating showOnly rating={productRating?.value} />
+                    <StarRating
+                      showOnly
+                      rating={(productRating && productRating.value) || 0}
+                    />
                   </div>
                   <span className="text-sm">
                     votes: {productRating?.quantity}
