@@ -270,6 +270,7 @@ export default function NewsArticle({
                         <img
                           src={URL.createObjectURL(selectedImg[0])}
                           alt="imgPreview"
+                          className="aspect-square w-full object-cover"
                         />
                       )}
                     </>
