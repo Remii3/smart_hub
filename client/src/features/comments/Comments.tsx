@@ -14,7 +14,7 @@ import { UserContext } from '@context/UserProvider';
 import { UserTypes } from '@customTypes/interfaces';
 import { UserRoleTypes } from '@customTypes/types';
 import { DATABASE_ENDPOINTS } from '@data/endpoints';
-import StarRating from '@features/starRating/StarRating';
+import StarRating from '@features/rating/StarRating';
 import { TrashIcon, UserCircleIcon } from '@heroicons/react/24/outline';
 import { UserCircleIcon as UserIcon } from '@heroicons/react/24/solid';
 import {

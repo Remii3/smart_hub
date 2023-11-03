@@ -1,23 +1,40 @@
 import { useState } from 'react';
 import { StarIcon } from '@heroicons/react/24/solid';
+import { useSearchParams } from 'react-router-dom';
 
 export default function StarRating({
   showOnly = false,
   rating,
+  changeUrl,
   changeRatingHandler,
 }: {
   showOnly?: boolean;
   rating: number;
+  changeUrl?: boolean;
   changeRatingHandler?: (rateValue: number) => void;
 }) {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [hoveredValue, setHoveredValue] = useState(0);
 
+  const changeUrlHandler = (rateValue: number) => {
+    searchParams.set('rating', `${rateValue}`);
+    setSearchParams(searchParams, { replace: true });
+  };
+
   const handleStarClick = (value: number) => {
-    if (!showOnly && changeRatingHandler) {
+    if (!showOnly && (changeRatingHandler || changeUrlHandler)) {
       if (value === rating) {
-        changeRatingHandler(0);
+        if (changeUrl) {
+          changeUrlHandler(0);
+        } else if (changeRatingHandler) {
+          changeRatingHandler(0);
+        }
       } else {
-        changeRatingHandler(value);
+        if (changeUrl) {
+          changeUrlHandler(value);
+        } else if (changeRatingHandler) {
+          changeRatingHandler(value);
+        }
       }
     }
   };

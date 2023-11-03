@@ -56,19 +56,22 @@ const deleteOneNews = async (req, res) => {
 };
 
 const updateOne = async (req, res) => {
-  const { _id, title, subtitle, img, content } = req.body;
+  const { _id, newData, img } = req.body;
   if (!_id) {
     return res.status(422).json({ message: "Provide news id" });
+  }
+
+  const preparedData = newData;
+
+  if (img) {
+    preparedData.img = img;
   }
 
   try {
     await News.updateOne(
       { _id },
       {
-        title,
-        subtitle,
-        img,
-        content,
+        ...newData,
       }
     );
     return res.status(200).json({ message: "Successfully updated news" });

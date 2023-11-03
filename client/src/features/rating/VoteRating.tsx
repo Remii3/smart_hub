@@ -3,13 +3,9 @@ import { VotingTypes } from '@customTypes/interfaces';
 import { VoteType } from '@customTypes/types';
 import { DATABASE_ENDPOINTS } from '@data/endpoints';
 import {
-  HandThumbUpIcon as EmptyHandThumbUpIcon,
-  HandThumbDownIcon as EmptyHandThumbDownIcon,
+  HandThumbUpIcon,
+  HandThumbDownIcon,
 } from '@heroicons/react/24/outline';
-import {
-  HandThumbUpIcon as FilledHandThumbUpIcon,
-  HandThumbDownIcon as FilledHandThumbDownIcon,
-} from '@heroicons/react/24/solid';
 import { usePostAccessDatabase } from '@hooks/useAaccessDatabase';
 import { useEffect, useState } from 'react';
 
@@ -19,7 +15,7 @@ interface PropsTypes extends VotingTypes {
   updateVotesHandler?: () => void;
 }
 
-export default function Votes({
+export default function VoteRating({
   quantity,
   votes,
   userId,
@@ -79,37 +75,43 @@ export default function Votes({
   }, [votes]);
 
   return (
-    <article>
-      <section>
+    <article className="space-x-2">
+      <section className="inline-block">
         <button
           type="button"
           aria-label="Like"
           name="Like"
           onClick={() => changeVoteHandler('Like')}
           disabled={userVote === 'Dislike' || !userId}
+          className="block p-2 pb-0"
         >
-          {userVote === 'Like' ? (
-            <FilledHandThumbUpIcon className="h-6 w-6" />
-          ) : (
-            <EmptyHandThumbUpIcon className="h-6 w-6" />
-          )}
+          <HandThumbUpIcon
+            className={`${
+              userVote === 'Like'
+                ? 'fill-green-600 text-green-600'
+                : 'fill-transparent text-black'
+            } h-6 w-6 transition-colors ease-out`}
+          />
         </button>
-        <span>{quantity.likes}</span>
+        <div className="text-center">{quantity.likes}</div>
       </section>
-      <section>
+      <section className="inline-block">
         <button
           type="button"
           aria-label="Dislike"
           onClick={() => changeVoteHandler('Dislike')}
           disabled={userVote === 'Like' || !userId}
+          className="block rounded-full"
         >
-          {userVote === 'Dislike' ? (
-            <FilledHandThumbDownIcon className="h-6 w-6" />
-          ) : (
-            <EmptyHandThumbDownIcon className="h-6 w-6" />
-          )}
+          <HandThumbDownIcon
+            className={`${
+              userVote === 'Dislike'
+                ? 'fill-red-600 text-red-600'
+                : 'fill-transparent text-black'
+            } h-6 w-6 transition-colors ease-out`}
+          />
         </button>
-        <span>{quantity.dislikes}</span>
+        <div className="text-center">{quantity.dislikes}</div>
       </section>
     </article>
   );

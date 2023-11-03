@@ -9,8 +9,11 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@components/UI/dialog';
+import DeleteDialog from '@components/UI/dialogs/DeleteDialog';
 import ErrorMessage from '@components/UI/error/ErrorMessage';
 import errorToast from '@components/UI/error/errorToast';
+import { Form, FormControl, FormField, FormItem } from '@components/UI/form';
+import { Input } from '@components/UI/input';
 import { UserContext } from '@context/UserProvider';
 import {
   AuthorTypes,
@@ -20,14 +23,17 @@ import {
 import { ImgTypes } from '@customTypes/types';
 import { DATABASE_ENDPOINTS } from '@data/endpoints';
 import Comments from '@features/comments/Comments';
-import Votes from '@features/votes/Votes';
+import VoteRating from '@features/rating/VoteRating';
 import { TrashIcon } from '@heroicons/react/24/outline';
+import { zodResolver } from '@hookform/resolvers/zod';
 import {
   useGetAccessDatabase,
   usePostAccessDatabase,
 } from '@hooks/useAaccessDatabase';
 import { useCallback, useContext, useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
 import { Link } from 'react-router-dom';
+import { z } from 'zod';
 interface RatingTypes extends FetchDataTypes {
   data: VotingTypes;
 }
@@ -49,13 +55,19 @@ interface PropsTypes {
   newsId: string;
 }
 
+const newArticleDataSchema = z.object({
+  title: z.string().nonempty(),
+  subtitle: z.string(),
+  content: z.string(),
+});
+
 export default function NewsArticle({
   newsId,
   updateNewsList,
   dialogOpenedHandler,
 }: PropsTypes) {
   const [openedDialog, setOpenedDialog] = useState(false);
-
+  const [isEditing, setIsEditing] = useState(false);
   const [articleData, setArticleData] = useState<ArticleDataTypes>({
     data: null,
     hasError: null,
@@ -85,7 +97,9 @@ export default function NewsArticle({
       updateNewsList();
     }, 150);
   };
-
+  const form = useForm<any>({
+    resolver: zodResolver(newArticleDataSchema),
+  });
   const fetchVotes = async () => {
     setVote((prevState) => {
       return { ...prevState, isLoading: true };
@@ -133,6 +147,11 @@ export default function NewsArticle({
         isLoading: false,
       };
     });
+    form.reset({
+      title: data.title,
+      subtitle: data.subtitle,
+      content: data.content,
+    });
     setVote({
       data: {
         votes: data.voting.votes,
@@ -150,6 +169,33 @@ export default function NewsArticle({
     fetchData();
   }, [fetchData]);
 
+  const uploadNewDataHandler = async (
+    formResponse: z.infer<typeof newArticleDataSchema>
+  ) => {
+    const newArticleData = {} as any;
+
+    for (const [key, value] of Object.entries(formResponse)) {
+      if (form.getFieldState(key).isDirty) {
+        newArticleData[key] = value;
+      }
+    }
+
+    const { data, error } = await usePostAccessDatabase({
+      url: DATABASE_ENDPOINTS.NEWS_UPDATE,
+      body: { _id: newsId, newData: newArticleData },
+    });
+    if (error) {
+      return errorToast(error);
+    }
+    console.log(newArticleData);
+    setIsEditing(false);
+    fetchData();
+    updateNewsList();
+  };
+  const editArticleHandler = () => {
+    setIsEditing((prevState) => !prevState);
+    form.reset();
+  };
   return (
     <div>
       {articleData.isLoading && (
@@ -160,71 +206,118 @@ export default function NewsArticle({
       {articleData.hasError && <ErrorMessage message={articleData.hasError} />}
       {articleData.data && (
         <div className={`${articleData.isLoading && 'invisible'}`}>
-          <div className="space-y-6">
-            <div className="space-y-2">
-              <Votes
-                userId={userData.data?._id}
-                newsId={articleData.data._id}
-                votes={vote.data.votes}
-                quantity={vote.data.quantity}
-                updateVotesHandler={fetchVotes}
-              />
-              {articleData.data.img?.url && (
-                <img src={articleData.data.img.url} alt="article_img" />
-              )}
-              <h3>{articleData.data.title}</h3>
-              <h6 className="text-slate-600">{articleData.data.subtitle}</h6>
-              <Dialog
-                open={openedDialog}
-                onOpenChange={() => setOpenedDialog(false)}
-              >
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(uploadNewDataHandler)}>
+              <div>
+                <DeleteDialog
+                  deleteHandler={() => deleteArticleHandler(newsId)}
+                  openState={openedDialog}
+                  openStateHandler={(state) => setOpenedDialog(state)}
+                />
                 <Button
-                  onClick={() => setOpenedDialog(true)}
-                  variant={'destructive'}
+                  variant={'outline'}
                   type="button"
+                  onClick={() => editArticleHandler()}
                 >
-                  Delete
-                  <TrashIcon className="h-6 w-6" />
+                  {isEditing ? 'Cancel' : 'Edit'}
                 </Button>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Are you sure?</DialogTitle>
-                    <DialogDescription>
-                      Deleting this will permamently remove the item from the
-                      database.
-                    </DialogDescription>
-                  </DialogHeader>
-                  <DialogFooter>
-                    <Button
-                      type="button"
-                      variant={'destructive'}
-                      onClick={() => deleteArticleHandler(newsId)}
-                    >
-                      Delete
-                    </Button>
-                    <DialogTrigger asChild>
-                      <button type="button">Cancel</button>
-                    </DialogTrigger>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
-            </div>
-            <div>
-              <p>Author:</p>
-              <Link to={`/account/${articleData.data.user._id}`}>
-                {articleData.data.user.author_info.pseudonim}
-              </Link>
-            </div>
+                {isEditing && (
+                  <Button
+                    type="submit"
+                    variant={'outline'}
+                    className="text-green-600 hover:text-green-600"
+                  >
+                    Accept
+                  </Button>
+                )}
+              </div>
+              <div className="space-y-6">
+                <div className="space-y-2">
+                  <VoteRating
+                    userId={userData.data?._id}
+                    newsId={articleData.data._id}
+                    votes={vote.data.votes}
+                    quantity={vote.data.quantity}
+                    updateVotesHandler={fetchVotes}
+                  />
+                  {articleData.data.img?.url && (
+                    <img src={articleData.data.img.url} alt="article_img" />
+                  )}
 
-            <p>{articleData.data.content}</p>
-            <div className="mt-8">
-              <Comments
-                target="News"
-                targetId={articleData.data._id}
-                withRating={false}
-              />
-            </div>
-          </div>
+                  {isEditing ? (
+                    <FormField
+                      name="title"
+                      control={form.control}
+                      render={({ field }) => {
+                        return (
+                          <FormItem>
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
+                          </FormItem>
+                        );
+                      }}
+                    />
+                  ) : (
+                    <h3>{articleData.data.title}</h3>
+                  )}
+                  {isEditing ? (
+                    <FormField
+                      name="subtitle"
+                      control={form.control}
+                      render={({ field }) => {
+                        return (
+                          <FormItem>
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
+                          </FormItem>
+                        );
+                      }}
+                    />
+                  ) : (
+                    articleData.data.subtitle && (
+                      <h6 className="text-slate-600">
+                        {articleData.data.subtitle}
+                      </h6>
+                    )
+                  )}
+                </div>
+                <div>
+                  <p>Author:</p>
+                  <Link to={`/account/${articleData.data.user._id}`}>
+                    {articleData.data.user.author_info.pseudonim}
+                  </Link>
+                </div>
+
+                {isEditing ? (
+                  <FormField
+                    name="content"
+                    control={form.control}
+                    render={({ field }) => {
+                      return (
+                        <FormItem>
+                          <FormControl>
+                            <Input {...field} />
+                          </FormControl>
+                        </FormItem>
+                      );
+                    }}
+                  />
+                ) : (
+                  articleData.data.content && <p>{articleData.data.content}</p>
+                )}
+
+                <div className="mt-8">
+                  <Comments
+                    target="News"
+                    targetId={articleData.data._id}
+                    withRating={false}
+                  />
+                </div>
+              </div>
+            </form>
+          </Form>
         </div>
       )}
     </div>

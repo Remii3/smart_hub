@@ -5,7 +5,7 @@ import { CartProductTypes, ProductShopCardType } from '@customTypes/interfaces';
 import LoadingCircle from '@components/Loaders/LoadingCircle';
 import { Button } from '@components/UI/button';
 import { Skeleton } from '@components/UI/skeleton';
-import StarRating from '@features/starRating/StarRating';
+import StarRating from '@features/rating/StarRating';
 
 const defaultProps = {
   img: '',

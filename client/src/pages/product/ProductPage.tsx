@@ -14,7 +14,7 @@ import {
 } from '@customTypes/interfaces';
 import { UserContext } from '@context/UserProvider';
 import ProductPill from './ProductPill';
-import StarRating from '@features/starRating/StarRating';
+import StarRating from '@features/rating/StarRating';
 import ProductForm from '@pages/product/ProductForm';
 import { Button } from '@components/UI/button';
 import {
