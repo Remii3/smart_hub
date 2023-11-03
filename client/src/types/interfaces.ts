@@ -196,12 +196,14 @@ export interface NewsTypes extends FetchDataTypes {
 }
 
 export interface VotesType {
-  user: AuthorTypes;
+  userId: string;
   vote: VoteType;
 }
 
 export interface VotingTypes {
-  likes: null | number;
-  dislikes: null | number;
+  quantity: {
+    likes: null | number;
+    dislikes: null | number;
+  };
   votes: VotesType[];
 };

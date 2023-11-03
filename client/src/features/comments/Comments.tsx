@@ -8,6 +8,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@components/UI/dialog';
+import errorToast from '@components/UI/error/errorToast';
 import { Skeleton } from '@components/UI/skeleton';
 import { UserContext } from '@context/UserProvider';
 import { UserTypes } from '@customTypes/interfaces';
@@ -160,18 +161,21 @@ export default function Comments({
         value,
       },
     });
-    if (error === null) {
-      await fetchData();
-      if (updateProductStatus) {
-        updateProductStatus();
-      }
-      setShowDeleteDialog(null);
+    if (error) {
+      return errorToast(error);
     }
+    if (updateProductStatus) {
+      updateProductStatus();
+    }
+    setShowDeleteDialog(null);
+    setTimeout(() => {
+      fetchData();
+    }, 150);
   };
   return (
     <div className="mt-8">
       <h5 className="pb-2">Comments</h5>
-      <section className="mb-16">
+      <section className="mb-8">
         <div className="flex flex-col-reverse gap-8 md:flex-row">
           <div>
             {withRating && (
@@ -222,7 +226,7 @@ export default function Comments({
                 name="newComment"
                 rows={4}
                 disabled={!userData.data}
-                placeholder={userData.data ? 'Enter new comment...' : ''}
+                placeholder={!userData.data ? '' : 'Enter new comment...'}
                 value={newComment.value}
                 onChange={(e) =>
                   setNewComment((prevState) => {
@@ -240,19 +244,22 @@ export default function Comments({
             <div className="flex items-center justify-end gap-2 bg-background p-3">
               <Button
                 variant="default"
-                disabled={!userData.data}
-                className={`${!userData.data && 'bg-slate-300'}`}
+                disabled={!userData.data || newComment.isLoading}
+                className={`${!userData.data && 'bg-slate-300'} relative`}
                 onClick={() => addNewCommentHandler()}
               >
-                {newComment.isLoading ? <LoadingCircle /> : 'Publish'}
+                {newComment.isLoading && <LoadingCircle />}
+                <span className={`${newComment.isLoading && 'invisible'}`}>
+                  Publish
+                </span>
               </Button>
             </div>
           </div>
         </div>
       </section>
-      <section>
-        {comments.isLoading && !comments.data && (
-          <div className="space-y-8">
+      <section className="relative">
+        {comments.isLoading && (
+          <div className="absolute top-0 w-full space-y-8">
             <Skeleton className="flex h-[92px] w-full items-center px-4">
               <div className="space-y-3">
                 <Skeleton className="h-3 w-5" />
@@ -262,13 +269,17 @@ export default function Comments({
             </Skeleton>
           </div>
         )}
-        {!comments.isLoading && !comments.data && <div>No data</div>}
-        {!comments.isLoading &&
-          comments.data &&
+        {!comments.isLoading && comments.data && comments.data.length <= 0 && (
+          <div className="text-center text-slate-600">No comments</div>
+        )}
+        {comments.data &&
+          comments.data.length > 0 &&
           comments.data.map((comment) => (
             <div
               key={comment._id}
-              className="mb-8 flex w-full flex-col-reverse gap-8 rounded-md bg-gray-50 p-4 sm:flex-row"
+              className={`${
+                comments.isLoading && 'invisible'
+              } mb-8 flex w-full flex-col-reverse gap-8 rounded-md bg-gray-50 p-4 sm:flex-row`}
             >
               <div>
                 {withRating && (

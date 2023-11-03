@@ -11,22 +11,16 @@ import {
 } from '@components/UI/dialog';
 import ErrorMessage from '@components/UI/error/ErrorMessage';
 import errorToast from '@components/UI/error/errorToast';
-import { Skeleton } from '@components/UI/skeleton';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@components/UI/tooltip';
 import { UserContext } from '@context/UserProvider';
 import {
+  AuthorTypes,
   FetchDataTypes,
-  UserTypes,
   VotingTypes,
 } from '@customTypes/interfaces';
 import { ImgTypes } from '@customTypes/types';
 import { DATABASE_ENDPOINTS } from '@data/endpoints';
 import Comments from '@features/comments/Comments';
+import Votes from '@features/votes/Votes';
 import { TrashIcon } from '@heroicons/react/24/outline';
 import {
   useGetAccessDatabase,
@@ -39,7 +33,7 @@ interface RatingTypes extends FetchDataTypes {
 }
 interface ArticleDataTypes extends FetchDataTypes {
   data: null | {
-    user: UserTypes;
+    user: AuthorTypes;
     _id: string;
     title: string;
     subtitle: null | string;
@@ -71,7 +65,7 @@ export default function NewsArticle({
   const [vote, setVote] = useState<RatingTypes>({
     hasError: null,
     isLoading: false,
-    data: { likes: null, dislikes: null, votes: [] },
+    data: { quantity: { likes: null, dislikes: null }, votes: [] },
   });
 
   const { userData } = useContext(UserContext);
@@ -89,16 +83,7 @@ export default function NewsArticle({
     dialogOpenedHandler(null);
     setTimeout(() => {
       updateNewsList();
-    }, 100);
-  };
-
-  const checkUserVoted = (votes: { user: string; vote: number }[]) => {
-    const voted = votes.find((item) => item.user === userData.data?._id);
-    let result = null;
-    if (voted) {
-      result = voted.vote === 1 ? 'like' : 'dislike';
-    }
-    return result;
+    }, 150);
   };
 
   const fetchVotes = async () => {
@@ -115,9 +100,14 @@ export default function NewsArticle({
         return { ...prevState, isLoading: false, hasError: error };
       });
     }
-    const userVote = checkUserVoted(data.voting.votes);
     setVote({
-      data: { vote: userVote, quantity: data.voting.quantity },
+      data: {
+        quantity: {
+          likes: data.voting.quantity.likes,
+          dislikes: data.voting.quantity.dislikes,
+        },
+        votes: data.voting.votes,
+      },
       hasError: null,
       isLoading: false,
     });
@@ -143,9 +133,14 @@ export default function NewsArticle({
         isLoading: false,
       };
     });
-    const userVote = checkUserVoted(data.voting.votes);
     setVote({
-      data: { vote: userVote, quantity: data.voting.quantity },
+      data: {
+        votes: data.voting.votes,
+        quantity: {
+          dislikes: data.voting.quantity.dislikes,
+          likes: data.voting.quantity.likes,
+        },
+      },
       hasError: null,
       isLoading: false,
     });
@@ -154,22 +149,6 @@ export default function NewsArticle({
   useEffect(() => {
     fetchData();
   }, [fetchData]);
-
-  const handleVote = async (voteType: any) => {
-    if (voteType === vote.data.vote) {
-      await usePostAccessDatabase({
-        url: DATABASE_ENDPOINTS.NEWS_VOTE_REMOVE,
-        body: { userId: userData.data?._id, newsId, vote: voteType },
-      });
-      await fetchVotes();
-    } else {
-      await usePostAccessDatabase({
-        url: DATABASE_ENDPOINTS.NEWS_VOTE_ADD,
-        body: { userId: userData.data?._id, newsId, vote: voteType },
-      });
-      await fetchVotes();
-    }
-  };
 
   return (
     <div>
@@ -183,51 +162,13 @@ export default function NewsArticle({
         <div className={`${articleData.isLoading && 'invisible'}`}>
           <div className="space-y-6">
             <div className="space-y-2">
-              {userData ? (
-                <div>
-                  <button
-                    onClick={() => handleVote('like')}
-                    disabled={vote.data.vote === 'dislike'}
-                  >
-                    Like
-                  </button>
-                  <button
-                    onClick={() => handleVote('dislike')}
-                    disabled={!userData || vote.data.vote === 'like'}
-                  >
-                    Dislike
-                  </button>
-                </div>
-              ) : (
-                <div>
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <button className="text-slate-400" disabled={true}>
-                          Like
-                        </button>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Sign in to add vote</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <button className="text-slate-400" disabled={true}>
-                          Dislike
-                        </button>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Sign in to add vote</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                </div>
-              )}
-              <p>Likes: {vote.data.quantity?.like}</p>
-              <p>Dislikes: {vote.data.quantity?.dislike}</p>
+              <Votes
+                userId={userData.data?._id}
+                newsId={articleData.data._id}
+                votes={vote.data.votes}
+                quantity={vote.data.quantity}
+                updateVotesHandler={fetchVotes}
+              />
               {articleData.data.img?.url && (
                 <img src={articleData.data.img.url} alt="article_img" />
               )}
@@ -271,7 +212,7 @@ export default function NewsArticle({
             <div>
               <p>Author:</p>
               <Link to={`/account/${articleData.data.user._id}`}>
-                {articleData.data.user.username}
+                {articleData.data.user.author_info.pseudonim}
               </Link>
             </div>
 
