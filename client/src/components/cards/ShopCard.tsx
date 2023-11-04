@@ -6,6 +6,7 @@ import LoadingCircle from '@components/Loaders/LoadingCircle';
 import { Button } from '@components/UI/button';
 import { Skeleton } from '@components/UI/skeleton';
 import StarRating from '@features/rating/StarRating';
+import { ShoppingCartIcon } from '@heroicons/react/24/solid';
 
 const defaultProps = {
   img: '',
@@ -70,6 +71,7 @@ export default function ShopCard({
       >
         <Link
           to={`/shop/${_id}`}
+          aria-label="Show product page"
           className="absolute block h-full w-full indent-0"
         />
 
@@ -114,7 +116,7 @@ export default function ShopCard({
 
           <div className="flex flex-col gap-3">
             <div className="flex items-end justify-between gap-3">
-              <h4 className="flex items-center">${price.toFixed(2)}</h4>
+              <h4 className="flex items-center ">${price.toFixed(2)}</h4>
               <div className="text-center">
                 <Button
                   type="submit"
@@ -122,7 +124,14 @@ export default function ShopCard({
                   disabled={isAddingToCart || itemBtnCapacity}
                   className="relative z-20"
                 >
-                  {isAddingToCart ? <LoadingCircle /> : 'Add to cart'}
+                  {isAddingToCart ? (
+                    <LoadingCircle />
+                  ) : (
+                    <div className="space-x-1">
+                      <span className="text-lg">+</span>
+                      <ShoppingCartIcon className="inline-block h-6 w-6" />
+                    </div>
+                  )}
                 </Button>
               </div>
             </div>
