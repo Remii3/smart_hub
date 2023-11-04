@@ -5,11 +5,10 @@ export enum UserRoleTypes {
   AUTHOR = 'Author',
   ADMIN = 'Admin',
 }
-export enum MarketPlaceTypes {
-  AUCTION = 'Auction',
-  SHOP = 'Shop',
-  COLLECTION = 'Collection',
-}
+// export enum MarketPlaceTypes {
+//   SHOP = 'Shop',
+//   COLLECTION = 'Collection',
+// }
 
 export type UserRoleType =
   | UserRoleTypes.USER
@@ -22,13 +21,13 @@ export const USER_ROLES = [
   UserRoleTypes.USER,
 ];
 
-export type MarketplaceType = MarketPlaceTypes.AUCTION | MarketPlaceTypes.SHOP;
-
-export const MARKETPLACES = [MarketPlaceTypes.AUCTION, MarketPlaceTypes.SHOP];
+// export const MARKETPLACES = [MarketPlaceTypes.SHOP];
 
 export type ImgTypes = { id: string; url: string };
 
-export type VoteType = 'Like' | 'Dislike'; 
+export type MarketplaceTypes = 'Shop' | 'Collection';
+
+export type VoteType = 'Like' | 'Dislike';
 
 export type RatingTypes = {
   value: number;

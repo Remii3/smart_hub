@@ -35,9 +35,33 @@ const getAllProducts = async (req, res) => {
 };
 
 const getShopProducts = async (req, res) => {
-  const { category, minPrice, maxPrice } = req.query;
+  const { category, minPrice, maxPrice, sortOption } = req.query;
   try {
+    let sortMethod = {};
+    switch (sortOption) {
+      case 'Date, ASC':
+        sortMethod.created_at = 1;
+        break;
+      case 'Date, DESC':
+        sortMethod.created_at = -1;
+        break;
+      case 'Title, ASC':
+        sortMethod.title = 1;
+        break;
+      case 'Title, DESC':
+        sortMethod.title = -1;
+        break;
+      case 'Price, DESC':
+        sortMethod['shop_info.price'] = -1;
+        break;
+      case 'Price, ASC':
+        sortMethod['shop_info.price'] = 1;
+        break;
+      default:
+        return (sortMethod.created_at = -1);
+    }
     const findData = {};
+    const rawData = {};
     if (category) {
       const categoryLabel =
         category.charAt(0).toUpperCase() + category.slice(1);
@@ -51,26 +75,41 @@ const getShopProducts = async (req, res) => {
         });
       }
       findData.categories = categoryData._id;
+      rawData.categories = categoryData.label;
     }
     if (minPrice) {
-      findData.shop_info = { price: { $gte: minPrice } };
+      findData['shop_info.price'] = { $gte: minPrice };
+      rawData.minPrice = minPrice;
     }
     if (maxPrice) {
-      findData.shop_info = { price: { $lte: maxPrice } };
+      findData['shop_info.price'] = { $lte: Number(maxPrice) };
+      rawData.minPrice = maxPrice;
     }
     const products = await Product.find({
       market_place: 'Shop',
       quantity: { $gt: 0 },
       deleted: false,
       ...findData,
-    }).populate('authors');
+    })
+      .sort(sortMethod)
+      .populate('authors');
 
     const preparedProducts = [];
+    const products_copy = [...products];
+    const highestPrice =
+      products_copy.length >= 1
+        ? products_copy.sort(
+            (a, b) => Number(b.shop_info.price) - Number(a.shop_info.price),
+          )
+        : null;
+    rawData.highestPrice = highestPrice
+      ? parseFloat(highestPrice[0].shop_info.price)
+      : null;
     for (let product of products) {
       preparedProducts.push(prepareProductObject(product));
     }
 
-    return res.status(200).json({ data: preparedProducts });
+    return res.status(200).json({ data: { data: preparedProducts, rawData } });
   } catch (err) {
     return res
       .status(500)

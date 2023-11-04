@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { SwiperSlide } from 'swiper/react';
 import { AuthorTypes } from '@customTypes/interfaces';
 import ShopCard from '@components/cards/ShopCard';
-import ShortSwiper from '@components/swiper/ShortSwiper';
+import ShortSwiper from '@components/swiper/SushiSwiper';
 import { UserContext } from '@context/UserProvider';
 import { Button } from '@components/UI/button';
 import { MarketPlaceTypes, UserRoleTypes } from '@customTypes/types';

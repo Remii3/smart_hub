@@ -12,26 +12,7 @@ const defaultProps = {
   authors: [],
   description: '',
 };
-export const SkeletonShopCard = ({
-  width,
-  height,
-}: {
-  width: string;
-  height: string;
-}) => {
-  return (
-    <Skeleton
-      className={`${width} ${height} flex min-w-[200px] max-w-[250px] flex-col gap-8 p-3`}
-    >
-      <Skeleton className="h-3/5 w-full" />
-      <div className="flex flex-col gap-2">
-        <Skeleton className="h-3 w-3/4 md:w-1/2" />
-        <Skeleton className="h-3 w-1/2 md:w-1/3" />
-        <Skeleton className="h-3 w-1/3 md:w-1/4" />
-      </div>
-    </Skeleton>
-  );
-};
+
 export default function ShopCard({
   _id,
   title,
@@ -82,13 +63,18 @@ export default function ShopCard({
     itemBtnCapacity = productQuantity! < 1 || false;
   }
   return (
-    <div id={`${_id}`} className="mx-auto h-full w-full max-w-[280px]">
+    <div id={`${_id}`} className="relative h-full w-full max-w-[280px]">
       <form
         onSubmit={(e) => addToCartHandler(e)}
         className="flex h-full flex-col justify-between gap-3 rounded-lg bg-background shadow transition duration-200 ease-in-out hover:shadow-md"
       >
+        <Link
+          to={`/shop/${_id}`}
+          className="absolute block h-full w-full indent-0"
+        />
+
         <div>
-          <Link to={`/shop/${_id}`} className="block overflow-hidden">
+          <div>
             {img ? (
               <img
                 className="h-[160px] w-full rounded-t-lg object-cover"
@@ -101,14 +87,14 @@ export default function ShopCard({
               <img
                 src="https://firebasestorage.googleapis.com/v0/b/smarthub-75eab.appspot.com/o/static_imgs%2Fnophoto.webp?alt=media&token=a974d32e-108a-4c21-be71-de358368a167"
                 alt="img"
-                className="h-full max-h-[160px] w-full rounded-t-lg object-cover"
+                height={760}
+                width={760}
+                className="h-[160px] w-full rounded-t-lg object-cover"
               />
             )}
-          </Link>
+          </div>
           <div className="px-3 pt-3">
-            <Link to={`/product/${_id}`} className="inline-block">
-              <strong className="m-0 line-clamp-1">{titleShortened}</strong>
-            </Link>
+            <strong className="m-0 line-clamp-1">{titleShortened}</strong>
             <div className="line-clamp-1 pb-1 text-sm">
               {authors.map((author, id) => (
                 <span key={id} className="mr-3">
@@ -134,6 +120,7 @@ export default function ShopCard({
                   type="submit"
                   variant="default"
                   disabled={isAddingToCart || itemBtnCapacity}
+                  className="relative z-20"
                 >
                   {isAddingToCart ? <LoadingCircle /> : 'Add to cart'}
                 </Button>
