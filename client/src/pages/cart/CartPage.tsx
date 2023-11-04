@@ -4,6 +4,7 @@ import { CartContext } from '@context/CartProvider';
 import CartProdList from './CartProdList';
 import { TicketIcon } from '@heroicons/react/24/outline';
 import MainContainer from '@layout/MainContainer';
+import { Button, buttonVariants } from '@components/UI/button';
 
 export default function CartPage() {
   const { cartState } = useContext(CartContext);
@@ -59,12 +60,18 @@ export default function CartPage() {
                 )}
 
                 <div className="flex justify-end">
-                  <Link
-                    to="/checkout"
-                    className="block rounded bg-primary px-5 py-3 text-sm text-gray-100 transition hover:bg-blue-700"
-                  >
-                    Checkout
-                  </Link>
+                  {cartState.products.length <= 0 ? (
+                    <Button variant={'default'} disabled>
+                      Checkout
+                    </Button>
+                  ) : (
+                    <Link
+                      to="/checkout"
+                      className={`${buttonVariants({ variant: 'default' })}`}
+                    >
+                      Checkout
+                    </Link>
+                  )}
                 </div>
               </div>
             </div>

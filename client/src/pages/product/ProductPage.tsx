@@ -495,6 +495,7 @@ export default function ProductPage() {
       navigate(-1);
     }
   };
+  console.log('productState', productState.data);
   if (!productState.data || userData.isLoading) return <></>;
   return (
     <MainContainer className="relative py-8">
@@ -565,6 +566,13 @@ export default function ProductPage() {
                         />
                       )}
                   </DialogTrigger>
+                  {!productEditState.isEditing &&
+                    productState.data.imgs.length <= 0 && (
+                      <img
+                        src="https://firebasestorage.googleapis.com/v0/b/smarthub-75eab.appspot.com/o/static_imgs%2Fnophoto.webp?alt=media&token=a974d32e-108a-4c21-be71-de358368a167"
+                        className="mx-auto aspect-auto h-full w-full max-w-[500px] rounded-xl object-cover lg:xl:w-[90%] xl:w-[80%]"
+                      />
+                    )}
                   <DialogContent>
                     {productState.data.imgs.length > 0 && (
                       <img

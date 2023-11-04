@@ -215,7 +215,11 @@ export default function MyAccount() {
                   alt="avatar_img"
                 />
               ) : (
-                <UserCircleIcon className="inline-block h-24 w-24 rounded-full object-cover ring-2 ring-white" />
+                <img
+                  src="https://firebasestorage.googleapis.com/v0/b/smarthub-75eab.appspot.com/o/static_imgs%2Fnophoto.webp?alt=media&token=a974d32e-108a-4c21-be71-de358368a167"
+                  className="inline-block h-24 w-24 rounded-full object-cover ring-2 ring-white"
+                  alt="profile_img"
+                />
               )}
             </button>
 

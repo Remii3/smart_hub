@@ -172,14 +172,18 @@ export default function OtherUserPage() {
           <section className="flex items-center justify-center px-8 pb-16 pt-12">
             <div className="flex flex-col items-center justify-center rounded-md ">
               <div className="mb-4">
-                {otherUserData.data.user_info.profile_img ? (
+                {otherUserData.data.user_info.profile_img.url ? (
                   <img
-                    src={otherUserData.data.user_info.profile_img}
+                    src={otherUserData.data.user_info.profile_img.url}
                     className="aspect-auto h-36 w-36 rounded-full object-cover"
                     alt="profile_img"
                   />
                 ) : (
-                  <UserCircleIcon className="h-12 w-12" />
+                  <img
+                    src="https://firebasestorage.googleapis.com/v0/b/smarthub-75eab.appspot.com/o/static_imgs%2Fnophoto.webp?alt=media&token=a974d32e-108a-4c21-be71-de358368a167"
+                    className="aspect-auto h-36 w-36 rounded-full object-cover"
+                    alt="profile_img"
+                  />
                 )}
               </div>
               <h3 className="mb-4">
