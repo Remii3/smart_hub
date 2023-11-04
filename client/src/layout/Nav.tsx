@@ -120,12 +120,12 @@ export default function Nav({ scrollFlag }: { scrollFlag: boolean }) {
         <div className="z-30 flex items-center">
           <Link
             to="/"
-            className="relative block text-blue-600"
+            className="relative block h-8 w-8 text-blue-600"
             onClick={() => hideMobileOverlay()}
           >
             <span className="sr-only">Home</span>
             <Suspense fallback={<LoadingCircle />}>
-              <HomeLogoIcon />
+              <HomeLogoIcon className="h-8 w-8" />
             </Suspense>
           </Link>
           <ul className={`hidden flex-row items-center px-8 lg:flex`}>

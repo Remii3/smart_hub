@@ -125,7 +125,7 @@ export default function RegisterPage() {
           <div className="max-w-xl lg:max-w-3xl">
             <Link className="inline-block text-blue-600" to="/">
               <span className="sr-only">Home</span>
-              <SunRiseIcon height={8} width="auto" />
+              <SunRiseIcon className="h-10 w-10" />
             </Link>
 
             <h1 className="mt-6 text-2xl font-bold text-gray-900 sm:text-3xl md:text-4xl">

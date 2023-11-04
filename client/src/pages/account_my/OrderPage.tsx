@@ -3,8 +3,8 @@ import { useEffect, useState, useContext, useCallback } from 'react';
 import MainContainer from '@layout/MainContainer';
 import { UserContext } from '@context/UserProvider';
 import { OrderTypes } from '@customTypes/interfaces';
-import { useGetAccessDatabase } from '../hooks/useAaccessDatabase';
-import { DATABASE_ENDPOINTS } from '../data/endpoints';
+import { useGetAccessDatabase } from '../../hooks/useAaccessDatabase';
+import { DATABASE_ENDPOINTS } from '../../data/endpoints';
 
 interface OrderType {
   data: OrderTypes | null;

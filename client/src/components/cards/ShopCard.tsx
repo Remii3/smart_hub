@@ -88,7 +88,7 @@ export default function ShopCard({
         className="flex h-full flex-col justify-between gap-3 rounded-lg bg-background shadow transition duration-200 ease-in-out hover:shadow-md"
       >
         <div>
-          <Link to={`/product/${_id}`} className="block overflow-hidden">
+          <Link to={`/shop/${_id}`} className="block overflow-hidden">
             {img ? (
               <img
                 className="h-[160px] w-full rounded-t-lg object-cover"

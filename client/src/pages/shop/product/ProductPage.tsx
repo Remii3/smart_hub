@@ -15,7 +15,7 @@ import {
 import { UserContext } from '@context/UserProvider';
 import ProductPill from './ProductPill';
 import StarRating from '@features/rating/StarRating';
-import ProductForm from '@pages/product/ProductForm';
+import ProductForm from '@pages/shop/product/ProductForm';
 import { Button } from '@components/UI/button';
 import {
   Dialog,
@@ -29,8 +29,8 @@ import {
 import {
   useGetAccessDatabase,
   usePostAccessDatabase,
-} from '../../hooks/useAaccessDatabase';
-import { DATABASE_ENDPOINTS } from '../../data/endpoints';
+} from '../../../hooks/useAaccessDatabase';
+import { DATABASE_ENDPOINTS } from '../../../data/endpoints';
 import Comments from '@features/comments/Comments';
 import { Skeleton } from '@components/UI/skeleton';
 import { Textarea } from '@components/UI/textarea';
