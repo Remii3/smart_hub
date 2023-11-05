@@ -195,7 +195,6 @@ export default function NewsArticle({
     if (error) {
       return errorToast(error);
     }
-    console.log(newArticleData);
     setIsEditing(false);
     fetchData();
     updateNewsList();

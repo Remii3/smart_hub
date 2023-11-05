@@ -240,7 +240,6 @@ const getOtherProfile = async (req, res) => {
       sold_books_quantity,
       _id,
     };
-    console.log(security_settings.hide_private_information);
     let preparedUserInfo = null;
     if (!security_settings.hide_private_information) {
       preparedUserInfo = user_info;

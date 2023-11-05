@@ -29,9 +29,9 @@ const ShopDataSchema = mongoose.Schema({
   created_at: { type: Date, required: true, default: Date.now },
   comments: [{ type: mongoose.Types.ObjectId, ref: 'Comment' }],
   sold: { type: Boolean, default: false },
-  currency: { type: String, default: 'EUR' },
+  currency: { type: String, default: 'USD' },
   shop_info: {
-    price: { type: mongoose.Types.Decimal128 },
+    price: { type: Number },
   },
   auction_info: {
     starting_price: { type: mongoose.Types.Decimal128 },

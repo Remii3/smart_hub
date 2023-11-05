@@ -24,7 +24,6 @@ export default function ShopCard({
   productQuantity,
   rating,
 }: ProductShopCardType) {
-  const [isAddingToCart, setIsAddingToCart] = useState(false);
   const { addProductToCart, cartState } = useContext(CartContext);
   let itemBtnCapacity = false;
 
@@ -42,13 +41,10 @@ export default function ShopCard({
   const addToCartHandler = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (_id) {
-      setIsAddingToCart(true);
-
       addProductToCart({
         productId: _id,
         productQuantity: 1,
       });
-      setIsAddingToCart(false);
     }
   };
   const currentItem = cartState.products.find(
@@ -116,7 +112,7 @@ export default function ShopCard({
           <div className="flex flex-col gap-3">
             <div className="flex flex-wrap items-end justify-between gap-3">
               <h3 className="flex items-center text-3xl lg:text-4xl">
-                ${price.toFixed(2)}
+                {price}
               </h3>
               <Button
                 type="submit"

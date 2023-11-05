@@ -78,7 +78,6 @@ export default function NewNews({ updateNewsList }: PropsTypes) {
         targetLocation: 'News_img',
         selectedFile: selectedImg[0],
       });
-      console.log(imgResData);
       const { error } = await usePostAccessDatabase({
         url: DATABASE_ENDPOINTS.NEWS_UPDATE,
         body: { img: imgResData, _id: data.id },

@@ -167,7 +167,6 @@ export default function OtherUserPage() {
       await getFollowersHandler();
     }
   };
-  console.log(otherUserData);
   return (
     <MainContainer>
       {otherUserData.isLoading && !otherUserData.data && (

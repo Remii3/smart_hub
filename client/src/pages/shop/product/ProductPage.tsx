@@ -64,6 +64,7 @@ import {
 } from '@components/UI/form';
 import Select from 'react-select';
 import errorToast from '@components/UI/error/errorToast';
+import useCashFormatter from '@hooks/useCashFormatter';
 
 interface ProductTypes extends FetchDataTypes {
   data: null | UnknownProductTypes;
@@ -279,7 +280,7 @@ export default function ProductPage() {
         description: productState.data.description,
       });
     }
-  }, [userData.data, productState]);
+  }, [userData.data, productState.data]);
   const removeImg = (clieckedId: string) => {
     const updatedImgs = [...selectedImgs];
     const indexToRemove = updatedImgs.findIndex(
@@ -481,9 +482,10 @@ export default function ProductPage() {
       });
       setImgsToAdd([]);
       setImgsToRemove([]);
-      await fetchData();
-      setProductEditState((prevState) => {
-        return { ...prevState, isEditing: false, isLoading: false };
+      await fetchData().then(() => {
+        setProductEditState((prevState) => {
+          return { ...prevState, isEditing: false, isLoading: false };
+        });
       });
     }
   };
@@ -992,32 +994,15 @@ export default function ProductPage() {
                               </span>
                               <Input
                                 className="rounded-l-none shadow-none"
-                                placeholder="0.00"
+                                placeholder={
+                                  productState.data
+                                    ? `${productState.data.shop_info.price}`
+                                    : useCashFormatter({ number: 0 })
+                                }
                                 {...field}
                                 step="0.01"
                                 type="number"
                                 value={field.value}
-                                onBlur={(e) => {
-                                  if (e.target.value.trim().length > 0) {
-                                    return field.onChange(
-                                      e.target.value
-                                        ? parseFloat(e.target.value).toFixed(2)
-                                        : 0
-                                    );
-                                  }
-                                }}
-                                onKeyDown={(e) => {
-                                  if (['.'].includes(e.key)) {
-                                    e.preventDefault();
-                                  }
-                                }}
-                                onChange={(e) => {
-                                  return field.onChange(
-                                    e.target.value
-                                      ? parseFloat(e.target.value)
-                                      : 0
-                                  );
-                                }}
                               />
                             </div>
                           </FormControl>
@@ -1031,7 +1016,6 @@ export default function ProductPage() {
                   ) : (
                     !productState.isLoading && (
                       <p className="text-xl font-bold">
-                        $
                         {productState.data &&
                           productState.data.shop_info &&
                           productState.data.shop_info.price}

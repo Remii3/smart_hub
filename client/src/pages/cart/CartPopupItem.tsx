@@ -51,7 +51,7 @@ export default function CartPopupItem({
         <dl className="mt-0.5 space-y-px text-[10px] text-gray-600">
           <div>
             <dt className="inline">Price:</dt>
-            <dd className="inline">{productData.shop_info.price}€</dd>
+            <dd className="inline">{productData.shop_info.price}</dd>
           </div>
         </dl>
       </div>

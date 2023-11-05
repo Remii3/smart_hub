@@ -103,7 +103,7 @@ const getShopProducts = async (req, res) => {
           )
         : null;
     rawData.highestPrice = highestPrice
-      ? parseFloat(highestPrice[0].shop_info.price)
+      ? prepareProductObject(highestPrice[0]).shop_info.price
       : null;
     for (let product of products) {
       preparedProducts.push(prepareProductObject(product));
@@ -268,7 +268,7 @@ const getSearchedProducts = async (req, res) => {
     rawData.totalProducts = totalDocuments;
     rawData.highestPrice =
       highestPrice && highestPrice.length > 0
-        ? Number(highestPrice[0].shop_info.price)
+        ? prepareProductObject(highestPrice[0]).shop_info.price
         : 0;
 
     const preparedProducts = [];
@@ -343,38 +343,7 @@ const addOneProduct = async (req, res) => {
           comments: [],
           avgRating: 0,
           shop_info: {
-            price: price.toString(),
-          },
-        });
-      } catch (err) {
-        return res
-          .status(500)
-          .json({ message: 'Failed creating new product', error: err.message });
-      }
-    } else {
-      if (typeof starting_price !== 'number') {
-        return res.status(422).json({
-          message: 'Starting price, currency and auction end date are required',
-        });
-      }
-
-      try {
-        await Product.create({
-          seller_data,
-          _id,
-          title,
-          description,
-          imgs: [],
-          categories,
-          authors,
-          rating: [],
-          quantity,
-          market_place,
-          created_at,
-          comments: [],
-          auction_info: {
-            starting_price,
-            auction_end_date,
+            price: Number(price),
           },
         });
       } catch (err) {
@@ -434,7 +403,7 @@ const updateOneProduct = async (req, res) => {
     const updateData = {};
     if (title) updateData.title = title;
     if (description) updateData.description = description;
-    if (price) updateData.shop_info = { price };
+    if (price) updateData.shop_info = { price: Number(price) };
     if (imgs) updateData.imgs = imgs;
     if (categories) updateData.categories = categories;
     if (authors) updateData.authors = authors;

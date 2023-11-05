@@ -1,3 +1,5 @@
+const cashFormatter = require('./cashFormatter');
+
 const prepareProductObject = product => {
   let {
     _id,
@@ -47,11 +49,10 @@ const prepareProductObject = product => {
     currency,
     seller_data,
     deleted,
+    shop_info: {
+      price: cashFormatter({ number: shop_info ? shop_info.price : 0 }),
+    },
   };
-
-  if (shop_info) {
-    preparedObject.shop_info = { price: parseFloat(shop_info.price) };
-  }
 
   if (auction_info) {
     preparedObject.auction_info = {

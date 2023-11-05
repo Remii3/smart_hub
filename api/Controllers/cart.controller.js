@@ -1,6 +1,7 @@
 const Cart = require('../Models/cart');
 const Product = require('../Models/product');
 const calculateOrderAmount = require('../helpers/calculateOrderAmount');
+const cashFormatter = require('../helpers/cashFormatter');
 const prepareProductObject = require('../helpers/prepareProductObject');
 
 const stripe = require('stripe')(
@@ -132,7 +133,7 @@ const getAllCartItems = async (req, res) => {
         cartPrice += product.totalPrice;
       }
 
-      cartPrice = cartPrice.toFixed(2);
+      cartPrice = cashFormatter({ number: cartPrice });
 
       cartPrice = `${cartPrice}`;
       return res
@@ -203,7 +204,7 @@ const initiatePayment = async (req, res) => {
   try {
     const paymentIntent = await stripe.paymentIntents.create({
       amount: calculateOrderAmount(items),
-      currency: 'eur',
+      currency: 'usd',
       automatic_payment_methods: {
         enabled: true,
       },
