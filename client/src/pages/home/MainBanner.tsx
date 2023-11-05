@@ -23,11 +23,11 @@ export default function MainBanner() {
           <div className="mx-auto max-w-screen-xl px-4 py-[20%] sm:py-32 lg:flex lg:h-screen lg:items-center">
             <section
               id="mainPageTitle"
-              className="mx-auto max-w-xl text-left lg:max-w-3xl"
+              className="max-w-2xl text-left lg:max-w-3xl"
             >
-              <h1 className=" font-extrabold text-background ">
+              <h1 className="text-7xl font-extrabold text-background ">
                 Understand User Flow.
-                <strong className="font-extrabold text-blue-600 sm:block">
+                <strong className="font-extrabold text-[#3E74FF] sm:block">
                   Increase Conversion.
                 </strong>
               </h1>
@@ -39,16 +39,22 @@ export default function MainBanner() {
               </p>
               <div className="mt-8 space-x-4">
                 <Link
-                  to={{ pathname: 'search' }}
-                  className={`${buttonVariants({ variant: 'secondary' })}`}
-                >
-                  Explore books
-                </Link>
-                <Link
                   to={{ pathname: 'search', search: 'special=bestseller' }}
-                  className={`${buttonVariants({ variant: 'default' })}`}
+                  className={`${buttonVariants({
+                    variant: 'default',
+                    size: 'lg',
+                  })} px-6 py-4 text-xl`}
                 >
                   Best Sellers
+                </Link>
+                <Link
+                  to={{ pathname: 'search' }}
+                  className={`${buttonVariants({
+                    variant: 'ghost',
+                    size: 'lg',
+                  })} px-6 py-4 text-xl text-white`}
+                >
+                  Explore books
                 </Link>
               </div>
             </section>

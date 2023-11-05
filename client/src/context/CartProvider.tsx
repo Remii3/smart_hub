@@ -20,6 +20,10 @@ const initialState = {
   products: [],
   cartPrice: 0,
   isLoading: false,
+  isAdding: false,
+  isIncrementing: false,
+  isDecrementing: false,
+  isDeleting: false,
 };
 
 export const CartContext = createContext<{
@@ -75,7 +79,7 @@ export default function CartProvider({ children }: { children: ReactNode }) {
       productQuantity: number;
     }) => {
       setCart((prevState) => {
-        return { ...prevState, isLoading: true };
+        return { ...prevState, isAdding: productId };
       });
 
       await usePostAccessDatabase({
@@ -86,7 +90,7 @@ export default function CartProvider({ children }: { children: ReactNode }) {
       await fetchCartData();
 
       setCart((prevState) => {
-        return { ...prevState, isLoading: false };
+        return { ...prevState, isAdding: false };
       });
     },
     [userId, fetchCartData]
@@ -105,7 +109,7 @@ export default function CartProvider({ children }: { children: ReactNode }) {
       newProducts[productIndex].inCartQuantity += 1;
 
       setCart((prevState) => {
-        return { ...prevState, isLoading: true };
+        return { ...prevState, isIncrementing: productId };
       });
 
       await usePostAccessDatabase({
@@ -114,7 +118,7 @@ export default function CartProvider({ children }: { children: ReactNode }) {
       });
       await fetchCartData();
       setCart((prevState) => {
-        return { ...prevState, isLoading: false };
+        return { ...prevState, isIncrementing: false };
       });
 
       setCart((prevState) => {
@@ -141,7 +145,7 @@ export default function CartProvider({ children }: { children: ReactNode }) {
       newProducts[productIndex].inCartQuantity -= 1;
 
       setCart((prevState) => {
-        return { ...prevState, isLoading: true };
+        return { ...prevState, isDecrementing: productId };
       });
 
       await usePostAccessDatabase({
@@ -150,7 +154,7 @@ export default function CartProvider({ children }: { children: ReactNode }) {
       });
       await fetchCartData();
       setCart((prevState) => {
-        return { ...prevState, isLoading: false };
+        return { ...prevState, isDecrementing: false };
       });
 
       setCart((prevState) => {
@@ -172,13 +176,18 @@ export default function CartProvider({ children }: { children: ReactNode }) {
         (product) => product.productData._id !== productId
       );
 
+      setCart((prevState) => {
+        return { ...prevState, isDeleting: productId };
+      });
       await usePostAccessDatabase({
         url: DATABASE_ENDPOINTS.CART_REMOVE,
         body: { userId, productId },
       });
 
       await fetchCartData();
-
+      setCart((prevState) => {
+        return { ...prevState, isDeleting: false };
+      });
       setCart((prevState) => {
         return {
           ...prevState,

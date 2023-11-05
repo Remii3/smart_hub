@@ -144,6 +144,7 @@ export default function CheckoutForm({
   const paymentElementOptions = {
     layout: 'tabs',
   } as { layout: Layout };
+
   return (
     <form id="payment-form" onSubmit={handleSubmit}>
       <LinkAuthenticationElement
@@ -151,7 +152,9 @@ export default function CheckoutForm({
         onChange={(e: StripeLinkAuthenticationElementChangeEvent) =>
           setEmail(e.value.email)
         }
-        options={{ defaultValues: { email: userData.data?.email || email } }}
+        options={{
+          defaultValues: { email: userData.data?.email || email },
+        }}
         onReady={() =>
           readyToShowHandler((prevState) => {
             return { ...prevState, linkAuth: true };

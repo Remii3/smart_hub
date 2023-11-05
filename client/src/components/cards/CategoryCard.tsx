@@ -16,7 +16,11 @@ function CategoryCard({ _id, label, value, description }: ProductCategories) {
   }
 
   return (
-    <Link id={_id} to={{ pathname: `/search`, search: finalQuery }}>
+    <Link
+      id={_id}
+      to={{ pathname: `/search`, search: finalQuery }}
+      className="rounded-xl"
+    >
       <Card className="relative flex h-full cursor-pointer flex-col gap-4 transition-[transform,box-shadow] duration-300 ease-in-out hover:scale-[1.02] hover:shadow-md active:scale-100">
         <CardHeader className="pb-0">
           <h3 className="text-foreground">{label}</h3>

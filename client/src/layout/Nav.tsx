@@ -14,6 +14,7 @@ import { DATABASE_ENDPOINTS } from '../data/endpoints';
 import { Separator } from '@components/UI/separator';
 import { Button } from '@components/UI/button';
 import LoadingCircle from '@components/Loaders/LoadingCircle';
+import { Input } from '@components/UI/input';
 
 const ShoppingBagIcon = lazy(
   () => import('@heroicons/react/24/outline/ShoppingBagIcon')
@@ -146,8 +147,8 @@ export default function Nav({ scrollFlag }: { scrollFlag: boolean }) {
           onSubmit={(e) => searchHandler(e)}
           className="relative mx-auto me-4 hidden w-full basis-full items-center justify-end text-gray-600 lg:flex"
         >
-          <input
-            className="border-1 h-full max-w-[24rem] rounded-lg border-gray-300 bg-background pl-3 pr-12 text-sm transition-[width] duration-200 ease-in-out focus:w-full focus:outline-none sm:w-56"
+          <Input
+            className="h-full max-w-[24rem] rounded-lg bg-background py-2 pl-3 pr-12 text-sm transition-[width] duration-200 ease-in-out focus-visible:w-full sm:w-56"
             type="text"
             name="search"
             placeholder="Search"
@@ -180,8 +181,8 @@ export default function Nav({ scrollFlag }: { scrollFlag: boolean }) {
                   onSubmit={(e) => searchHandler(e)}
                   className="relative mx-auto w-full max-w-xl text-gray-600"
                 >
-                  <input
-                    className="h-full w-full rounded-lg border-2 border-gray-300 bg-background px-3 pr-16 text-sm focus:outline-none"
+                  <Input
+                    className="h-full w-full rounded-lg border-2 border-gray-300 bg-background px-3 py-2 pr-16 text-sm focus:outline-none"
                     type="text"
                     name="search"
                     placeholder="Search"
@@ -190,7 +191,7 @@ export default function Nav({ scrollFlag }: { scrollFlag: boolean }) {
                   />
                   <PopoverClose
                     type="submit"
-                    className="absolute right-0 top-1/2 h-4 w-4 -translate-y-1/2 rounded-e-lg border-b-2 border-r-2 border-t-2 border-transparent bg-transparent px-2 text-gray-600 transition"
+                    className="absolute right-0 top-1/2 -translate-y-1/2 rounded-e-lg border-b-2 border-r-2 border-t-2 border-transparent bg-transparent px-2 text-gray-600 transition"
                   >
                     <span className="sr-only">Search</span>
                     <Suspense fallback={<LoadingCircle />}>
@@ -209,7 +210,7 @@ export default function Nav({ scrollFlag }: { scrollFlag: boolean }) {
                 aria-label="Shopping cart"
               >
                 <Suspense fallback={<LoadingCircle />}>
-                  <ShoppingBagIcon className={`h-7 w-7`} />
+                  <ShoppingBagIcon className={`h-8 w-8`} />
                   {cartState && cartState.products.length > 0 && (
                     <span
                       aria-hidden="true"

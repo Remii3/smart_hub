@@ -54,7 +54,6 @@ export default function ShopCard({
   const currentItem = cartState.products.find(
     (product: CartProductTypes) => product.productData._id === _id
   );
-
   if (currentItem) {
     itemBtnCapacity =
       productQuantity! < 1 ||
@@ -72,7 +71,7 @@ export default function ShopCard({
         <Link
           to={`/shop/${_id}`}
           aria-label="Show product page"
-          className="absolute block h-full w-full indent-0"
+          className="absolute block h-full w-full rounded-lg indent-0 focus-visible:ring-ring"
         />
 
         <div>
@@ -116,24 +115,27 @@ export default function ShopCard({
 
           <div className="flex flex-col gap-3">
             <div className="flex items-end justify-between gap-3">
-              <h4 className="flex items-center ">${price.toFixed(2)}</h4>
-              <div className="text-center">
-                <Button
-                  type="submit"
-                  variant="default"
-                  disabled={isAddingToCart || itemBtnCapacity}
-                  className="relative z-20"
+              <h3 className="flex items-center ">${price.toFixed(2)}</h3>
+              <Button
+                type="submit"
+                variant="default"
+                disabled={
+                  cartState.isAdding === _id ||
+                  cartState.isDeleting === _id ||
+                  itemBtnCapacity
+                }
+                className="relative z-20"
+              >
+                {cartState.isAdding === _id && <LoadingCircle />}
+                <div
+                  className={`${
+                    cartState.isAdding === _id && 'invisible'
+                  } space-x-1`}
                 >
-                  {isAddingToCart ? (
-                    <LoadingCircle />
-                  ) : (
-                    <div className="space-x-1">
-                      <span className="text-lg">+</span>
-                      <ShoppingCartIcon className="inline-block h-6 w-6" />
-                    </div>
-                  )}
-                </Button>
-              </div>
+                  <span className="text-lg">+</span>
+                  <ShoppingCartIcon className="inline-block h-6 w-6" />
+                </div>
+              </Button>
             </div>
           </div>
         </div>

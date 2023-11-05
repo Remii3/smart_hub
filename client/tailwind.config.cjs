@@ -117,9 +117,5 @@ module.exports = {
       },
     },
   },
-  plugins: [
-    require('@tailwindcss/forms'),
-    require('tailwindcss-animate'),
-    require('tailwind-hamburgers'),
-  ],
+  plugins: [require('tailwindcss-animate'), require('tailwind-hamburgers')],
 };

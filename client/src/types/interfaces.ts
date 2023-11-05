@@ -1,5 +1,5 @@
 // eslint-disable-next-line import/no-cycle
-import { MarketPlaceTypes, UserRoleType, VoteType } from './types';
+import { MarketplaceTypes, UserRoleType, VoteType } from './types';
 
 // * Product types
 
@@ -21,7 +21,7 @@ export interface ProductTypes {
   authors: AuthorTypes[];
   rating: { rating: number; count: number };
   quantity: number;
-  market_place: MarketPlaceTypes;
+  market_place: MarketplaceTypes;
   created_at: string;
   sold: boolean;
   comments: [
@@ -54,7 +54,7 @@ export interface ProductCategories {
   _id: string;
   label: string;
   value: string;
-  description: string;
+  description?: string;
 }
 
 // * User types
@@ -144,6 +144,10 @@ export interface CartTypes {
     | [];
   cartPrice: number;
   isLoading: boolean;
+  isAdding: boolean | string;
+  isIncrementing: boolean | string;
+  isDecrementing: boolean | string;
+  isDeleting: boolean | string;
 }
 
 // * Card types

@@ -63,6 +63,36 @@ export default function CategoriesFilter() {
       <Select
         inputId="filterCategories"
         menuPlacement="top"
+        className="rounded-md shadow-sm"
+        styles={{
+          control: (base, state) => ({
+            ...base,
+            border: '1px hsl(214, 32%, 91%) solid',
+            boxShadow: state.isFocused ? '0' : '0',
+            '&:hover': {
+              border: '1px var hsl(214, 30%, 95%) solid',
+            },
+            borderRadius: 'calc(var(--radius) - 2px)',
+            padding: '',
+          }),
+          option: (base, state) => ({
+            ...base,
+            backgroundColor: state.isFocused ? 'hsl(214, 30%, 95%)' : undefined,
+            ':active': {
+              backgroundColor: 'hsl(214, 30%, 95%)',
+            },
+          }),
+          multiValue: (base) => ({
+            ...base,
+            backgroundColor: 'hsl(214, 30%, 95%)',
+            borderRadius: '0.75rem',
+            paddingLeft: '2px',
+          }),
+          multiValueRemove: (base) => ({
+            ...base,
+            borderRadius: '0 0.75rem 0.75rem 0',
+          }),
+        }}
         maxMenuHeight={250}
         isMulti
         options={categoriesState.options}

@@ -4,11 +4,11 @@ import {
   useState,
   useContext,
   useCallback,
-  useMemo,
 } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   AuthorTypes,
+  FetchDataTypes,
   ProductCategories,
   UnknownProductTypes,
 } from '@customTypes/interfaces';
@@ -37,7 +37,6 @@ import { Textarea } from '@components/UI/textarea';
 import { Input } from '@components/UI/input';
 import { UserRoleTypes } from '@customTypes/types';
 import { useToast } from '@components/UI/use-toast';
-import { ToastAction } from '@components/UI/toast';
 import MainContainer from '@layout/MainContainer';
 import SuspenseComponent from '@components/suspense/SuspenseComponent';
 import LoadingCircle from '@components/Loaders/LoadingCircle';
@@ -64,9 +63,9 @@ import {
   FormMessage,
 } from '@components/UI/form';
 import Select from 'react-select';
+import errorToast from '@components/UI/error/errorToast';
 
-interface ProductTypes {
-  isLoading: boolean;
+interface ProductTypes extends FetchDataTypes {
   data: null | UnknownProductTypes;
 }
 interface ProductRating {
@@ -79,7 +78,7 @@ interface ProductEditTypes {
   data: {
     title: null | string;
     price: null | number;
-    categories: null | { value: string; label: string; _id: string }[];
+    categories: null | ProductCategories[];
     authors: null | AuthorTypes[];
     quantity: null | number;
     description: null | string;
@@ -123,6 +122,7 @@ const formSchema = z.object({
 export default function ProductPage() {
   const [productState, setProductState] = useState<ProductTypes>({
     isLoading: false,
+    hasError: null,
     data: null,
   });
   const [selectedImgs, setSelectedImgs] = useState<SelectedImgsTypes>([]);
@@ -158,7 +158,6 @@ export default function ProductPage() {
   });
 
   const { userData, fetchUserData } = useContext(UserContext);
-  const { toast } = useToast();
   const navigate = useNavigate();
   const path = useLocation();
   const [productRating, setProductRating] = useState<ProductRating>();
@@ -206,15 +205,9 @@ export default function ProductPage() {
       params: { productId: prodId },
     });
     if (error) {
-      return toast({
-        variant: 'destructive',
-        title: 'Uh oh! Something went wrong.',
-        description: 'There was a problem with your request.',
-        action: (
-          <ToastAction onClick={() => location.reload()} altText="Try again">
-            Try again
-          </ToastAction>
-        ),
+      errorToast(error);
+      return setProductState((prevState) => {
+        return { ...prevState, isLoading: false, hasError: error };
       });
     }
 
@@ -237,7 +230,7 @@ export default function ProductPage() {
       quantity: data.rating.count,
       value: data.rating.rating,
     });
-    setProductState({ data, isLoading: false });
+    setProductState({ data, isLoading: false, hasError: null });
   }, [prodId]);
 
   useEffect(() => {
@@ -409,7 +402,10 @@ export default function ProductPage() {
           }
         }
       }
-      function differentAuthors(array1, array2) {
+      function differentAuthors(
+        array1: { label: string; value: string }[],
+        array2: AuthorTypes[]
+      ) {
         if (array1.length === array2.length) {
           return array1.every((element, index) => {
             if (element.label === array2[index].author_info.pseudonim) {
@@ -420,7 +416,10 @@ export default function ProductPage() {
         }
         return true;
       }
-      function differentCategories(array1, array2) {
+      function differentCategories(
+        array1: { label: string; value: string }[],
+        array2: ProductCategories[]
+      ) {
         if (array1.length === array2.length) {
           return array1.every((element, index) => {
             if (element.value === array2[index].value) {
@@ -462,9 +461,13 @@ export default function ProductPage() {
         productData.description = formResponse.description;
       if (formResponse.quantity !== formResponse.quantity)
         productData.quantity = formResponse.quantity;
-      if (differentAuthors(formResponse.authors, productState.data.authors))
+      if (
+        formResponse.authors &&
+        differentAuthors(formResponse.authors, productState.data.authors)
+      )
         productData.authors = formResponse.authors;
       if (
+        productState.data.categories &&
         differentCategories(
           formResponse.categories,
           productState.data.categories
@@ -495,7 +498,6 @@ export default function ProductPage() {
       navigate(-1);
     }
   };
-  console.log('productState', productState.data);
   if (!productState.data || userData.isLoading) return <></>;
   return (
     <MainContainer className="relative py-8">
@@ -1138,7 +1140,7 @@ export default function ProductPage() {
             productId={productState.data?._id}
             productQuantity={productState.data?.quantity}
             sold={(productState.data && productState.data.sold) || false}
-            isLoading={productEditState.isEditing}
+            isEditing={productEditState.isEditing}
           />
         </div>
       </div>

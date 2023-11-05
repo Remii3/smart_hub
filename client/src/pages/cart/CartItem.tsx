@@ -10,8 +10,12 @@ export default function CartItem({
   productsTotalPrice,
 }: CartProductTypes) {
   const [localQuantity, setLocalQuantity] = useState(inCartQuantity);
-  const { incrementCartItem, decrementCartItem, removeProductFromCart } =
-    useContext(CartContext);
+  const {
+    incrementCartItem,
+    decrementCartItem,
+    removeProductFromCart,
+    cartState,
+  } = useContext(CartContext);
 
   if (!productData) return <div />;
 
@@ -31,23 +35,23 @@ export default function CartItem({
 
   return (
     <li className="flex items-center gap-4">
-      <Link to={`/product/${productData._id}`}>
+      <Link to={`/shop/${productData._id}`} className="block rounded-md">
         {productData.imgs && productData.imgs[0] ? (
           <img
             src={productData.imgs[0].url}
             alt="product_img"
-            className="h-16 w-16 rounded object-cover"
+            className="h-16 w-16 rounded-md object-cover"
           />
         ) : (
           <img
             src="https://firebasestorage.googleapis.com/v0/b/smarthub-75eab.appspot.com/o/static_imgs%2Fnophoto.webp?alt=media&token=a974d32e-108a-4c21-be71-de358368a167"
             alt="product_img"
-            className="h-16 w-16 rounded object-cover"
+            className="h-16 w-16 rounded-md object-cover"
           />
         )}
       </Link>
       <div>
-        <Link to={`/product/${productData._id}`}>
+        <Link to={`/shop/${productData._id}`} className="block">
           <h3 className="m-0 text-sm text-gray-900">{productData.title}</h3>
         </Link>
 
@@ -65,7 +69,11 @@ export default function CartItem({
             <button
               type="button"
               className={`${!(localQuantity > 1) && 'text-gray-300'} px-2`}
-              disabled={!(localQuantity > 1)}
+              disabled={
+                !(localQuantity > 1) ||
+                cartState.isDecrementing === productData._id ||
+                cartState.isDeleting === productData._id
+              }
               onClick={() => decrementHandler()}
             >
               -
@@ -88,7 +96,11 @@ export default function CartItem({
               className={`${
                 localQuantity >= productData.quantity && 'text-gray-300'
               } px-2`}
-              disabled={localQuantity >= productData.quantity}
+              disabled={
+                localQuantity >= productData.quantity ||
+                cartState.isIncrementing === productData._id ||
+                cartState.isDeleting === productData._id
+              }
               onClick={() => incrementHandler()}
             >
               +

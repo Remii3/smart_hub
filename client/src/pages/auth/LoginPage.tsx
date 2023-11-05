@@ -78,17 +78,19 @@ export default function LoginPage() {
   return (
     <section className="bg-background">
       <div className="lg:grid lg:min-h-screen lg:grid-cols-12">
-        <aside className="relative block h-16 lg:order-last lg:col-span-5 lg:h-full xl:col-span-6">
+        <aside className="relative -ml-4 -mr-4 -mt-6 block h-24 lg:order-last lg:col-span-5 lg:ml-0 lg:h-full xl:col-span-6">
           <img
             alt="Pattern"
-            src="https://images.unsplash.com/photo-1605106702734-205df224ecce?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=870&q=80"
+            src="https://firebasestorage.googleapis.com/v0/b/smarthub-75eab.appspot.com/o/static_imgs%2FauthMainPhoto.webp?alt=media&token=74727027-d0c0-4c96-879c-972c9fefac85&_gl=1*1jnc41l*_ga*NDYxNzIyMDYxLjE2OTU3NTEwNzA.*_ga_CW55HF8NVT*MTY5OTIwNjYzOC42OC4xLjE2OTkyMDY2NTAuNDguMC4w"
             className="absolute inset-0 h-full w-full object-cover"
+            width={716}
+            height={950}
           />
         </aside>
 
         <main
           aria-label="Main"
-          className="flex items-center justify-center px-8 py-8 sm:px-12 lg:col-span-7 lg:px-16 lg:py-12 xl:col-span-6"
+          className="flex items-center justify-center py-4 sm:px-12 lg:col-span-7 lg:py-12 xl:col-span-6"
         >
           <div className="max-w-xl lg:max-w-3xl">
             <Link className="inline-block text-blue-600" to="/">
@@ -144,7 +146,7 @@ export default function LoginPage() {
                           />
                           <button
                             type="button"
-                            className="absolute right-0 top-1/2 -translate-y-1/2 cursor-pointer px-3"
+                            className="absolute right-0 top-1/2 h-full -translate-y-1/2 cursor-pointer rounded-r-md px-3"
                             onClick={() =>
                               setShowPassword((prevState) => !prevState)
                             }
@@ -166,11 +168,17 @@ export default function LoginPage() {
                 <div className="col-span-6">
                   <p className="text-sm text-gray-500">
                     By having an account on this site, you agree to our{' '}
-                    <Link to="/" className="text-gray-700 underline">
+                    <Link
+                      to="/terms_conditions"
+                      className="text-gray-700 underline"
+                    >
                       terms and conditions
                     </Link>{' '}
                     and{' '}
-                    <Link to="/" className="text-gray-700 underline">
+                    <Link
+                      to="/privacy_policy"
+                      className="text-gray-700 underline"
+                    >
                       privacy policy
                     </Link>
                     .

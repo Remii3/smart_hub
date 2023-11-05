@@ -1,10 +1,18 @@
 import { ChangeEvent } from 'react';
 import { sortOptionsArray } from '@hooks/useSortProducts';
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@components/UI/select';
 
 type SortProductsPropsTypes = {
   category: string;
   sortOption: string | null;
-  sortOptionChangeHandler: (e: ChangeEvent<HTMLSelectElement>) => void;
+  sortOptionChangeHandler: (selectedOption: string) => void;
 };
 
 export default function SortProducts({
@@ -18,18 +26,20 @@ export default function SortProducts({
       <label htmlFor={`${category}-SortProducts`} className="sr-only">
         SortBy
       </label>
-      <select
-        id={`${category}-SortProducts`}
-        value={sortOption}
-        onChange={(e) => sortOptionChangeHandler(e)}
-        className="h-10 cursor-pointer rounded border-gray-300 text-sm"
-      >
-        {sortOptionsArray.map((option) => (
-          <option key={option.key} value={option.value}>
-            {option.value}
-          </option>
-        ))}
-      </select>
+      <Select onValueChange={(e) => sortOptionChangeHandler(e)}>
+        <SelectTrigger aria-label="Select sort option">
+          <SelectValue placeholder={sortOption} />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectGroup>
+            {sortOptionsArray.map((option) => (
+              <SelectItem key={option.key} value={option.value}>
+                {option.value}
+              </SelectItem>
+            ))}
+          </SelectGroup>
+        </SelectContent>
+      </Select>
     </div>
   );
 }

@@ -10,8 +10,8 @@
     --popover: 0 0% 100%;
     --popover-foreground: 214 10% 3.9%;
 
-    --primary: 221 83% 53%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 223 100% 62%;
+    --primary-foreground: 214 40% 98%;
     --secondary: 221 66% 86%;
     --secondary-foreground: 222.2 47.4% 11.2%;
 
@@ -23,8 +23,7 @@
     --destructive-foreground: 0 0% 98%;
     --border: 214 32% 91%;
     --input: 214 32% 91%;
-    /* --input: 240 5.9% 90%; */
-    --ring: 214.2 83.2% 53.3%;
+    --ring: 215 20.2% 65.1%;
     --radius: 0.5rem;
   }
 
@@ -35,7 +34,7 @@
     --card-foreground: 0 0% 98%;
     --popover: 240 10% 3.9%;
     --popover-foreground: 0 0% 98%;
-    --primary: 210 40% 70%;
+    --primary: 223 100% 62%;
     --primary-foreground: 222.2 47.4% 1.2%;
     --secondary: 222.2 47.4% 11.2%;
     --secondary-foreground: 210 40% 98%;
@@ -47,10 +46,17 @@
     --destructive-foreground: 0 85.7% 97.3%;
     --border: 240 3.7% 15.9%;
     --input: 240 3.7% 15.9%;
-    --ring: 240 4.9% 83.9%;
+    --ring: 215 20.2% 65.1%;
   }
   * {
     @apply border-border;
+  }
+
+  a:-webkit-any-link:focus-visible,
+  button:focus-visible {
+    @apply ring-ring;
+    @apply ring-2;
+    @apply outline-none;
   }
   body {
     @apply bg-background text-foreground;
@@ -116,4 +122,8 @@
 
 .swiper-button-disabled {
   display: none !important;
+}
+
+.StripeElement--focus {
+  background-color: red;
 }

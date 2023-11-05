@@ -79,8 +79,8 @@ export default function BasicShopWidget({
     fetchData();
   }, [fetchData]);
 
-  const sortOptionChangeHandler = (e: ChangeEvent<HTMLSelectElement>) => {
-    const selectedValue = e.target.value;
+  const sortOptionChangeHandler = (selectedOption: string) => {
+    const selectedValue = selectedOption;
     const selectedSortOption = sortOptionsArray.find(
       (sortOption) => sortOption.value === selectedValue
     );
@@ -104,21 +104,21 @@ export default function BasicShopWidget({
 
   return (
     <section className="mb-4">
-      <header className="mb-8">
+      <header className="mb-8 px-1">
         <h2 className="inline-block text-xl font-bold text-gray-900 sm:text-3xl">
           {title}
         </h2>
         {showMore && (
           <Link
             to={{ pathname: '/search', search: `category=${category}` }}
-            className="pl-4 text-sm"
+            className="ml-4 text-sm"
           >
             Show more
           </Link>
         )}
         {subTitle && <p className="mt-4 max-w-md text-slate-500">{subTitle}</p>}
       </header>
-      <div className="mb-4 flex items-center justify-between">
+      <div className="mb-4 flex items-center justify-between px-1">
         <div className="flex flex-grow gap-4">
           <PriceSelector
             highestPrice={products.rawData ? products.rawData.highestPrice : 0}

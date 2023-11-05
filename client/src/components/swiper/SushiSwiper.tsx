@@ -74,7 +74,7 @@ export default function SushiSwiper({
           },
         }}
         modules={[Pagination, Navigation]}
-        style={{ paddingBottom: '56px', marginRight: '-16px' }}
+        style={{ marginRight: '-16px', padding: '4px 4px 56px' }}
       >
         <SuspenseComponent fallback={<LoadingCircle />}>
           {loadingState && (

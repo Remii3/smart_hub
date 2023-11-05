@@ -18,9 +18,9 @@ export default function MainPageHeading({
       } px-4 text-center md:py-32`}
     >
       {usecase === 'main' ? (
-        <h2 className={`mb-5 uppercase text-${color}`}>{mainTitle}</h2>
+        <h2 className={`mb-5 text-6xl uppercase text-${color}`}>{mainTitle}</h2>
       ) : (
-        <h3 className={`mb-5   text-${color}`}>{mainTitle}</h3>
+        <h3 className={`mb-5  text-5xl text-${color}`}>{mainTitle}</h3>
       )}
       <p
         className={`${

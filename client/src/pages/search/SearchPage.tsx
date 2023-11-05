@@ -150,9 +150,9 @@ export default function SearchPage() {
     setSearchParams(searchParams);
   };
 
-  const sortOptionChangeHandler = (e: ChangeEvent<HTMLSelectElement>) => {
+  const sortOptionChangeHandler = (selectedOption: string) => {
     const selectedSortOption = sortOptionsArray.find((item) => {
-      return item.value === e.target.value;
+      return item.value === selectedOption;
     });
     if (selectedSortOption) {
       searchParams.set('sortMethod', selectedSortOption.value);

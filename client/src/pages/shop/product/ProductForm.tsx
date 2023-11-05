@@ -8,7 +8,7 @@ type ProductFormType = {
   productId?: string;
   productQuantity?: number;
   sold: boolean;
-  isLoading: boolean;
+  isEditing: boolean;
 };
 
 const defaultProps = {
@@ -20,10 +20,9 @@ export default function ProductForm({
   productId,
   productQuantity,
   sold,
-  isLoading,
+  isEditing,
 }: ProductFormType) {
   const [selectedQuantity, setSelectedQuantity] = useState(1);
-  const [isAddingToCart, setIsAddingToCart] = useState(false);
   const { addProductToCart, cartState } = useContext(CartContext);
 
   let itemCapacity = false;
@@ -32,14 +31,11 @@ export default function ProductForm({
   const addToCartHandler = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (productId) {
-      setIsAddingToCart(true);
-
       addProductToCart({
         productId,
         productQuantity: selectedQuantity,
       });
       setSelectedQuantity(1);
-      setIsAddingToCart(false);
     }
   };
   const incrementQuantityHandler = () => {
@@ -109,25 +105,24 @@ export default function ProductForm({
             variant="default"
             type="submit"
             disabled={
-              isAddingToCart ||
               itemBtnCapacity ||
-              isLoading ||
-              cartState.isLoading
+              isEditing ||
+              cartState.isAdding === productId ||
+              cartState.isDeleting === productId
             }
-            className={`${isAddingToCart && 'bg-slate-200'}`}
+            className="relative"
           >
-            {isAddingToCart ? (
-              <LoadingCircle />
-            ) : (
-              <span>
-                Add to cart
-                <ShoppingBagIcon
-                  className="ml-2 inline-block"
-                  height={24}
-                  width={24}
-                />
-              </span>
-            )}
+            {cartState.isAdding === productId && <LoadingCircle />}
+            <span
+              className={`${cartState.isAdding === productId && 'invisible'}`}
+            >
+              Add to cart
+              <ShoppingBagIcon
+                className="ml-2 inline-block"
+                height={24}
+                width={24}
+              />
+            </span>
           </Button>
         </div>
       )}

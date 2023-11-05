@@ -171,7 +171,6 @@ export default function Comments({
       fetchData();
     }, 150);
   };
-  console.log(comments);
   return (
     <div className="mt-8">
       <h5 className="pb-2">Comments</h5>
@@ -179,9 +178,10 @@ export default function Comments({
         <div className="flex flex-col-reverse gap-8 md:flex-row">
           <div>
             {withRating && (
-              <div className="mb-3">
+              <div className={`${!userData.data && 'opacity-20'} mb-3`}>
                 <StarRating
                   rating={newComment.rating || 0}
+                  showOnly={!userData.data}
                   changeRatingHandler={(e) =>
                     setNewComment((prevState) => {
                       return { ...prevState, rating: e };

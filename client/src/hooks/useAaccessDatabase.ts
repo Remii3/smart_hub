@@ -48,8 +48,8 @@ const usePostAccessDatabase = async ({ url, body, headers }: PostTypes) => {
     } else {
       return {
         data: null,
-        error: error.response?.data.message,
-        name: error.response?.data.name,
+        error: error.response ? error.response.data.message : error.message,
+        name: error.response ? error.response.data.name : error.name,
       };
     }
   }
