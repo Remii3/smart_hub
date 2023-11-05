@@ -7,7 +7,6 @@ import {
   DialogDescription,
 } from '@components/UI/dialog';
 import { UserContext } from '@context/UserProvider';
-import { MarketPlaceTypes, MarketplaceType } from '@customTypes/types';
 import { DATABASE_ENDPOINTS } from '@data/endpoints';
 import {
   useGetAccessDatabase,
@@ -44,13 +43,17 @@ import { PlusCircleIcon, XCircleIcon } from '@heroicons/react/24/outline';
 import { v4 } from 'uuid';
 import useUploadImg from '@hooks/useUploadImg';
 import { Textarea } from '@components/UI/textarea';
+import { MarketplaceTypes } from '@customTypes/types';
 
 type SelectedImgsTypes = {
   id: string;
   data: File;
   url: string;
 }[];
-
+const MarketPlaceTypes = { shop: 'Shop', collection: 'Collection' } as {
+  shop: MarketplaceTypes;
+  collection: MarketplaceTypes;
+};
 const formSchema = z.object({
   title: z.string().nonempty({ message: 'Please provide book title!' }).min(2, {
     message: 'Title must be at least 2 characters.',
@@ -80,7 +83,7 @@ const formSchema = z.object({
     .string()
     .nonempty({ message: 'Please provide book price' })
     .or(z.number()),
-  marketplace: z.enum([MarketPlaceTypes.SHOP, MarketPlaceTypes.COLLECTION]),
+  marketplace: z.enum([MarketPlaceTypes.shop, MarketPlaceTypes.collection]),
 });
 
 export default function NewProduct() {
@@ -145,7 +148,7 @@ export default function NewProduct() {
       price: '',
       categories: [],
       authors: [],
-      marketplace: MarketPlaceTypes.SHOP,
+      marketplace: MarketPlaceTypes.shop,
     },
   });
   const { handleSubmit, control, watch, reset } = form;
@@ -219,7 +222,7 @@ export default function NewProduct() {
       }
       await usePostAccessDatabase({
         url: DATABASE_ENDPOINTS.PRODUCT_UPDATE,
-        body: { _id: data.id, market_place: MarketPlaceTypes.SHOP, imgs: urls },
+        body: { _id: data.id, market_place: MarketPlaceTypes.shop, imgs: urls },
       });
     }
     if (error) {
@@ -551,7 +554,7 @@ export default function NewProduct() {
                   </FormItem>
                 )}
               />
-              {marketplaceValue === MarketPlaceTypes.COLLECTION && (
+              {marketplaceValue === MarketPlaceTypes.collection && (
                 <div>TODO: Show available collections</div>
               )}
               <DialogFooter>

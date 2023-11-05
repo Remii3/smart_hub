@@ -127,17 +127,21 @@ export default function AdvancedFilter({ highestPrice }: AdvancedFilterTypes) {
           <form
             className={`${
               openCollapsible && 'h-[calc(100vh-64px-48px-8px-42px)]'
-            } overflow-y-scroll pb-4`}
+            } overflow-y-auto pb-4`}
           >
             <section className="mb-2 flex items-center justify-end">
-              <Button variant="link" onClick={clearAll}>
+              <Button type="button" variant="link" onClick={clearAll}>
                 Clear all
               </Button>
             </section>
             <section className="mb-1">
               <div className="flex items-center justify-between">
                 <p className="inline-block font-medium">Type of offer</p>
-                <Button variant="link" onClick={clearSelectedMarketplace}>
+                <Button
+                  type="button"
+                  variant="link"
+                  onClick={clearSelectedMarketplace}
+                >
                   Clear
                 </Button>
               </div>
@@ -146,7 +150,11 @@ export default function AdvancedFilter({ highestPrice }: AdvancedFilterTypes) {
             <section className="mb-1">
               <div className="flex items-center justify-between">
                 <p className="inline-block font-medium">Price range</p>
-                <Button variant="link" onClick={clearSelectedPriceRange}>
+                <Button
+                  type="button"
+                  variant="link"
+                  onClick={clearSelectedPriceRange}
+                >
                   Clear
                 </Button>
               </div>
@@ -156,7 +164,11 @@ export default function AdvancedFilter({ highestPrice }: AdvancedFilterTypes) {
             <section className="mb-1">
               <div className="flex items-center justify-between">
                 <p className="inline-block font-medium">Rating</p>
-                <Button variant="link" onClick={clearSelectedRating}>
+                <Button
+                  type="button"
+                  variant="link"
+                  onClick={clearSelectedRating}
+                >
                   Clear
                 </Button>
               </div>
@@ -165,7 +177,11 @@ export default function AdvancedFilter({ highestPrice }: AdvancedFilterTypes) {
             <section className="mb-1">
               <div className="flex items-center justify-between">
                 <p className="inline-block font-medium">Categories</p>
-                <Button variant="link" onClick={clearSelectedCategories}>
+                <Button
+                  type="button"
+                  variant="link"
+                  onClick={clearSelectedCategories}
+                >
                   Clear
                 </Button>
               </div>
@@ -174,7 +190,11 @@ export default function AdvancedFilter({ highestPrice }: AdvancedFilterTypes) {
             <section className="mb-1">
               <div className="flex items-center justify-between">
                 <p className="inline-block font-medium">Authors</p>
-                <Button variant="link" onClick={clearSelectedAuthors}>
+                <Button
+                  type="button"
+                  variant="link"
+                  onClick={clearSelectedAuthors}
+                >
                   Clear
                 </Button>
               </div>

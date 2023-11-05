@@ -114,8 +114,10 @@ export default function ShopCard({
           )}
 
           <div className="flex flex-col gap-3">
-            <div className="flex items-end justify-between gap-3">
-              <h3 className="flex items-center ">${price.toFixed(2)}</h3>
+            <div className="flex flex-wrap items-end justify-between gap-3">
+              <h3 className="flex items-center text-3xl lg:text-4xl">
+                ${price.toFixed(2)}
+              </h3>
               <Button
                 type="submit"
                 variant="default"
@@ -124,7 +126,7 @@ export default function ShopCard({
                   cartState.isDeleting === _id ||
                   itemBtnCapacity
                 }
-                className="relative z-20"
+                className="relative flex-grow"
               >
                 {cartState.isAdding === _id && <LoadingCircle />}
                 <div
@@ -132,8 +134,10 @@ export default function ShopCard({
                     cartState.isAdding === _id && 'invisible'
                   } space-x-1`}
                 >
-                  <span className="text-lg">+</span>
-                  <ShoppingCartIcon className="inline-block h-6 w-6" />
+                  <span className="text-lg">
+                    +
+                    <ShoppingCartIcon className="inline-block h-6 w-6" />
+                  </span>
                 </div>
               </Button>
             </div>

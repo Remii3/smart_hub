@@ -210,7 +210,7 @@ const getOtherProfile = async (req, res) => {
   }
 
   try {
-    const { role, email, username, user_info, author_info } =
+    const { role, email, username, user_info, author_info, security_settings } =
       await User.findOne({
         _id: userId,
       }).populate('author_info.my_products');
@@ -240,13 +240,19 @@ const getOtherProfile = async (req, res) => {
       sold_books_quantity,
       _id,
     };
+    console.log(security_settings.hide_private_information);
+    let preparedUserInfo = null;
+    if (!security_settings.hide_private_information) {
+      preparedUserInfo = user_info;
+    }
     if (role !== 'User') {
       return res.status(200).json({
         data: {
           email,
           username,
-          user_info,
+          user_info: preparedUserInfo,
           author_info: preparedAuthorInfo,
+          role,
         },
       });
     } else {
@@ -254,7 +260,7 @@ const getOtherProfile = async (req, res) => {
         data: {
           email,
           username,
-          user_info,
+          user_info: preparedUserInfo,
           role,
         },
       });

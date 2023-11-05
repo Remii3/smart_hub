@@ -24,7 +24,7 @@ export default function MyShop() {
   const deleteAllItemsHandler = async () => {
     const { error } = await usePostAccessDatabase({
       url: DATABASE_ENDPOINTS.PRODUCT_DELETE_ALL,
-      body: { userId: userData.data._id },
+      body: { userId: userData.data && userData.data._id },
     });
     if (error) {
       return toast({

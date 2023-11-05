@@ -172,9 +172,9 @@ export default function MyAccount() {
     userData.data.role === UserRoleTypes.ADMIN ? (
       <span>Let&apos; put some things in order!</span>
     ) : userData.data.role === UserRoleTypes.AUTHOR ? (
-      <p>Let&apos; add some new books! </p>
+      <div>Let&apos; add some new books! </div>
     ) : (
-      <p>Let&apos;s see some books! 🎉</p>
+      <div>Let&apos;s see some books! 🎉</div>
     );
 
   return (
@@ -228,7 +228,7 @@ export default function MyAccount() {
                 Welcome Back, {userData.data.username}!
               </h1>
 
-              <p className="mt-1.5 space-x-2 text-lg text-gray-500">
+              <div className="mt-1.5 space-x-2 text-lg text-gray-500">
                 {subtitle}
                 {userData.data && userData.data.role !== 'User' && (
                   <MarketplaceBadge
@@ -245,7 +245,7 @@ export default function MyAccount() {
                     }
                   />
                 )}
-              </p>
+              </div>
             </div>
           </div>
           {userData.data.role !== UserRoleTypes.USER && <NewProduct />}
@@ -270,12 +270,15 @@ export default function MyAccount() {
                 {TABS_ARRAY.map((tab) => {
                   if (
                     tab.name === 'admin' &&
+                    userData.data &&
                     userData.data.role !== UserRoleTypes.ADMIN
                   )
                     return null;
                   if (
                     tab.name === 'my_products' &&
+                    userData.data &&
                     userData.data.role !== UserRoleTypes.ADMIN &&
+                    userData.data &&
                     userData.data.role !== UserRoleTypes.AUTHOR
                   )
                     return null;
@@ -299,13 +302,16 @@ export default function MyAccount() {
                   {TABS_ARRAY.map((option) => {
                     if (
                       option.name === 'admin' &&
+                      userData.data &&
                       userData.data.role !== UserRoleTypes.ADMIN
                     ) {
                       return null;
                     }
                     if (
                       option.name === 'my_products' &&
+                      userData.data &&
                       userData.data.role !== UserRoleTypes.ADMIN &&
+                      userData.data &&
                       userData.data.role !== UserRoleTypes.AUTHOR
                     ) {
                       return null;

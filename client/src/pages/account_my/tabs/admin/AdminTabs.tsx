@@ -1,4 +1,4 @@
-import { Controller, useFieldArray, useForm } from 'react-hook-form';
+import { useFieldArray, useForm } from 'react-hook-form';
 import {
   Form,
   FormControl,
@@ -50,7 +50,7 @@ export default function AdminTabs({
   fetchData,
 }: {
   user: AuthorTypes;
-  userData: AuthorTypes;
+  userData: AuthorTypes | null;
   fetchData: () => void;
 }) {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);

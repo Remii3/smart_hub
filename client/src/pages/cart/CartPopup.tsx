@@ -4,6 +4,7 @@ import { XMarkIcon } from '@heroicons/react/24/outline';
 import { PopoverClose } from '@radix-ui/react-popover';
 import { CartContext } from '@context/CartProvider';
 import CartPopupProdList from './CartPopupProdList';
+import { Button } from '@components/UI/button';
 
 function CartPopup() {
   const { cartState } = useContext(CartContext);
@@ -27,13 +28,24 @@ function CartPopup() {
             </Link>
           </PopoverClose>
           <PopoverClose asChild>
-            <Link
-              to="/checkout"
-              className="block w-full rounded border border-primary bg-primary px-12 py-3 text-sm font-medium
+            {cartState.products.length > 0 ? (
+              <Link
+                to="/checkout"
+                className="block w-full rounded border border-primary bg-primary px-12 py-3 text-sm font-medium
             text-background shadow-sm transition ease-out hover:bg-blue-700 focus:ring focus:ring-blue-300"
-            >
-              Checkout
-            </Link>
+              >
+                Checkout
+              </Link>
+            ) : (
+              <Button
+                variant={'default'}
+                className="block w-full rounded border border-primary bg-primary px-12 py-3 text-sm font-medium
+            text-background shadow-sm transition ease-out hover:bg-blue-700 focus:ring focus:ring-blue-300"
+                disabled
+              >
+                Checkout
+              </Button>
+            )}
           </PopoverClose>
 
           <PopoverClose asChild>

@@ -61,7 +61,6 @@ export default function CheckoutPage() {
   useEffect(() => {
     fetchData();
   }, [fetchData]);
-
   const options = {
     clientSecret: clientSecret.data,
     appearance,
@@ -92,9 +91,13 @@ export default function CheckoutPage() {
               <p className="text-red-500">{clientSecret.hasError}</p>
             )}
             {!clientSecret.isLoading &&
-              clientSecret.data &&
+              options.clientSecret &&
               !clientSecret.hasError && (
-                <Elements options={options} stripe={stripePromise}>
+                <Elements
+                  key={options.clientSecret}
+                  options={options}
+                  stripe={stripePromise}
+                >
                   <CheckoutForm
                     readyToShow={readyToShow}
                     readyToShowHandler={setReadyToShow}

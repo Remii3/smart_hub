@@ -39,7 +39,7 @@ export default function SearchPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const currentSortMethod = searchParams.get('sortMethod');
 
-  const pageIteration = 5;
+  const pageIteration = 8;
 
   const [searchedProductsData, setSearchedProductsData] =
     useState<SearchedProductsDataTypes>({
@@ -188,12 +188,12 @@ export default function SearchPage() {
   }, []);
   return (
     <MainContainer>
-      <div className="fixed left-0 right-0 top-16 z-10 flex w-full justify-between bg-background px-4 pt-2 md:static md:mb-2 md:px-0 md:pt-0">
-        <p>
+      <div className="fixed left-0 right-0 top-16 z-10 flex w-full items-center justify-between bg-background px-4 pb-1 pt-2 md:static md:mb-2 md:px-0 md:pt-0">
+        <span>
           Results:{' '}
           {searchedProductsData.rawData &&
             searchedProductsData.rawData.totalProducts}
-        </p>
+        </span>
         <div>
           <SortProducts
             category="search"
@@ -211,7 +211,7 @@ export default function SearchPage() {
             0
           }
         />
-        <section className="h-full w-full space-y-2 md:pt-0">
+        <section className="mt-16 h-full w-full space-y-2 md:pt-0">
           {(searchParams.get('phrase') ||
             searchParams.get('special') ||
             searchParams.get('category') ||
@@ -321,7 +321,7 @@ export default function SearchPage() {
               </div>
             )}
           <div className="relative h-full">
-            <div className="relative grid min-h-[400px] grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            <div className="relative grid min-h-[400px] grid-cols-1 justify-items-center gap-6 sm:grid-cols-2 sm:gap-3 lg:grid-cols-3 xl:grid-cols-4">
               {searchedProductsData.isLoading && <LoadingCircle />}
               {!searchedProductsData.isLoading &&
                 searchedProductsData.products &&

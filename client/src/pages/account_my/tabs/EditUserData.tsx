@@ -198,7 +198,7 @@ export default function EditUserData() {
     const { error } = await usePostAccessDatabase({
       url: DATABASE_ENDPOINTS.USER_UPDATE,
       body: {
-        userEmail: userData.data.email,
+        userEmail: userData.data && userData.data.email,
         fieldKey: selectedElementName,
         fieldValue:
           selectedElementName === 'address'
@@ -297,7 +297,11 @@ export default function EditUserData() {
                               <FormControl>
                                 <Input
                                   type="text"
-                                  placeholder={userData.data.username}
+                                  placeholder={
+                                    userData.data
+                                      ? userData.data.username
+                                      : 'Username'
+                                  }
                                   {...field}
                                 />
                               </FormControl>
@@ -374,8 +378,10 @@ export default function EditUserData() {
                                   <Input
                                     type="text"
                                     placeholder={
-                                      userData.data.user_info.credentials
-                                        .first_name
+                                      userData.data
+                                        ? userData.data.user_info.credentials
+                                            .first_name
+                                        : 'First name'
                                     }
                                     {...field}
                                   />
@@ -452,8 +458,10 @@ export default function EditUserData() {
                                   <Input
                                     type="text"
                                     placeholder={
-                                      userData.data.user_info.credentials
-                                        .last_name
+                                      userData.data
+                                        ? userData.data.user_info.credentials
+                                            .last_name
+                                        : 'Last name'
                                     }
                                     {...field}
                                   />
@@ -705,7 +713,9 @@ export default function EditUserData() {
                                 <Input
                                   type="text"
                                   placeholder={
-                                    userData.data.user_info.address.line1
+                                    userData.data
+                                      ? userData.data.user_info.address.line1
+                                      : 'Main address'
                                   }
                                   {...field}
                                 />
@@ -727,7 +737,9 @@ export default function EditUserData() {
                                 <Input
                                   type="text"
                                   placeholder={
-                                    userData.data.user_info.address.line2
+                                    userData.data
+                                      ? userData.data.user_info.address.line2
+                                      : 'Apartment, storey etc.'
                                   }
                                   {...field}
                                 />
@@ -749,7 +761,9 @@ export default function EditUserData() {
                                 <Input
                                   type="text"
                                   placeholder={
-                                    userData.data.user_info.address.city
+                                    userData.data
+                                      ? userData.data.user_info.address.city
+                                      : 'City'
                                   }
                                   {...field}
                                 />
@@ -771,7 +785,9 @@ export default function EditUserData() {
                                 <Input
                                   type="text"
                                   placeholder={
-                                    userData.data.user_info.address.state
+                                    userData.data
+                                      ? userData.data.user_info.address.state
+                                      : 'State'
                                   }
                                   {...field}
                                 />
@@ -793,7 +809,10 @@ export default function EditUserData() {
                                 <Input
                                   type="text"
                                   placeholder={
-                                    userData.data.user_info.address.postal_code
+                                    userData.data
+                                      ? userData.data.user_info.address
+                                          .postal_code
+                                      : 'Postal code'
                                   }
                                   {...field}
                                 />
@@ -815,7 +834,9 @@ export default function EditUserData() {
                                 <Input
                                   type="text"
                                   placeholder={
-                                    userData.data.user_info.address.country
+                                    userData.data
+                                      ? userData.data.user_info.address.country
+                                      : 'Country'
                                   }
                                   {...field}
                                 />
@@ -899,7 +920,9 @@ export default function EditUserData() {
                                   <Input
                                     type="text"
                                     placeholder={
-                                      userData.data.author_info.quote
+                                      userData.data
+                                        ? userData.data.author_info.quote
+                                        : 'Quote'
                                     }
                                     {...field}
                                   />
@@ -975,7 +998,9 @@ export default function EditUserData() {
                                   <Input
                                     type="text"
                                     placeholder={
-                                      userData.data.author_info.pseudonim
+                                      userData.data
+                                        ? userData.data.author_info.pseudonim
+                                        : 'Pseudonim'
                                     }
                                     {...field}
                                   />
@@ -1054,8 +1079,10 @@ export default function EditUserData() {
                                   <Input
                                     type="text"
                                     placeholder={
-                                      userData.data.author_info
-                                        .short_description
+                                      userData.data
+                                        ? userData.data.author_info
+                                            .short_description
+                                        : 'Short description'
                                     }
                                     {...field}
                                   />

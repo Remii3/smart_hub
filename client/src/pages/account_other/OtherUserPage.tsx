@@ -1,12 +1,12 @@
 import { useEffect, useState, useContext, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { SwiperSlide } from 'swiper/react';
-import { AuthorTypes } from '@customTypes/interfaces';
+import { AuthorTypes, FetchDataTypes } from '@customTypes/interfaces';
 import ShopCard from '@components/cards/ShopCard';
 import ShortSwiper from '@components/swiper/SushiSwiper';
 import { UserContext } from '@context/UserProvider';
 import { Button } from '@components/UI/button';
-import { MarketPlaceTypes, UserRoleTypes } from '@customTypes/types';
+import { MarketplaceTypes, UserRoleTypes } from '@customTypes/types';
 import { Skeleton } from '@components/UI/skeleton';
 import {
   useGetAccessDatabase,
@@ -16,13 +16,16 @@ import { DATABASE_ENDPOINTS } from '../../data/endpoints';
 import { UserCircleIcon } from '@heroicons/react/24/outline';
 import MainContainer from '@layout/MainContainer';
 import { useToast } from '@components/UI/use-toast';
-
+import SushiSwiper from '@components/swiper/SushiSwiper';
+import MarketplaceBadge from '@components/UI/badges/MarketplaceBadge';
+const marketplaces = { shop: 'Shop', collection: 'Collection' } as {
+  shop: MarketplaceTypes;
+  collection: MarketplaceTypes;
+};
 type StatsTypes = { text: string; quantity: number }[];
-interface PropsTypes {
+interface PropsTypes extends FetchDataTypes {
   data: AuthorTypes | null;
   stats: StatsTypes;
-  isLoading: boolean;
-  hasError: null | string;
 }
 
 export default function OtherUserPage() {
@@ -53,13 +56,13 @@ export default function OtherUserPage() {
         {
           text: 'Products',
           quantity: data.author_info.my_products?.filter(
-            (item) => item.market_place === MarketPlaceTypes.SHOP
+            (item) => item.market_place === marketplaces.shop
           ).length,
         },
         {
           text: 'Collections',
           quantity: data.author_info.my_products?.filter(
-            (item) => item.market_place === MarketPlaceTypes.COLLECTION
+            (item) => item.market_place === marketplaces.collection
           ).length,
         },
         {
@@ -69,7 +72,24 @@ export default function OtherUserPage() {
       ]
     );
   };
+  const getFollowersHandler = async () => {
+    const { data } = await useGetAccessDatabase({
+      url: DATABASE_ENDPOINTS.USER_OTHER_PROFILE,
+      params: { userId },
+    });
 
+    const stats = getStats(data);
+    if (data && data.role !== 'User') {
+      setIsFollowing(
+        data.author_info.followers.some(
+          (id: string) => id === userData.data?._id
+        ) || false
+      );
+    }
+    setOtherUserData((prevState) => {
+      return { ...prevState, stats };
+    });
+  };
   const getOtherUserData = useCallback(async () => {
     setOtherUserData((prevState) => {
       return { ...prevState, isLoading: true };
@@ -91,7 +111,6 @@ export default function OtherUserPage() {
         description: error,
       });
     }
-
     const stats = getStats(data);
 
     setOtherUserData({ data, stats, isLoading: false, hasError: null });
@@ -129,7 +148,7 @@ export default function OtherUserPage() {
           description: error,
         });
       }
-      await getOtherUserData();
+      await getFollowersHandler();
     } else {
       const { error } = await usePostAccessDatabase({
         url: DATABASE_ENDPOINTS.USER_FOLLOW_ADD,
@@ -145,10 +164,10 @@ export default function OtherUserPage() {
           description: error,
         });
       }
-      await getOtherUserData();
+      await getFollowersHandler();
     }
   };
-
+  console.log(otherUserData);
   return (
     <MainContainer>
       {otherUserData.isLoading && !otherUserData.data && (
@@ -172,7 +191,8 @@ export default function OtherUserPage() {
           <section className="flex items-center justify-center px-8 pb-16 pt-12">
             <div className="flex flex-col items-center justify-center rounded-md ">
               <div className="mb-4">
-                {otherUserData.data.user_info.profile_img.url ? (
+                {otherUserData.data.user_info &&
+                otherUserData.data.user_info.profile_img.url ? (
                   <img
                     src={otherUserData.data.user_info.profile_img.url}
                     className="aspect-auto h-36 w-36 rounded-full object-cover"
@@ -186,36 +206,94 @@ export default function OtherUserPage() {
                   />
                 )}
               </div>
+              <MarketplaceBadge
+                message={otherUserData.data.role}
+                color={
+                  otherUserData.data.role === 'Author'
+                    ? 'text-purple-700'
+                    : 'text-cyan-700'
+                }
+                bgColor={
+                  otherUserData.data.role === 'Author'
+                    ? 'bg-purple-100'
+                    : 'bg-cyan-100'
+                }
+              />
               <h3 className="mb-4">
                 {otherUserData.data.author_info
                   ? otherUserData.data.author_info.pseudonim
-                  : otherUserData.data.user_info.credentials.full_name}
+                  : otherUserData.data.username}
               </h3>
-              <div className="mb-8 flex gap-8">
-                {otherUserData.stats.map((field, i) => (
-                  <div key={i} className="flex flex-col items-center">
-                    <p>{field.text}</p>
-                    <span>{field.quantity}</span>
+              {otherUserData.data.user_info && (
+                <article>
+                  {otherUserData.data.user_info.credentials.first_name && (
+                    <div>
+                      First name:{' '}
+                      <span>
+                        {otherUserData.data.user_info.credentials.first_name}
+                      </span>
+                    </div>
+                  )}
+                  {otherUserData.data.user_info.credentials.last_name && (
+                    <div>
+                      Last name:{' '}
+                      <span>
+                        {otherUserData.data.user_info.credentials.last_name}
+                      </span>
+                    </div>
+                  )}
+                </article>
+              )}
+              {otherUserData.data.user_info &&
+                otherUserData.data.role !== UserRoleTypes.USER && (
+                  <article>
+                    {otherUserData.data.author_info.quote && (
+                      <div>
+                        Favourite quote:{' '}
+                        <span>{otherUserData.data.author_info.quote}</span>
+                      </div>
+                    )}
+                    {otherUserData.data.author_info.short_description && (
+                      <div>
+                        Short description:{' '}
+                        <span>
+                          {otherUserData.data.author_info.short_description}
+                        </span>
+                      </div>
+                    )}
+                  </article>
+                )}
+              {otherUserData.data.role !== UserRoleTypes.USER && (
+                <>
+                  <div className="mb-8 flex gap-8">
+                    {otherUserData.stats.map((field, i) => (
+                      <div key={i} className="flex flex-col items-center">
+                        <p>{field.text}</p>
+                        <span>{field.quantity}</span>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-              <div>
-                <Button
-                  variant={isFollowing ? 'outline' : 'default'}
-                  disabled={userData.data === null}
-                  onClick={() => followHandler()}
-                  className="relative w-[96px] transition-all ease-out"
-                >
-                  <div
-                    className={`${
-                      isFollowing ? 'hover:opacity-100' : 'opacity-0'
-                    } absolute flex h-full w-full items-center justify-center bg-accent text-red-600 opacity-0 transition-opacity ease-out`}
-                  >
-                    Unfollow
+
+                  <div>
+                    <Button
+                      type="button"
+                      variant={isFollowing ? 'outline' : 'default'}
+                      disabled={userData.data === null}
+                      onClick={() => followHandler()}
+                      className="relative w-[96px] transition-all ease-out"
+                    >
+                      <div
+                        className={`${
+                          isFollowing ? 'hover:opacity-100' : 'opacity-0'
+                        } absolute flex h-full w-full items-center justify-center bg-accent text-red-600 opacity-0 transition-opacity ease-out`}
+                      >
+                        Unfollow
+                      </div>
+                      {isFollowing ? 'Following' : 'Follow'}
+                    </Button>
                   </div>
-                  {isFollowing ? 'Following' : 'Follow'}
-                </Button>
-              </div>
+                </>
+              )}
             </div>
           </section>
 
@@ -223,32 +301,13 @@ export default function OtherUserPage() {
             <section className="mb-8">
               <div className="">
                 <h4 className="mb-5">Products</h4>
-                {otherUserData.data.author_info.my_products.length > 0 ? (
-                  <ShortSwiper swiperCategory="product">
-                    {otherUserData.data.author_info.my_products.map(
-                      (product) => {
-                        return (
-                          product.market_place === MarketPlaceTypes.SHOP && (
-                            <SwiperSlide key={product._id} className="pr-8">
-                              <ShopCard
-                                _id={product._id}
-                                title={product.title}
-                                authors={product.authors}
-                                description={product.description}
-                                price={product.shop_info.price}
-                                img={product.imgs && product.imgs[0]}
-                                productQuantity={product.quantity}
-                                rating={product.rating}
-                              />
-                            </SwiperSlide>
-                          )
-                        );
-                      }
-                    )}
-                  </ShortSwiper>
-                ) : (
-                  <p className="text-slate-400">No products...</p>
-                )}
+                <SushiSwiper
+                  swiperCategory="shop"
+                  itemsType="Shop"
+                  loadingState={otherUserData.isLoading}
+                  errorState={otherUserData.hasError}
+                  arrayOfItems={otherUserData.data.author_info.my_products}
+                />
               </div>
               <div className="relative max-w-[1092px]">
                 <h4 className="mb-5">Collections</h4>

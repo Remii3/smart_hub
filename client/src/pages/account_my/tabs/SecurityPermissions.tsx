@@ -40,7 +40,7 @@ export default function SecurityPermissions() {
     await usePostAccessDatabase({
       url: DATABASE_ENDPOINTS.USER_UPDATE,
       body: {
-        userEmail: userData.email,
+        userEmail: userData.data && userData.data.email,
         fieldKey: selectedOptionName,
         fieldValue: check,
       },

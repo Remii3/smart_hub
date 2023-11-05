@@ -25,8 +25,8 @@ export default function MainBanner() {
               id="mainPageTitle"
               className="max-w-2xl text-left lg:max-w-3xl"
             >
-              <h1 className="text-7xl font-extrabold text-background ">
-                Understand User Flow.
+              <h1 className="text-5xl font-extrabold text-background md:text-7xl ">
+                Understand User Flow.{' '}
                 <strong className="font-extrabold text-[#3E74FF] sm:block">
                   Increase Conversion.
                 </strong>
@@ -43,7 +43,7 @@ export default function MainBanner() {
                   className={`${buttonVariants({
                     variant: 'default',
                     size: 'lg',
-                  })} px-6 py-4 text-xl`}
+                  })} px-6 py-4 text-lg md:text-xl`}
                 >
                   Best Sellers
                 </Link>
@@ -52,7 +52,7 @@ export default function MainBanner() {
                   className={`${buttonVariants({
                     variant: 'ghost',
                     size: 'lg',
-                  })} px-6 py-4 text-xl text-white`}
+                  })} px-6 py-4 text-lg text-white md:text-xl`}
                 >
                   Explore books
                 </Link>
