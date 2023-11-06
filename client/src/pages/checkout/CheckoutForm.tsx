@@ -159,7 +159,7 @@ export default function CheckoutForm({
   const paymentElementOptions = {
     layout: 'tabs',
   } as { layout: Layout };
-
+  if (userData.isLoading) return;
   return (
     <form id="payment-form" onSubmit={handleSubmit}>
       <LinkAuthenticationElement
@@ -194,9 +194,7 @@ export default function CheckoutForm({
           validation: { phone: { required: 'auto' } },
           display: { name: 'split' },
           defaultValues: {
-            phone: userData.data
-              ? userData.data.user_info.phone
-              : '123 123 123',
+            phone: userData.data ? userData.data.user_info.phone : '',
             firstName: userData.data
               ? userData.data.user_info.credentials.first_name
               : '',
@@ -208,9 +206,7 @@ export default function CheckoutForm({
                 ? userData.data.user_info.address.country
                 : '',
               city: userData.data ? userData.data.user_info.address.city : '',
-              line1: userData.data
-                ? userData.data.user_info.address.line1
-                : 'Warszawska',
+              line1: userData.data ? userData.data.user_info.address.line1 : '',
               line2: userData.data ? userData.data.user_info.address.line2 : '',
               postal_code: userData.data
                 ? userData.data.user_info.address.postal_code

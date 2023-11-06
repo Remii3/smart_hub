@@ -50,7 +50,7 @@ export default function MainBanner() {
                 <Link
                   to={{ pathname: 'search' }}
                   className={`${buttonVariants({
-                    variant: 'ghost',
+                    variant: 'link',
                     size: 'lg',
                   })} px-6 py-4 text-lg text-white md:text-xl`}
                 >
