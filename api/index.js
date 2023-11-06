@@ -21,8 +21,12 @@ app.use(express.static('public'));
 app.use(
   cors({
     credentials: true,
-    origin: ['http://localhost:5173', 'https://smarthub-jb8g.onrender.com'],
-  }),
+    origin: [
+      "http://localhost:5173",
+      "http://localhost:4173",
+      "https://smarthub-jb8g.onrender.com",
+    ],
+  })
 );
 server.listen(8080, () => console.log('listening on http://localhost:8080'));
 mongoose

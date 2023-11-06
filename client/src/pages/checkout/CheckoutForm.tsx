@@ -104,10 +104,25 @@ export default function CheckoutForm({
     }
 
     setIsLoading(true);
+    let currentUrl = '';
+    switch (window.location.origin) {
+      case 'http://localhost:5173':
+        currentUrl = 'http://localhost:4000';
+        break;
+      case 'http://localhost:4173':
+        currentUrl = 'http://localhost:4173';
+        break;
+      case 'https://smarthub-jb8g.onrender.com':
+        currentUrl = 'https://smarthub-backend.onrender.com';
+        break;
+      default:
+        currentUrl = 'https://smarthub-backend.onrender.com';
+        break;
+    }
     const { error } = await stripe.confirmPayment({
       elements,
       confirmParams: {
-        return_url: 'http://localhost:5173',
+        return_url: currentUrl,
       },
       redirect: 'if_required',
     });

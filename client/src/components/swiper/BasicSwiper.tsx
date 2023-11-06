@@ -40,7 +40,7 @@ function BasicSwiper({ children }: { children: ReactNode }) {
         },
       }}
     >
-      <SuspenseComponent fallback={<LoadingCircle isLoading />}>
+      <SuspenseComponent fallback={<LoadingCircle />}>
         {children}
       </SuspenseComponent>
     </Swiper>
