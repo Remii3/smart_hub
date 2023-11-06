@@ -116,7 +116,9 @@ export default function LoginPage() {
                   control={form.control}
                   render={({ field }) => (
                     <FormItem className="col-span-6">
-                      <FormLabel>Email</FormLabel>
+                      <FormLabel>
+                        Email <span className="text-red-600">*</span>
+                      </FormLabel>
                       <FormControl>
                         <Input
                           type="text"
@@ -135,7 +137,9 @@ export default function LoginPage() {
                   control={form.control}
                   render={({ field }) => (
                     <FormItem className="col-span-6">
-                      <FormLabel>Password</FormLabel>
+                      <FormLabel>
+                        Password <span className="text-red-600">*</span>
+                      </FormLabel>
                       <FormControl>
                         <div className="relative">
                           <Input

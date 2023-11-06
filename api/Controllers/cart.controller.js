@@ -133,14 +133,12 @@ const getAllCartItems = async (req, res) => {
         cartPrice += product.totalPrice;
       }
 
-      cartPrice = cashFormatter({ number: cartPrice });
-
-      cartPrice = `${cartPrice}`;
+      cartPrice = `${cashFormatter({ number: cartPrice })}`;
       return res
         .status(200)
         .json({ data: { products: productsData, cartPrice } });
     } else {
-      cartPrice = '0';
+      cartPrice = `${cashFormatter({ number: 0 })}`;
       return res.status(200).json({ data: { products: [], cartPrice } });
     }
   } catch (err) {

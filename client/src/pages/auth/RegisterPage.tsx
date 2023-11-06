@@ -148,7 +148,9 @@ export default function RegisterPage() {
                   control={form.control}
                   render={({ field }) => (
                     <FormItem className="col-span-6 sm:col-span-3">
-                      <FormLabel>First name</FormLabel>
+                      <FormLabel>
+                        First name <span className="text-red-600">*</span>
+                      </FormLabel>
                       <FormControl>
                         <Input
                           type="text"
@@ -166,7 +168,9 @@ export default function RegisterPage() {
                   control={form.control}
                   render={({ field }) => (
                     <FormItem className="col-span-6 sm:col-span-3">
-                      <FormLabel>Last name</FormLabel>
+                      <FormLabel>
+                        Last name <span className="text-red-600">*</span>
+                      </FormLabel>
                       <FormControl>
                         <Input
                           type="text"
@@ -185,7 +189,9 @@ export default function RegisterPage() {
                   control={form.control}
                   render={({ field }) => (
                     <FormItem className="col-span-6">
-                      <FormLabel>Email</FormLabel>
+                      <FormLabel>
+                        Email <span className="text-red-600">*</span>
+                      </FormLabel>
                       <FormControl>
                         <Input type="text" placeholder="Email..." {...field} />
                       </FormControl>
@@ -199,7 +205,9 @@ export default function RegisterPage() {
                   control={form.control}
                   render={({ field }) => (
                     <FormItem className="col-span-6">
-                      <FormLabel>Username</FormLabel>
+                      <FormLabel>
+                        Username <span className="text-red-600">*</span>
+                      </FormLabel>
                       <FormControl>
                         <Input
                           autoComplete="username"
@@ -218,7 +226,9 @@ export default function RegisterPage() {
                   control={form.control}
                   render={({ field }) => (
                     <FormItem className="col-span-6 sm:col-span-3">
-                      <FormLabel>Password</FormLabel>
+                      <FormLabel>
+                        Password <span className="text-red-600">*</span>
+                      </FormLabel>
                       <FormControl>
                         <div className="relative">
                           <Input
@@ -257,7 +267,10 @@ export default function RegisterPage() {
                   control={form.control}
                   render={({ field }) => (
                     <FormItem className="col-span-6 sm:col-span-3">
-                      <FormLabel>Password Confirmation</FormLabel>
+                      <FormLabel>
+                        Password Confirmation{' '}
+                        <span className="text-red-600">*</span>
+                      </FormLabel>
                       <FormControl>
                         <div className="relative">
                           <Input

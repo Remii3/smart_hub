@@ -153,7 +153,7 @@ export default function CheckoutForm({
           setEmail(e.value.email)
         }
         options={{
-          defaultValues: { email: userData.data?.email || email },
+          defaultValues: { email: userData.data ? userData.data.email : email },
         }}
         onReady={() =>
           readyToShowHandler((prevState) => {
@@ -177,7 +177,32 @@ export default function CheckoutForm({
           fields: { phone: 'always' },
           blockPoBox: true,
           validation: { phone: { required: 'auto' } },
-          display: { name: 'full' },
+          display: { name: 'split' },
+          defaultValues: {
+            phone: userData.data
+              ? userData.data.user_info.phone
+              : '123 123 123',
+            firstName: userData.data
+              ? userData.data.user_info.credentials.first_name
+              : '',
+            lastName: userData.data
+              ? userData.data.user_info.credentials.last_name
+              : '',
+            address: {
+              country: userData.data
+                ? userData.data.user_info.address.country
+                : '',
+              city: userData.data ? userData.data.user_info.address.city : '',
+              line1: userData.data
+                ? userData.data.user_info.address.line1
+                : 'Warszawska',
+              line2: userData.data ? userData.data.user_info.address.line2 : '',
+              postal_code: userData.data
+                ? userData.data.user_info.address.postal_code
+                : '',
+              state: userData.data ? userData.data.user_info.address.state : '',
+            },
+          },
         }}
         onChange={(event) => {
           if (event.complete) {
