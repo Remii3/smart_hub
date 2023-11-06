@@ -54,7 +54,7 @@ function LongSwiper({
           paddingRight: '22px',
         }}
       >
-        <SuspenseComponent fallback={<LoadingCircle isLoading />}>
+        <SuspenseComponent fallback={<LoadingCircle />}>
           {children}
         </SuspenseComponent>
       </Swiper>

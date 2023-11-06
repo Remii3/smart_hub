@@ -58,7 +58,7 @@ function SpecialSwiper({
         },
       }}
     >
-      <SuspenseComponent fallback={<LoadingCircle isLoading />}>
+      <SuspenseComponent fallback={<LoadingCircle />}>
         {children}
       </SuspenseComponent>
     </Swiper>

@@ -11,6 +11,9 @@ switch (window.location.origin) {
   case 'http://localhost:5173':
     properUrl = 'http://localhost:4000';
     break;
+  case 'http://localhost:4173':
+    properUrl = 'http://localhost:4000';
+    break;
   case 'https://smarthub-jb8g.onrender.com':
     properUrl = 'https://smarthub-backend.onrender.com';
     break;
