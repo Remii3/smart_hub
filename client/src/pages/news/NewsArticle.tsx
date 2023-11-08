@@ -1,18 +1,16 @@
 import LoadingCircle from '@components/Loaders/LoadingCircle';
 import { Button } from '@components/UI/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@components/UI/dialog';
+
 import DeleteDialog from '@components/UI/dialogs/DeleteDialog';
 import ErrorMessage from '@components/UI/error/ErrorMessage';
 import errorToast from '@components/UI/error/errorToast';
-import { Form, FormControl, FormField, FormItem } from '@components/UI/form';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from '@components/UI/form';
 import { Input } from '@components/UI/input';
 import { UserContext } from '@context/UserProvider';
 import {
@@ -24,7 +22,6 @@ import { ImgTypes, UserRoleTypes } from '@customTypes/types';
 import { DATABASE_ENDPOINTS } from '@data/endpoints';
 import Comments from '@features/comments/Comments';
 import VoteRating from '@features/rating/VoteRating';
-import { TrashIcon } from '@heroicons/react/24/outline';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   useGetAccessDatabase,
@@ -35,6 +32,9 @@ import { useCallback, useContext, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link } from 'react-router-dom';
 import { z } from 'zod';
+import parse from 'html-react-parser';
+import { CKEditor } from '@ckeditor/ckeditor5-react';
+import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 interface RatingTypes extends FetchDataTypes {
   data: VotingTypes;
 }
@@ -59,7 +59,6 @@ interface PropsTypes {
 const newArticleDataSchema = z.object({
   title: z.string().nonempty(),
   subtitle: z.string().optional(),
-  content: z.string().optional(),
 });
 
 export default function NewsArticle({
@@ -69,11 +68,13 @@ export default function NewsArticle({
 }: PropsTypes) {
   const [openedDialog, setOpenedDialog] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+
   const [articleData, setArticleData] = useState<ArticleDataTypes>({
     data: null,
     hasError: null,
     isLoading: false,
   });
+  const [contentData, setContentData] = useState('');
 
   const [vote, setVote] = useState<RatingTypes>({
     hasError: null,
@@ -142,6 +143,7 @@ export default function NewsArticle({
         return { ...prevState, isLoading: false };
       });
     }
+    setContentData(data.content);
     setArticleData((prevState) => {
       return {
         ...prevState,
@@ -151,8 +153,7 @@ export default function NewsArticle({
     });
     form.reset({
       title: data.title,
-      subtitle: data.subtitle,
-      content: data.content,
+      subtitle: data.subtitle || '',
     });
     setVote({
       data: {
@@ -181,6 +182,9 @@ export default function NewsArticle({
         newArticleData[key] = value;
       }
     }
+    if (contentData !== articleData.data?.content) {
+      newArticleData.content = contentData;
+    }
     if (selectedImg) {
       img = await useUploadImg({
         ownerId: newsId,
@@ -202,6 +206,11 @@ export default function NewsArticle({
   const editArticleHandler = () => {
     setIsEditing((prevState) => !prevState);
     setSelectedImg(null);
+    setContentData(
+      articleData.data && articleData.data.content
+        ? articleData.data.content
+        : ''
+    );
     form.reset();
   };
   return (
@@ -264,6 +273,7 @@ export default function NewsArticle({
                             accept="image/png, image/jpg, image/jpeg"
                           />
                         </FormControl>
+                        <FormMessage />
                       </FormItem>
                       {selectedImg && selectedImg.length > 0 && (
                         <img
@@ -289,6 +299,7 @@ export default function NewsArticle({
                             <FormControl>
                               <Input {...field} />
                             </FormControl>
+                            <FormMessage />
                           </FormItem>
                         );
                       }}
@@ -306,6 +317,7 @@ export default function NewsArticle({
                             <FormControl>
                               <Input {...field} />
                             </FormControl>
+                            <FormMessage />
                           </FormItem>
                         );
                       }}
@@ -326,21 +338,45 @@ export default function NewsArticle({
                 </div>
 
                 {isEditing ? (
-                  <FormField
-                    name="content"
-                    control={form.control}
-                    render={({ field }) => {
-                      return (
-                        <FormItem>
-                          <FormControl>
-                            <Input {...field} />
-                          </FormControl>
-                        </FormItem>
-                      );
+                  <CKEditor
+                    editor={ClassicEditor}
+                    data={contentData}
+                    config={{
+                      mediaEmbed: { previewsInData: true },
+                      toolbar: {
+                        shouldNotGroupWhenFull: true,
+                        items: [
+                          'alignment',
+                          'heading',
+                          '|',
+                          'bold',
+                          'italic',
+                          'link',
+                          'bulletedList',
+                          'numberedList',
+                          '|',
+                          'outdent',
+                          'indent',
+                          '|',
+                          'blockQuote',
+                          'insertTable',
+                          'mediaEmbed',
+                          'undo',
+                          'redo',
+                        ],
+                      },
+                    }}
+                    onChange={(event, editor) => {
+                      const data = editor.getData();
+                      setContentData(data);
                     }}
                   />
                 ) : (
-                  articleData.data.content && <p>{articleData.data.content}</p>
+                  articleData.data.content && (
+                    <article className="prose">
+                      {parse(articleData.data.content)}
+                    </article>
+                  )
                 )}
 
                 <div className="mt-8">

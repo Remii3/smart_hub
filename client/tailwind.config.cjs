@@ -117,5 +117,9 @@ module.exports = {
       },
     },
   },
-  plugins: [require('tailwindcss-animate'), require('tailwind-hamburgers')],
+  plugins: [
+    require('tailwindcss-animate'),
+    require('tailwind-hamburgers'),
+    require('@tailwindcss/typography'),
+  ],
 };
