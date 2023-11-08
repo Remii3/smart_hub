@@ -35,30 +35,33 @@ const getAllProducts = async (req, res) => {
 };
 
 const getShopProducts = async (req, res) => {
-  const { category, minPrice, maxPrice, sortOption } = req.query;
+  const { category, minPrice, maxPrice, sortOption, authorId, limit } =
+    req.query;
   try {
     let sortMethod = {};
-    switch (sortOption) {
-      case 'Date, ASC':
-        sortMethod.created_at = 1;
-        break;
-      case 'Date, DESC':
-        sortMethod.created_at = -1;
-        break;
-      case 'Title, ASC':
-        sortMethod.title = 1;
-        break;
-      case 'Title, DESC':
-        sortMethod.title = -1;
-        break;
-      case 'Price, DESC':
-        sortMethod['shop_info.price'] = -1;
-        break;
-      case 'Price, ASC':
-        sortMethod['shop_info.price'] = 1;
-        break;
-      default:
-        return (sortMethod.created_at = -1);
+    if (sortOption) {
+      switch (sortOption) {
+        case "Date, ASC":
+          sortMethod.created_at = 1;
+          break;
+        case "Date, DESC":
+          sortMethod.created_at = -1;
+          break;
+        case "Title, ASC":
+          sortMethod.title = 1;
+          break;
+        case "Title, DESC":
+          sortMethod.title = -1;
+          break;
+        case "Price, DESC":
+          sortMethod["shop_info.price"] = -1;
+          break;
+        case "Price, ASC":
+          sortMethod["shop_info.price"] = 1;
+          break;
+        default:
+          return (sortMethod.created_at = -1);
+      }
     }
     const findData = {};
     const rawData = {};
@@ -70,36 +73,41 @@ const getShopProducts = async (req, res) => {
       });
       if (!categoryData) {
         return res.status(422).json({
-          message: 'Invalid category',
-          error: 'This category in not in database: ' + category,
+          message: "Invalid category",
+          error: "This category in not in database: " + category,
         });
       }
       findData.categories = categoryData._id;
       rawData.categories = categoryData.label;
     }
     if (minPrice) {
-      findData['shop_info.price'] = { $gte: minPrice };
+      findData["shop_info.price"] = { $gte: minPrice };
       rawData.minPrice = minPrice;
     }
     if (maxPrice) {
-      findData['shop_info.price'] = { $lte: Number(maxPrice) };
+      findData["shop_info.price"] = { $lte: Number(maxPrice) };
       rawData.minPrice = maxPrice;
     }
+    if (authorId) {
+      findData["authors"] = { $in: authorId };
+      rawData.authorId = authorId;
+    }
     const products = await Product.find({
-      market_place: 'Shop',
+      market_place: "Shop",
       quantity: { $gt: 0 },
       deleted: false,
       ...findData,
     })
       .sort(sortMethod)
-      .populate('authors');
+      .populate("authors")
+      .limit(limit);
 
     const preparedProducts = [];
     const products_copy = [...products];
     const highestPrice =
       products_copy.length >= 1
         ? products_copy.sort(
-            (a, b) => Number(b.shop_info.price) - Number(a.shop_info.price),
+            (a, b) => Number(b.shop_info.price) - Number(a.shop_info.price)
           )
         : null;
     rawData.highestPrice = highestPrice
@@ -108,19 +116,18 @@ const getShopProducts = async (req, res) => {
     for (let product of products) {
       preparedProducts.push(prepareProductObject(product));
     }
-
     return res.status(200).json({ data: { data: preparedProducts, rawData } });
   } catch (err) {
     return res
       .status(500)
-      .json({ message: 'Fetching shop data went wrong', error: err.message });
+      .json({ message: "Fetching shop data went wrong", error: err.message });
   }
 };
 
 const getAuctionProducts = async (req, res) => {
   try {
     const products = await Product.find({
-      market_place: 'Auction',
+      market_place: "Auction",
       quantity: { $gt: 0 },
       deleted: false,
     });
@@ -133,7 +140,7 @@ const getAuctionProducts = async (req, res) => {
     return res.status(200).json({ data: preparedProducts });
   } catch (err) {
     return res.status(500).json({
-      message: 'Fetching auction data went wrong',
+      message: "Fetching auction data went wrong",
       error: err.message,
     });
   }
@@ -143,22 +150,22 @@ const getOneProduct = async (req, res) => {
   const { productId } = req.query;
 
   if (!productId) {
-    return res.status(422).json({ message: 'Product id is requried' });
+    return res.status(422).json({ message: "Product id is requried" });
   }
 
   try {
     const product = await Product.findOne({ _id: productId }).populate([
       {
-        path: 'comments',
-        populate: { path: 'user' },
+        path: "comments",
+        populate: { path: "user" },
       },
-      { path: 'categories', select: ['value', 'label'] },
+      { path: "categories", select: ["value", "label"] },
       {
-        path: 'authors',
+        path: "authors",
         select: [
-          'user_info.credentials.full_name',
-          '_id',
-          'author_info.pseudonim',
+          "user_info.credentials.full_name",
+          "_id",
+          "author_info.pseudonim",
         ],
       },
     ]);
@@ -167,7 +174,7 @@ const getOneProduct = async (req, res) => {
   } catch (err) {
     return res
       .status(500)
-      .json({ message: 'Fetching data went wrong', error: err.message });
+      .json({ message: "Fetching data went wrong", error: err.message });
   }
 };
 
@@ -191,23 +198,23 @@ const getSearchedProducts = async (req, res) => {
     searchQuery.deleted = false;
     if (specialQuery) {
       switch (specialQuery) {
-        case 'bestseller':
+        case "bestseller":
           {
             const top_selling_products = await Order.aggregate([
-              { $unwind: '$products' },
+              { $unwind: "$products" },
               {
                 $lookup: {
-                  from: 'products',
-                  localField: 'products.product',
-                  foreignField: '_id',
-                  as: 'product_doc',
+                  from: "products",
+                  localField: "products.product",
+                  foreignField: "_id",
+                  as: "product_doc",
                 },
               },
-              { $unwind: '$product_doc' },
+              { $unwind: "$product_doc" },
               {
                 $group: {
-                  _id: '$product_doc._id',
-                  sum: { $sum: '$products.in_cart_quantity' },
+                  _id: "$product_doc._id",
+                  sum: { $sum: "$products.in_cart_quantity" },
                 },
               },
               { $sort: { sum: -1 } },
@@ -216,7 +223,7 @@ const getSearchedProducts = async (req, res) => {
                 $group: {
                   _id: null,
                   top_selling_products: {
-                    $push: '$_id',
+                    $push: "$_id",
                   },
                 },
               },
@@ -232,7 +239,7 @@ const getSearchedProducts = async (req, res) => {
               products_copy.length >= 1
                 ? products_copy.sort(
                     (a, b) =>
-                      Number(b.shop_info.price) - Number(a.shop_info.price),
+                      Number(b.shop_info.price) - Number(a.shop_info.price)
                   )
                 : null;
             totalDocuments = products.length;
@@ -248,7 +255,7 @@ const getSearchedProducts = async (req, res) => {
           .sort(sortMethod)
           .skip(skipPagesCopy)
           .limit(currentPageSize)
-          .populate('authors');
+          .populate("authors");
         if (products.length <= 0 && skipPages > 1 && currentPage > 1) {
           flag = true;
           skipPagesCopy -= skipPages;
@@ -259,7 +266,7 @@ const getSearchedProducts = async (req, res) => {
       } while (flag);
 
       highestPrice = await Product.find({ deleted: false })
-        .sort({ 'shop_info.price': -1 })
+        .sort({ "shop_info.price": -1 })
         .limit(1);
       totalDocuments = await Product.find(searchQuery).countDocuments();
       totalPages = Math.ceil(totalDocuments / currentPageSize);
@@ -286,7 +293,7 @@ const getSearchedProducts = async (req, res) => {
   } catch (err) {
     return res
       .status(500)
-      .json({ message: 'Faield fetching searched query', error: err.message });
+      .json({ message: "Faield fetching searched query", error: err.message });
   }
 };
 
@@ -320,13 +327,13 @@ const addOneProduct = async (req, res) => {
     } catch (err) {
       return res
         .status(500)
-        .json({ message: 'Failed verifying categories', error: err.message });
+        .json({ message: "Failed verifying categories", error: err.message });
     }
   }
   try {
     const _id = new mongoose.Types.ObjectId();
 
-    if (market_place === 'Shop') {
+    if (market_place === "Shop") {
       try {
         await Product.create({
           seller_data,
@@ -349,17 +356,17 @@ const addOneProduct = async (req, res) => {
       } catch (err) {
         return res
           .status(500)
-          .json({ message: 'Failed creating new product', error: err.message });
+          .json({ message: "Failed creating new product", error: err.message });
       }
     }
 
     try {
-      if (!authors.includes(author => author._id === seller_data._id)) {
+      if (!authors.includes((author) => author._id === seller_data._id)) {
         await User.updateOne(
           {
             _id: seller_data._id,
           },
-          { $push: { 'author_info.my_products': _id } },
+          { $push: { "author_info.my_products": _id } }
         );
       }
       for (let i = 0; i < authors.length; i++) {
@@ -367,22 +374,22 @@ const addOneProduct = async (req, res) => {
           {
             _id: authors[i]._id,
           },
-          { $push: { 'author_info.my_products': _id } },
+          { $push: { "author_info.my_products": _id } }
         );
       }
     } catch (err) {
       return res
         .status(500)
-        .json({ message: 'Failed updating user data', error: err.message });
+        .json({ message: "Failed updating user data", error: err.message });
     }
 
     return res
       .status(201)
-      .json({ message: 'Succesfully added new product', id: _id });
+      .json({ message: "Succesfully added new product", id: _id });
   } catch (err) {
     return res
       .status(500)
-      .json({ message: 'Adding product failed', error: err.message });
+      .json({ message: "Adding product failed", error: err.message });
   }
 };
 
@@ -408,14 +415,14 @@ const updateOneProduct = async (req, res) => {
     if (categories) updateData.categories = categories;
     if (authors) updateData.authors = authors;
     if (quantity) updateData.quantity = quantity;
-    if (market_place === 'Shop') {
+    if (market_place === "Shop") {
       if (authors) {
         const productData = await Product.findOne({ _id });
         const usersToPull = productData.authors.filter(
-          author => !authors.includes(author),
+          (author) => !authors.includes(author)
         );
         const usersToPush = authors.filter(
-          author => !productData.authors.includes(author),
+          (author) => !productData.authors.includes(author)
         );
 
         if (usersToPull) {
@@ -424,7 +431,7 @@ const updateOneProduct = async (req, res) => {
               {
                 _id: usersToPull[i]._id,
               },
-              { $pull: { 'author_info.my_products': _id } },
+              { $pull: { "author_info.my_products": _id } }
             );
           }
         }
@@ -434,7 +441,7 @@ const updateOneProduct = async (req, res) => {
               {
                 _id: usersToPush[i]._id,
               },
-              { $push: { 'author_info.my_products': _id } },
+              { $push: { "author_info.my_products": _id } }
             );
           }
         }
@@ -453,12 +460,12 @@ const updateOneProduct = async (req, res) => {
           authors,
           quantity,
           market_place,
-        },
+        }
       );
     }
-    return res.status(200).json({ message: 'Success' });
+    return res.status(200).json({ message: "Success" });
   } catch (err) {
-    return res.status(500).json({ message: 'Failed', error: err.message });
+    return res.status(500).json({ message: "Failed", error: err.message });
   }
 };
 
@@ -466,25 +473,25 @@ const deleteOneProduct = async (req, res) => {
   const { _id, userId } = req.body;
 
   if (!_id) {
-    return res.status(422).json({ message: 'Id is required' });
+    return res.status(422).json({ message: "Id is required" });
   }
 
   if (!userId) {
-    return res.status(422).json({ message: 'User id is required' });
+    return res.status(422).json({ message: "User id is required" });
   }
 
   try {
     const productData = await Product.findOne({ _id });
-    if (!productData.authors.includes(author => author._id === userId)) {
+    if (!productData.authors.includes((author) => author._id === userId)) {
       await User.updateOne(
         { _id: userId },
-        { $pull: { 'author_info.my_products': _id } },
+        { $pull: { "author_info.my_products": _id } }
       );
     }
     for (let i = 0; i < productData.authors.length; i++) {
       await User.updateOne(
         { _id: productData.authors[i]._id },
-        { $pull: { 'author_info.my_products': _id } },
+        { $pull: { "author_info.my_products": _id } }
       );
     }
     let currentDate = new Date();
@@ -494,11 +501,11 @@ const deleteOneProduct = async (req, res) => {
     futureDate.setDate(futureDate.getDate() - 1);
 
     await Product.updateOne({ _id }, { deleted: true, expireAt: futureDate });
-    return res.status(200).json({ message: 'Success' });
+    return res.status(200).json({ message: "Success" });
   } catch (err) {
     return res
       .status(500)
-      .json({ message: 'Failed updating one product', error: err.message });
+      .json({ message: "Failed updating one product", error: err.message });
   }
 };
 
@@ -507,7 +514,7 @@ const deleteAllProducts = async (req, res) => {
   try {
     await User.updateOne(
       { _id: userId },
-      { $set: { 'author_info.my_products': [] } },
+      { $set: { "author_info.my_products": [] } }
     );
     let currentDate = new Date();
     let currentMonth = currentDate.getMonth();
@@ -516,15 +523,15 @@ const deleteAllProducts = async (req, res) => {
     futureDate.setDate(futureDate.getDate() - 1);
 
     await Product.updateMany(
-      { 'seller_data._id': userId },
-      { deleted: true, expireAt: futureDate },
+      { "seller_data._id": userId },
+      { deleted: true, expireAt: futureDate }
     );
 
-    res.status(200).json({ message: 'Successfully deleted all products' });
+    res.status(200).json({ message: "Successfully deleted all products" });
   } catch (err) {
     res
       .status(500)
-      .json({ message: 'Failed deleting all prodcuts', error: err.message });
+      .json({ message: "Failed deleting all prodcuts", error: err.message });
   }
 };
 
@@ -533,13 +540,15 @@ const getProductRating = async (req, res) => {
   try {
     const productRating = await Product.findOne(
       { _id },
-      { rating: 1, avgRating: 1 },
+      { rating: 1, avgRating: 1 }
     );
     res.json({ data: productRating });
   } catch (err) {
-    res.json('error');
+    res.json("error");
   }
 };
+
+
 
 module.exports = {
   getAllProducts,
