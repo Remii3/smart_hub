@@ -5,6 +5,7 @@ import {
   LockClosedIcon,
   Square2StackIcon,
   RocketLaunchIcon,
+  StarIcon,
 } from '@heroicons/react/24/outline';
 import MainContainer from '@layout/MainContainer';
 import EditUserData from './tabs/EditUserData';
@@ -40,7 +41,7 @@ type TabKeysTypes =
   | 'HISTORY'
   | 'MY_PRODUCTS'
   | 'ADMIN'
-  | 'FOLLOWS';
+  | 'FOLLOWING';
 
 type TabNamesTypes =
   | 'my_data'
@@ -48,7 +49,7 @@ type TabNamesTypes =
   | 'history'
   | 'my_products'
   | 'admin'
-  | 'follows';
+  | 'following';
 
 const tabNames: Record<TabKeysTypes, TabNamesTypes> = {
   MY_DATA: 'my_data',
@@ -56,7 +57,7 @@ const tabNames: Record<TabKeysTypes, TabNamesTypes> = {
   HISTORY: 'history',
   MY_PRODUCTS: 'my_products',
   ADMIN: 'admin',
-  FOLLOWS: 'follows',
+  FOLLOWING: 'following',
 };
 
 const TABS_ARRAY: {
@@ -90,9 +91,9 @@ const TABS_ARRAY: {
     icon: <RocketLaunchIcon height={20} width={20} />,
   },
   {
-    text: 'Follows',
-    name: 'follows',
-    icon: <RocketLaunchIcon height={20} width={20} />,
+    text: 'Following',
+    name: 'following',
+    icon: <StarIcon height={20} width={20} />,
   },
 ];
 
@@ -355,7 +356,7 @@ export default function MyAccount() {
           {selectedtab === tabNames.HISTORY && <OrderHistory />}
           {selectedtab === tabNames.MY_PRODUCTS && <MyShop />}
           {selectedtab === tabNames.ADMIN && <Admin />}
-          {selectedtab === tabNames.FOLLOWS && <Follows />}
+          {selectedtab === tabNames.FOLLOWING && <Follows />}
         </div>
       </div>
     </MainContainer>

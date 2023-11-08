@@ -358,26 +358,25 @@ const removeOneFollow = async (req, res) => {
   const { followGiverId, followReceiverId } = req.body;
 
   if (!followGiverId) {
-    return res.status(422).json({ message: 'Giver id is required' });
+    return res.status(422).json({ message: "Giver id is required" });
   }
   if (!followReceiverId) {
-    return res.status(422).json({ message: 'Receiver id is required' });
+    return res.status(422).json({ message: "Receiver id is required" });
   }
-  console.log(followGiverId, followReceiverId);
   try {
     await User.updateOne(
       { _id: followGiverId },
-      { $pull: { following: followReceiverId } },
+      { $pull: { following: followReceiverId } }
     );
     await User.updateOne(
       { _id: followReceiverId },
-      { $pull: { 'author_info.followers': followGiverId } },
+      { $pull: { "author_info.followers": followGiverId } }
     );
-    return res.status(200).json({ message: 'success' });
+    return res.status(200).json({ message: "success" });
   } catch (err) {
     return res
       .status(500)
-      .json({ message: 'Failed removing follow', error: err.message });
+      .json({ message: "Failed removing follow", error: err.message });
   }
 };
 
@@ -401,31 +400,31 @@ const updateOneUser = async (req, res) => {
         {
           $set: {
             ...mainData,
-            'user_info.phone': fieldValue.phone,
-            'user_info.profile_img': fieldValue.profileImg,
-            'user_info.credentials.first_name': fieldValue.firstName,
-            'user_info.credentials.last_name': fieldValue.lastName,
-            'author_info.quote': fieldValue.quote,
-            'author_info.short_description': fieldValue.shortDescription,
-            'author_info.pseudonim': fieldValue.pseudonim,
+            "user_info.phone": fieldValue.phone,
+            "user_info.profile_img": fieldValue.profileImg,
+            "user_info.credentials.first_name": fieldValue.firstName,
+            "user_info.credentials.last_name": fieldValue.lastName,
+            "author_info.quote": fieldValue.quote,
+            "author_info.short_description": fieldValue.shortDescription,
+            "author_info.pseudonim": fieldValue.pseudonim,
           },
         },
-        { upsert: true },
+        { upsert: true }
       );
     }
-    if (typeof fieldValue == 'object') {
+    if (typeof fieldValue == "object") {
       await User.updateOne(
         { email: userEmail },
-        { $set: { [fieldPath]: { ...fieldValue } } },
+        { $set: { [fieldPath]: { ...fieldValue } } }
       );
     } else {
       await User.updateOne(
         { email: userEmail },
-        { $set: { [fieldPath]: fieldValue } },
+        { $set: { [fieldPath]: fieldValue } }
       );
     }
 
-    return res.status(200).json({ message: 'Successfully updated data' });
+    return res.status(200).json({ message: "Successfully updated data" });
   } catch (err) {
     if (err.code === 11000) {
       return res.status(422).json({
@@ -435,7 +434,7 @@ const updateOneUser = async (req, res) => {
     } else {
       return res
         .status(500)
-        .json({ message: 'Failed to update data', error: err.message });
+        .json({ message: "Failed to update data", error: err.message });
     }
   }
 };
@@ -445,45 +444,49 @@ const deleteOneUser = async (req, res) => {
   try {
     await User.deleteOne({ _id: userId });
     await Cart.deleteOne({ user_id: userId });
-    res.status(200).json({ message: 'Success' });
+    return res.status(200).json({ message: "Success" });
   } catch (err) {
-    res
+    return res
       .status(500)
-      .json({ message: 'Failed deleting user', error: err.message });
+      .json({ message: "Failed deleting user", error: err.message });
   }
 };
 
 const getFollowedUsers = async (req, res) => {
   const { userId } = req.query;
+  const fetchedUserData = [];
+
+  if (!userId) {
+    return res.status(402).json({ message: "UserId is required" });
+  }
 
   try {
-    const fetchedUserData = [];
     const userData = await User.findOne({ _id: userId });
     if (!userData.following || userData.following.length <= 0) {
-      res.status(200).json({ data: fetchedUserData });
+      return res.status(200).json({ data: fetchedUserData });
     }
     for (let i = 0; i < userData.following.length; i++) {
-      const userData = await User.findOne({ _id: userData.following[i] });
-      if (userData) {
+      const authorsData = await User.findOne({ _id: userData.following[i] });
+      if (authorsData) {
         const preparedData = {
-          _id: userData._id,
-          username: userData.username,
-          role: userData.role,
-          user_info: { profile_img: userData.user_info.profile_img },
+          _id: authorsData._id,
+          username: authorsData.username,
+          role: authorsData.role,
+          user_info: { profile_img: authorsData.user_info.profile_img },
         };
-        if (userData.role !== 'User') {
+        if (authorsData.role !== "User") {
           preparedData.author_info = {
-            pseudonim: userData.author_info.pseudonim,
+            pseudonim: authorsData.author_info.pseudonim,
           };
         }
         fetchedUserData.push(preparedData);
       }
     }
-    res.status(200).json({ data: fetchedUserData });
+    return res.status(200).json({ data: fetchedUserData });
   } catch (err) {
-    res
+    return res
       .status(500)
-      .json({ message: 'Failed loading followed users', error: err.message });
+      .json({ message: "Failed loading followed users", error: err.message });
   }
 };
 

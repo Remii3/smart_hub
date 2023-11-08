@@ -1,5 +1,6 @@
 import MarketplaceBadge from '@components/UI/badges/MarketplaceBadge';
 import { Button } from '@components/UI/button';
+import errorToast from '@components/UI/error/errorToast';
 import { UserContext } from '@context/UserProvider';
 import { AuthorTypes, FetchDataTypes } from '@customTypes/interfaces';
 import { UserRoleTypes } from '@customTypes/types';
@@ -11,22 +12,28 @@ import {
 import { useCallback, useContext, useEffect, useState } from 'react';
 
 interface FollowsTypes extends FetchDataTypes {
-  data: AuthorTypes[];
+  data: null | AuthorTypes[];
 }
 
 export default function Follows() {
   const [followedUsers, setFolloweedUsers] = useState<FollowsTypes>({
-    data: [],
+    data: null,
     hasError: null,
     isLoading: false,
   });
-  const { userData, fetchUserData } = useContext(UserContext);
+  const { userData } = useContext(UserContext);
   const fetchData = useCallback(async () => {
-    console.log('userData', userData);
+    setFolloweedUsers((prevState) => {
+      return { ...prevState, isLoading: true };
+    });
     const { data, error } = await useGetAccessDatabase({
       url: DATABASE_ENDPOINTS.USER_FOLLOWS,
       params: { userId: userData.data && userData.data._id },
     });
+    if (error) {
+      errorToast(error);
+      return setFolloweedUsers({ data, hasError: null, isLoading: false });
+    }
     setFolloweedUsers({ data, hasError: null, isLoading: false });
   }, []);
 
@@ -43,16 +50,15 @@ export default function Follows() {
         followReceiverId: followedUserId,
       },
     });
-    fetchUserData();
-    console.log('eweqeqweqwewqeq: ', userData);
     fetchData();
   };
-  console.log(followedUsers);
   return (
     <div>
-      {followedUsers.data && followedUsers.data.length <= 0 && (
-        <div>You're not following anybody yet!</div>
-      )}
+      {!followedUsers.isLoading &&
+        followedUsers.data &&
+        followedUsers.data.length <= 0 && (
+          <div>You're not following anybody yet!</div>
+        )}
       {followedUsers.data &&
         followedUsers.data.map((followedUser) => (
           <div key={followedUser._id} className="mb-4 rounded bg-slate-200">
