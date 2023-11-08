@@ -14,6 +14,7 @@ const {
   removeOneFollow,
   updateOneUser,
   deleteOneUser,
+  getFollowedUsers,
 } = require('../Controllers/user.controller');
 const checkSignUpData = require('../Middleware/checkSignUpData.middleware');
 const checkSignInData = require('../Middleware/checkSignInData.middleware');
@@ -24,6 +25,7 @@ router.get('/other-profile', getOtherProfile);
 router.get('/guest', getGuestProfile);
 router.get('/authors', getAllAuthors);
 router.get('/admins', getAllAdmins);
+router.get('/followed', getFollowedUsers);
 
 router.post('/login', checkSignInData, login);
 router.post('/register', checkSignUpData, register);

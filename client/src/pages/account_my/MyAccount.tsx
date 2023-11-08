@@ -32,20 +32,23 @@ import {
 
 import { useToast } from '@components/UI/use-toast';
 import { UserCircleIcon } from '@heroicons/react/24/solid';
+import Follows from './tabs/Follows';
 
 type TabKeysTypes =
   | 'MY_DATA'
   | 'SECURITY_PERMISSIONS'
   | 'HISTORY'
   | 'MY_PRODUCTS'
-  | 'ADMIN';
+  | 'ADMIN'
+  | 'FOLLOWS';
 
 type TabNamesTypes =
   | 'my_data'
   | 'security_permissions'
   | 'history'
   | 'my_products'
-  | 'admin';
+  | 'admin'
+  | 'follows';
 
 const tabNames: Record<TabKeysTypes, TabNamesTypes> = {
   MY_DATA: 'my_data',
@@ -53,6 +56,7 @@ const tabNames: Record<TabKeysTypes, TabNamesTypes> = {
   HISTORY: 'history',
   MY_PRODUCTS: 'my_products',
   ADMIN: 'admin',
+  FOLLOWS: 'follows',
 };
 
 const TABS_ARRAY: {
@@ -83,6 +87,11 @@ const TABS_ARRAY: {
   {
     text: 'Admin',
     name: 'admin',
+    icon: <RocketLaunchIcon height={20} width={20} />,
+  },
+  {
+    text: 'Follows',
+    name: 'follows',
     icon: <RocketLaunchIcon height={20} width={20} />,
   },
 ];
@@ -346,6 +355,7 @@ export default function MyAccount() {
           {selectedtab === tabNames.HISTORY && <OrderHistory />}
           {selectedtab === tabNames.MY_PRODUCTS && <MyShop />}
           {selectedtab === tabNames.ADMIN && <Admin />}
+          {selectedtab === tabNames.FOLLOWS && <Follows />}
         </div>
       </div>
     </MainContainer>

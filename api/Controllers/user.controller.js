@@ -363,7 +363,7 @@ const removeOneFollow = async (req, res) => {
   if (!followReceiverId) {
     return res.status(422).json({ message: 'Receiver id is required' });
   }
-
+  console.log(followGiverId, followReceiverId);
   try {
     await User.updateOne(
       { _id: followGiverId },
@@ -453,6 +453,40 @@ const deleteOneUser = async (req, res) => {
   }
 };
 
+const getFollowedUsers = async (req, res) => {
+  const { userId } = req.query;
+
+  try {
+    const fetchedUserData = [];
+    const userData = await User.findOne({ _id: userId });
+    if (!userData.following || userData.following.length <= 0) {
+      res.status(200).json({ data: fetchedUserData });
+    }
+    for (let i = 0; i < userData.following.length; i++) {
+      const userData = await User.findOne({ _id: userData.following[i] });
+      if (userData) {
+        const preparedData = {
+          _id: userData._id,
+          username: userData.username,
+          role: userData.role,
+          user_info: { profile_img: userData.user_info.profile_img },
+        };
+        if (userData.role !== 'User') {
+          preparedData.author_info = {
+            pseudonim: userData.author_info.pseudonim,
+          };
+        }
+        fetchedUserData.push(preparedData);
+      }
+    }
+    res.status(200).json({ data: fetchedUserData });
+  } catch (err) {
+    res
+      .status(500)
+      .json({ message: 'Failed loading followed users', error: err.message });
+  }
+};
+
 module.exports = {
   login,
   register,
@@ -464,5 +498,6 @@ module.exports = {
   addOneFollow,
   removeOneFollow,
   updateOneUser,
+  getFollowedUsers,
   deleteOneUser,
 };
