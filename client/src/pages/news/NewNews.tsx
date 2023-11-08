@@ -28,6 +28,9 @@ import { useContext, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import z from 'zod';
 import ErrorMessage from '@components/UI/error/ErrorMessage';
+import { CKEditor } from '@ckeditor/ckeditor5-react';
+import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
+import { Skeleton } from '@components/UI/skeleton';
 
 interface PropsTypes {
   updateNewsList: () => void;
@@ -36,12 +39,13 @@ interface PropsTypes {
 const formSchema = z.object({
   title: z.string().nonempty(),
   subtitle: z.string(),
-  content: z.string(),
 });
 
 export default function NewNews({ updateNewsList }: PropsTypes) {
   const [selectedImg, setSelectedImg] = useState<null | FileList>(null);
   const [openedDialog, setOpenedDialog] = useState(false);
+  const [readyToShow, setReadyToShow] = useState(false);
+  const [contentData, setContentData] = useState('');
   const { userData } = useContext(UserContext);
   const [pushStatus, setPushStatus] = useState<FetchDataTypes>({
     hasError: null,
@@ -52,21 +56,25 @@ export default function NewNews({ updateNewsList }: PropsTypes) {
     defaultValues: {
       title: '',
       subtitle: '',
-      content: '',
     },
   });
   const addNewNewsHandler = async (
     formResponse: z.infer<typeof formSchema>
   ) => {
     if (!userData.data) return;
-    const { title, subtitle, content } = formResponse;
+    const { title, subtitle } = formResponse;
     setPushStatus((prevState) => {
       return { ...prevState, isLoading: true };
     });
 
     const { data, error } = await usePostAccessDatabase({
       url: DATABASE_ENDPOINTS.NEWS_ONE,
-      body: { userId: userData.data._id, title, subtitle, content },
+      body: {
+        userId: userData.data._id,
+        title,
+        subtitle,
+        content: contentData,
+      },
     });
     if (error) {
       errorToast(error);
@@ -92,23 +100,34 @@ export default function NewNews({ updateNewsList }: PropsTypes) {
     setTimeout(() => {
       setPushStatus({ hasError: null, isLoading: false });
       setSelectedImg(null);
+      setContentData('');
       form.reset();
-    }, 150);
+    }, 100);
   };
   const changeDialogVisiblity = () => {
     setOpenedDialog(false);
     setTimeout(() => {
+      setReadyToShow(false);
       setPushStatus({ hasError: null, isLoading: false });
       setSelectedImg(null);
+      setContentData('');
       form.reset();
-    }, 150);
+    }, 100);
   };
   return (
     <Dialog open={openedDialog} onOpenChange={() => changeDialogVisiblity()}>
-      <Button variant="default" onClick={() => setOpenedDialog(true)}>
+      <Button
+        variant="default"
+        onClick={() => {
+          setTimeout(() => {
+            setReadyToShow(true);
+          }, 100);
+          setOpenedDialog(true);
+        }}
+      >
         Add new
       </Button>
-      <DialogContent>
+      <DialogContent className="max-h-[90%] overflow-y-scroll">
         {pushStatus.isLoading && (
           <div>
             <LoadingCircle />
@@ -174,20 +193,52 @@ export default function NewNews({ updateNewsList }: PropsTypes) {
                   )}
                   <FormMessage />
                 </FormItem>
+                <div>
+                  {readyToShow ? (
+                    <div className="ck-body-wrapper">
+                      <CKEditor
+                        editor={ClassicEditor}
+                        data={contentData}
+                        config={{
+                          mediaEmbed: { previewsInData: true },
+                          toolbar: {
+                            shouldNotGroupWhenFull: true,
+                            items: [
+                              'alignment',
+                              'heading',
+                              '|',
+                              'bold',
+                              'italic',
+                              'link',
+                              'bulletedList',
+                              'numberedList',
+                              '|',
+                              'outdent',
+                              'indent',
+                              '|',
 
-                <FormField
-                  control={form.control}
-                  name="content"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Content</FormLabel>
-                      <FormControl>
-                        <Input type="text" className="block" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
+                              'blockQuote',
+                              'insertTable',
+                              'mediaEmbed',
+                              'undo',
+                              'redo',
+                            ],
+                          },
+                        }}
+                        onChange={(event, editor) => {
+                          const data = editor.getData();
+                          setContentData(data);
+                        }}
+                      />
+                    </div>
+                  ) : (
+                    <Skeleton className="flex h-[132px] w-full gap-4 p-4">
+                      {[...Array(4)].map((el, index) => (
+                        <Skeleton key={index} className="h-6 w-10" />
+                      ))}
+                    </Skeleton>
                   )}
-                />
+                </div>
               </div>
               <DialogFooter>
                 <Button variant="default" type="submit">

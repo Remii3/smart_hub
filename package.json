@@ -21,10 +21,14 @@
   },
   "homepage": "https://github.com/Remii3/smart_hub#readme",
   "devDependencies": {
+    "@tailwindcss/typography": "^0.5.10",
     "concurrently": "^8.2.0"
   },
   "dependencies": {
+    "@ckeditor/ckeditor5-build-classic": "^40.0.0",
+    "@ckeditor/ckeditor5-react": "^6.1.0",
     "firebase": "^10.4.0",
+    "html-react-parser": "^5.0.6",
     "uuid": "^9.0.1"
   }
 }
