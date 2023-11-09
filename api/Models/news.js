@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const NewsSchema = mongoose.Schema({
+const NewsSchema = new mongoose.Schema({
   user: { type: mongoose.Types.ObjectId, required: true, ref: "User" },
   created_at: { type: Date, default: Date.now },
   title: { type: String, required: true },

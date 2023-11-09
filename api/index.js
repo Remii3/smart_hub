@@ -10,6 +10,7 @@ const comment_routes = require('./Routes/comment.routes');
 const order_routes = require('./Routes/order.routes');
 const admin_routes = require('./Routes/admin.routes');
 const news_routes = require('./Routes/news.routes');
+const collection_routes = require("./Routes/collection.routes");
 const app = express();
 const server = require('http').createServer(app);
 
@@ -47,6 +48,7 @@ mongoose
     app.use('/order', order_routes);
     app.use('/admin', admin_routes);
     app.use('/news', news_routes);
+    app.use("/collection", collection_routes);
   })
   .catch(err => {
     console.log(err);

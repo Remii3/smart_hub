@@ -30,6 +30,11 @@ export type MarketplaceTypes = 'Shop' | 'Collection';
 export type VoteType = 'Like' | 'Dislike';
 
 export type RatingTypes = {
-  value: number;
+  avgRating: number;
   quantity: number;
+};
+
+export type PriceTypes = {
+  value: string;
+  currency: string;
 };

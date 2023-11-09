@@ -1,8 +1,22 @@
 const express = require("express");
-const { findAllCollections } = require("../Controllers/collection.controller");
+const {
+  findAllCollections,
+  findOneCollection,
+  findSearchedCollections,
+  createOneCollection,
+  updateOneCollection,
+  deleteOneCollection,
+} = require("../Controllers/collection.controller");
+const checkSortMethod = require("../Middleware/checkSortMethod.middleware");
 
 const router = express.Router();
 
-router.get("/all", findAllCollections);
+router.get("/all", checkSortMethod, findAllCollections);
+router.get("/one", findOneCollection);
+router.get("/searched", findSearchedCollections);
+
+router.post("/add-one", createOneCollection);
+router.post("/update-one", updateOneCollection);
+router.post("/delete-one", deleteOneCollection);
 
 module.exports = router;

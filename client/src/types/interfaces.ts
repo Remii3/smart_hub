@@ -1,5 +1,12 @@
 // eslint-disable-next-line import/no-cycle
-import { MarketplaceTypes, UserRoleType, VoteType } from './types';
+import {
+  ImgTypes,
+  MarketplaceTypes,
+  PriceTypes,
+  RatingTypes,
+  UserRoleType,
+  VoteType,
+} from './types';
 
 // * Product types
 
@@ -210,4 +217,39 @@ export interface VotingTypes {
     dislikes: null | number;
   };
   votes: VotesType[];
+}
+
+export interface CategoryTypes {
+  value: string;
+  label: string;
+  _id: string;
+}
+export interface CommentTypes {
+  _id: string;
+  product_id: string;
+  user: AuthorTypes;
+  value: { rating: number; text: string };
+  created_at: string;
+}
+
+export interface CollectionTypes {
+  _id: string;
+  creatorData: {
+    _id: string;
+    pseudonim: string;
+  };
+  title: string;
+  description: string;
+  imgs: ImgTypes[];
+  categories: CategoryTypes[];
+  authors: AuthorTypes[];
+  rating: RatingTypes;
+  quantity: number;
+  market_place: MarketplaceTypes;
+  created_at: string;
+  updated_at: string;
+  sold: boolean;
+  products: ProductTypes[];
+  comments: CommentTypes[];
+  price: PriceTypes;
 }
