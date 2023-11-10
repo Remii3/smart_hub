@@ -15,8 +15,8 @@ interface PropsTypes {
   swiperCategory: string;
   arrayOfItems: any[] | null;
   itemsType: MarketplaceTypes;
-  loadingState: boolean;
-  errorState: string | null;
+  loadingState?: boolean;
+  errorState?: string | null;
 }
 
 export default function SushiSwiper({

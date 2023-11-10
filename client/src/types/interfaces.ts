@@ -133,6 +133,12 @@ export interface FetchDataTypes {
   hasError: null | string;
 }
 
+export interface PostDataTypes {
+  isLoading: boolean;
+  isSuccess: boolean;
+  hasError: null | string;
+}
+
 // * Cart types
 
 export interface CartProductTypes {
@@ -232,7 +238,7 @@ export interface CommentTypes {
   created_at: string;
 }
 
-export interface CollectionTypes {
+export interface CollectionObjectTypes {
   _id: string;
   creatorData: {
     _id: string;
@@ -240,6 +246,7 @@ export interface CollectionTypes {
   };
   title: string;
   description: string;
+  shortDescription: string;
   imgs: ImgTypes[];
   categories: CategoryTypes[];
   authors: AuthorTypes[];
@@ -253,3 +260,9 @@ export interface CollectionTypes {
   comments: CommentTypes[];
   price: PriceTypes;
 }
+
+export interface CollectionCardTypes
+  extends Pick<
+    CollectionObjectTypes,
+    '_id' | 'title' | 'price' | 'imgs' | 'rating' | 'shortDescription'
+  > {}

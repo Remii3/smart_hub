@@ -24,7 +24,7 @@ import {
 import { DialogClose } from '@radix-ui/react-dialog';
 import { useCallback, useContext, useEffect, useState } from 'react';
 
-type CommentTargetTypes = 'Product' | 'News';
+type CommentTargetTypes = 'Product' | 'News' | 'Collection';
 
 type CommentsTypes = {
   isLoading: boolean;

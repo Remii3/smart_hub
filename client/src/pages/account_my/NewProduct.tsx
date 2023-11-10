@@ -248,7 +248,11 @@ export default function NewProduct() {
   return (
     <Dialog open={openDialog} onOpenChange={clearForm}>
       <div className="mt-4 flex flex-col sm:mt-0 sm:flex-row sm:items-center">
-        <Button variant="default" onClick={() => setOpenDialog(true)}>
+        <Button
+          variant="default"
+          className="w-full"
+          onClick={() => setOpenDialog(true)}
+        >
           Add new book
         </Button>
       </div>
@@ -313,6 +317,49 @@ export default function NewProduct() {
                   when you&apos;re ready.
                 </DialogDescription>
               </DialogHeader>
+
+              <FormField
+                control={control}
+                name="marketplace"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Marketplace</FormLabel>
+                    <FormControl>
+                      <RadioGroup
+                        {...field}
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="Shop" id="shopOption" />
+                          <Label
+                            htmlFor="shopOption"
+                            className="cursor-pointer"
+                          >
+                            Shop
+                          </Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem
+                            value="Collection"
+                            id="collectionOption"
+                          />
+                          <Label
+                            htmlFor="collectionOption"
+                            className="cursor-pointer"
+                          >
+                            Collection
+                          </Label>
+                        </div>
+                      </RadioGroup>
+                    </FormControl>
+                    <FormDescription>
+                      Choose the destination of your book.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
               <FormField
                 control={control}
@@ -512,51 +559,7 @@ export default function NewProduct() {
                   </FormItem>
                 )}
               />
-              <FormField
-                control={control}
-                name="marketplace"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Marketplace</FormLabel>
-                    <FormControl>
-                      <RadioGroup
-                        {...field}
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="Shop" id="shopOption" />
-                          <Label
-                            htmlFor="shopOption"
-                            className="cursor-pointer"
-                          >
-                            Shop
-                          </Label>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <RadioGroupItem
-                            value="Collection"
-                            id="collectionOption"
-                          />
-                          <Label
-                            htmlFor="collectionOption"
-                            className="cursor-pointer"
-                          >
-                            Collection
-                          </Label>
-                        </div>
-                      </RadioGroup>
-                    </FormControl>
-                    <FormDescription>
-                      Choose the destination of your book.
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              {marketplaceValue === MarketPlaceTypes.collection && (
-                <div>TODO: Show available collections</div>
-              )}
+
               <DialogFooter>
                 <Button variant="default" type="submit">
                   Add

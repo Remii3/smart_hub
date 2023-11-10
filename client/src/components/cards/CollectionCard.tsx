@@ -1,49 +1,36 @@
-import { Link, useNavigate } from 'react-router-dom';
-import MainPageHeading from '@pages/home/MainPageHeading';
-import { buttonVariants } from '@components/UI/button';
+import { Link } from 'react-router-dom';
+import { Button } from '@components/UI/button';
+import { CollectionCardTypes } from '@customTypes/interfaces';
+import StarRating from '@features/rating/StarRating';
 
-type CollectionCardTypes = {
-  backcolor: 'white' | 'pageBackground';
-  collectionData: { title: string; description: string };
-  lastItem: boolean;
-};
-function CollectionCard({
-  backcolor,
-  collectionData,
-  lastItem,
+export default function CollectionCard({
+  _id,
+  title,
+  imgs,
+  price,
+  rating,
+  shortDescription,
 }: CollectionCardTypes) {
-  const colorStyle = () => {
-    switch (backcolor) {
-      case 'white':
-        return 'text-foreground bg-background';
-      case 'pageBackground':
-        return 'text-background bg-pageBackground';
-      default:
-        return '';
-    }
-  };
-
   return (
-    <div
-      className={`${colorStyle()} w-full ${!lastItem && 'pb-12'} text-center`}
-    >
-      <MainPageHeading
-        color={backcolor === 'white' ? 'foreground' : 'background'}
-        usecase="sub"
-        mainTitle="Award winning books"
-        subTitle="Our most awarded books, interested? Check out our gallery."
-      />
-      <div className="pb-16">{collectionData.title}</div>
+    <Link to={`/collections/${_id}`} className="block rounded-md border p-3">
+      <h4 className="">{title}</h4>
+      <div>{shortDescription}</div>
+      <div>{price.value}</div>
+      {rating.avgRating > 0 && (
+        <div>
+          <StarRating rating={rating.avgRating} />
+        </div>
+      )}
+      {imgs.length > 0 && (
+        <div>
+          {imgs.map((img) => (
+            <img key={img.id} src={img.url} alt="Collecting img" />
+          ))}
+        </div>
+      )}
       <div>
-        <Link
-          to="/collections"
-          className={buttonVariants({ variant: 'default' })}
-        >
-          Check out
-        </Link>
+        <Button variant={'default'}>Check out</Button>
       </div>
-    </div>
+    </Link>
   );
 }
-
-export default CollectionCard;
