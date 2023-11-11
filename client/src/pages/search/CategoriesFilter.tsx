@@ -63,17 +63,24 @@ export default function CategoriesFilter() {
       <Select
         inputId="filterCategories"
         menuPlacement="top"
-        className="rounded-md shadow-sm"
+        className="shadow-sm"
         styles={{
           control: (base, state) => ({
             ...base,
-            border: '1px hsl(214, 32%, 91%) solid',
-            boxShadow: state.isFocused ? '0' : '0',
+            outline: state.isFocused ? '2px solid transparent' : '',
+            outlineColor: state.isFocused
+              ? 'hsl(215, 20.2%, 65.1%)'
+              : 'transparent',
+            outlineOffset: state.isFocused ? '0' : '',
+            border: state.isFocused
+              ? '1px hsl(214, 32%, 91%) solid'
+              : '1px hsl(214, 32%, 91%) solid',
             '&:hover': {
               border: '1px var hsl(214, 30%, 95%) solid',
             },
             borderRadius: 'calc(var(--radius) - 2px)',
             padding: '',
+            transition: 'none',
           }),
           option: (base, state) => ({
             ...base,

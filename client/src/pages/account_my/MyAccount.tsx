@@ -23,7 +23,7 @@ import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import useUploadImg from '@hooks/useUploadImg';
 
 import { PlusCircleIcon } from '@heroicons/react/24/outline';
-import NewProduct from './NewProduct';
+import NewProduct from './newProduct/NewProduct';
 import {
   Select,
   SelectContent,

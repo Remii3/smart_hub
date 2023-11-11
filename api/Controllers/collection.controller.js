@@ -3,7 +3,7 @@ const Collection = require('../Models/collection');
 const cashFormatter = require('../helpers/cashFormatter.js');
 
 const findAllCollections = async (req, res) => {
-  const { category, authorId, limit = 10 } = req.query;
+  const { category, authorId, creatorId, limit = 10 } = req.query;
   const sortMethod = req.sortMethod;
 
   const query = {};
@@ -14,6 +14,10 @@ const findAllCollections = async (req, res) => {
 
   if (authorId) {
     query.authors = authorId;
+  }
+
+  if (creatorId) {
+    query['creatorData._id'] = creatorId;
   }
 
   try {
@@ -42,7 +46,7 @@ const findAllCollections = async (req, res) => {
   } catch (err) {
     return res
       .status(500)
-      .json({ message: 'Failed fetching comments', error: err.message });
+      .json({ message: 'Failed fetching collections', error: err.message });
   }
 };
 
@@ -66,10 +70,10 @@ const findOneCollection = async (req, res) => {
         created_at: 1,
         updated_at: 1,
         products: 1,
-        comments: 1,
       },
-    ).lean();
-
+    )
+      .populate('products')
+      .lean();
     const preparedData = {
       ...collectionData,
       price: {
@@ -78,12 +82,19 @@ const findOneCollection = async (req, res) => {
           number: collectionData.price.value,
         })}`,
       },
+      products: collectionData.products.map(product => ({
+        ...product,
+        shop_info: {
+          price: `${cashFormatter({ number: product.shop_info.price })}`,
+        },
+      })),
     };
+    console.log(preparedData);
     return res.status(200).json({ data: preparedData });
   } catch (err) {
     return res
       .status(500)
-      .json({ message: 'Failed fetching comments', error: err.message });
+      .json({ message: 'Failed fetching collection', error: err.message });
   }
 };
 

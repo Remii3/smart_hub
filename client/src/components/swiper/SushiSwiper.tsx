@@ -10,13 +10,16 @@ import { MarketplaceTypes } from '@customTypes/types';
 import ShopCard from '@components/cards/ShopCard';
 import ErrorMessage from '@components/UI/error/ErrorMessage';
 import { Skeleton } from '@components/UI/skeleton';
+import CollectionCard from '@components/cards/CollectionCard';
+import { ReactNode } from 'react';
 
 interface PropsTypes {
   swiperCategory: string;
   arrayOfItems: any[] | null;
-  itemsType: MarketplaceTypes;
+  itemsType: MarketplaceTypes | 'Other';
   loadingState?: boolean;
   errorState?: string | null;
+  children?: ReactNode;
 }
 
 export default function SushiSwiper({
@@ -25,6 +28,7 @@ export default function SushiSwiper({
   itemsType,
   loadingState,
   errorState,
+  children,
 }: PropsTypes) {
   return (
     <div className="relative">
@@ -105,11 +109,12 @@ export default function SushiSwiper({
           {!loadingState &&
             arrayOfItems &&
             arrayOfItems.length > 0 &&
-            arrayOfItems.map(
-              (item) =>
-                itemsType === 'Shop' && (
+            arrayOfItems.map((item) => (
+              <>
+                {itemsType === 'Shop' && (
                   <SwiperSlide
                     key={swiperCategory + item._id}
+                    style={{ height: 'auto' }}
                     className="min-w-[280px] pr-8"
                   >
                     <ShopCard
@@ -127,8 +132,26 @@ export default function SushiSwiper({
                       rating={item.rating}
                     />
                   </SwiperSlide>
-                )
-            )}
+                )}
+                {itemsType === 'Collection' && (
+                  <SwiperSlide
+                    key={swiperCategory + item._id}
+                    style={{ height: 'auto' }}
+                    className="min-w-[280px] pr-8"
+                  >
+                    <CollectionCard
+                      _id={item._id}
+                      imgs={item.imgs}
+                      price={item.price}
+                      rating={item.rating}
+                      shortDescription={item.shortDescription}
+                      title={item.title}
+                    />
+                  </SwiperSlide>
+                )}
+              </>
+            ))}
+          {itemsType === 'Other' && children}
         </SuspenseComponent>
         <div
           className={`swiper-button-next swiper-${swiperCategory}-button-next color-primary right-0 flex items-center justify-center rounded-full bg-white p-8 opacity-90 backdrop-blur-sm`}

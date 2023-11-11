@@ -95,8 +95,8 @@ export default function CollectionPage() {
           <article>
             <SushiSwiper
               arrayOfItems={collection.data.products}
-              itemsType="Collection"
-              swiperCategory="collection"
+              itemsType="Shop"
+              swiperCategory="products"
             />
           </article>
           <article>
