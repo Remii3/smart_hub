@@ -318,7 +318,13 @@ export default function CollectionPage() {
                         render={({ field }) => (
                           <FormItem>
                             <FormControl>
-                              <Input {...field} type="number" />
+                              <Input
+                                {...field}
+                                type="number"
+                                onChange={(e) =>
+                                  field.onChange(Number(e.target.value))
+                                }
+                              />
                             </FormControl>
                           </FormItem>
                         )}
@@ -335,7 +341,13 @@ export default function CollectionPage() {
                         render={({ field }) => (
                           <FormItem>
                             <FormControl>
-                              <Input {...field} type="number" />
+                              <Input
+                                {...field}
+                                type="number"
+                                onChange={(e) =>
+                                  field.onChange(Number(e.target.value))
+                                }
+                              />
                             </FormControl>
                           </FormItem>
                         )}
