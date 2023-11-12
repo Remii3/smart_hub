@@ -9,6 +9,7 @@ const {
 } = require('../Controllers/collection.controller');
 const checkSortMethod = require('../Middleware/checkSortMethod.middleware');
 const prepareNewCollectionData = require('../Middleware/Collection/prepareNewCollectionData.middleware');
+const prepareUpdateCollectionData = require('../Middleware/Collection/prepareUpdateCollectionData.middleware');
 
 const router = express.Router();
 
@@ -17,7 +18,7 @@ router.get('/one', findOneCollection);
 router.get('/searched', findSearchedCollections);
 
 router.post('/add-one', prepareNewCollectionData, createOneCollection);
-router.post('/update-one', updateOneCollection);
+router.post('/update-one', prepareUpdateCollectionData, updateOneCollection);
 router.post('/delete-one', deleteOneCollection);
 
 module.exports = router;

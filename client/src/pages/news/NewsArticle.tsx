@@ -108,7 +108,7 @@ export default function NewsArticle({
       return { ...prevState, isLoading: true };
     });
     const { data, error } = await useGetAccessDatabase({
-      url: DATABASE_ENDPOINTS.NEWS_VOTES_ALL,
+      url: DATABASE_ENDPOINTS.RATING_VOTES_ALL,
       params: { newsId },
     });
     if (error) {

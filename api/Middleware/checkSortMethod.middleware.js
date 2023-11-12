@@ -3,27 +3,27 @@ const checkSortMethod = (req, res, next) => {
   const sortMethod = {};
   if (sortOption) {
     switch (sortOption) {
-      case "Date, ASC":
-        sortMethod.created_at = 1;
+      case 'Date, ASC':
+        sortMethod.createdAt = 1;
         break;
-      case "Date, DESC":
-        sortMethod.created_at = -1;
+      case 'Date, DESC':
+        sortMethod.createdAt = -1;
         break;
-      case "Title, ASC":
+      case 'Title, ASC':
         sortMethod.title = 1;
         break;
-      case "Title, DESC":
+      case 'Title, DESC':
         sortMethod.title = -1;
         break;
-      case "Price, DESC":
-        sortMethod["shop_info.price"] = -1;
+      case 'Price, DESC':
+        sortMethod['price.value'] = -1;
         break;
-      case "Price, ASC":
-        sortMethod["shop_info.price"] = 1;
+      case 'Price, ASC':
+        sortMethod['price.value'] = 1;
         break;
     }
   } else {
-    sortMethod.created_at = -1;
+    sortMethod.createdAt = -1;
   }
   req.sortMethod = sortMethod;
   next();

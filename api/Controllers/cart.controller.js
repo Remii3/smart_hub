@@ -1,8 +1,7 @@
 const Cart = require('../Models/cart');
 const Product = require('../Models/product');
-const calculateOrderAmount = require('../helpers/calculateOrderAmount');
+const calculateOrderAmount = require('../helpers/calculate/calculateOrderAmount');
 const cashFormatter = require('../helpers/cashFormatter');
-const prepareProductObject = require('../helpers/prepareProductObject');
 
 const stripe = require('stripe')(
   'sk_test_51NDZ0zHqBBlAtOOFMShIrv9OwdfC6958wOWqZa1X59kOeyY4hNtZ80ANZ6WYv67v4a8FOFguc04SCV84QKEf6nFf005r6tKBO6',
@@ -114,8 +113,8 @@ const getAllCartItems = async (req, res) => {
         let totalPrice = 0;
         const contents = await Product.findOne({ _id: product._id });
         if (contents) {
-          totalPrice += contents.shop_info.price * product.quantity;
-          const preparedProduct = prepareProductObject(contents);
+          totalPrice += contents.price.value * product.quantity;
+          const preparedProduct = contents;
           productsData.push({
             productData: preparedProduct,
             inCartQuantity: product.quantity,

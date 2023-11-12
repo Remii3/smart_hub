@@ -130,7 +130,6 @@ export default function MyAccount() {
   const path = useLocation();
   const { userData, fetchUserData } = useContext(UserContext);
   const { toast } = useToast();
-
   const changeSelectedTab = (option: TabNamesTypes) => {
     setSelectedtab(option);
     navigate(

@@ -70,7 +70,7 @@ interface CollectionsDataTypes extends FetchDataTypes {
   data: null | CollectionCardTypes[];
 }
 
-const MarketPlaceTypes = { shop: 'Shop', collection: 'Collection' } as {
+const MarketPlaceTypes = { shop: 'shop', collection: 'collection' } as {
   shop: MarketplaceTypes;
   collection: MarketplaceTypes;
 };
@@ -110,7 +110,7 @@ export default function NewProduct() {
   const [selectedImgs, setSelectedImgs] = useState<SelectedImgsTypes>([]);
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedCollections, setSelectedCollections] = useState<string[]>([]);
-  const initalMarketplace = 'Shop' as MarketplaceTypes;
+  const initalMarketplace = 'shop' as MarketplaceTypes;
   const [selectedMarketplace, setSelectedMarketplace] =
     useState(initalMarketplace);
   const [collectionsData, setCollectionsData] = useState<CollectionsDataTypes>({
@@ -250,17 +250,17 @@ export default function NewProduct() {
     const { error, data } = await usePostAccessDatabase({
       url: DATABASE_ENDPOINTS.PRODUCT_ONE,
       body: {
-        seller_data: {
+        creatorData: {
           _id: userData.data?._id,
           pseudonim: userData.data?.author_info.pseudonim,
         },
         title,
         description,
-        price: parseFloat(price).toFixed(2),
+        price,
         categories,
         authors,
-        quantity: Number(quantity),
-        market_place: selectedMarketplace,
+        quantity,
+        marketplace: selectedMarketplace,
         selectedCollections,
       },
     });
@@ -276,7 +276,7 @@ export default function NewProduct() {
       }
       await usePostAccessDatabase({
         url: DATABASE_ENDPOINTS.PRODUCT_UPDATE,
-        body: { _id: data.id, market_place: MarketPlaceTypes.shop, imgs: urls },
+        body: { _id: data.id, imgs: urls },
       });
     }
     if (error) {
@@ -403,8 +403,8 @@ export default function NewProduct() {
                         <FormLabel>Marketplace</FormLabel>
                         <FormControl>
                           <TabsList className="grid w-full grid-cols-2">
-                            <TabsTrigger value="Shop">Shop</TabsTrigger>
-                            <TabsTrigger value="Collection">
+                            <TabsTrigger value="shop">Shop</TabsTrigger>
+                            <TabsTrigger value="collection">
                               Collection
                             </TabsTrigger>
                           </TabsList>
@@ -712,7 +712,7 @@ export default function NewProduct() {
 
                 <DialogFooter className="flex justify-end">
                   <TabsContent
-                    value="Collection"
+                    value="collection"
                     tabIndex={-1}
                     className="flex justify-end"
                   >
@@ -771,7 +771,7 @@ export default function NewProduct() {
                     </Button>
                   </TabsContent>
                   <TabsContent
-                    value="Shop"
+                    value="shop"
                     tabIndex={-1}
                     className="flex justify-end"
                   >

@@ -10,7 +10,9 @@ const comment_routes = require('./Routes/comment.routes');
 const order_routes = require('./Routes/order.routes');
 const admin_routes = require('./Routes/admin.routes');
 const news_routes = require('./Routes/news.routes');
-const collection_routes = require("./Routes/collection.routes");
+const collection_routes = require('./Routes/collection.routes');
+const rating_routes = require('./Routes/rating.routes');
+
 const app = express();
 const server = require('http').createServer(app);
 
@@ -23,11 +25,11 @@ app.use(
   cors({
     credentials: true,
     origin: [
-      "http://localhost:5173",
-      "http://localhost:4173",
-      "https://smarthub-jb8g.onrender.com",
+      'http://localhost:5173',
+      'http://localhost:4173',
+      'https://smarthub-jb8g.onrender.com',
     ],
-  })
+  }),
 );
 server.listen(8080, () => console.log('listening on http://localhost:8080'));
 mongoose
@@ -48,7 +50,8 @@ mongoose
     app.use('/order', order_routes);
     app.use('/admin', admin_routes);
     app.use('/news', news_routes);
-    app.use("/collection", collection_routes);
+    app.use('/collection', collection_routes);
+    app.use('/rating', rating_routes);
   })
   .catch(err => {
     console.log(err);

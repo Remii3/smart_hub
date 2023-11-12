@@ -105,7 +105,7 @@ export default function ShopCard({
         <div className="px-3 pb-3">
           {rating && (
             <div className="pb-1">
-              <StarRating showOnly rating={rating.rating ? rating.rating : 0} />
+              <StarRating showOnly rating={rating ? rating : 0} />
             </div>
           )}
 

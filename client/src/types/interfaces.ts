@@ -10,26 +10,23 @@ import {
 
 // * Product types
 
-export interface UnknownProductTypes
-  extends ProductTypes,
-    ShopProductTypes,
-    AuctionProductTypes {}
-
 export interface ProductTypes {
-  seller_data: {
+  creatorData: {
     _id: string;
     pseudonim: string;
   };
   _id: string;
   title: string;
-  description?: string;
-  imgs: { id: string; url: string }[];
-  categories?: { value: string; label: string; _id: string }[];
-  authors: AuthorTypes[];
-  rating: { rating: number; count: number };
+  description: string;
+  shortDescription: string;
   quantity: number;
-  market_place: MarketplaceTypes;
-  created_at: string;
+  imgs: { id: string; url: string }[];
+  categories: { value: string; label: string; _id: string }[];
+  authors: AuthorTypes[];
+  rating: { avgRating: number; quantity: number };
+  marketplace: MarketplaceTypes;
+  createdAt: string;
+  updatedAt: string;
   sold: boolean;
   comments: [
     {
@@ -37,21 +34,12 @@ export interface ProductTypes {
       product_id: string;
       user: UserTypes;
       value: { rating: number; text: string };
-      created_at: string;
+      createdAt: string;
     }
   ];
-  currency: string;
-}
-
-export interface ShopProductTypes extends ProductTypes {
-  shop_info: { price: number };
-}
-
-export interface AuctionProductTypes extends ProductTypes {
-  auction_info: {
-    starting_price: number;
-    current_price: number;
-    auction_end_date: Date;
+  price: {
+    currency: string;
+    value: string;
   };
 }
 
@@ -83,7 +71,7 @@ export interface UserTypes {
     };
     phone: string;
   };
-  cart_data: { products: UnknownProductTypes[]; _id: string };
+  cart_data: { products: ProductTypes[]; _id: string };
   following: string[];
   orders: OrderTypes[];
   role: UserRoleType | string;
@@ -101,7 +89,8 @@ export interface AuthorTypes extends UserTypes {
     quote: string;
     avg_products_grade: number;
     sold_books_quantity: number;
-    my_products: UnknownProductTypes[];
+    my_products: ProductTypes[];
+    myCollections: CollectionObjectTypes[];
     followers: string[];
   };
 }
@@ -110,7 +99,7 @@ export interface AuthorTypes extends UserTypes {
 
 export interface TransactionHistoryTypes {
   status: string;
-  data: UnknownProductTypes;
+  data: ProductTypes;
 }
 
 // * Order types
@@ -119,11 +108,11 @@ export interface OrderTypes {
   _id: string;
   buyer_id: string;
   products: {
-    product: UnknownProductTypes;
+    product: ProductTypes;
     in_cart_quantity: number;
     total_price: number;
   }[];
-  created_at: string;
+  createdAt: string;
 }
 
 // * Fetch types
@@ -143,7 +132,7 @@ export interface PostDataTypes {
 
 export interface CartProductTypes {
   inCartQuantity: number;
-  productData: UnknownProductTypes;
+  productData: ProductTypes;
   productsTotalPrice: number;
 }
 
@@ -151,7 +140,7 @@ export interface CartTypes {
   products:
     | {
         inCartQuantity: number;
-        productData: UnknownProductTypes;
+        productData: ProductTypes;
         productsTotalPrice: number;
       }[]
     | [];
@@ -168,31 +157,12 @@ export interface CartTypes {
 export interface ProductCardTypes {
   _id: string;
   title: string;
-  description?: string;
+  description: string;
   authors: AuthorTypes[];
-}
-
-export interface ProductSpecialAuctionCardTypes extends ProductCardTypes {
-  img?: string;
-  swipedFlag: boolean;
-  startingPrice: number;
-  currentPrice: number;
-  auctionEndDate: Date;
-}
-
-export interface ProductShopCardType extends ProductCardTypes {
-  price: number;
+  price: string;
   img: string | null;
-  description?: string;
   productQuantity: number;
-  rating: { rating: number; count: number };
-}
-
-export interface ProductAuctionCardType extends ProductCardTypes {
-  img: string | null;
-  startingPrice: number;
-  currentPrice: number;
-  auctionEndDate: Date;
+  rating: number;
 }
 
 // * news types
@@ -235,7 +205,7 @@ export interface CommentTypes {
   product_id: string;
   user: AuthorTypes;
   value: { rating: number; text: string };
-  created_at: string;
+  createdAt: string;
 }
 
 export interface CollectionObjectTypes {
@@ -253,8 +223,8 @@ export interface CollectionObjectTypes {
   rating: RatingTypes;
   quantity: number;
   market_place: MarketplaceTypes;
-  created_at: string;
-  updated_at: string;
+  createdAt: string;
+  updatedAt: string;
   sold: boolean;
   products: ProductTypes[];
   comments: CommentTypes[];

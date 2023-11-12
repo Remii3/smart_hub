@@ -93,7 +93,7 @@ const addOneOrder = async (req, res) => {
       }
     }
 
-    return res.status(201).json({ message: 'Success' });
+    return res.status(201).json({ message: 'Success', data: { _id: orderId } });
   } catch (err) {
     return res
       .status(500)

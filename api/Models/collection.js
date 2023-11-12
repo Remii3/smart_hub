@@ -1,47 +1,24 @@
-const mongoose = require('mongoose');
-const CollectionSchema = new mongoose.Schema({
+const { Schema, model } = require('mongoose');
+const CollectionSchema = new Schema({
   creatorData: {
     type: {
-      _id: { type: mongoose.Types.ObjectId, required: true },
+      _id: { type: Schema.Types.ObjectId, required: true },
       pseudonim: { type: String, required: true },
+      profileImg: { type: String },
     },
-    required: true,
     ref: 'User',
   },
   title: { type: String, required: true },
   description: { type: String, default: '' },
   shortDescription: { type: String, default: '' },
-  imgs: { type: [{ id: { type: String, required: true }, url: String }] },
-  categories: {
-    type: [
-      {
-        type: mongoose.Types.ObjectId,
-        ref: 'Category',
-      },
-    ],
-    default: [],
-  },
-  authors: {
-    type: [{ type: mongoose.Types.ObjectId, ref: 'User' }],
-    required: true,
-  },
-  rating: {
-    avgRating: { type: Number },
-    rates: [
-      {
-        type: {
-          value: Number,
-          commentId: { type: mongoose.Types.ObjectId, ref: 'Comment' },
-          userId: { type: mongoose.Types.ObjectId, ref: 'User' },
-        },
-      },
-    ],
-  },
   quantity: { type: Number, required: true },
-  created_at: { type: Date, required: true, default: Date.now },
-  updated_at: { type: Date, required: true, default: Date.now },
-  comments: [{ type: mongoose.Types.ObjectId, ref: 'Comment' }],
-  products: [{ type: mongoose.Types.ObjectId, ref: 'Product' }],
+  rating: {
+    type: { avgRating: { type: Number }, quantity: { type: Number } },
+    default: { avgRating: 0, quantity: 0 },
+  },
+  createdAt: { type: Date, required: true, default: Date.now },
+  updatedAt: { type: Date, required: true, default: Date.now },
+  products: [{ type: Schema.Types.ObjectId, ref: 'Product' }],
   sold: { type: Boolean, require: true, default: false },
   price: {
     type: {
@@ -53,6 +30,6 @@ const CollectionSchema = new mongoose.Schema({
   expireAt: { type: Date, expires: 0 },
 });
 
-const CollectionModel = mongoose.model('Collection', CollectionSchema);
+const CollectionModel = model('Collection', CollectionSchema);
 
 module.exports = CollectionModel;

@@ -1,12 +1,12 @@
 const mongoose = require('mongoose');
 
 const NewsSchema = new mongoose.Schema({
-  user: { type: mongoose.Types.ObjectId, required: true, ref: "User" },
-  created_at: { type: Date, default: Date.now },
+  user: { type: mongoose.Types.ObjectId, required: true, ref: 'User' },
+  createdAt: { type: Date, default: Date.now },
   title: { type: String, required: true },
   subtitle: { type: String },
   img: { type: { id: String, url: String } },
-  comments: [{ type: mongoose.Types.ObjectId, ref: "Comment" }],
+  comments: [{ type: mongoose.Types.ObjectId, ref: 'Comment' }],
   content: { type: String },
   voting: {
     type: {

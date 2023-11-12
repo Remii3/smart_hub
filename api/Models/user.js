@@ -1,6 +1,6 @@
-const mongoose = require('mongoose');
+const { Schema, model } = require('mongoose');
 
-const UserSchema = new mongoose.Schema({
+const UserSchema = new Schema({
   email: { type: String, required: true, unique: true },
   username: { type: String, required: true, unique: true },
   password: { type: String, required: true },
@@ -23,11 +23,11 @@ const UserSchema = new mongoose.Schema({
     },
     phone: { type: String },
   },
-  cart: { type: mongoose.Types.ObjectId },
-  following: [{ type: mongoose.Types.ObjectId, ref: 'User' }],
-  orders: [{ type: mongoose.Types.ObjectId, ref: 'Order' }],
+  cart: { type: Schema.Types.ObjectId },
+  following: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+  orders: [{ type: Schema.Types.ObjectId, ref: 'Order' }],
   role: { type: String, default: 'User', enum: ['User', 'Author', 'Admin'] },
-  news: { type: [mongoose.Types.ObjectId] },
+  news: { type: [Schema.Types.ObjectId] },
   security_settings: {
     type: {
       hide_private_information: Boolean,
@@ -42,12 +42,12 @@ const UserSchema = new mongoose.Schema({
       quote: { type: String },
       avg_products_grade: { type: Number },
       sold_books_quantity: { type: Number },
-      my_products: [{ type: mongoose.Types.ObjectId, ref: 'Product' }],
-      followers: [{ type: mongoose.Types.ObjectId, ref: 'User' }],
+      my_products: [{ type: Schema.Types.ObjectId, ref: 'Product' }],
+      followers: [{ type: Schema.Types.ObjectId, ref: 'User' }],
     },
   },
 });
 
-const UserModel = mongoose.model('User', UserSchema);
+const UserModel = model('User', UserSchema);
 
 module.exports = UserModel;

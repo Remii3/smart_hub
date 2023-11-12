@@ -33,10 +33,13 @@ type CommentsTypes = {
     | null
     | {
         _id: string;
-        product_id: string;
-        user: AuthorTypes;
+        creatorData: AuthorTypes;
+        targetData: {
+          _id: string;
+        };
         value: { rating: number; text: string };
-        created_at: string;
+        createdAt: string;
+        updatedAt: string;
       }[];
 };
 
@@ -96,7 +99,7 @@ export default function Comments({
         isLoading: false,
       });
     }
-  }, []);
+  }, [targetId]);
 
   const addNewCommentHandler = async () => {
     const preparedValue = {} as {
@@ -120,8 +123,10 @@ export default function Comments({
       url: DATABASE_ENDPOINTS.COMMENT_ONE,
       body: {
         userId: userData.data?._id,
-        targetId,
-        target: target,
+        targetData: {
+          _id: targetId,
+          type: target,
+        },
         value: preparedValue,
       },
     });
@@ -295,9 +300,9 @@ export default function Comments({
                 )}
                 <div className="flex gap-4">
                   <div className="h-14 w-14">
-                    {comment.user.user_info.profile_img.url ? (
+                    {comment.creatorData.user_info.profile_img.url ? (
                       <img
-                        src={comment.user.user_info.profile_img.url}
+                        src={comment.creatorData.user_info.profile_img.url}
                         alt="profile_img"
                         className="h-8 w-8 rounded-full object-cover"
                       />
@@ -306,21 +311,21 @@ export default function Comments({
                     )}
                   </div>
                   <p className="font-semibold">
-                    {comment.user.role !== UserRoleTypes.USER
-                      ? comment.user.author_info.pseudonim
-                      : comment.user.username}
+                    {comment.creatorData.role !== UserRoleTypes.USER
+                      ? comment.creatorData.author_info.pseudonim
+                      : comment.creatorData.username}
                   </p>
                 </div>
               </div>
               <div className="flex w-full flex-col gap-4">
                 <div className="flex justify-end">
                   <small className="text-sm">
-                    {comment.created_at.slice(0, 10)}
+                    {comment.createdAt.slice(0, 10)}
                   </small>
                 </div>
                 <div>{comment.value.text}</div>
               </div>
-              {(userData.data?._id === comment.user._id ||
+              {(userData.data?._id === comment.creatorData._id ||
                 userData.data?.role == UserRoleTypes.ADMIN) && (
                 <Dialog
                   open={showDeleteDialog === comment._id}

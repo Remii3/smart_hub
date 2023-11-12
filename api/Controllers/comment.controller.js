@@ -1,7 +1,9 @@
 const { default: mongoose } = require('mongoose');
 const Comment = require('../Models/comment');
 const Product = require('../Models/product');
-const User = require('../Models/user');
+const News = require('../Models/news');
+const Collection = require('../Models/collection');
+const calculateAvgRating = require('../helpers/calculate/calculateAvgRating');
 
 const getAllComments = async (req, res) => {
   const { targetId } = req.query;
@@ -10,11 +12,11 @@ const getAllComments = async (req, res) => {
     return res.status(422).json({ message: 'Provide comment target id' });
   }
   try {
-    const data = await Comment.find({ target_id: targetId })
+    const data = await Comment.find({ 'targetData._id': targetId })
       .sort({
-        created_at: -1,
+        createdAt: -1,
       })
-      .populate('user');
+      .populate('creatorData');
 
     return res.status(200).json({ data });
   } catch (err) {
@@ -25,69 +27,45 @@ const getAllComments = async (req, res) => {
 };
 
 const addOneComment = async (req, res) => {
-  const { userId, targetId, value, target } = req.body;
-
+  const { userId, targetData, value } = req.body;
   if (!userId) {
     return res.status(422).json({ message: 'Provide user id' });
   }
 
-  if (!targetId) {
-    return res.status(422).json({ message: 'Provide target id' });
-  }
-
   try {
-    const created_at = new Date().getTime();
+    const createdAt = new Date().getTime();
     const _id = new mongoose.Types.ObjectId();
+    await Comment.create({
+      _id,
+      creatorData: userId,
+      targetData,
+      value,
+      createdAt,
+      updatedAt: createdAt,
+    });
+    const comments = await Comment.find({
+      'targetData._id': targetData._id,
+    }).lean();
 
-    if (target === 'Product') {
-      const product = await Product.findOne({ _id: targetId });
-      const { rating } = product;
-
-      let preparedRating = 0;
-      let count = 0;
-      for (let i = 0; i < rating.length; i++) {
-        if (rating[i].value) {
-          count += rating[i].value;
-        }
+    switch (targetData.type) {
+      case 'Product': {
+        const rating = calculateAvgRating(comments);
+        await Product.updateOne({ _id: targetData._id }, { rating });
+        break;
       }
-      count += value.rating;
-
-      preparedRating = count / (rating.length + 1);
-      const avgRating = Math.ceil(preparedRating);
-      await Comment.create({
-        _id,
-        user: userId,
-        target_id: targetId,
-        value,
-        target,
-        created_at,
-      });
-      if (value.rating) {
-        await Product.updateOne(
-          { _id: targetId },
-          {
-            avgRating,
-            $push: {
-              rating: { value: value.rating, userId, commentId: _id },
-            },
-          },
-        );
+      case 'News': {
+        const rating = calculateAvgRating(comments);
+        await News.updateOne({ _id: targetData._id }, { rating });
+        break;
       }
-
-      return res.status(201).json({ message: 'Success' });
+      case 'Collection': {
+        const rating = calculateAvgRating(comments);
+        await Collection.updateOne({ _id: targetData._id }, { rating });
+        break;
+      }
     }
-    if (target === 'News') {
-      await Comment.create({
-        _id,
-        user: userId,
-        target_id: targetId,
-        value,
-        target,
-        created_at,
-      });
 
-      return res.status(201).json({ message: 'Success' });
-    }
+    return res.status(201).json({ message: 'Success' });
   } catch (err) {
     return res
       .status(500)
@@ -96,36 +74,42 @@ const addOneComment = async (req, res) => {
 };
 
 const deleteOneComment = async (req, res) => {
-  const { commentId, userId, target, targetId, value } = req.body;
+  const { commentId } = req.body;
   if (!commentId) {
     return res.status(422).json({ message: 'Provide comment id' });
   }
-  if (!userId) {
-    return res.status(422).json({ message: 'Provide user id' });
-  }
 
   try {
-    await User.updateOne({ _id: userId }, { $pull: { news: commentId } });
-    await Comment.deleteOne({ _id: commentId });
-    if (target === 'Product') {
-      const product = await Product.findOne({ _id: targetId });
-      const { rating } = product;
+    const commentData = await Comment.findOne({ _id: commentId });
 
-      let count = 0;
-      for (let i = 0; i < rating.length; i++) {
-        if (rating[i].value) {
-          count += rating[i].value;
-        }
+    await Comment.deleteOne({ _id: commentId });
+
+    const comments = await Comment.find({
+      'targetData._id': commentId,
+    }).lean();
+
+    switch (commentData.targetData.type) {
+      case 'Product': {
+        const rating = calculateAvgRating(comments);
+        await Product.updateOne(
+          { _id: commentData.targetData._id },
+          { rating },
+        );
+        break;
       }
-      if (value.rating) {
-        count -= value.rating;
+      case 'News': {
+        const rating = calculateAvgRating(comments);
+        await News.updateOne({ _id: commentData.targetData._id }, { rating });
+        break;
       }
-      const preparedRating = count / (rating.length - 1);
-      const avgRating = Math.ceil(preparedRating);
-      await Product.updateOne(
-        { _id: targetId },
-        { avgRating, $pull: { rating: { commentId } } },
-      );
+      case 'Collection': {
+        const rating = calculateAvgRating(comments);
+        await Collection.updateOne(
+          { _id: commentData.targetData._id },
+          { rating },
+        );
+        break;
+      }
     }
 
     return res.status(200).json({ message: 'Success' });

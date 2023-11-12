@@ -18,7 +18,7 @@ import MainContainer from '@layout/MainContainer';
 import { useToast } from '@components/UI/use-toast';
 import SushiSwiper from '@components/swiper/SushiSwiper';
 import MarketplaceBadge from '@components/UI/badges/MarketplaceBadge';
-const marketplaces = { shop: 'Shop', collection: 'Collection' } as {
+const marketplaces = { shop: 'shop', collection: 'collection' } as {
   shop: MarketplaceTypes;
   collection: MarketplaceTypes;
 };
@@ -56,13 +56,13 @@ export default function OtherUserPage() {
         {
           text: 'Products',
           quantity: data.author_info.my_products?.filter(
-            (item) => item.market_place === marketplaces.shop
+            (item) => item.marketplace === marketplaces.shop
           ).length,
         },
         {
           text: 'Collections',
           quantity: data.author_info.my_products?.filter(
-            (item) => item.market_place === marketplaces.collection
+            (item) => item.marketplace === marketplaces.collection
           ).length,
         },
         {
@@ -302,7 +302,7 @@ export default function OtherUserPage() {
                 <h4 className="mb-5">Products</h4>
                 <SushiSwiper
                   swiperCategory="shop"
-                  itemsType="Shop"
+                  itemsType="shop"
                   loadingState={otherUserData.isLoading}
                   errorState={otherUserData.hasError}
                   arrayOfItems={otherUserData.data.author_info.my_products}

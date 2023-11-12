@@ -30,7 +30,7 @@ export default function VoteRating({
       (userVote === 'Dislike' && voteType === 'Dislike')
     ) {
       const { error } = await usePostAccessDatabase({
-        url: DATABASE_ENDPOINTS.NEWS_VOTE_REMOVE,
+        url: DATABASE_ENDPOINTS.RATING_VOTE_REMOVE,
         body: {
           userId,
           newsId,
@@ -47,7 +47,7 @@ export default function VoteRating({
       }
     } else {
       const { error } = await usePostAccessDatabase({
-        url: DATABASE_ENDPOINTS.NEWS_VOTE_ADD,
+        url: DATABASE_ENDPOINTS.RATING_VOTE_ADD,
         body: {
           userId,
           newsId,

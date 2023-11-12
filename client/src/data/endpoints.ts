@@ -8,6 +8,7 @@ const MAIN_ROUTES = {
   USER: '/user',
   NEWS: '/news',
   COLLECTION: '/collection',
+  RATING: '/rating',
 };
 
 const ADMIN_ENDPOINTS = {
@@ -50,9 +51,6 @@ const NEWS_ENDPOINTS = {
   NEWS_DELETE: `${MAIN_ROUTES.NEWS}/delete`,
   NEWS_UPDATE: `${MAIN_ROUTES.NEWS}/update`,
   NEWS_COMMENTS: `${MAIN_ROUTES.NEWS}/comments`,
-  NEWS_VOTES_ALL: `${MAIN_ROUTES.NEWS}/votes`,
-  NEWS_VOTE_ADD: `${MAIN_ROUTES.NEWS}/vote-add`,
-  NEWS_VOTE_REMOVE: `${MAIN_ROUTES.NEWS}/vote-remove`,
 };
 
 const ORDER_ENDPOINTS = {
@@ -62,7 +60,6 @@ const ORDER_ENDPOINTS = {
 
 const PRODUCT_ENDPOINTS = {
   PRODUCT_ALL: `${MAIN_ROUTES.PRODUCT}/all`,
-  PRODUCT_RATING: `${MAIN_ROUTES.PRODUCT}/rating`,
   PRODUCT_SHOP_ALL: `${MAIN_ROUTES.PRODUCT}/shop`,
   PRODUCT_AUCTION_ALL: `${MAIN_ROUTES.PRODUCT}/auction`,
   PRODUCT_ONE: `${MAIN_ROUTES.PRODUCT}/one`,
@@ -70,6 +67,7 @@ const PRODUCT_ENDPOINTS = {
   PRODUCT_UPDATE: `${MAIN_ROUTES.PRODUCT}/update`,
   PRODUCT_DELETE: `${MAIN_ROUTES.PRODUCT}/delete`,
   PRODUCT_DELETE_ALL: `${MAIN_ROUTES.PRODUCT}/delete-all`,
+  PRODUCT_QUANTITY: `${MAIN_ROUTES.PRODUCT}/quantity`,
 };
 
 const USER_ENDPOINTS = {
@@ -87,6 +85,13 @@ const USER_ENDPOINTS = {
   USER_DELETE_ONE: `${MAIN_ROUTES.USER}/delete-one`,
 };
 
+const RATING_ENDPOINTS = {
+  RATING_RATING: `${MAIN_ROUTES.RATING}/rating`,
+  RATING_VOTES_ALL: `${MAIN_ROUTES.RATING}/votes`,
+  RATING_VOTE_ADD: `${MAIN_ROUTES.RATING}/vote-add`,
+  RATING_VOTE_REMOVE: `${MAIN_ROUTES.RATING}/vote-remove`,
+};
+
 export const DATABASE_ENDPOINTS = {
   ...ADMIN_ENDPOINTS,
   ...CART_ENDPOINTS,
@@ -97,9 +102,11 @@ export const DATABASE_ENDPOINTS = {
   ...ORDER_ENDPOINTS,
   ...PRODUCT_ENDPOINTS,
   ...USER_ENDPOINTS,
+  ...RATING_ENDPOINTS,
 };
 
 export const COMMENT_TARGET = {
   NEWS: 'News',
   PRODUCT: 'Product',
+  COLLECTION: 'Collection',
 };

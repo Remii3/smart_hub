@@ -5,10 +5,6 @@ export enum UserRoleTypes {
   AUTHOR = 'Author',
   ADMIN = 'Admin',
 }
-// export enum MarketPlaceTypes {
-//   SHOP = 'Shop',
-//   COLLECTION = 'Collection',
-// }
 
 export type UserRoleType =
   | UserRoleTypes.USER
@@ -25,7 +21,7 @@ export const USER_ROLES = [
 
 export type ImgTypes = { id: string; url: string };
 
-export type MarketplaceTypes = 'Shop' | 'Collection';
+export type MarketplaceTypes = 'shop' | 'collection';
 
 export type VoteType = 'Like' | 'Dislike';
 

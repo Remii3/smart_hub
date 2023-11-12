@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { ChangeEvent, useCallback, useEffect, useState } from 'react';
-import { FetchDataTypes, UnknownProductTypes } from '@customTypes/interfaces';
+import { FetchDataTypes, ProductTypes } from '@customTypes/interfaces';
 import PriceSelector from './PriceSelector';
 import SortProducts from '../../features/sortProducts/SortProducts';
 import {
@@ -26,7 +26,7 @@ const defaultProps = {
 };
 
 interface ProductsTypes extends FetchDataTypes {
-  data: null | UnknownProductTypes[];
+  data: null | ProductTypes[];
   rawData: null | any;
 }
 
@@ -121,7 +121,7 @@ export default function BasicShopWidget({
       <div className="mb-4 flex items-center justify-between px-1">
         <div className="flex flex-grow gap-4">
           <PriceSelector
-            highestPrice={products.rawData ? products.rawData.highestPrice : 0}
+            highestPrice={products.rawData && products.rawData.highestPrice}
             category={category}
             minPrice={minPrice}
             maxPrice={maxPrice}
@@ -141,7 +141,7 @@ export default function BasicShopWidget({
 
       <SushiSwiper
         swiperCategory={category}
-        itemsType="Shop"
+        itemsType="shop"
         arrayOfItems={products.data}
         loadingState={products.isLoading}
         errorState={products.hasError}

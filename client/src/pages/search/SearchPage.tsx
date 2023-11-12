@@ -1,7 +1,7 @@
 import { useState, useEffect, ChangeEvent, useCallback, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import AdvancedFilter from '@pages/search/AdvancedFilter';
-import { UnknownProductTypes } from '@customTypes/interfaces';
+import { ProductTypes } from '@customTypes/interfaces';
 import ShopCard from '@components/cards/ShopCard';
 import MainContainer from '@layout/MainContainer';
 import Pagination from '@components/paginations/Pagination';
@@ -12,9 +12,10 @@ import { sortOptions, sortOptionsArray } from '@hooks/useSortProducts';
 import { Badge } from '@components/UI/badge';
 import LoadingCircle from '@components/Loaders/LoadingCircle';
 import { toast } from '@components/UI/use-toast';
+import CollectionCard from '@components/cards/CollectionCard';
 
 interface SearchedProductsDataTypes {
-  products: UnknownProductTypes[];
+  products: ProductTypes[];
   rawData: {
     queries: {
       phrase: string;
@@ -78,6 +79,8 @@ export default function SearchPage() {
       params: {
         pageSize: pageIteration,
         filtersData: newFilters,
+        sortOption: newFilters.sortOption,
+        strictMarketplace: true,
       },
     });
     if (error) {
@@ -313,7 +316,6 @@ export default function SearchPage() {
           )}
 
           {!searchedProductsData.isLoading &&
-            searchedProductsData.rawData.queries &&
             searchedProductsData.products &&
             searchedProductsData.products.length === 0 && (
               <div className="flex h-full w-full items-center justify-center">
@@ -327,11 +329,11 @@ export default function SearchPage() {
                 searchedProductsData.products &&
                 searchedProductsData.products.map((item) => {
                   return (
-                    item.market_place === 'Shop' && (
+                    item.marketplace === 'shop' && (
                       <ShopCard
                         key={item._id}
                         _id={item._id}
-                        price={item.shop_info.price}
+                        price={item.price.value}
                         productQuantity={item.quantity}
                         title={item.title}
                         authors={item.authors}
@@ -341,7 +343,24 @@ export default function SearchPage() {
                             ? item.imgs[0].url
                             : null
                         }
+                        rating={item.rating.avgRating}
+                      />
+                    )
+                  );
+                })}
+              {!searchedProductsData.isLoading &&
+                searchedProductsData.products &&
+                searchedProductsData.products.map((item) => {
+                  return (
+                    item.marketplace === 'collection' && (
+                      <CollectionCard
+                        key={item._id}
+                        _id={item._id}
+                        price={item.price}
+                        title={item.title}
                         rating={item.rating}
+                        imgs={item.imgs}
+                        shortDescription={item.shortDescription}
                       />
                     )
                   );

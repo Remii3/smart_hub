@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "check": "tsc"
   },
   "dependencies": {
     "@ckeditor/ckeditor5-build-classic": "^40.0.0",

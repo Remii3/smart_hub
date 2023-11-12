@@ -33,7 +33,6 @@ export default function MyCollections() {
   useEffect(() => {
     fetchData();
   }, []);
-  console.log(collections);
   return (
     <div>
       {collections.data &&

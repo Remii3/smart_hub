@@ -110,46 +110,37 @@ export default function SushiSwiper({
             arrayOfItems &&
             arrayOfItems.length > 0 &&
             arrayOfItems.map((item) => (
-              <>
-                {itemsType === 'Shop' && (
-                  <SwiperSlide
-                    key={swiperCategory + item._id}
-                    style={{ height: 'auto' }}
-                    className="min-w-[280px] pr-8"
-                  >
-                    <ShopCard
-                      _id={item._id}
-                      price={item.shop_info.price}
-                      productQuantity={item.quantity}
-                      title={item.title}
-                      authors={item.authors}
-                      description={item.description}
-                      img={
-                        item.imgs && item.imgs.length > 0
-                          ? item.imgs[0].url
-                          : ''
-                      }
-                      rating={item.rating}
-                    />
-                  </SwiperSlide>
+              <SwiperSlide
+                key={swiperCategory + item._id}
+                id={swiperCategory + item._id}
+                style={{ height: 'auto' }}
+                className="min-w-[280px] pr-8"
+              >
+                {itemsType === 'shop' && (
+                  <ShopCard
+                    _id={item._id}
+                    price={item.price.value}
+                    productQuantity={item.quantity}
+                    title={item.title}
+                    authors={item.authors}
+                    description={item.description}
+                    img={
+                      item.imgs && item.imgs.length > 0 ? item.imgs[0].url : ''
+                    }
+                    rating={item.rating}
+                  />
                 )}
-                {itemsType === 'Collection' && (
-                  <SwiperSlide
-                    key={swiperCategory + item._id}
-                    style={{ height: 'auto' }}
-                    className="min-w-[280px] pr-8"
-                  >
-                    <CollectionCard
-                      _id={item._id}
-                      imgs={item.imgs}
-                      price={item.price}
-                      rating={item.rating}
-                      shortDescription={item.shortDescription}
-                      title={item.title}
-                    />
-                  </SwiperSlide>
+                {itemsType === 'collection' && (
+                  <CollectionCard
+                    _id={item._id}
+                    imgs={item.imgs}
+                    price={item.price}
+                    rating={item.rating}
+                    shortDescription={item.shortDescription}
+                    title={item.title}
+                  />
                 )}
-              </>
+              </SwiperSlide>
             ))}
           {itemsType === 'Other' && children}
         </SuspenseComponent>

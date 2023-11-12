@@ -10,7 +10,7 @@ import {
   AuthorTypes,
   FetchDataTypes,
   ProductCategories,
-  UnknownProductTypes,
+  ProductTypes,
 } from '@customTypes/interfaces';
 import { UserContext } from '@context/UserProvider';
 import ProductPill from './ProductPill';
@@ -67,8 +67,8 @@ import errorToast from '@components/UI/error/errorToast';
 import useCashFormatter from '@hooks/useCashFormatter';
 import SimilarProducts from '@features/similarProducts/SimilarProducts';
 
-interface ProductTypes extends FetchDataTypes {
-  data: null | UnknownProductTypes;
+interface ProductTypesLocal extends FetchDataTypes {
+  data: null | ProductTypes;
 }
 interface ProductRating {
   quantity: number;
@@ -117,12 +117,13 @@ const formSchema = z.object({
     })
   ),
   description: z.string().optional(),
+  marketplace: z.string().optional(),
   quantity: z.number().min(1).optional(),
   price: z.string().or(z.number()).optional(),
 });
 
 export default function ProductPage() {
-  const [productState, setProductState] = useState<ProductTypes>({
+  const [productState, setProductState] = useState<ProductTypesLocal>({
     isLoading: false,
     hasError: null,
     data: null,
@@ -192,10 +193,10 @@ export default function ProductPage() {
 
   const fetchComments = useCallback(async () => {
     const { data } = await useGetAccessDatabase({
-      url: DATABASE_ENDPOINTS.PRODUCT_RATING,
-      params: { _id: prodId },
+      url: DATABASE_ENDPOINTS.RATING_RATING,
+      params: { targetId: prodId },
     });
-    setProductRating({ quantity: data.rating.length, value: data.avgRating });
+    setProductRating({ quantity: data.quantity, value: data.avgRating });
   }, []);
 
   const fetchData = useCallback(async () => {
@@ -221,7 +222,7 @@ export default function ProductPage() {
           title: data.title,
           authors: data.authors,
           categories: data.categories,
-          price: data.shop_info.price,
+          price: data.price.value,
           quantity: data.quantity,
           description: data.description,
         },
@@ -229,8 +230,8 @@ export default function ProductPage() {
       };
     });
     setProductRating({
-      quantity: data.rating.count,
-      value: data.rating.rating,
+      quantity: data.rating.quantity,
+      value: data.rating.avgRating,
     });
     setProductState({ data, isLoading: false, hasError: null });
   }, [prodId]);
@@ -246,8 +247,7 @@ export default function ProductPage() {
       userData.data &&
       ((userData.data.role == UserRoleTypes.AUTHOR &&
         userData.data.author_info.my_products.find(
-          (product: UnknownProductTypes) =>
-            product._id === productState.data?._id
+          (product: ProductTypes) => product._id === productState.data?._id
         )) ||
         userData.data.role == UserRoleTypes.ADMIN)
     ) {
@@ -274,11 +274,12 @@ export default function ProductPage() {
       }
       reset({
         title: productState.data.title,
-        price: productState.data.shop_info.price,
+        price: productState.data.price.value,
         authors: preparedAuthors,
         categories: preparedCategories,
         quantity: productState.data.quantity,
         description: productState.data.description,
+        marketplace: productState.data.marketplace,
       });
     }
   }, [userData.data, productState.data]);
@@ -339,7 +340,7 @@ export default function ProductPage() {
             authors: productState.data!.authors,
             categories: productState.data!.categories ?? [],
             description: productState.data!.description ?? '',
-            price: productState.data!.shop_info.price,
+            price: Number(productState.data!.price.value.slice(1)),
             quantity: productState.data!.quantity,
             title: productState.data!.title,
           },
@@ -387,7 +388,6 @@ export default function ProductPage() {
           }
         }
       }
-
       if (imgsToAdd.length > 0) {
         for (let i = 0; i < imgsToAdd.length; i++) {
           const index = selectedImgs.findIndex(
@@ -404,6 +404,7 @@ export default function ProductPage() {
           }
         }
       }
+
       function differentAuthors(
         array1: { label: string; value: string }[],
         array2: AuthorTypes[]
@@ -433,20 +434,13 @@ export default function ProductPage() {
         return true;
       }
       function validImgsArray(array1: SelectedImgsTypes) {
-        array1.forEach((item) => {
-          if (item.data) {
-            return true;
-          }
-        });
-
-        return false;
+        return true;
       }
       const productData = {
         _id: productState.data._id,
-        market_place: productState.data.market_place,
       } as {
         _id: string;
-        market_place: string;
+        marketplace?: string;
         title?: string;
         price?: string | number;
         quantity?: string | number;
@@ -457,7 +451,10 @@ export default function ProductPage() {
       };
       if (formResponse.title !== productState.data.title)
         productData.title = formResponse.title;
-      if (formResponse.price !== productState.data.shop_info.price)
+      if (productState.data.marketplace !== formResponse.marketplace) {
+        productData.marketplace = formResponse.marketplace;
+      }
+      if (formResponse.price !== productState.data.price.value)
         productData.price = formResponse.price;
       if (formResponse.description! == productState.data.description)
         productData.description = formResponse.description;
@@ -765,7 +762,7 @@ export default function ProductPage() {
               <form onSubmit={handleSubmit(updateProductData)}>
                 <div className="relative mb-3 w-full">
                   <ProductPill
-                    text={productState.data && productState.data.market_place}
+                    text={productState.data && productState.data.marketplace}
                   />
 
                   {(isMyProduct ||
@@ -908,17 +905,17 @@ export default function ProductPage() {
                     <div>
                       Added:{' '}
                       {productState.data &&
-                        productState.data.created_at.slice(0, 10)}
+                        productState.data.createdAt.slice(0, 10)}
                     </div>
                     <div>
                       <p>Seller:</p>
                       {productState.data && !productState.isLoading && (
                         <Link
-                          key={productState.data.seller_data._id}
+                          key={productState.data.creatorData._id}
                           className="pr-4"
-                          to={`/account/${productState.data.seller_data._id}`}
+                          to={`/account/${productState.data.creatorData._id}`}
                         >
-                          {productState.data.seller_data.pseudonim}
+                          {productState.data.creatorData.pseudonim}
                         </Link>
                       )}
                       {productState.isLoading && <Skeleton className="h-4" />}
@@ -1001,7 +998,7 @@ export default function ProductPage() {
                                   className="rounded-l-none shadow-none"
                                   placeholder={
                                     productState.data
-                                      ? `${productState.data.shop_info.price}`
+                                      ? `${productState.data.price.value}`
                                       : useCashFormatter({ number: 0 })
                                   }
                                   {...field}
@@ -1022,8 +1019,8 @@ export default function ProductPage() {
                       !productState.isLoading && (
                         <p className="text-xl font-bold">
                           {productState.data &&
-                            productState.data.shop_info &&
-                            productState.data.shop_info.price}
+                            productState.data.price &&
+                            productState.data.price.value}
                         </p>
                       )
                     )}
