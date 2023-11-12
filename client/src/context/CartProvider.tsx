@@ -32,9 +32,11 @@ export const CartContext = createContext<{
   addProductToCart: ({
     productId,
     productQuantity,
+    type,
   }: {
     productId: string;
     productQuantity: number;
+    type: string;
   }) => void;
   incrementCartItem: (productId: string) => void;
   decrementCartItem: (productId: string) => void;

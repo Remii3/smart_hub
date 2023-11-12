@@ -301,7 +301,6 @@ const getSearchedProducts = async (req, res) => {
       });
 
       const highestPrice = await Product.aggregate(pipeline);
-      console.log(highestPrice);
       rawData.highestPrice =
         highestPrice.length > 0
           ? cashFormatter({ number: highestPrice[0].maxNumber })

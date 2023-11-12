@@ -7,6 +7,7 @@ const getRandomString = require('../helpers/getRandomString');
 const prepareProductObject = require('../helpers/prepareProductObject');
 const salt = bcrypt.genSaltSync(12);
 const Collection = require('../Models/collection');
+const Product = require('../Models/product');
 
 const login = async (req, res) => {
   const { email, password } = req.body;
@@ -139,10 +140,6 @@ const getMyProfile = async (req, res) => {
       { password: 0 },
     ).populate([
       {
-        path: 'author_info',
-        populate: { path: 'my_products' },
-      },
-      {
         path: 'orders',
       },
       {
@@ -165,15 +162,18 @@ const getMyProfile = async (req, res) => {
       sold_books_quantity,
     } = author_info;
 
-    const preparedMyProducts = author_info.my_products.map(item => {
-      return prepareProductObject(item);
-    });
+    const userProducts = await Product.find({
+      $or: [{ authors: _id }, { 'creatorData._id': _id }],
+      sold: false,
+      deleted: false,
+      quantity: { $gt: 0 },
+    }).lean();
 
     const preparedAuthorInfo = {
       avg_products_grade,
       categories,
       followers,
-      my_products: preparedMyProducts,
+      my_products: userProducts,
       pseudonim,
       quote,
       short_description,
@@ -230,16 +230,17 @@ const getOtherProfile = async (req, res) => {
       sold_books_quantity,
       _id,
     } = author_info;
-
-    // const preparedMyProducts = author_info.my_products.map(item => {
-    //   return prepareProductObject(item);
-    // });
-
+    const userProducts = await Product.find({
+      $or: [{ authors: userId }, { 'creatorData._id': userId }],
+      sold: false,
+      deleted: false,
+      quantity: { $gt: 0 },
+    }).lean();
     const preparedAuthorInfo = {
       avg_products_grade,
       categories,
       followers,
-      my_products: preparedMyProducts,
+      my_products: userProducts,
       pseudonim,
       quote,
       short_description,

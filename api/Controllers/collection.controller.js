@@ -167,7 +167,6 @@ const createOneCollection = async (req, res) => {
 const updateOneCollection = async (req, res) => {
   const { collectionId } = req.body;
   const preparedData = req.collectionData;
-
   try {
     await Collection.updateOne({ _id: collectionId }, preparedData);
 

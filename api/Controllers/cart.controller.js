@@ -8,7 +8,7 @@ const stripe = require('stripe')(
 );
 
 const addItemToCart = async (req, res) => {
-  const { userId, productId, productQuantity } = req.body;
+  const { userId, productId, productQuantity, type } = req.body;
 
   if (!userId) {
     return res.status(422).json({ message: 'User id is required!' });
@@ -24,15 +24,38 @@ const addItemToCart = async (req, res) => {
 
   try {
     const cart = await Cart.findOne({ user_id: userId });
-    if (cart) {
-      const existingItem = await Cart.findOne({
+
+    if (!cart) {
+      await Cart.create({
         user_id: userId,
-        'products._id': productId,
+        products: [{ _id: productId, quantity: productQuantity }],
       });
-      if (existingItem) {
+      return res.status(201).json({ message: 'Successfully added' });
+    }
+
+    const existingItem = await Cart.findOne({
+      user_id: userId,
+      $or: [{ 'products._id': productId }, { 'collections._id': productId }],
+    });
+    if (existingItem) {
+      await Cart.updateOne(
+        { user_id: userId, 'products._id': productId },
+        { $inc: { 'products.$.quantity': productQuantity } },
+      );
+    } else {
+      console.log(productId);
+      console.log(productQuantity);
+      if (type === 'collection') {
         await Cart.updateOne(
-          { user_id: userId, 'products._id': productId },
-          { $inc: { 'products.$.quantity': productQuantity } },
+          { user_id: userId },
+          {
+            $push: {
+              collections: {
+                _id: productId,
+                quantity: productQuantity,
+              },
+            },
+          },
         );
       } else {
         await Cart.updateOne(
@@ -47,11 +70,6 @@ const addItemToCart = async (req, res) => {
           },
         );
       }
-    } else {
-      await Cart.create({
-        user_id: userId,
-        products: [{ _id: productId, quantity: productQuantity }],
-      });
     }
     return res.status(201).json({ message: 'Successfully added' });
   } catch (err) {
@@ -104,7 +122,7 @@ const getAllCartItems = async (req, res) => {
   try {
     const cartData = await Cart.findOne({ user_id: userId });
     let cartPrice = 0;
-
+    console.log(cartData);
     if (cartData) {
       const products = cartData.products;
       const productsData = [];
