@@ -332,6 +332,7 @@ export default function SearchPage() {
                     <ShopCard
                       key={item._id}
                       _id={item._id}
+                      categories={item.categories}
                       price={item.price.value}
                       productQuantity={item.quantity}
                       title={item.title}
@@ -342,7 +343,7 @@ export default function SearchPage() {
                           ? item.imgs[0].url
                           : null
                       }
-                      rating={item.rating.avgRating}
+                      rating={item.rating}
                       type={item.marketplace}
                     />
                   );

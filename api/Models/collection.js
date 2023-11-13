@@ -16,6 +16,7 @@ const CollectionSchema = new Schema({
     type: { avgRating: { type: Number }, quantity: { type: Number } },
     default: { avgRating: 0, quantity: 0 },
   },
+  imgs: { type: [{ url: String, id: String }] },
   createdAt: { type: Date, required: true, default: Date.now },
   updatedAt: { type: Date, required: true, default: Date.now },
   products: [{ type: Schema.Types.ObjectId, ref: 'Product' }],
@@ -26,6 +27,13 @@ const CollectionSchema = new Schema({
       currency: { type: String, required: true, default: 'USD' },
     },
   },
+  categories: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: 'Category',
+    },
+  ],
+  authors: [{ type: Schema.Types.ObjectId, ref: 'User' }],
   marketplace: { type: String, required: true, default: 'Collection' },
   deleted: { type: Boolean, required: true, default: false },
   expireAt: { type: Date, expires: 0 },

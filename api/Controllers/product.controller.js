@@ -23,7 +23,7 @@ const getAllProducts = async (req, res) => {
         .sort(sortMethod)
         .skip(skipPagesCopy)
         .limit(currentPageSize)
-        .populate('authors')
+        .populate(['authors', 'categories'])
         .lean();
       if (productsData.length <= 0 && skipPages > 1 && currentPage > 1) {
         flag = true;
@@ -71,7 +71,7 @@ const getShopProducts = async (req, res) => {
       ...query,
     })
       .sort(sortMethod)
-      .populate('authors')
+      .populate(['authors', 'categories'])
       .limit(limit)
       .lean();
 
@@ -147,8 +147,64 @@ const getOneProduct = async (req, res) => {
         sold: false,
         quantity: { $gt: 0 },
       })
-        .populate('creatorData')
+        .populate([
+          { path: 'creatorData' },
+          { path: 'products', populate: ['authors', 'categories'] },
+        ])
         .lean();
+      const preparedData = [...collectionsData];
+
+      for (let i = 0; i < collectionsData.length; i++) {
+        const imgs = [];
+        const authors = [];
+        const categories = [];
+
+        for (let j = 0; j < collectionsData[i].products.length; j++) {
+          for (
+            let k = 0;
+            k < collectionsData[i].products[j].authors.length;
+            k++
+          ) {
+            if (
+              !authors.find(
+                author =>
+                  author._id == collectionsData[i].products[j].authors[k]._id,
+              )
+            ) {
+              authors.push(collectionsData[i].products[j].authors[k]);
+            }
+          }
+          for (
+            let k = 0;
+            k < collectionsData[i].products[j].categories.length;
+            k++
+          ) {
+            if (
+              !categories.find(
+                category =>
+                  category._id ==
+                  collectionsData[i].products[j].categories[k]._id,
+              )
+            ) {
+              categories.push(collectionsData[i].products[j].categories[k]);
+            }
+          }
+          if (collectionsData[i].products[j].imgs.length > 0) {
+            imgs.push(collectionsData[i].products[j].imgs[0]);
+          }
+        }
+
+        preparedData[i].imgs = imgs;
+        preparedData[i].authors = authors;
+        preparedData[i].categories = categories;
+        preparedData[i].price = {
+          ...preparedData[i].price,
+          value: `${cashFormatter({
+            number: preparedData[i].price.value,
+          })}`,
+        };
+      }
+
       preparedProduct.collections = collectionsData;
     }
 
@@ -223,6 +279,7 @@ const getSearchedProducts = async (req, res) => {
             ...searchQuery,
             deleted: false,
           })
+            .populate('categories')
             .sort(sortMethod)
             .lean();
 
@@ -272,7 +329,7 @@ const getSearchedProducts = async (req, res) => {
           .sort(sortMethod)
           .skip(skipPagesCopy)
           .limit(currentPageSize)
-          .populate('authors')
+          .populate(['authors', 'categories'])
           .lean();
         if (productsData.length <= 0 && skipPages > 1 && currentPage > 1) {
           flag = true;
@@ -368,7 +425,9 @@ const addOneProduct = async (req, res) => {
         for (let i = 0; i < selectedCollections.length; i++) {
           await Collection.updateOne(
             { _id: selectedCollections[i] },
-            { $push: { products: _id } },
+            {
+              $push: { products: _id },
+            },
           );
         }
       } catch (err) {
@@ -391,7 +450,6 @@ const addOneProduct = async (req, res) => {
 const updateOneProduct = async (req, res) => {
   const { _id, selectedCollections } = req.body;
   const preparedData = req.preparedData;
-  console.log(preparedData);
   try {
     const updatedAt = new Date().getTime();
     const productData = await Product.findOne(

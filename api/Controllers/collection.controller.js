@@ -31,19 +31,51 @@ const findAllCollections = async (req, res) => {
         rating: 1,
       },
     )
-      .populate('products')
+      .populate({ path: 'products', populate: ['categories', 'authors'] })
       .sort(sortMethod)
       .limit(limit)
       .lean();
+
     const preparedData = [...collectionData];
+
     for (let i = 0; i < collectionData.length; i++) {
       const imgs = [];
+      const authors = [];
+      const categories = [];
+
       for (let j = 0; j < collectionData[i].products.length; j++) {
+        for (let k = 0; k < collectionData[i].products[j].authors.length; k++) {
+          if (
+            !authors.find(
+              author =>
+                author._id == collectionData[i].products[j].authors[k]._id,
+            )
+          ) {
+            authors.push(collectionData[i].products[j].authors[k]);
+          }
+        }
+        for (
+          let k = 0;
+          k < collectionData[i].products[j].categories.length;
+          k++
+        ) {
+          if (
+            !categories.find(
+              category =>
+                category._id == collectionData[i].products[j].categories[k]._id,
+            )
+          ) {
+            categories.push(collectionData[i].products[j].categories[k]);
+          }
+        }
         if (collectionData[i].products[j].imgs.length > 0) {
           imgs.push(collectionData[i].products[j].imgs[0]);
         }
       }
+
       preparedData[i].imgs = imgs;
+      preparedData[i].authors = authors;
+      preparedData[i].categories = categories;
       preparedData[i].price = {
         ...preparedData[i].price,
         value: `${cashFormatter({
@@ -51,6 +83,7 @@ const findAllCollections = async (req, res) => {
         })}`,
       };
     }
+
     return res.status(200).json({ data: preparedData });
   } catch (err) {
     return res

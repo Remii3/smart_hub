@@ -49,6 +49,10 @@ export default function MyCollections() {
                 rating={collection.rating}
                 imgs={collection.imgs}
                 shortDescription={collection.shortDescription}
+                authors={collection.authors}
+                categories={collection.categories}
+                type="collection"
+                productQuantity={collection.quantity}
               />
             ))}
           </div>

@@ -762,6 +762,10 @@ export default function NewProduct() {
                                     rating={collection.rating}
                                     price={collection.price}
                                     imgs={collection.imgs}
+                                    authors={collection.authors}
+                                    categories={collection.categories}
+                                    type="collection"
+                                    productQuantity={collection.productQuantity}
                                     showOnly
                                   />
                                 </div>

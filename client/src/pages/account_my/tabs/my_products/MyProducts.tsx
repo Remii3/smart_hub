@@ -99,6 +99,7 @@ export default function MyProducts({ tag, limit }: PropsTypes) {
               <ShopCard
                 key={product._id}
                 _id={product._id}
+                categories={product.categories}
                 price={product.price.value}
                 productQuantity={product.quantity}
                 title={product.title}
@@ -111,7 +112,7 @@ export default function MyProducts({ tag, limit }: PropsTypes) {
                     product.imgs[0].url) ||
                   null
                 }
-                rating={product.rating.avgRating}
+                rating={product.rating}
               />
             );
           })}

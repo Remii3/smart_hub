@@ -160,8 +160,9 @@ export interface ProductCardTypes {
   price: string;
   img: string | null;
   productQuantity: number;
-  rating: number;
+  rating: RatingTypes;
   type: MarketplaceTypes;
+  categories: CategoryTypes[];
 }
 
 // * news types
@@ -233,7 +234,16 @@ export interface CollectionObjectTypes {
 export interface CollectionCardTypes
   extends Pick<
     CollectionObjectTypes,
-    '_id' | 'title' | 'price' | 'imgs' | 'rating' | 'shortDescription'
+    | '_id'
+    | 'title'
+    | 'price'
+    | 'imgs'
+    | 'rating'
+    | 'shortDescription'
+    | 'authors'
+    | 'categories'
   > {
-  showOnly: boolean;
+  showOnly?: boolean;
+  productQuantity: number;
+  type: MarketplaceTypes;
 }

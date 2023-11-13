@@ -119,6 +119,7 @@ export default function SushiSwiper({
                 {itemsType === 'shop' && (
                   <ShopCard
                     _id={item._id}
+                    categories={item.categories}
                     price={item.price.value}
                     productQuantity={item.quantity}
                     title={item.title}
@@ -139,6 +140,10 @@ export default function SushiSwiper({
                     rating={item.rating}
                     shortDescription={item.shortDescription}
                     title={item.title}
+                    authors={item.authors}
+                    categories={item.categories}
+                    type="collection"
+                    productQuantity={item.quantity}
                   />
                 )}
               </SwiperSlide>

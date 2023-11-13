@@ -74,6 +74,10 @@ export default function BasicCollectionWidget({
               rating={collection.rating}
               shortDescription={collection.shortDescription}
               title={collection.title}
+              authors={collection.authors}
+              categories={collection.categories}
+              type="collection"
+              productQuantity={collection.productQuantity}
             />
           ))}
       </section>
