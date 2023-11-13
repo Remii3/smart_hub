@@ -434,7 +434,6 @@ export default function ProductPage() {
     }
   };
 
-  console.log(productState);
 
   if (!productState.data || userData.isLoading) return <></>;
   return (

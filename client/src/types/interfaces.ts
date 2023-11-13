@@ -134,7 +134,6 @@ export interface PostDataTypes {
 export interface CartProductTypes {
   inCartQuantity: number;
   productData: ProductTypes;
-  productsTotalPrice: number;
 }
 
 export interface CartTypes {

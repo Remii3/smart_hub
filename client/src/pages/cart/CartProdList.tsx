@@ -15,7 +15,6 @@ export default function CartProdList() {
             key={cartProduct.productData._id}
             productData={cartProduct.productData}
             inCartQuantity={cartProduct.inCartQuantity}
-            productsTotalPrice={cartProduct.productsTotalPrice}
           />
         ))}
       </ul>

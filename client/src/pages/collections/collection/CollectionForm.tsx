@@ -48,23 +48,23 @@ export default function CollectionForm({
     setSelectedQuantity((prevState) => (prevState -= 1));
   };
 
-  // const currentItem = cartState.products.find((product) => {
-  //   return product.productData._id === productId;
-  // });
+  const currentItem = cartState.products.find((product) => {
+    return product.productData._id === productId;
+  });
 
-  // if (currentItem) {
-  //   itemCapacity =
-  //     productQuantity! <= selectedQuantity ||
-  //     currentItem.inCartQuantity + selectedQuantity >= productQuantity! ||
-  //     false;
-  //   itemBtnCapacity =
-  //     productQuantity! < selectedQuantity ||
-  //     currentItem.inCartQuantity + selectedQuantity > productQuantity! ||
-  //     false;
-  // } else {
-  //   itemCapacity = productQuantity! <= selectedQuantity || false;
-  //   itemBtnCapacity = productQuantity! < selectedQuantity || false;
-  // }
+  if (currentItem) {
+    itemCapacity =
+      productQuantity! <= selectedQuantity ||
+      currentItem.inCartQuantity + selectedQuantity >= productQuantity! ||
+      false;
+    itemBtnCapacity =
+      productQuantity! < selectedQuantity ||
+      currentItem.inCartQuantity + selectedQuantity > productQuantity! ||
+      false;
+  } else {
+    itemCapacity = productQuantity! <= selectedQuantity || false;
+    itemBtnCapacity = productQuantity! < selectedQuantity || false;
+  }
 
   return (
     <form className="mt-8" onSubmit={(e) => addToCartHandler(e)}>

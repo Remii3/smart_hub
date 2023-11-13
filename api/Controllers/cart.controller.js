@@ -179,6 +179,7 @@ const getAllCartItems = async (req, res) => {
           marketplace: 1,
           price: 1,
           title: 1,
+          quantity: 1,
         }
       ).lean();
 
@@ -212,6 +213,7 @@ const getAllCartItems = async (req, res) => {
           price: 1,
           title: 1,
           marketplace: 1,
+          quantity: 1,
         }
       ).lean();
 

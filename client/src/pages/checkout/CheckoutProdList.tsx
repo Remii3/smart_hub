@@ -39,7 +39,6 @@ export default function CheckoutProdList() {
                   key={cartProduct.productData._id}
                   productData={cartProduct.productData}
                   inCartQuantity={cartProduct.inCartQuantity}
-                  productsTotalPrice={cartProduct.productsTotalPrice}
                 />
               ))}
             </ul>

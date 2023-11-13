@@ -4,23 +4,16 @@ import { TrashIcon } from '@heroicons/react/24/outline';
 import { CartProductTypes } from '@customTypes/interfaces';
 import { CartContext } from '@context/CartProvider';
 
-export default function CartPopupItem({
-  productData,
-  inCartQuantity,
-  productsTotalPrice,
-}: CartProductTypes) {
-  const [localQuantity, setLocalQuantity] = useState(inCartQuantity);
+export default function CartPopupItem({ productData, inCartQuantity }: CartProductTypes) {
   const { incrementCartItem, decrementCartItem, removeProductFromCart } =
     useContext(CartContext);
   if (!productData) return <div />;
 
   const decrementHandler = () => {
-    setLocalQuantity((prevState) => prevState - 1);
     decrementCartItem(productData._id, productData.marketplace);
   };
 
   const incrementHandler = () => {
-    setLocalQuantity((prevState) => prevState + 1);
     incrementCartItem(productData._id, productData.marketplace);
   };
   const removeHandler = () => {
@@ -67,8 +60,8 @@ export default function CartPopupItem({
           <div className="flex items-center">
             <button
               type="button"
-              className={`${!(localQuantity > 1) && 'text-gray-300'} px-2`}
-              disabled={!(localQuantity > 1)}
+              className={`${!(inCartQuantity > 1) && 'text-gray-300'} px-2`}
+              disabled={!(inCartQuantity > 1)}
               onClick={() => decrementHandler()}
             >
               -
@@ -79,7 +72,7 @@ export default function CartPopupItem({
             <input
               type="number"
               min="1"
-              value={localQuantity}
+              value={inCartQuantity}
               max={productData.quantity}
               readOnly
               disabled
@@ -89,9 +82,9 @@ export default function CartPopupItem({
             <button
               type="button"
               className={`${
-                localQuantity >= productData.quantity && 'text-gray-300'
+                inCartQuantity >= productData.quantity && 'text-gray-300'
               } px-2`}
-              disabled={localQuantity >= productData.quantity}
+              disabled={inCartQuantity >= productData.quantity}
               onClick={() => incrementHandler()}
             >
               +

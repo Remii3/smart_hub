@@ -4,28 +4,16 @@ import { TrashIcon } from '@heroicons/react/24/outline';
 import { CartProductTypes } from '@customTypes/interfaces';
 import { CartContext } from '@context/CartProvider';
 
-export default function CartItem({
-  productData,
-  inCartQuantity,
-  productsTotalPrice,
-}: CartProductTypes) {
-  const [localQuantity, setLocalQuantity] = useState(inCartQuantity);
-  const {
-    incrementCartItem,
-    decrementCartItem,
-    removeProductFromCart,
-    cartState,
-  } = useContext(CartContext);
-
+export default function CartItem({ productData, inCartQuantity }: CartProductTypes) {
+  const { incrementCartItem, decrementCartItem, removeProductFromCart } =
+    useContext(CartContext);
   if (!productData) return <div />;
 
   const decrementHandler = () => {
-    setLocalQuantity((prevState) => prevState - 1);
     decrementCartItem(productData._id, productData.marketplace);
   };
 
   const incrementHandler = () => {
-    setLocalQuantity((prevState) => prevState + 1);
     incrementCartItem(productData._id, productData.marketplace);
   };
 
@@ -70,12 +58,8 @@ export default function CartItem({
           <div className="flex items-center">
             <button
               type="button"
-              className={`${!(localQuantity > 1) && 'text-gray-300'} px-2`}
-              disabled={
-                !(localQuantity > 1) ||
-                cartState.isDecrementing === productData._id ||
-                cartState.isDeleting === productData._id
-              }
+              className={`${!(inCartQuantity > 1) && 'text-gray-300'} px-2`}
+              disabled={!(inCartQuantity > 1)}
               onClick={() => decrementHandler()}
             >
               -
@@ -87,7 +71,7 @@ export default function CartItem({
               type="number"
               min="1"
               max={productData.quantity}
-              value={localQuantity}
+              value={inCartQuantity}
               readOnly
               disabled
               id="Line1Qty"
@@ -96,13 +80,9 @@ export default function CartItem({
             <button
               type="button"
               className={`${
-                localQuantity >= productData.quantity && 'text-gray-300'
+                inCartQuantity >= productData.quantity && 'text-gray-300'
               } px-2`}
-              disabled={
-                localQuantity >= productData.quantity ||
-                cartState.isIncrementing === productData._id ||
-                cartState.isDeleting === productData._id
-              }
+              disabled={inCartQuantity >= productData.quantity}
               onClick={() => incrementHandler()}
             >
               +
