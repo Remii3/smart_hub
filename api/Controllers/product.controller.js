@@ -391,7 +391,7 @@ const addOneProduct = async (req, res) => {
 const updateOneProduct = async (req, res) => {
   const { _id, selectedCollections } = req.body;
   const preparedData = req.preparedData;
-
+  console.log(preparedData);
   try {
     const updatedAt = new Date().getTime();
     const productData = await Product.findOne(

@@ -128,6 +128,7 @@ export default function SushiSwiper({
                       item.imgs && item.imgs.length > 0 ? item.imgs[0].url : ''
                     }
                     rating={item.rating}
+                    type="shop"
                   />
                 )}
                 {itemsType === 'collection' && (

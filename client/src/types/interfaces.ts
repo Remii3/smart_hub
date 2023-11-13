@@ -17,6 +17,7 @@ export interface ProductTypes {
   };
   _id: string;
   title: string;
+  collections: CollectionObjectTypes[];
   description: string;
   shortDescription: string;
   quantity: number;
@@ -137,14 +138,12 @@ export interface CartProductTypes {
 }
 
 export interface CartTypes {
-  products:
-    | {
-        inCartQuantity: number;
-        productData: ProductTypes;
-        productsTotalPrice: number;
-      }[]
-    | [];
-  cartPrice: number;
+  products: {
+    inCartQuantity: number;
+    productData: ProductTypes;
+    productsTotalPrice: number;
+  }[];
+  cartPrice: number | null;
   isLoading: boolean;
   isAdding: boolean | string;
   isIncrementing: boolean | string;
@@ -163,6 +162,7 @@ export interface ProductCardTypes {
   img: string | null;
   productQuantity: number;
   rating: number;
+  type: MarketplaceTypes;
 }
 
 // * news types

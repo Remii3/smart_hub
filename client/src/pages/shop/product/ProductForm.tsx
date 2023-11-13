@@ -34,6 +34,7 @@ export default function ProductForm({
       addProductToCart({
         productId,
         productQuantity: selectedQuantity,
+        type: 'shop',
       });
       setSelectedQuantity(1);
     }

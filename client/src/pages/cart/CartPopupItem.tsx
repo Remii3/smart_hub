@@ -16,19 +16,23 @@ export default function CartPopupItem({
 
   const decrementHandler = () => {
     setLocalQuantity((prevState) => prevState - 1);
-    decrementCartItem(productData._id);
+    decrementCartItem(productData._id, productData.marketplace);
   };
 
   const incrementHandler = () => {
     setLocalQuantity((prevState) => prevState + 1);
-    incrementCartItem(productData._id);
+    incrementCartItem(productData._id, productData.marketplace);
   };
   const removeHandler = () => {
-    removeProductFromCart(productData._id);
+    removeProductFromCart(productData._id, productData.marketplace);
   };
+
   return (
     <li className="flex items-center gap-4">
-      <Link to={`/shop/${productData._id}`} className="block">
+      <Link
+        to={`/${productData.marketplace}/${productData._id}`}
+        className="block"
+      >
         {productData.imgs && productData.imgs[0] ? (
           <img
             src={productData.imgs[0].url}
@@ -44,14 +48,16 @@ export default function CartPopupItem({
         )}
       </Link>
       <div>
-        <Link to={`/shop/${productData._id}`} className="block">
+        <Link
+          to={`/${productData.marketplace}/${productData._id}`}
+          className="block"
+        >
           <h3 className="m-0 text-sm text-gray-900">{productData.title}</h3>
         </Link>
 
         <dl className="mt-0.5 space-y-px text-[10px] text-gray-600">
           <div>
-            <dt className="inline">Price:</dt>
-            <dd className="inline">{productData.price.value}</dd>
+            <span>{productData.price.value}</span>
           </div>
         </dl>
       </div>

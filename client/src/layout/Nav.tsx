@@ -45,7 +45,7 @@ export default function Nav({ scrollFlag }: { scrollFlag: boolean }) {
   const navLinkList = [
     { to: '/news', text: 'news' },
     { to: '/shop', text: 'shop' },
-    { to: '/collections', text: 'collections' },
+    { to: '/collection', text: 'collections' },
   ];
   const { userData, changeUserData } = useContext(UserContext);
   const { cartState } = useContext(CartContext);

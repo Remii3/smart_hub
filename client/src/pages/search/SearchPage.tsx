@@ -329,40 +329,22 @@ export default function SearchPage() {
                 searchedProductsData.products &&
                 searchedProductsData.products.map((item) => {
                   return (
-                    item.marketplace === 'shop' && (
-                      <ShopCard
-                        key={item._id}
-                        _id={item._id}
-                        price={item.price.value}
-                        productQuantity={item.quantity}
-                        title={item.title}
-                        authors={item.authors}
-                        description={item.description}
-                        img={
-                          item.imgs && item.imgs.length > 0
-                            ? item.imgs[0].url
-                            : null
-                        }
-                        rating={item.rating.avgRating}
-                      />
-                    )
-                  );
-                })}
-              {!searchedProductsData.isLoading &&
-                searchedProductsData.products &&
-                searchedProductsData.products.map((item) => {
-                  return (
-                    item.marketplace === 'collection' && (
-                      <CollectionCard
-                        key={item._id}
-                        _id={item._id}
-                        price={item.price}
-                        title={item.title}
-                        rating={item.rating}
-                        imgs={item.imgs}
-                        shortDescription={item.shortDescription}
-                      />
-                    )
+                    <ShopCard
+                      key={item._id}
+                      _id={item._id}
+                      price={item.price.value}
+                      productQuantity={item.quantity}
+                      title={item.title}
+                      authors={item.authors}
+                      description={item.description}
+                      img={
+                        item.imgs && item.imgs.length > 0
+                          ? item.imgs[0].url
+                          : null
+                      }
+                      rating={item.rating.avgRating}
+                      type={item.marketplace}
+                    />
                   );
                 })}
             </div>

@@ -66,6 +66,7 @@ import Select from 'react-select';
 import errorToast from '@components/UI/error/errorToast';
 import useCashFormatter from '@hooks/useCashFormatter';
 import SimilarProducts from '@features/similarProducts/SimilarProducts';
+import SushiSwiper from '@components/swiper/SushiSwiper';
 
 interface ProductTypesLocal extends FetchDataTypes {
   data: null | ProductTypes;
@@ -357,9 +358,6 @@ export default function ProductPage() {
     formResponse: z.infer<typeof formSchema>
   ) => {
     if (productState.data) {
-      setProductState((prevState) => {
-        return { ...prevState, isLoading: true };
-      });
       setProductEditState((prevState) => {
         return { ...prevState, isLoading: true };
       });
@@ -405,78 +403,15 @@ export default function ProductPage() {
         }
       }
 
-      function differentAuthors(
-        array1: { label: string; value: string }[],
-        array2: AuthorTypes[]
-      ) {
-        if (array1.length === array2.length) {
-          return array1.every((element, index) => {
-            if (element.label === array2[index].author_info.pseudonim) {
-              return false;
-            }
-            return true;
-          });
-        }
-        return true;
-      }
-      function differentCategories(
-        array1: { label: string; value: string }[],
-        array2: ProductCategories[]
-      ) {
-        if (array1.length === array2.length) {
-          return array1.every((element, index) => {
-            if (element.value === array2[index].value) {
-              return false;
-            }
-            return true;
-          });
-        }
-        return true;
-      }
-      function validImgsArray(array1: SelectedImgsTypes) {
-        return true;
-      }
-      const productData = {
-        _id: productState.data._id,
-      } as {
-        _id: string;
-        marketplace?: string;
-        title?: string;
-        price?: string | number;
-        quantity?: string | number;
-        description?: string;
-        authors?: any[];
-        categories?: any[];
-        imgs?: any[];
-      };
-      if (formResponse.title !== productState.data.title)
-        productData.title = formResponse.title;
-      if (productState.data.marketplace !== formResponse.marketplace) {
-        productData.marketplace = formResponse.marketplace;
-      }
-      if (formResponse.price !== productState.data.price.value)
-        productData.price = formResponse.price;
-      if (formResponse.description! == productState.data.description)
-        productData.description = formResponse.description;
-      if (formResponse.quantity !== formResponse.quantity)
-        productData.quantity = formResponse.quantity;
-      if (
-        formResponse.authors &&
-        differentAuthors(formResponse.authors, productState.data.authors)
-      )
-        productData.authors = formResponse.authors;
-      if (
-        productState.data.categories &&
-        differentCategories(
-          formResponse.categories,
-          productState.data.categories
-        )
-      )
-        productData.categories = formResponse.categories;
-      if (validImgsArray(filteredImgs)) productData.imgs = filteredImgs;
+      const dirtyData = Object.fromEntries(
+        Object.keys(form.formState.dirtyFields).map((x: string) => [
+          x,
+          form.getValues(x as keyof z.infer<typeof formSchema>),
+        ])
+      );
       await usePostAccessDatabase({
         url: DATABASE_ENDPOINTS.PRODUCT_UPDATE,
-        body: productData,
+        body: { _id: productState.data._id, ...dirtyData, imgs: filteredImgs },
       });
       setImgsToAdd([]);
       setImgsToRemove([]);
@@ -498,6 +433,9 @@ export default function ProductPage() {
       navigate(-1);
     }
   };
+
+  console.log(productState);
+
   if (!productState.data || userData.isLoading) return <></>;
   return (
     <MainContainer className="relative py-8">
@@ -1125,14 +1063,29 @@ export default function ProductPage() {
                 </div>
               </form>
             </Form>
-            <ProductForm
-              productId={productState.data?._id}
-              productQuantity={productState.data?.quantity}
-              sold={(productState.data && productState.data.sold) || false}
-              isEditing={productEditState.isEditing}
-            />
+            {productState.data.marketplace === 'shop' && (
+              <ProductForm
+                productId={productState.data?._id}
+                productQuantity={productState.data?.quantity}
+                sold={(productState.data && productState.data.sold) || false}
+                isEditing={productEditState.isEditing}
+              />
+            )}
           </div>
         </div>
+        {productState.data.collections &&
+          productState.data.collections.length > 0 && (
+            <div>
+              <h2 className="mb-4 text-3xl">Collection with this item</h2>
+              <section className="px-2">
+                <SushiSwiper
+                  arrayOfItems={productState.data.collections}
+                  itemsType={'collection'}
+                  swiperCategory={`collections`}
+                />
+              </section>
+            </div>
+          )}
         {productState.data && productState.data.authors.length > 0 && (
           <SimilarProducts
             authorId={productState.data.authors[0]._id}

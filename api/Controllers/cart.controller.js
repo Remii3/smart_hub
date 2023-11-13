@@ -1,5 +1,6 @@
 const Cart = require('../Models/cart');
 const Product = require('../Models/product');
+const Collection = require('../Models/collection');
 const calculateOrderAmount = require('../helpers/calculate/calculateOrderAmount');
 const cashFormatter = require('../helpers/cashFormatter');
 
@@ -37,27 +38,29 @@ const addItemToCart = async (req, res) => {
       user_id: userId,
       $or: [{ 'products._id': productId }, { 'collections._id': productId }],
     });
+
     if (existingItem) {
-      await Cart.updateOne(
-        { user_id: userId, 'products._id': productId },
-        { $inc: { 'products.$.quantity': productQuantity } },
-      );
-    } else {
-      console.log(productId);
-      console.log(productQuantity);
-      if (type === 'collection') {
-        await Cart.updateOne(
-          { user_id: userId },
-          {
-            $push: {
-              collections: {
-                _id: productId,
-                quantity: productQuantity,
-              },
-            },
-          },
-        );
-      } else {
+      switch (type) {
+        case 'shop': {
+          await Cart.updateOne(
+            { user_id: userId, 'products._id': productId },
+            { $inc: { 'products.$.quantity': productQuantity } },
+          );
+          break;
+        }
+        case 'collection': {
+          await Cart.updateOne(
+            { user_id: userId, 'collections._id': productId },
+            { $inc: { 'collections.$.quantity': productQuantity } },
+          );
+          break;
+        }
+      }
+      return res.status(201).json({ message: 'Successfully added' });
+    }
+
+    switch (type) {
+      case 'shop': {
         await Cart.updateOne(
           { user_id: userId },
           {
@@ -69,19 +72,34 @@ const addItemToCart = async (req, res) => {
             },
           },
         );
+        break;
+      }
+      case 'collection': {
+        await Cart.updateOne(
+          { user_id: userId },
+          {
+            $push: {
+              collections: {
+                _id: productId,
+                quantity: productQuantity,
+              },
+            },
+          },
+        );
+        break;
       }
     }
     return res.status(201).json({ message: 'Successfully added' });
   } catch (err) {
     return res.status(500).json({
-      message: 'Server error',
+      message: `Failed adding ${type} to cart.`,
       error: err.message,
     });
   }
 };
 
 const removeItemFromCart = async (req, res) => {
-  const { userId, productId } = req.body;
+  const { userId, productId, type } = req.body;
 
   if (!userId) {
     return res.status(422).json({ message: 'User id is required!' });
@@ -95,10 +113,22 @@ const removeItemFromCart = async (req, res) => {
     if (productId === 'all') {
       await Cart.updateOne({ user_id: userId }, { $set: { products: [] } });
     } else {
-      await Cart.updateOne(
-        { user_id: userId },
-        { $pull: { products: { _id: productId } } },
-      );
+      switch (type) {
+        case 'shop': {
+          await Cart.updateOne(
+            { user_id: userId },
+            { $pull: { products: { _id: productId } } },
+          );
+          break;
+        }
+        case 'collection': {
+          await Cart.updateOne(
+            { user_id: userId },
+            { $pull: { collections: { _id: productId } } },
+          );
+          break;
+        }
+      }
     }
     return res.status(200).json({ message: 'Success' });
   } catch (err) {
@@ -120,44 +150,94 @@ const getAllCartItems = async (req, res) => {
   }
 
   try {
-    const cartData = await Cart.findOne({ user_id: userId });
+    const productsData = [];
     let cartPrice = 0;
-    console.log(cartData);
-    if (cartData) {
-      const products = cartData.products;
-      const productsData = [];
 
-      for (const product of products) {
-        let totalPrice = 0;
-        const contents = await Product.findOne({ _id: product._id });
-        if (contents) {
-          totalPrice += contents.price.value * product.quantity;
-          const preparedProduct = contents;
-          productsData.push({
-            productData: preparedProduct,
-            inCartQuantity: product.quantity,
-            totalPrice: totalPrice,
-          });
-        } else {
-          await Cart.updateOne(
-            { user_id: userId, 'products._id': product._id },
-            { $pull: { products: { _id: product._id } } },
-          );
-        }
-      }
+    const { products, collections } = await Cart.findOne({
+      user_id: userId,
+    }).lean();
 
-      for (const product of productsData) {
-        cartPrice += product.totalPrice;
-      }
-
-      cartPrice = `${cashFormatter({ number: cartPrice })}`;
+    if (!products && !collections) {
+      cartPrice = `${cashFormatter({ number: 0 })}`;
       return res
         .status(200)
         .json({ data: { products: productsData, cartPrice } });
-    } else {
-      cartPrice = `${cashFormatter({ number: 0 })}`;
-      return res.status(200).json({ data: { products: [], cartPrice } });
     }
+
+    for (let i = 0; i < products.length; i++) {
+      const productData = await Product.findOne(
+        {
+          _id: products[i]._id,
+          deleted: false,
+          quantity: { $gt: 0 },
+          sold: false,
+        },
+        {
+          imgs: 1,
+          marketplace: 1,
+          price: 1,
+          title: 1,
+        },
+      ).lean();
+
+      if (productData) {
+        const dataCopy = { ...productData, price: { ...productData.price } };
+        dataCopy.price.value = `${cashFormatter({
+          number: dataCopy.price.value,
+        })}`;
+        productsData.push({
+          productData: dataCopy,
+          inCartQuantity: products[i].quantity,
+          totalPrice: productData.price.value * products[i].quantity,
+        });
+        cartPrice += productData.price.value * products[i].quantity;
+      } else {
+        await Cart.updateOne(
+          { user_id: userId, 'products._id': products[i]._id },
+          { $pull: { products: { _id: products[i]._id } } },
+        );
+      }
+    }
+    for (let i = 0; i < collections.length; i++) {
+      const collectionData = await Collection.findOne(
+        {
+          _id: collections[i]._id,
+          deleted: false,
+          quantity: { $gt: 0 },
+          sold: false,
+        },
+        {
+          price: 1,
+          title: 1,
+          marketplace: 1,
+        },
+      ).lean();
+
+      if (collectionData) {
+        const dataCopy = {
+          ...collectionData,
+          price: { ...collectionData.price },
+        };
+        dataCopy.price.value = `${cashFormatter({
+          number: dataCopy.price.value,
+        })}`;
+        productsData.push({
+          productData: dataCopy,
+          inCartQuantity: collections[i].quantity,
+          totalPrice: collectionData.price.value * collections[i].quantity,
+        });
+        cartPrice += collectionData.price.value * collections[i].quantity;
+      } else {
+        await Cart.updateOne(
+          { user_id: userId, 'products._id': collections[i]._id },
+          { $pull: { collections: { _id: collections[i]._id } } },
+        );
+      }
+    }
+    cartPrice = `${cashFormatter({ number: cartPrice })}`;
+    return res
+      .status(200)
+      .json({ data: { products: productsData, cartPrice } });
   } catch (err) {
     return res.status(500).json({
       message: "We couldn't update your cart data",
@@ -167,7 +247,7 @@ const getAllCartItems = async (req, res) => {
 };
 
 const cartItemIncrement = async (req, res) => {
-  const { userId, productId } = req.body;
+  const { userId, productId, type } = req.body;
   if (!userId) {
     return res.status(422).json({ message: 'User id is required!' });
   }
@@ -175,11 +255,25 @@ const cartItemIncrement = async (req, res) => {
   if (!productId) {
     return res.status(422).json({ message: 'Product id is required!' });
   }
+
   try {
-    await Cart.updateOne(
-      { user_id: userId, 'products._id': productId },
-      { $inc: { 'products.$.quantity': 1 } },
-    );
+    switch (type) {
+      case 'shop': {
+        await Cart.updateOne(
+          { user_id: userId, 'products._id': productId },
+          { $inc: { 'products.$.quantity': 1 } },
+        );
+        break;
+      }
+      case 'collection': {
+        await Cart.updateOne(
+          { user_id: userId, 'collections._id': productId },
+          { $inc: { 'collections.$.quantity': 1 } },
+        );
+        break;
+      }
+    }
+
     return res.status(200).json({ message: 'Successfuly updated data' });
   } catch (err) {
     return res.status(500).json({
@@ -190,7 +284,7 @@ const cartItemIncrement = async (req, res) => {
 };
 
 const cartItemDecrement = async (req, res) => {
-  const { userId, productId } = req.body;
+  const { userId, productId, type } = req.body;
   if (!userId) {
     return res.status(422).json({ message: 'User id is required!' });
   }
@@ -200,10 +294,20 @@ const cartItemDecrement = async (req, res) => {
   }
 
   try {
-    await Cart.updateOne(
-      { user_id: userId, 'products._id': productId },
-      { $inc: { 'products.$.quantity': -1 } },
-    );
+    switch (type) {
+      case 'shop': {
+        await Cart.updateOne(
+          { user_id: userId, 'products._id': productId },
+          { $inc: { 'products.$.quantity': -1 } },
+        );
+      }
+      case 'collection': {
+        await Cart.updateOne(
+          { user_id: userId, 'collections._id': productId },
+          { $inc: { 'collections.$.quantity': -1 } },
+        );
+      }
+    }
 
     return res.status(200).json({ message: 'Successfuly updated data' });
   } catch (err) {

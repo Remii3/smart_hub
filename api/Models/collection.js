@@ -26,6 +26,7 @@ const CollectionSchema = new Schema({
       currency: { type: String, required: true, default: 'USD' },
     },
   },
+  marketplace: { type: String, required: true, default: 'Collection' },
   deleted: { type: Boolean, required: true, default: false },
   expireAt: { type: Date, expires: 0 },
 });

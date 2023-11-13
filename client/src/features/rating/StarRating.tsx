@@ -49,7 +49,6 @@ export default function StarRating({
       setHoveredValue(0);
     }
   };
-
   const renderStars = () => {
     const stars = [];
     for (let i = 1; i <= 5; i++) {

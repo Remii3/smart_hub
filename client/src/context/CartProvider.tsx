@@ -18,7 +18,7 @@ import { DATABASE_ENDPOINTS } from '@data/endpoints';
 
 const initialState = {
   products: [],
-  cartPrice: 0,
+  cartPrice: null,
   isLoading: false,
   isAdding: false,
   isIncrementing: false,
@@ -38,9 +38,9 @@ export const CartContext = createContext<{
     productQuantity: number;
     type: string;
   }) => void;
-  incrementCartItem: (productId: string) => void;
-  decrementCartItem: (productId: string) => void;
-  removeProductFromCart: (productId: string) => void;
+  incrementCartItem: (productId: string, type: string) => void;
+  decrementCartItem: (productId: string, type: string) => void;
+  removeProductFromCart: (productId: string, type: string) => void;
 }>({
   cartState: initialState,
   fetchCartData: () => null,
@@ -76,9 +76,11 @@ export default function CartProvider({ children }: { children: ReactNode }) {
     async ({
       productId,
       productQuantity,
+      type,
     }: {
       productId: string;
       productQuantity: number;
+      type: string;
     }) => {
       setCart((prevState) => {
         return { ...prevState, isAdding: productId };
@@ -86,7 +88,7 @@ export default function CartProvider({ children }: { children: ReactNode }) {
 
       await usePostAccessDatabase({
         url: DATABASE_ENDPOINTS.CART_ADD,
-        body: { userId, productId, productQuantity },
+        body: { userId, productId, productQuantity, type },
       });
 
       await fetchCartData();
@@ -99,11 +101,10 @@ export default function CartProvider({ children }: { children: ReactNode }) {
   );
 
   const incrementCartItem = useCallback(
-    async (productId: string) => {
+    async (productId: string, type: string) => {
       if (!cartState) return;
 
       const newProducts = cartState.products;
-
       const productIndex = cartState.products.findIndex(
         (product) => product.productData._id === productId
       );
@@ -116,7 +117,7 @@ export default function CartProvider({ children }: { children: ReactNode }) {
 
       await usePostAccessDatabase({
         url: DATABASE_ENDPOINTS.CART_INCREMENT,
-        body: { userId, productId },
+        body: { userId, productId, type },
       });
       await fetchCartData();
       setCart((prevState) => {
@@ -135,7 +136,7 @@ export default function CartProvider({ children }: { children: ReactNode }) {
   );
 
   const decrementCartItem = useCallback(
-    async (productId: string) => {
+    async (productId: string, type: string) => {
       if (!cartState) return;
 
       const newProducts = cartState.products;
@@ -152,7 +153,7 @@ export default function CartProvider({ children }: { children: ReactNode }) {
 
       await usePostAccessDatabase({
         url: DATABASE_ENDPOINTS.CART_DECREMENT,
-        body: { userId, productId },
+        body: { userId, productId, type },
       });
       await fetchCartData();
       setCart((prevState) => {
@@ -171,7 +172,7 @@ export default function CartProvider({ children }: { children: ReactNode }) {
   );
 
   const removeProductFromCart = useCallback(
-    async (productId: string) => {
+    async (productId: string, type: string) => {
       if (!cartState) return;
 
       const newProducts = cartState.products.filter(
@@ -183,7 +184,7 @@ export default function CartProvider({ children }: { children: ReactNode }) {
       });
       await usePostAccessDatabase({
         url: DATABASE_ENDPOINTS.CART_REMOVE,
-        body: { userId, productId },
+        body: { userId, productId, type },
       });
 
       await fetchCartData();

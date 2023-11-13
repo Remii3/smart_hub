@@ -57,8 +57,8 @@ export default function AppRoutes() {
           <Route path="news" element={<NewsPage />} />
           <Route path="shop" element={<ShopPage />} />
           <Route path="shop/:id" element={<ProductPage />} />
-          <Route path="collections" element={<CollectionsPage />} />
-          <Route path="collections/:id" element={<CollectionPage />} />
+          <Route path="collection" element={<CollectionsPage />} />
+          <Route path="collection/:id" element={<CollectionPage />} />
           <Route path="search" element={<SearchPage />} />
           <Route path="cart" element={<CartPage />} />
           <Route path="checkout" element={<Outlet />}>

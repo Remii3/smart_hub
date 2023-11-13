@@ -1,9 +1,9 @@
 import { FormEvent, useContext, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { CartContext } from '@context/CartProvider';
-import { CartProductTypes, ProductShopCardType } from '@customTypes/interfaces';
+import { CartProductTypes, ProductCardTypes } from '@customTypes/interfaces';
 import LoadingCircle from '@components/Loaders/LoadingCircle';
-import { Button } from '@components/UI/button';
+import { Button, buttonVariants } from '@components/UI/button';
 import { Skeleton } from '@components/UI/skeleton';
 import StarRating from '@features/rating/StarRating';
 import { ShoppingCartIcon } from '@heroicons/react/24/solid';
@@ -23,7 +23,8 @@ export default function ShopCard({
   img,
   productQuantity,
   rating,
-}: ProductShopCardType) {
+  type,
+}: ProductCardTypes) {
   const { addProductToCart, cartState } = useContext(CartContext);
   let itemBtnCapacity = false;
 
@@ -44,6 +45,7 @@ export default function ShopCard({
       addProductToCart({
         productId: _id,
         productQuantity: 1,
+        type: 'shop',
       });
     }
   };
@@ -103,41 +105,56 @@ export default function ShopCard({
           </div>
         </div>
         <div className="px-3 pb-3">
-          {rating && (
-            <div className="pb-1">
-              <StarRating showOnly rating={rating ? rating : 0} />
+          <div className="pb-1">
+            <StarRating showOnly rating={rating ? rating : 0} />
+          </div>
+
+          {type === 'shop' && (
+            <div className="flex flex-col gap-3">
+              <div className="flex flex-wrap items-end justify-between gap-3">
+                <h3 className="flex items-center text-3xl lg:text-4xl">
+                  {price}
+                </h3>
+                <Button
+                  type="submit"
+                  variant="default"
+                  disabled={
+                    cartState.isAdding === _id ||
+                    cartState.isDeleting === _id ||
+                    itemBtnCapacity
+                  }
+                  className="relative flex-grow"
+                >
+                  {cartState.isAdding === _id && <LoadingCircle />}
+                  <div
+                    className={`${
+                      cartState.isAdding === _id && 'invisible'
+                    } space-x-1`}
+                  >
+                    <span className="text-lg">
+                      +
+                      <ShoppingCartIcon className="inline-block h-6 w-6" />
+                    </span>
+                  </div>
+                </Button>
+              </div>
             </div>
           )}
-
-          <div className="flex flex-col gap-3">
-            <div className="flex flex-wrap items-end justify-between gap-3">
-              <h3 className="flex items-center text-3xl lg:text-4xl">
-                {price}
-              </h3>
-              <Button
-                type="submit"
-                variant="default"
-                disabled={
-                  cartState.isAdding === _id ||
-                  cartState.isDeleting === _id ||
-                  itemBtnCapacity
-                }
-                className="relative flex-grow"
-              >
-                {cartState.isAdding === _id && <LoadingCircle />}
-                <div
-                  className={`${
-                    cartState.isAdding === _id && 'invisible'
-                  } space-x-1`}
+          {type === 'collection' && (
+            <div className="flex flex-col gap-3">
+              <div className="flex flex-wrap items-end justify-between gap-3">
+                <Link
+                  to={`/shop/${_id}`}
+                  aria-label="Show product page"
+                  className={`${buttonVariants({
+                    variant: 'default',
+                  })} relative flex-grow`}
                 >
-                  <span className="text-lg">
-                    +
-                    <ShoppingCartIcon className="inline-block h-6 w-6" />
-                  </span>
-                </div>
-              </Button>
+                  See now
+                </Link>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </form>
     </div>

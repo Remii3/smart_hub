@@ -10,7 +10,6 @@ const prepareUpdate = (req, res, next) => {
     marketplace,
     price,
   } = req.body;
-
   const preparedData = {};
 
   if (title) {
@@ -46,7 +45,7 @@ const prepareUpdate = (req, res, next) => {
   }
 
   if (price) {
-    preparedData.price = Number(price);
+    preparedData['price.value'] = Number(price);
   }
 
   req.preparedData = preparedData;

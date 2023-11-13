@@ -12,7 +12,7 @@ export default function CollectionCard({
   shortDescription,
 }: CollectionCardTypes) {
   return (
-    <Link to={`/collections/${_id}`} className="block rounded-md border p-3">
+    <Link to={`/collection/${_id}`} className="block rounded-md border p-3">
       <h4 className="">{title}</h4>
       <div>{shortDescription}</div>
       <div>{price.value}</div>
@@ -21,7 +21,7 @@ export default function CollectionCard({
           <StarRating rating={rating.avgRating} />
         </div>
       )}
-      {imgs.length > 0 && (
+      {imgs && imgs.length > 0 && (
         <div>
           {imgs.map((img) => (
             <img key={img.id} src={img.url} alt="Collecting img" />

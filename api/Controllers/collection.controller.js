@@ -85,7 +85,6 @@ const findOneCollection = async (req, res) => {
         populate: [{ path: 'authors' }, { path: 'categories' }],
       })
       .lean();
-
     const authors = [];
     for (let i = 0; i < collectionData.products.length; i++) {
       const productAuthors = collectionData.products[i].authors;
