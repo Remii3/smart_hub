@@ -59,6 +59,7 @@ import {
   SheetTrigger,
 } from '@components/UI/sheet';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@components/UI/tabs';
+import CollectionCard from '@components/cards/CollectionCard';
 
 type SelectedImgsTypes = {
   id: string;
@@ -734,24 +735,36 @@ export default function NewProduct() {
                           <section className="my-4 h-full space-y-4 overflow-y-auto">
                             {collectionsData.data &&
                               collectionsData.data.map((collection) => (
-                                <Label
-                                  key={collection._id}
-                                  className="block h-[25vh] bg-red-500"
-                                >
-                                  {collection.title}
-                                  <Checkbox
-                                    id={collection._id}
-                                    checked={selectedCollections.includes(
-                                      collection._id
-                                    )}
-                                    onCheckedChange={(checked) =>
-                                      changeSelectedCollectionsHandler(
-                                        checked as boolean,
+                                <div className="relative">
+                                  <Label
+                                    key={collection._id}
+                                    className="absolute inset-0 block h-full w-full cursor-pointer p-3 text-right"
+                                  >
+                                    <Checkbox
+                                      id={collection._id}
+                                      checked={selectedCollections.includes(
                                         collection._id
-                                      )
+                                      )}
+                                      onCheckedChange={(checked) =>
+                                        changeSelectedCollectionsHandler(
+                                          checked as boolean,
+                                          collection._id
+                                        )
+                                      }
+                                    />
+                                  </Label>
+                                  <CollectionCard
+                                    _id={collection._id}
+                                    title={collection.title}
+                                    shortDescription={
+                                      collection.shortDescription
                                     }
+                                    rating={collection.rating}
+                                    price={collection.price}
+                                    imgs={collection.imgs}
+                                    showOnly
                                   />
-                                </Label>
+                                </div>
                               ))}
                           </section>
                           <SheetFooter>

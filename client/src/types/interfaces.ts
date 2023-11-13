@@ -234,4 +234,6 @@ export interface CollectionCardTypes
   extends Pick<
     CollectionObjectTypes,
     '_id' | 'title' | 'price' | 'imgs' | 'rating' | 'shortDescription'
-  > {}
+  > {
+  showOnly: boolean;
+}

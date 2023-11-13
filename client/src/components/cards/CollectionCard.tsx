@@ -10,27 +10,39 @@ export default function CollectionCard({
   price,
   rating,
   shortDescription,
+  showOnly = false,
 }: CollectionCardTypes) {
   return (
     <Link to={`/collection/${_id}`} className="block rounded-md border p-3">
-      <h4 className="">{title}</h4>
-      <div>{shortDescription}</div>
-      <div>{price.value}</div>
-      {rating.avgRating > 0 && (
+      <h4 className="line-clamp-1">{title}</h4>
+      <div className="mb-2 line-clamp-2">{shortDescription}</div>
+      {!showOnly && <div>{price.value}</div>}
+      {!showOnly && rating.avgRating > 0 && (
         <div>
           <StarRating rating={rating.avgRating} />
         </div>
       )}
       {imgs && imgs.length > 0 && (
-        <div>
+        <div
+          className={`grid grid-cols-2 ${
+            imgs.length > 2 && 'grid-rows-2'
+          } px-2`}
+        >
           {imgs.map((img) => (
-            <img key={img.id} src={img.url} alt="Collecting img" />
+            <img
+              key={img.id}
+              src={img.url}
+              alt="Collection_img"
+              className="aspect-square"
+            />
           ))}
         </div>
       )}
-      <div>
-        <Button variant={'default'}>Check out</Button>
-      </div>
+      {!showOnly && (
+        <div>
+          <Button variant={'default'}>Check out</Button>
+        </div>
+      )}
     </Link>
   );
 }
