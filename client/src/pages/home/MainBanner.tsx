@@ -25,14 +25,14 @@ export default function MainBanner() {
               id="mainPageTitle"
               className="max-w-2xl text-left lg:max-w-3xl"
             >
-              <h1 className="text-5xl font-extrabold text-background md:text-7xl ">
+              <h1 className="text-5xl font-extrabold text-background sm:text-6xl md:text-7xl ">
                 Understand User Flow.{' '}
                 <strong className="font-extrabold text-[#3E74FF] sm:block">
                   Increase Conversion.
                 </strong>
               </h1>
 
-              <p className="mt-4 text-background sm:text-xl/relaxed">
+              <p className="mt-4 text-lg text-background sm:text-xl/relaxed">
                 Dive into the world of books and unleash your imagination!
                 Browse through our vast collection and find your next literary
                 escape.
