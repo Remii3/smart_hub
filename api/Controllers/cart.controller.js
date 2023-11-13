@@ -146,23 +146,25 @@ const removeItemFromCart = async (req, res) => {
 const getAllCartItems = async (req, res) => {
   const { userId } = req.query;
   if (!userId) {
-    return res.status(422).json({ message: 'User id is required!' });
+    return res.status(422).json({ message: "User id is required!" });
   }
-
   try {
     const productsData = [];
     let cartPrice = 0;
 
-    const { products, collections } = await Cart.findOne({
+    const cartData = await Cart.findOne({
       user_id: userId,
     }).lean();
 
-    if (!products && !collections) {
+    if (!cartData) {
       cartPrice = `${cashFormatter({ number: 0 })}`;
+
       return res
         .status(200)
         .json({ data: { products: productsData, cartPrice } });
     }
+    const products = cartData.products;
+    const collections = cartData.collections;
 
     for (let i = 0; i < products.length; i++) {
       const productData = await Product.findOne(
@@ -177,7 +179,7 @@ const getAllCartItems = async (req, res) => {
           marketplace: 1,
           price: 1,
           title: 1,
-        },
+        }
       ).lean();
 
       if (productData) {
@@ -193,8 +195,8 @@ const getAllCartItems = async (req, res) => {
         cartPrice += productData.price.value * products[i].quantity;
       } else {
         await Cart.updateOne(
-          { user_id: userId, 'products._id': products[i]._id },
-          { $pull: { products: { _id: products[i]._id } } },
+          { user_id: userId, "products._id": products[i]._id },
+          { $pull: { products: { _id: products[i]._id } } }
         );
       }
     }
@@ -210,7 +212,7 @@ const getAllCartItems = async (req, res) => {
           price: 1,
           title: 1,
           marketplace: 1,
-        },
+        }
       ).lean();
 
       if (collectionData) {
@@ -229,8 +231,8 @@ const getAllCartItems = async (req, res) => {
         cartPrice += collectionData.price.value * collections[i].quantity;
       } else {
         await Cart.updateOne(
-          { user_id: userId, 'products._id': collections[i]._id },
-          { $pull: { collections: { _id: collections[i]._id } } },
+          { user_id: userId, "products._id": collections[i]._id },
+          { $pull: { collections: { _id: collections[i]._id } } }
         );
       }
     }

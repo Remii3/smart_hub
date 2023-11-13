@@ -62,6 +62,7 @@ export default function CartProvider({ children }: { children: ReactNode }) {
         url: DATABASE_ENDPOINTS.CART_ALL,
         params: { userId },
       });
+      console.log(data);
       setCart((prevState) => {
         return {
           ...prevState,
