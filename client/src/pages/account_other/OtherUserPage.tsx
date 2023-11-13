@@ -310,7 +310,13 @@ export default function OtherUserPage() {
               </div>
               <div className="relative max-w-[1092px]">
                 <h4 className="mb-5">Collections</h4>
-                <p>TODO: ADD COLLECTIONS</p>
+                <SushiSwiper
+                  swiperCategory="collection"
+                  itemsType="collection"
+                  loadingState={otherUserData.isLoading}
+                  errorState={otherUserData.hasError}
+                  arrayOfItems={otherUserData.data.author_info.myCollections}
+                />
               </div>
             </section>
           )}

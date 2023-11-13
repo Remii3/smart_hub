@@ -918,50 +918,52 @@ export default function ProductPage() {
                       votes: {productRating?.quantity}
                     </span>
                   </div>
-                  <div>
-                    {productEditState.isEditing ? (
-                      <FormField
-                        name="price"
-                        control={control}
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Price</FormLabel>
-                            <FormControl>
-                              <div className="flex flex-row rounded-md shadow">
-                                <span className="flex items-center rounded-md rounded-r-none border border-input px-3 font-semibold text-foreground">
-                                  $
-                                </span>
-                                <Input
-                                  className="rounded-l-none shadow-none"
-                                  placeholder={
-                                    productState.data
-                                      ? `${productState.data.price.value}`
-                                      : useCashFormatter({ number: 0 })
-                                  }
-                                  {...field}
-                                  step="0.01"
-                                  type="number"
-                                  value={field.value}
-                                />
-                              </div>
-                            </FormControl>
-                            <FormDescription>
-                              This is the price of your book.
-                            </FormDescription>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    ) : (
-                      !productState.isLoading && (
-                        <p className="text-xl font-bold">
-                          {productState.data &&
-                            productState.data.price &&
-                            productState.data.price.value}
-                        </p>
-                      )
-                    )}
-                  </div>
+                  {productState.data.marketplace === 'shop' && (
+                    <div>
+                      {productEditState.isEditing ? (
+                        <FormField
+                          name="price"
+                          control={control}
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Price</FormLabel>
+                              <FormControl>
+                                <div className="flex flex-row rounded-md shadow">
+                                  <span className="flex items-center rounded-md rounded-r-none border border-input px-3 font-semibold text-foreground">
+                                    $
+                                  </span>
+                                  <Input
+                                    className="rounded-l-none shadow-none"
+                                    placeholder={
+                                      productState.data
+                                        ? `${productState.data.price.value}`
+                                        : useCashFormatter({ number: 0 })
+                                    }
+                                    {...field}
+                                    step="0.01"
+                                    type="number"
+                                    value={field.value}
+                                  />
+                                </div>
+                              </FormControl>
+                              <FormDescription>
+                                This is the price of your book.
+                              </FormDescription>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      ) : (
+                        !productState.isLoading && (
+                          <p className="text-xl font-bold">
+                            {productState.data &&
+                              productState.data.price &&
+                              productState.data.price.value}
+                          </p>
+                        )
+                      )}
+                    </div>
+                  )}
 
                   {productState.isLoading && <Skeleton className="h-6" />}
                 </div>

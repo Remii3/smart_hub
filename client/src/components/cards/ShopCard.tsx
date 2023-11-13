@@ -27,7 +27,6 @@ export default function ShopCard({
 }: ProductCardTypes) {
   const { addProductToCart, cartState } = useContext(CartContext);
   let itemBtnCapacity = false;
-
   let titleShortened = title;
 
   if (title.length >= 50) {

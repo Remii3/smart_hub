@@ -8,6 +8,7 @@ const prepareProductObject = require('../helpers/prepareProductObject');
 const salt = bcrypt.genSaltSync(12);
 const Collection = require('../Models/collection');
 const Product = require('../Models/product');
+const cashFormatter = require("../helpers/cashFormatter");
 
 const login = async (req, res) => {
   const { email, password } = req.body;
@@ -15,16 +16,16 @@ const login = async (req, res) => {
   const userDoc = await User.findOne({ email });
   if (!userDoc)
     return res.status(422).json({
-      name: 'email',
-      error: 'No account found',
-      message: 'No account found',
+      name: "email",
+      error: "No account found",
+      message: "No account found",
     });
   const passwordVerification = bcrypt.compareSync(password, userDoc.password);
   if (!passwordVerification)
     return res.status(422).json({
-      name: 'password',
-      error: 'Invalid password',
-      message: 'Invalid password',
+      name: "password",
+      error: "Invalid password",
+      message: "Invalid password",
     });
   jwt.sign(
     {
@@ -34,9 +35,9 @@ const login = async (req, res) => {
     process.env.JWT_SECRET,
     {},
     (err, token) => {
-      if (err) throw 'firts';
-      return res.status(200).cookie('token', token).json({ data: userDoc });
-    },
+      if (err) throw "firts";
+      return res.status(200).cookie("token", token).json({ data: userDoc });
+    }
   );
 };
 
@@ -60,14 +61,14 @@ const register = async (req, res) => {
           full_name: `${credentials.firstName} ${credentials.lastName}`,
         },
         address: {
-          line1: '',
-          line2: '',
-          city: '',
-          state: '',
-          postal_code: '',
-          country: '',
+          line1: "",
+          line2: "",
+          city: "",
+          state: "",
+          postal_code: "",
+          country: "",
         },
-        phone: '',
+        phone: "",
       },
       cart: cartId,
       following: [],
@@ -75,8 +76,8 @@ const register = async (req, res) => {
       author_info: {
         categories: [],
         pseudonim: `${credentials.firstName} ${credentials.lastName}`,
-        short_description: '',
-        quote: '',
+        short_description: "",
+        quote: "",
         avg_products_grade: 0,
         sold_books_quantity: 0,
         my_products: [],
@@ -98,12 +99,12 @@ const register = async (req, res) => {
       process.env.JWT_SECRET,
       {},
       (err, token) => {
-        if (err) throw 'firts';
+        if (err) throw "firts";
         return res
           .status(201)
-          .cookie('token', token)
-          .json({ message: 'Succesfully created an account' });
-      },
+          .cookie("token", token)
+          .json({ message: "Succesfully created an account" });
+      }
     );
   } catch (err) {
     if (err.code === 11000) {
@@ -111,12 +112,12 @@ const register = async (req, res) => {
       return res.status(422).json({
         message: Object.values(responseObject)[0] + ` already exists`,
         error: err.message,
-        name: 'email',
+        name: "email",
       });
     }
     return res
       .status(500)
-      .json({ message: 'Failed to register', error: err.message });
+      .json({ message: "Failed to register", error: err.message });
   }
 };
 
@@ -137,14 +138,14 @@ const getMyProfile = async (req, res) => {
       {
         _id: req.user.user_id,
       },
-      { password: 0 },
+      { password: 0 }
     ).populate([
       {
-        path: 'orders',
+        path: "orders",
       },
       {
-        path: 'orders',
-        populate: { path: 'products.product' },
+        path: "orders",
+        populate: { path: "products.product" },
       },
     ]);
 
@@ -163,17 +164,45 @@ const getMyProfile = async (req, res) => {
     } = author_info;
 
     const userProducts = await Product.find({
-      $or: [{ authors: _id }, { 'creatorData._id': _id }],
+      $or: [{ authors: _id }, { "creatorData._id": _id }],
       sold: false,
       deleted: false,
       quantity: { $gt: 0 },
     }).lean();
 
+    const userProductsCopy = userProducts.map((product) => ({
+      ...product,
+      price: {
+        ...product.price,
+        value: `${cashFormatter({
+          number: product.price.value,
+        })}`,
+      },
+    }));
+
+    const userCollections = await Collection.find({
+      "creatorData._id": _id,
+      sold: false,
+      deleted: false,
+      quantity: { $gt: 0 },
+    }).lean();
+
+    const userCollectionsCopy = userCollections.map((collection) => ({
+      ...collection,
+      price: {
+        ...collection.price,
+        value: `${cashFormatter({
+          number: collection.price.value,
+        })}`,
+      },
+    }));
+
     const preparedAuthorInfo = {
       avg_products_grade,
       categories,
       followers,
-      my_products: userProducts,
+      my_products: userProductsCopy,
+      myCollections: userCollectionsCopy,
       pseudonim,
       quote,
       short_description,
@@ -194,9 +223,9 @@ const getMyProfile = async (req, res) => {
       news,
     };
 
-    if (role !== 'User') {
+    if (role !== "User") {
       const collectionsData = await Collection.find({
-        'creatorData._id': _id,
+        "creatorData._id": _id,
         deleted: false,
       }).lean();
       preparedAuthorInfo.myCollections = collectionsData;
@@ -204,7 +233,9 @@ const getMyProfile = async (req, res) => {
     }
     res.status(200).json({ data: preparedUserData });
   } catch (err) {
-    res.status(500).json({ message: 'Failed to fetch user data' });
+    res
+      .status(500)
+      .json({ message: "Failed to fetch user data", error: err.message });
   }
 };
 
@@ -212,14 +243,14 @@ const getOtherProfile = async (req, res) => {
   const { userId } = req.query;
 
   if (!userId) {
-    return res.status(422).json({ message: 'user id is required' });
+    return res.status(422).json({ message: "user id is required" });
   }
 
   try {
     const { role, email, username, user_info, author_info, security_settings } =
       await User.findOne({
         _id: userId,
-      }).populate('author_info.my_products');
+      }).populate("author_info");
     const {
       avg_products_grade,
       categories,
@@ -230,17 +261,47 @@ const getOtherProfile = async (req, res) => {
       sold_books_quantity,
       _id,
     } = author_info;
+
     const userProducts = await Product.find({
-      $or: [{ authors: userId }, { 'creatorData._id': userId }],
+      $or: [{ authors: userId }, { "creatorData._id": userId }],
       sold: false,
       deleted: false,
       quantity: { $gt: 0 },
     }).lean();
+
+    const userProductsCopy = userProducts.map((product) => ({
+      ...product,
+      price: {
+        ...product.price,
+        value: `${cashFormatter({
+          number: product.price.value,
+        })}`,
+      },
+    }));
+
+    const userCollections = await Collection.find({
+      "creatorData._id": userId,
+      sold: false,
+      deleted: false,
+      quantity: { $gt: 0 },
+    }).lean();
+
+    const userCollectionsCopy = userCollections.map((collection) => ({
+      ...collection,
+      price: {
+        ...collection.price,
+        value: `${cashFormatter({
+          number: collection.price.value,
+        })}`,
+      },
+    }));
+
     const preparedAuthorInfo = {
       avg_products_grade,
       categories,
       followers,
-      my_products: userProducts,
+      my_products: userProductsCopy,
+      myCollections: userCollectionsCopy,
       pseudonim,
       quote,
       short_description,
@@ -251,7 +312,7 @@ const getOtherProfile = async (req, res) => {
     if (!security_settings.hide_private_information) {
       preparedUserInfo = user_info;
     }
-    if (role !== 'User') {
+    if (role !== "User") {
       return res.status(200).json({
         data: {
           email,
@@ -274,7 +335,7 @@ const getOtherProfile = async (req, res) => {
   } catch (err) {
     return res
       .status(500)
-      .json({ message: 'Failed to fetch user data', error: err.message });
+      .json({ message: "Failed to fetch user data", error: err.message });
   }
 };
 

@@ -117,7 +117,7 @@ export default function MyProducts({ tag, limit }: PropsTypes) {
           })}
       </div>
       {tag === 'all' && limit && (
-        <div>
+        <div className="flex justify-center">
           <Pagination
             currentPage={page}
             pageSize={limit}
