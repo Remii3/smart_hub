@@ -99,7 +99,7 @@ export default function LatestNews({
                   </section>
                 </div>
               </button>
-              <DialogContent className="h-full max-w-2xl overflow-y-auto sm:max-h-[80%]">
+              <DialogContent>
                 <NewsArticle
                   newsId={item._id}
                   updateNewsList={updateLatestNews}

@@ -67,9 +67,7 @@ export default function NewNews({
       shortDescription: '',
     },
   });
-  const addNewNewsHandler = async (
-    formResponse: z.infer<typeof formSchema>
-  ) => {
+  const addNewNewsHandler = async () => {
     if (!userData.data) return;
 
     const dirtyData = Object.fromEntries(
@@ -148,26 +146,31 @@ export default function NewNews({
       >
         Add news
       </Button>
-      <DialogContent className="max-h-[90%] overflow-y-scroll">
+      <DialogContent
+        className={`${
+          pushStatus.isLoading ? 'overflow-y-hidden' : 'overflow-y-auto'
+        }`}
+      >
         {pushStatus.isLoading && (
-          <div>
+          <div className="relative min-h-[1vh]">
             <LoadingCircle />
           </div>
         )}
         {!pushStatus.isLoading && pushStatus.hasError && (
           <ErrorMessage message={pushStatus.hasError} />
         )}
-        {!pushStatus.hasError && (
+        {!pushStatus.hasError && !pushStatus.isLoading && (
           <Form {...form}>
             <form
-              className={`${pushStatus.isLoading && 'invisible'} space-y-4`}
+              className={`flex flex-col space-y-4`}
               onSubmit={form.handleSubmit(addNewNewsHandler)}
             >
               <DialogHeader>
                 <DialogTitle>News</DialogTitle>
                 <DialogDescription>Add new news</DialogDescription>
               </DialogHeader>
-              <div className="flex flex-col gap-4">
+
+              <div className="flex flex-grow flex-col gap-4">
                 <FormField
                   name="title"
                   control={form.control}
@@ -211,14 +214,6 @@ export default function NewNews({
                   <FormLabel>Image</FormLabel>
                   <FormControl>
                     <Label className="cursor-pointer space-y-2">
-                      <Input
-                        type="file"
-                        className="block"
-                        name="mainImg"
-                        onChange={(e) => setSelectedImg(e.target.files)}
-                        accept="image/png, image/jpg, image/jpeg"
-                      />
-
                       {selectedImg && selectedImg.length > 0 && (
                         <div className="group relative">
                           <PlusCircleIcon className="absolute left-1/2 top-1/2 z-10 h-12 w-12 -translate-x-1/2 -translate-y-1/2 transform text-slate-300 opacity-75 brightness-75 transition-[opacity,filter] group-hover:opacity-100 group-hover:brightness-100" />
@@ -229,6 +224,13 @@ export default function NewNews({
                           />
                         </div>
                       )}
+                      <Input
+                        type="file"
+                        className="block cursor-pointer"
+                        name="mainImg"
+                        onChange={(e) => setSelectedImg(e.target.files)}
+                        accept="image/png, image/jpg, image/jpeg"
+                      />
                     </Label>
                   </FormControl>
 
@@ -280,6 +282,7 @@ export default function NewNews({
                   )}
                 </div>
               </div>
+
               <DialogFooter>
                 <Button variant="default" type="submit">
                   Submit

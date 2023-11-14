@@ -330,7 +330,7 @@ export default function NewProduct() {
       <DialogContent
         className={`${
           status.isLoading ? 'overflow-y-hidden' : 'overflow-y-auto'
-        } h-full max-h-[100vh] w-screen max-w-none transition-[height] duration-200 ease-in-out sm:h-auto sm:max-h-[90vh] sm:max-w-lg`}
+        }  `}
       >
         {status.isLoading && (
           <div className="flex items-center justify-center">
@@ -388,7 +388,7 @@ export default function NewProduct() {
             <Form {...form}>
               <form
                 onSubmit={handleSubmit(onSubmit)}
-                className="relative flex h-full max-h-[calc(100vh-50px)] flex-col space-y-8 sm:h-auto sm:max-h-[calc(90vh-50px)]"
+                className="relative flex flex-col space-y-4"
               >
                 <DialogHeader>
                   <DialogTitle>Add new product</DialogTitle>
@@ -418,7 +418,7 @@ export default function NewProduct() {
                     )}
                   />
                 </DialogHeader>
-                <article className="overflow-y-auto px-1">
+                <article className="flex-grow px-1">
                   <FormField
                     control={control}
                     name="title"

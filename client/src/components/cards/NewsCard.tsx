@@ -26,7 +26,12 @@ export default function NewsCard({
   return (
     <Dialog
       open={newsArticleDialogOpened == item._id}
-      onOpenChange={() => setNewsArticleDialogOpened(null)}
+      onOpenChange={() => {
+        if (updateTopRated && newsArticleDialogOpened !== null) {
+          updateTopRated();
+        }
+        setNewsArticleDialogOpened(null);
+      }}
     >
       <button
         type="button"
@@ -72,7 +77,7 @@ export default function NewsCard({
           </section>
         )}
       </button>
-      <DialogContent className="h-full w-full overflow-y-auto sm:max-h-[80%]">
+      <DialogContent>
         <NewsArticle
           newsId={item._id}
           updateNewsList={fetchData}

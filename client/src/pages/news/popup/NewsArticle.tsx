@@ -42,6 +42,7 @@ import { Label } from '@radix-ui/react-label';
 import { Badge } from '@components/UI/badge';
 import { Separator } from '@components/UI/separator';
 import { PlusCircleIcon } from '@heroicons/react/24/outline';
+import { Textarea } from '@components/UI/textarea';
 
 interface ArticleDataTypes extends FetchDataTypes {
   data: null | NewsType;
@@ -188,13 +189,17 @@ export default function NewsArticle({
       {articleData.isLoading && <LoadingCircle />}
       {articleData.hasError && <ErrorMessage message={articleData.hasError} />}
       {articleData.data && (
-        <div className={`${articleData.isLoading ? 'invisible' : 'visible'}`}>
+        <div
+          className={`${
+            articleData.isLoading ? 'invisible' : 'visible'
+          } relative`}
+        >
           <Form {...form}>
             <form onSubmit={form.handleSubmit(uploadNewDataHandler)}>
               {userData.data &&
                 (userData.data._id === articleData.data.creatorData._id ||
                   userData.data.role === UserRoleTypes.ADMIN) && (
-                  <div className="mb-4 space-x-2">
+                  <div className="mb-4 space-x-2 bg-white">
                     <DeleteDialog
                       deleteHandler={() => deleteArticleHandler(newsId)}
                       openState={openedDialog}
@@ -236,14 +241,14 @@ export default function NewsArticle({
                                   <img
                                     src={URL.createObjectURL(selectedImg[0])}
                                     alt="imgPreview"
-                                    className="aspect-square w-full rounded-xl object-cover brightness-75 transition-[filter] group-hover:brightness-50"
+                                    className="aspect-[16/9] w-full rounded-xl object-cover brightness-75 transition-[filter] group-hover:brightness-50"
                                   />
                                 )}
                                 {articleData.data.img?.url && !selectedImg && (
                                   <img
                                     src={articleData.data.img.url}
                                     alt="article_img"
-                                    className="aspect-square w-full rounded-xl object-cover brightness-75 transition-[filter] group-hover:brightness-50"
+                                    className="aspect-[16/9] w-full rounded-xl object-cover brightness-75 transition-[filter] group-hover:brightness-50"
                                   />
                                 )}
                               </div>
@@ -267,11 +272,11 @@ export default function NewsArticle({
                       <img
                         src={articleData.data.img.url}
                         alt="article_img"
-                        className="aspect-square w-full rounded-xl object-cover"
+                        className="aspect-[16/9] w-full rounded-xl object-cover"
                       />
                     )
                   )}
-                  <div className="flex items-center justify-between">
+                  <div className="flex flex-col items-start justify-between sm:flex-row sm:items-center">
                     <div>
                       {isEditing ? (
                         <FormField
@@ -331,6 +336,26 @@ export default function NewsArticle({
                       </div>
                     )}
                   </div>
+                  {isEditing && (
+                    <FormField
+                      name="shortDescription"
+                      control={form.control}
+                      render={({ field }) => {
+                        return (
+                          <FormItem>
+                            <FormLabel>Short description</FormLabel>
+                            <FormControl>
+                              <Textarea {...field} className="min-h-[14vh]" />
+                            </FormControl>
+                            <FormDescription>
+                              Change short description.
+                            </FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        );
+                      }}
+                    />
+                  )}
                   <div className="flex items-center">
                     <span className="mr-2">Author:</span>
                     <Link

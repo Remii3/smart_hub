@@ -109,11 +109,7 @@ export default function NewCollection() {
           Create collection
         </Button>
       </div>
-      <DialogContent
-        className={`${
-          uploadStatus.isLoading ? 'overflow-y-hidden' : 'overflow-y-auto'
-        } max-h-[80vh] transition-[height] duration-200 ease-in-out`}
-      >
+      <DialogContent>
         {uploadStatus.isLoading && <LoadingCircle />}
         {uploadStatus.hasError && (
           <div className="h-auto">
@@ -156,7 +152,7 @@ export default function NewCollection() {
             <Form {...form}>
               <form
                 onSubmit={form.handleSubmit(uploadCollectionHandler)}
-                className="space-y-8"
+                className="flex flex-col space-y-4"
               >
                 <DialogHeader>
                   <DialogTitle>Create new collection</DialogTitle>
@@ -165,84 +161,91 @@ export default function NewCollection() {
                     button when you&apos;re ready.
                   </DialogDescription>
                 </DialogHeader>
-                <FormField
-                  control={form.control}
-                  name="title"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Title</FormLabel>
-                      <FormControl>
-                        <Input type="text" placeholder="Title..." {...field} />
-                      </FormControl>
-                      <FormDescription>Collection title.</FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="description"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Desciption</FormLabel>
-                      <FormControl>
-                        <Textarea placeholder="Description..." {...field} />
-                      </FormControl>
-                      <FormDescription>Collection description.</FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="quantity"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Quantity</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="number"
-                          step={1}
-                          placeholder="0"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormDescription>
-                        How many collections you want to sell.
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="price"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Price</FormLabel>
-                      <FormControl>
-                        <div className="flex flex-row rounded-md shadow">
-                          <span className="flex items-center rounded-md rounded-r-none border border-input px-3 text-foreground">
-                            $
-                          </span>
+                <section className="flex flex-grow flex-col gap-4">
+                  <FormField
+                    control={form.control}
+                    name="title"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Title</FormLabel>
+                        <FormControl>
                           <Input
-                            id="search-Min-PriceSelector"
-                            className="rounded-l-none shadow-none"
-                            placeholder={useCashFormatter({ number: 0 })}
-                            step="0.01"
-                            type="number"
+                            type="text"
+                            placeholder="Title..."
                             {...field}
                           />
-                        </div>
-                      </FormControl>
-                      <FormDescription>
-                        This is the price of your book.
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
+                        </FormControl>
+                        <FormDescription>Collection title.</FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="description"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Desciption</FormLabel>
+                        <FormControl>
+                          <Textarea placeholder="Description..." {...field} />
+                        </FormControl>
+                        <FormDescription>
+                          Collection description.
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="quantity"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Quantity</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            step={1}
+                            placeholder="0"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormDescription>
+                          How many collections you want to sell.
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="price"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Price</FormLabel>
+                        <FormControl>
+                          <div className="flex flex-row rounded-md shadow">
+                            <span className="flex items-center rounded-md rounded-r-none border border-input px-3 text-foreground">
+                              $
+                            </span>
+                            <Input
+                              id="search-Min-PriceSelector"
+                              className="rounded-l-none shadow-none"
+                              placeholder={useCashFormatter({ number: 0 })}
+                              step="0.01"
+                              type="number"
+                              {...field}
+                            />
+                          </div>
+                        </FormControl>
+                        <FormDescription>
+                          This is the price of your book.
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </section>
                 <DialogFooter>
                   <Button variant="default" type="submit">
                     Add

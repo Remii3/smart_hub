@@ -94,7 +94,9 @@ export default function NewsPage() {
   return (
     <section>
       <section className="-mx-4 -mt-6 mb-14 h-[40vh]">
-        {latestNews.isLoading && <Skeleton className="h-[40vh] w-full" />}
+        {latestNews.isLoading && !latestNews.data && (
+          <Skeleton className="h-[40vh] w-full" />
+        )}
         {latestNews.hasError && <ErrorMessage message={latestNews.hasError} />}
         {latestNews.data && (
           <LatestNews
@@ -112,18 +114,18 @@ export default function NewsPage() {
               <div className="w-full">
                 <SearchNews updateAllNews={fetchAllNews} />
               </div>
-              <div className="inline-block">
-                {userData.data && userData.data.role !== UserRoleTypes.USER && (
+              {userData.data && userData.data.role !== UserRoleTypes.USER && (
+                <div className="inline-block">
                   <NewNews
                     updateAllNews={fetchAllNews}
                     updateLatestNews={fetchLatestNews}
                   />
-                )}
-              </div>
+                </div>
+              )}
             </div>
           </div>
           <div>
-            {allNews.isLoading && (
+            {allNews.isLoading && !allNews.data && (
               <div className="space-y-4">
                 {[...Array(3)].map((el, index) => (
                   <Skeleton
@@ -151,7 +153,7 @@ export default function NewsPage() {
         </main>
         <aside className="basis-full md:basis-1/3">
           <h3 className="mb-2">Top rated</h3>
-          {topRatedNews.isLoading && (
+          {topRatedNews.isLoading && !topRatedNews.data && (
             <div className="space-y-4">
               {[...Array(3)].map((el, index) => (
                 <Skeleton

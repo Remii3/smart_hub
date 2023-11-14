@@ -63,10 +63,6 @@ export default function VoteRating({
       hasError: null,
       isLoading: false,
     });
-
-    if (updateTopRated) {
-      updateTopRated();
-    }
   };
 
   const changeVoteHandler = async (voteType: VoteType) => {
