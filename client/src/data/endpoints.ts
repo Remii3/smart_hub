@@ -50,6 +50,7 @@ const NEWS_ENDPOINTS = {
   NEWS_ONE: `${MAIN_ROUTES.NEWS}/one`,
   NEWS_DELETE: `${MAIN_ROUTES.NEWS}/delete`,
   NEWS_UPDATE: `${MAIN_ROUTES.NEWS}/update`,
+  NEWS_SEARCH: `${MAIN_ROUTES.NEWS}/search`,
   NEWS_COMMENTS: `${MAIN_ROUTES.NEWS}/comments`,
 };
 

@@ -5,7 +5,7 @@ const Comment = require('../Models/comment');
 
 const getAllNews = async (req, res) => {
   try {
-    const data = await News.find({}, { comments: 0 }).sort({ createdAt: -1 });
+    const data = await News.find({}).sort({ createdAt: -1 });
     return res.status(200).json({ data });
   } catch (err) {
     return res.status(500).json({
@@ -23,17 +23,11 @@ const getOneNews = async (req, res) => {
   }
 
   try {
-    const data = await News.findOne({ _id: newsId })
-      .populate([
-        {
-          path: 'user',
-        },
-      ])
-      .lean();
-    const comments = await Comment.find({ 'targetData._id': data._id })
+    const newsData = await News.findOne({ _id: newsId }).lean();
+    const comments = await Comment.find({ 'targetData._id': newsData._id })
       .populate('creatorData')
       .lean();
-    const preparedData = { ...data, comments };
+    const preparedData = { ...newsData, comments };
     return res.status(200).json({ data: preparedData });
   } catch (err) {
     return res.status(500).json({
@@ -43,17 +37,13 @@ const getOneNews = async (req, res) => {
   }
 };
 const deleteOneNews = async (req, res) => {
-  const { userId, newsId } = req.body;
+  const { newsId } = req.body;
 
-  if (!userId) {
-    return res.json({ message: 'Provide user id' });
-  }
   if (!newsId) {
     return res.json({ message: 'Provide news id' });
   }
 
   try {
-    await User.updateOne({ _id: userId }, { $pull: { news: newsId } });
     await News.deleteOne({ _id: newsId });
     return res.json({ message: 'News was deleted' });
   } catch (err) {
@@ -71,6 +61,7 @@ const updateOne = async (req, res) => {
   if (img) {
     preparedData.img = img;
   }
+
   try {
     await News.updateOne(
       { _id },
@@ -88,10 +79,11 @@ const updateOne = async (req, res) => {
 };
 
 const addOneNews = async (req, res) => {
-  const { userId, title, subtitle, img, content } = req.body;
+  const { creatorData, title, subtitle, img, shortDescription, content } =
+    req.body;
 
-  if (!userId) {
-    return res.status(422).json({ message: 'Provide user id' });
+  if (!creatorData || !creatorData._id) {
+    return res.status(422).json({ message: 'Provide creatorData' });
   }
 
   try {
@@ -99,19 +91,38 @@ const addOneNews = async (req, res) => {
     const _id = new mongoose.Types.ObjectId();
 
     await News.create({
-      user: userId,
+      creatorData,
       _id,
       title,
-      subtitle: subtitle || null,
-      img: img || null,
-      content: content || null,
+      subtitle,
+      img,
+      shortDescription,
+      content: content,
       createdAt,
+      updatedAt: createdAt,
     });
-    await User.updateOne({ _id: userId }, { $push: { news: _id } });
     return res.status(201).json({ message: 'Success', id: _id });
   } catch (err) {
     return res.status(500).json({
       message: 'Failed adding news',
+      error: err.message,
+    });
+  }
+};
+
+const findSearchedNews = async (req, res) => {
+  const preparedData = req.preparedData;
+  const { limit } = req.searchOptions;
+  const sortMethod = req.sortMethod;
+  try {
+    const newsData = await News.find({ ...preparedData })
+      .sort(sortMethod)
+      .limit(limit);
+
+    return res.json({ data: newsData });
+  } catch (err) {
+    return res.status(500).json({
+      message: 'Failed searching for news',
       error: err.message,
     });
   }
@@ -123,4 +134,5 @@ module.exports = {
   addOneNews,
   deleteOneNews,
   updateOne,
+  findSearchedNews,
 };

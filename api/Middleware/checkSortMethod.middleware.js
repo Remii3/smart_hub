@@ -21,6 +21,12 @@ const checkSortMethod = (req, res, next) => {
       case 'Price, ASC':
         sortMethod['price.value'] = 1;
         break;
+      case 'latest':
+        sortMethod.createdAt = -1;
+        break;
+      case 'top_rated':
+        sortMethod['voting.quantity.likes'] = -1;
+        break;
     }
   } else {
     sortMethod.createdAt = -1;

@@ -31,17 +31,25 @@ import ErrorMessage from '@components/UI/error/ErrorMessage';
 import { CKEditor } from '@ckeditor/ckeditor5-react';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import { Skeleton } from '@components/UI/skeleton';
+import { Textarea } from '@components/UI/textarea';
+import { PlusCircleIcon } from '@heroicons/react/24/outline';
+import { Label } from '@components/UI/label';
 
 interface PropsTypes {
-  updateNewsList: () => void;
+  updateAllNews: () => void;
+  updateLatestNews: () => void;
 }
 
 const formSchema = z.object({
   title: z.string().nonempty(),
   subtitle: z.string(),
+  shortDescription: z.string(),
 });
 
-export default function NewNews({ updateNewsList }: PropsTypes) {
+export default function NewNews({
+  updateAllNews,
+  updateLatestNews,
+}: PropsTypes) {
   const [selectedImg, setSelectedImg] = useState<null | FileList>(null);
   const [openedDialog, setOpenedDialog] = useState(false);
   const [readyToShow, setReadyToShow] = useState(false);
@@ -56,13 +64,21 @@ export default function NewNews({ updateNewsList }: PropsTypes) {
     defaultValues: {
       title: '',
       subtitle: '',
+      shortDescription: '',
     },
   });
   const addNewNewsHandler = async (
     formResponse: z.infer<typeof formSchema>
   ) => {
     if (!userData.data) return;
-    const { title, subtitle } = formResponse;
+
+    const dirtyData = Object.fromEntries(
+      Object.keys(form.formState.dirtyFields).map((x: string) => [
+        x,
+        form.getValues(x as keyof z.infer<typeof formSchema>),
+      ])
+    );
+
     setPushStatus((prevState) => {
       return { ...prevState, isLoading: true };
     });
@@ -70,10 +86,12 @@ export default function NewNews({ updateNewsList }: PropsTypes) {
     const { data, error } = await usePostAccessDatabase({
       url: DATABASE_ENDPOINTS.NEWS_ONE,
       body: {
-        userId: userData.data._id,
-        title,
-        subtitle,
+        creatorData: {
+          _id: userData.data._id,
+          pseudonim: userData.data.author_info.pseudonim,
+        },
         content: contentData,
+        ...dirtyData,
       },
     });
     if (error) {
@@ -95,7 +113,8 @@ export default function NewNews({ updateNewsList }: PropsTypes) {
         return setPushStatus({ hasError: error, isLoading: false });
       }
     }
-    updateNewsList();
+    updateAllNews();
+    updateLatestNews();
     setOpenedDialog(false);
     setTimeout(() => {
       setPushStatus({ hasError: null, isLoading: false });
@@ -124,8 +143,10 @@ export default function NewNews({ updateNewsList }: PropsTypes) {
           }, 100);
           setOpenedDialog(true);
         }}
+        className="whitespace-nowrap"
+        type="button"
       >
-        Add new
+        Add news
       </Button>
       <DialogContent className="max-h-[90%] overflow-y-scroll">
         {pushStatus.isLoading && (
@@ -173,24 +194,44 @@ export default function NewNews({ updateNewsList }: PropsTypes) {
                     </FormItem>
                   )}
                 />
+                <FormField
+                  control={form.control}
+                  name="shortDescription"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Short description</FormLabel>
+                      <FormControl>
+                        <Textarea className="block" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
                 <FormItem>
                   <FormLabel>Image</FormLabel>
                   <FormControl>
-                    <Input
-                      type="file"
-                      className="block"
-                      name="mainImg"
-                      onChange={(e) => setSelectedImg(e.target.files)}
-                      accept="image/png, image/jpg, image/jpeg"
-                    />
+                    <Label className="cursor-pointer space-y-2">
+                      <Input
+                        type="file"
+                        className="block"
+                        name="mainImg"
+                        onChange={(e) => setSelectedImg(e.target.files)}
+                        accept="image/png, image/jpg, image/jpeg"
+                      />
+
+                      {selectedImg && selectedImg.length > 0 && (
+                        <div className="group relative">
+                          <PlusCircleIcon className="absolute left-1/2 top-1/2 z-10 h-12 w-12 -translate-x-1/2 -translate-y-1/2 transform text-slate-300 opacity-75 brightness-75 transition-[opacity,filter] group-hover:opacity-100 group-hover:brightness-100" />
+                          <img
+                            src={URL.createObjectURL(selectedImg[0])}
+                            alt="preview_img"
+                            className="aspect-square w-full rounded-xl object-cover brightness-75 transition-[filter] group-hover:brightness-50"
+                          />
+                        </div>
+                      )}
+                    </Label>
                   </FormControl>
-                  {selectedImg && selectedImg.length > 0 && (
-                    <img
-                      src={URL.createObjectURL(selectedImg[0])}
-                      alt="preview_img"
-                      className="aspect-square w-full object-cover"
-                    />
-                  )}
+
                   <FormMessage />
                 </FormItem>
                 <div>
@@ -204,7 +245,6 @@ export default function NewNews({ updateNewsList }: PropsTypes) {
                           toolbar: {
                             shouldNotGroupWhenFull: true,
                             items: [
-                              'alignment',
                               'heading',
                               '|',
                               'bold',

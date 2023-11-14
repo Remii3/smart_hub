@@ -1,33 +1,76 @@
 import { useCallback, useContext, useEffect, useState } from 'react';
-import { Dialog, DialogContent, DialogTrigger } from '@components/UI/dialog';
-import MainContainer from '@layout/MainContainer';
-import { NewsTypes } from '@customTypes/interfaces';
-import {
-  useGetAccessDatabase,
-  usePostAccessDatabase,
-} from '../../hooks/useAaccessDatabase';
-import { DATABASE_ENDPOINTS } from '../../data/endpoints';
-import { UserContext } from '@context/UserProvider';
-import NewsArticle from './NewsArticle';
+import AllNews from './parts/AllNews';
+import LatestNews from './parts/LatestNews';
+import TopRated from './parts/TopRated';
+import { useGetAccessDatabase } from '@hooks/useAaccessDatabase';
+import { DATABASE_ENDPOINTS } from '@data/endpoints';
 import errorToast from '@components/UI/error/errorToast';
-import NewNews from './NewNews';
+import { Skeleton } from '@components/UI/skeleton';
+import SearchNews from './parts/SearchNews';
+import ErrorMessage from '@components/UI/error/ErrorMessage';
+import { FetchDataTypes, NewsType } from '@customTypes/interfaces';
+import { UserContext } from '@context/UserProvider';
+import NewNews from './popup/NewNews';
 import { UserRoleTypes } from '@customTypes/types';
 
+interface NewsTypes extends FetchDataTypes {
+  data: null | NewsType[];
+}
 export default function NewsPage() {
-  const [newsArticleDialogOpened, setNewsArticleDialogOpened] = useState<
-    null | string
-  >(null);
+  const { userData } = useContext(UserContext);
 
-  const [newsList, setNewsList] = useState<NewsTypes>({
+  const [topRatedNews, setTopRatedNews] = useState<NewsTypes>({
+    data: null,
+    hasError: null,
+    isLoading: false,
+  });
+  const [latestNews, setLatestNews] = useState<NewsTypes>({
+    data: null,
+    hasError: null,
+    isLoading: false,
+  });
+  const [allNews, setAllNews] = useState<NewsTypes>({
     data: null,
     hasError: null,
     isLoading: false,
   });
 
-  const { userData } = useContext(UserContext);
+  const fetchTopRated = useCallback(async () => {
+    setTopRatedNews((prevState) => {
+      return { ...prevState, isLoading: true };
+    });
+    const { data, error } = await useGetAccessDatabase({
+      url: DATABASE_ENDPOINTS.NEWS_SEARCH,
+      params: { sortOption: 'top_rated', limit: 6 },
+    });
 
-  const fetchData = useCallback(async () => {
-    setNewsList((prevState) => {
+    if (error) {
+      errorToast(error);
+      return setTopRatedNews((prevState) => {
+        return { ...prevState, isLoading: false, hasError: error };
+      });
+    }
+    setTopRatedNews({ data, hasError: null, isLoading: false });
+  }, []);
+
+  const fetchLatestNews = useCallback(async () => {
+    setLatestNews((prevState) => {
+      return { ...prevState, isLoading: true };
+    });
+
+    const { data, error } = await useGetAccessDatabase({
+      url: DATABASE_ENDPOINTS.NEWS_SEARCH,
+      params: { sortOption: 'latest', limit: 6 },
+    });
+    if (error) {
+      errorToast(error);
+      return setLatestNews({ data: null, hasError: error, isLoading: false });
+    }
+    setLatestNews({ data, hasError: null, isLoading: false });
+  }, []);
+
+  const fetchAllNews = useCallback(async () => {
+    setAllNews((prevState) => {
       return { ...prevState, isLoading: true };
     });
     const { data, error } = await useGetAccessDatabase({
@@ -35,67 +78,106 @@ export default function NewsPage() {
     });
     if (error) {
       errorToast(error);
-      return setNewsList((prevState) => {
+      return setAllNews((prevState) => {
         return { ...prevState, isLoading: false, hasError: error };
       });
     }
-    setNewsList({ data, hasError: null, isLoading: false });
+    setAllNews({ data, hasError: null, isLoading: false });
   }, []);
 
   useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+    fetchLatestNews();
+    fetchTopRated();
+    fetchAllNews();
+  }, []);
 
   return (
-    <MainContainer>
-      <div>
-        <span>News</span>
-        {userData.data && userData.data.role !== UserRoleTypes.USER && (
-          <NewNews updateNewsList={fetchData} />
+    <section>
+      <section className="-mx-4 -mt-6 mb-14 h-[40vh]">
+        {latestNews.isLoading && <Skeleton className="h-[40vh] w-full" />}
+        {latestNews.hasError && <ErrorMessage message={latestNews.hasError} />}
+        {latestNews.data && (
+          <LatestNews
+            updateTopRated={fetchTopRated}
+            updateLatestNews={fetchLatestNews}
+            latestNewsData={latestNews.data}
+          />
         )}
-      </div>
-      <div className="flex flex-col gap-4">
-        {newsList.data ? (
-          newsList.data.map((item) => (
-            <div key={item._id} className="p-3">
-              <Dialog
-                open={newsArticleDialogOpened == item._id}
-                onOpenChange={() => setNewsArticleDialogOpened(null)}
-              >
-                <button
-                  type="button"
-                  onClick={() => setNewsArticleDialogOpened(item._id)}
-                  aria-label="Show news article"
-                  className="rounded-md border border-slate-400 p-3 text-start shadow-sm"
-                >
-                  {item.img && (
-                    <div className="flex max-h-[200px]">
-                      <img
-                        src={item.img.url}
-                        className="aspect-auto w-full object-cover object-center"
-                        alt="news_img"
-                      />
-                    </div>
-                  )}
-                  <h6>{item.title}</h6>
-                  {item.subtitle && (
-                    <section className="pt-3">{item.subtitle}</section>
-                  )}
-                </button>
-                <DialogContent className="h-full w-full overflow-y-auto sm:max-h-[80%]">
-                  <NewsArticle
-                    newsId={item._id}
-                    updateNewsList={fetchData}
-                    dialogOpenedHandler={setNewsArticleDialogOpened}
+      </section>
+      <section className="relative flex flex-col-reverse justify-between gap-4 md:flex-row">
+        <main className="flex flex-col gap-4 md:basis-3/5">
+          <div>
+            <h3 className="mb-2">Latest</h3>
+            <div className="flex gap-4">
+              <div className="w-full">
+                <SearchNews updateAllNews={fetchAllNews} />
+              </div>
+              <div className="inline-block">
+                {userData.data && userData.data.role !== UserRoleTypes.USER && (
+                  <NewNews
+                    updateAllNews={fetchAllNews}
+                    updateLatestNews={fetchLatestNews}
                   />
-                </DialogContent>
-              </Dialog>
+                )}
+              </div>
             </div>
-          ))
-        ) : (
-          <h4>No news</h4>
-        )}
-      </div>
-    </MainContainer>
+          </div>
+          <div>
+            {allNews.isLoading && (
+              <div className="space-y-4">
+                {[...Array(3)].map((el, index) => (
+                  <Skeleton
+                    key={index}
+                    className="flex w-full flex-col justify-between p-3"
+                  >
+                    <Skeleton className="mb-4 h-5 w-32" />
+                    <div className="space-y-2">
+                      <Skeleton className="h-4 w-40" />
+                      <Skeleton className="h-4 w-44" />
+                    </div>
+                  </Skeleton>
+                ))}
+              </div>
+            )}
+            {allNews.hasError && <ErrorMessage message={allNews.hasError} />}
+            {allNews.data && (
+              <AllNews
+                updateTopRated={fetchTopRated}
+                allNews={allNews.data}
+                updateAllNews={fetchAllNews}
+              />
+            )}
+          </div>
+        </main>
+        <aside className="basis-full md:basis-1/3">
+          <h3 className="mb-2">Top rated</h3>
+          {topRatedNews.isLoading && (
+            <div className="space-y-4">
+              {[...Array(3)].map((el, index) => (
+                <Skeleton
+                  key={index}
+                  className="flex w-full flex-col justify-between p-3"
+                >
+                  <Skeleton className="mb-4 h-5 w-32" />
+                  <div className="space-y-2">
+                    <Skeleton className="h-4 w-40" />
+                    <Skeleton className="h-4 w-44" />
+                  </div>
+                </Skeleton>
+              ))}
+            </div>
+          )}
+          {topRatedNews.hasError && (
+            <ErrorMessage message={topRatedNews.hasError} />
+          )}
+          {topRatedNews.data && (
+            <TopRated
+              fetchTopRatedData={fetchTopRated}
+              newsTopRatedList={topRatedNews.data}
+            />
+          )}
+        </aside>
+      </section>
+    </section>
   );
 }

@@ -24,10 +24,9 @@ const UserSchema = new Schema({
     phone: { type: String },
   },
   cart: { type: Schema.Types.ObjectId },
-  following: [{ type: Schema.Types.ObjectId, ref: "User" }],
-  orders: [{ type: Schema.Types.ObjectId, ref: "Order" }],
-  role: { type: String, default: "User", enum: ["User", "Author", "Admin"] },
-  news: { type: [Schema.Types.ObjectId] },
+  following: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+  orders: [{ type: Schema.Types.ObjectId, ref: 'Order' }],
+  role: { type: String, default: 'User', enum: ['User', 'Author', 'Admin'] },
   security_settings: {
     type: {
       hide_private_information: Boolean,
@@ -42,7 +41,7 @@ const UserSchema = new Schema({
       quote: { type: String },
       avg_products_grade: { type: Number },
       sold_books_quantity: { type: Number },
-      followers: [{ type: Schema.Types.ObjectId, ref: "User" }],
+      followers: [{ type: Schema.Types.ObjectId, ref: 'User' }],
     },
   },
 });

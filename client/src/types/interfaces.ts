@@ -167,19 +167,19 @@ export interface ProductCardTypes {
 
 // * news types
 
-export interface NewsTypes extends FetchDataTypes {
-  data:
-    | null
-    | {
-        _id: string;
-        title: string;
-        subtitle?: string;
-        content: string;
-        img?: {
-          id: string;
-          url: string;
-        };
-      }[];
+export interface NewsType {
+  _id: string;
+  title: string;
+  subtitle: string;
+  shortDescription: string;
+  content: string;
+  creatorData: { _id: string; pseudonim: string };
+  voting: { quantity: { likes: number; dislikes: number } };
+  updatedAt: string;
+  img: {
+    id: string;
+    url: string;
+  };
 }
 
 export interface VotesType {
