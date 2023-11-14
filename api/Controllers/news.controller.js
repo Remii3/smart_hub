@@ -1,6 +1,5 @@
 const { default: mongoose } = require('mongoose');
 const News = require('../Models/news');
-const User = require('../Models/user');
 const Comment = require('../Models/comment');
 
 const getAllNews = async (req, res) => {
@@ -23,11 +22,29 @@ const getOneNews = async (req, res) => {
   }
 
   try {
-    const newsData = await News.findOne({ _id: newsId }).lean();
+    const newsData = await News.findOne({ _id: newsId })
+      .populate([
+        {
+          path: 'creatorData',
+          select: ['user_info.profile_img', 'author_info.pseudonim'],
+        },
+      ])
+      .lean();
     const comments = await Comment.find({ 'targetData._id': newsData._id })
       .populate('creatorData')
       .lean();
-    const preparedData = { ...newsData, comments };
+
+    const creatorData = newsData.creatorData;
+
+    const preparedData = {
+      ...newsData,
+      comments,
+      creatorData: {
+        _id: creatorData._id,
+        pseudonim: creatorData.author_info.pseudonim,
+        profile_img: creatorData.user_info.profile_img,
+      },
+    };
     return res.status(200).json({ data: preparedData });
   } catch (err) {
     return res.status(500).json({
@@ -82,7 +99,7 @@ const addOneNews = async (req, res) => {
   const { creatorData, title, subtitle, img, shortDescription, content } =
     req.body;
 
-  if (!creatorData || !creatorData._id) {
+  if (!creatorData) {
     return res.status(422).json({ message: 'Provide creatorData' });
   }
 

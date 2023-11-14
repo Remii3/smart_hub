@@ -79,7 +79,6 @@ export interface UserTypes {
   security_settings: {
     hide_private_information: boolean;
   };
-  news: string[];
 }
 
 export interface AuthorTypes extends UserTypes {
@@ -173,7 +172,7 @@ export interface NewsType {
   subtitle: string;
   shortDescription: string;
   content: string;
-  creatorData: { _id: string; pseudonim: string };
+  creatorData: { _id: string; pseudonim: string; profile_img: ImgTypes };
   voting: { quantity: { likes: number; dislikes: number } };
   updatedAt: string;
   img: {

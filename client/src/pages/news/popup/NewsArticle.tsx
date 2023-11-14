@@ -356,15 +356,18 @@ export default function NewsArticle({
                       }}
                     />
                   )}
-                  <div className="flex items-center">
-                    <span className="mr-2">Author:</span>
+                  <div className="flex flex-col gap-1">
+                    <div className="mr-2">Author:</div>
                     <Link
                       to={`/account/${articleData.data.creatorData._id}`}
-                      className="text-sm"
+                      className="flex items-center gap-1 text-sm"
                     >
-                      <Badge variant={'secondary'}>
-                        {articleData.data.creatorData.pseudonim}
-                      </Badge>
+                      <img
+                        src={articleData.data.creatorData.profile_img.url}
+                        alt="profile_img"
+                        className="h-8 w-8 rounded-full"
+                      />
+                      <span>{articleData.data.creatorData.pseudonim}</span>
                     </Link>
                   </div>
                 </div>

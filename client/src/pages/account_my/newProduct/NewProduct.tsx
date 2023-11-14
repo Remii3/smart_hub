@@ -254,6 +254,7 @@ export default function NewProduct() {
         creatorData: {
           _id: userData.data?._id,
           pseudonim: userData.data?.author_info.pseudonim,
+          profile_img: userData.data?.user_info.profile_img.url,
         },
         title,
         description,

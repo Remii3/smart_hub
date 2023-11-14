@@ -2,10 +2,9 @@ const mongoose = require('mongoose');
 
 const NewsSchema = new mongoose.Schema({
   creatorData: {
-    type: {
-      _id: { type: mongoose.Types.ObjectId, required: true, ref: 'User' },
-      pseudonim: { type: String, required: true },
-    },
+    type: mongoose.Types.ObjectId,
+    required: true,
+    ref: 'User',
   },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },

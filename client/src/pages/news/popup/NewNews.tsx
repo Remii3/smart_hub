@@ -84,10 +84,7 @@ export default function NewNews({
     const { data, error } = await usePostAccessDatabase({
       url: DATABASE_ENDPOINTS.NEWS_ONE,
       body: {
-        creatorData: {
-          _id: userData.data._id,
-          pseudonim: userData.data.author_info.pseudonim,
-        },
+        creatorData: userData.data._id,
         content: contentData,
         ...dirtyData,
       },
