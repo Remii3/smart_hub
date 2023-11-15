@@ -3,8 +3,10 @@ const News = require('../Models/news');
 const Comment = require('../Models/comment');
 
 const getAllNews = async (req, res) => {
+  const sortMethod = req.sortMethod;
+  const { limit = 6 } = req.body;
   try {
-    const data = await News.find({}).sort({ createdAt: -1 });
+    const data = await News.find({}).sort(sortMethod).limit(limit);
     return res.status(200).json({ data });
   } catch (err) {
     return res.status(500).json({
@@ -128,34 +130,18 @@ const addOneNews = async (req, res) => {
 };
 
 const findSearchedNews = async (req, res) => {
-  const searchQuery = req.searchQuery;
-  const searchLimit = req.searchLimit;
-  try {
-    const newsData = await News.aggregate([
-      {
-        $search: {
-          // index: 'autocomplete-tutorial',
-          autocomplete: {
-            path: 'title',
-            query: 'zxc',
-          },
-        },
-      },
-      {
-        $limit: 20,
-      },
-      {
-        $project: {
-          _id: 0,
-          title: 1,
-        },
-      },
-    ]);
-    // const newsData = await News.find({ ...searchQuery })
-    // .sort(sortMethod)
-    // .limit(limit);
+  const searchCopyPipeline = req.searchCopyPipeline;
+  const searchPipeline = req.searchPipeline;
 
-    return res.json({ data: newsData });
+  try {
+    const [countResult, newsData] = await Promise.all([
+      News.aggregate(searchPipeline),
+      News.aggregate(searchCopyPipeline),
+    ]);
+    const totalPages =
+      countResult.length > 0 ? countResult[0].totalDocuments : 0;
+
+    return res.json({ data: { data: newsData, rawData: { totalPages } } });
   } catch (err) {
     return res.status(500).json({
       message: 'Failed searching for news',

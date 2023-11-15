@@ -123,7 +123,9 @@ export default function VoteRating({
         name="Like"
         onClick={() => changeVoteHandler('Like')}
         disabled={userVote === 'Dislike' || !userId || vote.isLoading}
-        className="flex items-center gap-1 p-1"
+        className={`${
+          (!userId || vote.isLoading) && 'opacity-50'
+        } flex items-center gap-1 p-1`}
       >
         <HandThumbUpIcon
           className={`${
@@ -144,7 +146,9 @@ export default function VoteRating({
         aria-label="Dislike"
         onClick={() => changeVoteHandler('Dislike')}
         disabled={userVote === 'Like' || !userId || vote.isLoading}
-        className="flex items-center gap-1 p-1"
+        className={`${
+          (!userId || vote.isLoading) && 'opacity-50'
+        } flex items-center gap-1 p-1`}
       >
         <HandThumbDownIcon
           className={`${

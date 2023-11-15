@@ -30,7 +30,6 @@ import z from 'zod';
 import ErrorMessage from '@components/UI/error/ErrorMessage';
 import { CKEditor } from '@ckeditor/ckeditor5-react';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
-import { Skeleton } from '@components/UI/skeleton';
 import { Textarea } from '@components/UI/textarea';
 import { PlusCircleIcon } from '@heroicons/react/24/outline';
 import { Label } from '@components/UI/label';
@@ -128,6 +127,7 @@ export default function NewNews({
       form.reset();
     }, 100);
   };
+
   return (
     <Dialog open={openedDialog} onOpenChange={() => changeDialogVisiblity()}>
       <Button
@@ -143,11 +143,7 @@ export default function NewNews({
       >
         Add news
       </Button>
-      <DialogContent
-        className={`${
-          pushStatus.isLoading ? 'overflow-y-hidden' : 'overflow-y-auto'
-        }`}
-      >
+      <DialogContent className="h-full w-full p-7">
         {pushStatus.isLoading && (
           <div className="relative min-h-[1vh]">
             <LoadingCircle />
@@ -201,7 +197,7 @@ export default function NewNews({
                     <FormItem>
                       <FormLabel>Short description</FormLabel>
                       <FormControl>
-                        <Textarea className="block" {...field} />
+                        <Textarea className="block resize-y" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -233,51 +229,39 @@ export default function NewNews({
 
                   <FormMessage />
                 </FormItem>
-                <div>
-                  {readyToShow ? (
-                    <div className="ck-body-wrapper">
-                      <CKEditor
-                        editor={ClassicEditor}
-                        data={contentData}
-                        config={{
-                          mediaEmbed: { previewsInData: true },
-                          toolbar: {
-                            shouldNotGroupWhenFull: true,
-                            items: [
-                              'heading',
-                              '|',
-                              'bold',
-                              'italic',
-                              'link',
-                              'bulletedList',
-                              'numberedList',
-                              '|',
-                              'outdent',
-                              'indent',
-                              '|',
-
-                              'blockQuote',
-                              'insertTable',
-                              'mediaEmbed',
-                              'undo',
-                              'redo',
-                            ],
-                          },
-                        }}
-                        onChange={(event, editor) => {
-                          const data = editor.getData();
-                          setContentData(data);
-                        }}
-                      />
-                    </div>
-                  ) : (
-                    <Skeleton className="flex h-[132px] w-full gap-4 p-4">
-                      {[...Array(4)].map((el, index) => (
-                        <Skeleton key={index} className="h-6 w-10" />
-                      ))}
-                    </Skeleton>
-                  )}
-                </div>
+                {readyToShow && (
+                  <CKEditor
+                    editor={ClassicEditor}
+                    data={contentData}
+                    config={{
+                      mediaEmbed: { previewsInData: true },
+                      toolbar: {
+                        shouldNotGroupWhenFull: true,
+                        items: [
+                          'heading',
+                          '|',
+                          'bold',
+                          'italic',
+                          'bulletedList',
+                          'numberedList',
+                          '|',
+                          'outdent',
+                          'indent',
+                          '|',
+                          'blockQuote',
+                          'insertTable',
+                          'mediaEmbed',
+                          'undo',
+                          'redo',
+                        ],
+                      },
+                    }}
+                    onChange={(event, editor) => {
+                      const data = editor.getData();
+                      setContentData(data);
+                    }}
+                  />
+                )}
               </div>
 
               <DialogFooter>

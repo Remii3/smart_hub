@@ -16,7 +16,6 @@ export default function TopRated({
         <div key={item._id}>
           <NewsCard
             fetchData={fetchTopRatedData}
-            updateTopRated={fetchTopRatedData}
             item={item}
             textOnly
             withRating

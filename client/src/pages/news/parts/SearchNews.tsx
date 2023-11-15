@@ -14,46 +14,51 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Suspense } from 'react';
 
 const formSchema = z.object({
-  search: z.string().nonempty().min(2),
+  search: z.string(),
 });
 
 interface PropsTypes {
-  updateAllNews: (searchText: string) => void;
+  updateAllNews: () => void;
+  changeSearchQUery: React.Dispatch<React.SetStateAction<string>>;
+  changePage: React.Dispatch<React.SetStateAction<number>>;
 }
 
-export default function SearchNews({ updateAllNews }: PropsTypes) {
+export default function SearchNews({
+  updateAllNews,
+  changePage,
+  changeSearchQUery,
+}: PropsTypes) {
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: { search: '' },
+    mode: 'onSubmit',
+    reValidateMode: 'onSubmit',
   });
 
-  const searchHandler = () => {
-    const dirtyData = Object.fromEntries(
-      Object.keys(form.formState.dirtyFields).map((x: string) => [
-        x,
-        form.getValues(x as keyof z.infer<typeof formSchema>),
-      ])
-    );
-    updateAllNews(dirtyData.search);
+  const searchHandler = (formResponse: z.infer<typeof formSchema>) => {
+    changeSearchQUery(formResponse.search || 'all');
+    changePage(1);
+    updateAllNews();
+    form.reset();
   };
 
   return (
     <Form {...form}>
       <form
-        className="relative mx-auto w-full items-center justify-end text-gray-600 lg:flex"
+        className="h-full w-full"
         onSubmit={form.handleSubmit(searchHandler)}
       >
         <FormField
           name="search"
           control={form.control}
           render={({ field }) => (
-            <FormItem className="w-full">
-              <FormControl>
-                <div className="relative w-full">
+            <FormItem className="h-full w-full">
+              <FormControl className="h-full">
+                <div className="relative">
                   <Input
+                    className="h-full"
                     type="text"
-                    placeholder="Search"
-                    onKeyDown={searchHandler}
+                    placeholder="News title..."
                     {...field}
                   />
                   <button

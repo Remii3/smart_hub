@@ -12,14 +12,25 @@ import { FetchDataTypes, NewsType } from '@customTypes/interfaces';
 import { UserContext } from '@context/UserProvider';
 import NewNews from './popup/NewNews';
 import { UserRoleTypes } from '@customTypes/types';
+import Pagination from '@components/paginations/Pagination';
+import { useSearchParams } from 'react-router-dom';
 
 interface NewsTypes extends FetchDataTypes {
   data: null | NewsType[];
 }
+interface AllNewsTypes extends FetchDataTypes {
+  data: null | NewsType[];
+  rawData: { totalPages: number | null };
+}
 export default function NewsPage() {
   const { userData } = useContext(UserContext);
-  const [page, setPage] = useState(1);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [page, setPage] = useState(Number(searchParams.get('page')) || 1);
+  const [searchQuery, setSearchQuery] = useState(
+    searchParams.get('search') || 'all'
+  );
   const currentPageSize = 10;
+
   const [topRatedNews, setTopRatedNews] = useState<NewsTypes>({
     data: null,
     hasError: null,
@@ -30,8 +41,9 @@ export default function NewsPage() {
     hasError: null,
     isLoading: false,
   });
-  const [allNews, setAllNews] = useState<NewsTypes>({
+  const [allNews, setAllNews] = useState<AllNewsTypes>({
     data: null,
+    rawData: { totalPages: null },
     hasError: null,
     isLoading: false,
   });
@@ -41,7 +53,7 @@ export default function NewsPage() {
       return { ...prevState, isLoading: true };
     });
     const { data, error } = await useGetAccessDatabase({
-      url: DATABASE_ENDPOINTS.NEWS_SEARCH,
+      url: DATABASE_ENDPOINTS.NEWS_ALL,
       params: { sortOption: 'top_rated', limit: 6 },
     });
 
@@ -60,7 +72,7 @@ export default function NewsPage() {
     });
 
     const { data, error } = await useGetAccessDatabase({
-      url: DATABASE_ENDPOINTS.NEWS_SEARCH,
+      url: DATABASE_ENDPOINTS.NEWS_ALL,
       params: { sortOption: 'latest', limit: 6 },
     });
     if (error) {
@@ -70,33 +82,42 @@ export default function NewsPage() {
     setLatestNews({ data, hasError: null, isLoading: false });
   }, []);
 
-  const fetchAllNews = useCallback(async (searchedPhrase?: string) => {
+  const fetchAllNews = useCallback(async () => {
     setAllNews((prevState) => {
       return { ...prevState, isLoading: true };
     });
-    console.log('first');
     const { data, error } = await useGetAccessDatabase({
       url: DATABASE_ENDPOINTS.NEWS_SEARCH,
       params: {
-        currentPageSize,
-        currentPage: page,
-        filtersData: { searchedPhrase },
+        limit: currentPageSize,
+        currentPage: searchParams.get('page'),
+        searchQuery: searchParams.get('search'),
       },
     });
-    console.log(data);
     if (error) {
       errorToast(error);
       return setAllNews((prevState) => {
         return { ...prevState, isLoading: false, hasError: error };
       });
     }
-    setAllNews({ data, hasError: null, isLoading: false });
-  }, []);
+    setAllNews({
+      data: data.data,
+      rawData: data.rawData,
+      hasError: null,
+      isLoading: false,
+    });
+  }, [searchParams.get('page'), searchParams.get('search')]);
+
+  useEffect(() => {
+    searchParams.set('search', searchQuery);
+    searchParams.set('page', page.toString());
+    setSearchParams(searchParams);
+    fetchAllNews();
+  }, [searchQuery, page]);
 
   useEffect(() => {
     fetchLatestNews();
     fetchTopRated();
-    fetchAllNews();
   }, []);
 
   return (
@@ -108,7 +129,6 @@ export default function NewsPage() {
         {latestNews.hasError && <ErrorMessage message={latestNews.hasError} />}
         {latestNews.data && (
           <LatestNews
-            updateTopRated={fetchTopRated}
             updateLatestNews={fetchLatestNews}
             latestNewsData={latestNews.data}
           />
@@ -118,9 +138,13 @@ export default function NewsPage() {
         <main className="flex flex-col gap-4 md:basis-3/5">
           <div>
             <h3 className="mb-2">Latest</h3>
-            <div className="flex gap-4">
+            <div className="flex items-stretch gap-4">
               <div className="w-full">
-                <SearchNews updateAllNews={fetchAllNews} />
+                <SearchNews
+                  updateAllNews={fetchAllNews}
+                  changePage={setPage}
+                  changeSearchQUery={setSearchQuery}
+                />
               </div>
               {userData.data && userData.data.role !== UserRoleTypes.USER && (
                 <div className="inline-block">
@@ -151,11 +175,20 @@ export default function NewsPage() {
             )}
             {allNews.hasError && <ErrorMessage message={allNews.hasError} />}
             {allNews.data && (
-              <AllNews
-                updateTopRated={fetchTopRated}
-                allNews={allNews.data}
-                updateAllNews={fetchAllNews}
-              />
+              <AllNews allNews={allNews.data} updateAllNews={fetchAllNews} />
+            )}
+            {allNews.rawData.totalPages && (
+              <div className="mt-4 flex w-full items-center justify-center">
+                <Pagination
+                  currentPage={page}
+                  onPageChange={(newPageNumber: number) => {
+                    setPage(newPageNumber);
+                  }}
+                  pageSize={currentPageSize}
+                  siblingCount={1}
+                  totalCount={allNews.rawData.totalPages}
+                />
+              </div>
             )}
           </div>
         </main>

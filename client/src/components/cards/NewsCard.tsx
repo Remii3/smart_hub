@@ -27,7 +27,7 @@ export default function NewsCard({
     <Dialog
       open={newsArticleDialogOpened == item._id}
       onOpenChange={() => {
-        if (updateTopRated && newsArticleDialogOpened !== null) {
+        if (updateTopRated) {
           updateTopRated();
         }
         setNewsArticleDialogOpened(null);
@@ -65,19 +65,19 @@ export default function NewsCard({
         </section>
         {!textOnly && (
           <section className="basis-1/2">
-            {item.img && (
-              <div className="flex h-48 justify-end">
+            <div className="flex h-48 justify-end">
+              {item.img && (
                 <img
                   src={item.img.url}
                   className="aspect-square h-full rounded-r-md object-cover object-center"
                   alt="news_img"
                 />
-              </div>
-            )}
+              )}
+            </div>
           </section>
         )}
       </button>
-      <DialogContent>
+      <DialogContent className="h-full w-full p-7">
         <NewsArticle
           newsId={item._id}
           updateNewsList={fetchData}

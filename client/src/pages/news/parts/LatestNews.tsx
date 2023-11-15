@@ -10,13 +10,11 @@ import 'swiper/css/pagination';
 import 'swiper/css/navigation';
 
 interface PropsTypes {
-  updateTopRated?: () => void;
   updateLatestNews: () => void;
   latestNewsData: NewsType[];
 }
 
 export default function LatestNews({
-  updateTopRated,
   latestNewsData,
   updateLatestNews,
 }: PropsTypes) {
@@ -99,12 +97,11 @@ export default function LatestNews({
                   </section>
                 </div>
               </button>
-              <DialogContent>
+              <DialogContent className="h-full w-full p-7">
                 <NewsArticle
                   newsId={item._id}
                   updateNewsList={updateLatestNews}
                   dialogOpenedHandler={setNewsArticleDialogOpened}
-                  updateTopRated={updateTopRated}
                 />
               </DialogContent>
             </Dialog>
