@@ -128,13 +128,32 @@ const addOneNews = async (req, res) => {
 };
 
 const findSearchedNews = async (req, res) => {
-  const preparedData = req.preparedData;
-  const { limit } = req.searchOptions;
-  const sortMethod = req.sortMethod;
+  const searchQuery = req.searchQuery;
+  const searchLimit = req.searchLimit;
   try {
-    const newsData = await News.find({ ...preparedData })
-      .sort(sortMethod)
-      .limit(limit);
+    const newsData = await News.aggregate([
+      {
+        $search: {
+          // index: 'autocomplete-tutorial',
+          autocomplete: {
+            path: 'title',
+            query: 'zxc',
+          },
+        },
+      },
+      {
+        $limit: 20,
+      },
+      {
+        $project: {
+          _id: 0,
+          title: 1,
+        },
+      },
+    ]);
+    // const newsData = await News.find({ ...searchQuery })
+    // .sort(sortMethod)
+    // .limit(limit);
 
     return res.json({ data: newsData });
   } catch (err) {

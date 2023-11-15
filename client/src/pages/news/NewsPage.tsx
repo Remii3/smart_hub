@@ -18,7 +18,8 @@ interface NewsTypes extends FetchDataTypes {
 }
 export default function NewsPage() {
   const { userData } = useContext(UserContext);
-
+  const [page, setPage] = useState(1);
+  const currentPageSize = 10;
   const [topRatedNews, setTopRatedNews] = useState<NewsTypes>({
     data: null,
     hasError: null,
@@ -69,13 +70,20 @@ export default function NewsPage() {
     setLatestNews({ data, hasError: null, isLoading: false });
   }, []);
 
-  const fetchAllNews = useCallback(async () => {
+  const fetchAllNews = useCallback(async (searchedPhrase?: string) => {
     setAllNews((prevState) => {
       return { ...prevState, isLoading: true };
     });
+    console.log('first');
     const { data, error } = await useGetAccessDatabase({
-      url: DATABASE_ENDPOINTS.NEWS_ALL,
+      url: DATABASE_ENDPOINTS.NEWS_SEARCH,
+      params: {
+        currentPageSize,
+        currentPage: page,
+        filtersData: { searchedPhrase },
+      },
     });
+    console.log(data);
     if (error) {
       errorToast(error);
       return setAllNews((prevState) => {

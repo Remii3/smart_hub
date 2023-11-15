@@ -18,7 +18,7 @@ const formSchema = z.object({
 });
 
 interface PropsTypes {
-  updateAllNews: () => void;
+  updateAllNews: (searchText: string) => void;
 }
 
 export default function SearchNews({ updateAllNews }: PropsTypes) {
@@ -27,7 +27,15 @@ export default function SearchNews({ updateAllNews }: PropsTypes) {
     defaultValues: { search: '' },
   });
 
-  const searchHandler = (formResponse: z.infer<typeof formSchema>) => {};
+  const searchHandler = () => {
+    const dirtyData = Object.fromEntries(
+      Object.keys(form.formState.dirtyFields).map((x: string) => [
+        x,
+        form.getValues(x as keyof z.infer<typeof formSchema>),
+      ])
+    );
+    updateAllNews(dirtyData.search);
+  };
 
   return (
     <Form {...form}>
@@ -42,7 +50,12 @@ export default function SearchNews({ updateAllNews }: PropsTypes) {
             <FormItem className="w-full">
               <FormControl>
                 <div className="relative w-full">
-                  <Input type="text" placeholder="Search" {...field} />
+                  <Input
+                    type="text"
+                    placeholder="Search"
+                    onKeyDown={searchHandler}
+                    {...field}
+                  />
                   <button
                     type="submit"
                     aria-label="Search for news"

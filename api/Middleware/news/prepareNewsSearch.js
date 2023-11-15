@@ -1,19 +1,25 @@
 const prepareNewsSearch = (req, res, next) => {
-  const { special, limit } = req.query;
+  const { special, limit, filtersData } = req.query;
 
-  const preparedData = {};
-  const searchOptions = {};
+  const searchQuery = {};
+  const searchLimit = {};
 
-  if (special) {
-    searchOptions.special = special;
+  // if (special) {
+  //   searchOptions.special = special;
+  // }
+
+  if (filtersData && filtersData.searchedPhrase) {
+    searchQuery['$search'] = {
+      autocomplete: { query: `${filtersData.searchedPhrase}`, path: 'title' },
+    };
   }
 
   if (limit) {
-    searchOptions.limit = limit;
+    searchLimit['$limit'] = limit;
   }
 
-  req.preparedData = preparedData;
-  req.searchOptions = searchOptions;
+  req.searchQuery = searchQuery;
+  req.searchLimit = searchLimit;
   next();
 };
 module.exports = prepareNewsSearch;
