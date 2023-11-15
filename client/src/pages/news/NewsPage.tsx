@@ -193,7 +193,7 @@ export default function NewsPage() {
           </div>
         </main>
         <aside className="basis-full md:basis-1/3">
-          <h3 className="mb-2">Top rated</h3>
+          <h3 className="mb-2">Trending</h3>
           {topRatedNews.isLoading && !topRatedNews.data && (
             <div className="space-y-4">
               {[...Array(3)].map((el, index) => (

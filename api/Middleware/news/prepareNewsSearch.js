@@ -1,6 +1,6 @@
 const prepareNewsSearch = (req, res, next) => {
   let { limit, searchQuery, currentPage } = req.query;
-
+  const maxPagination = 200 / limit;
   const searchPipeline = [];
   const searchCopyPipeline = [];
 
@@ -50,6 +50,10 @@ const prepareNewsSearch = (req, res, next) => {
 
   searchPipeline.push({
     $count: 'totalDocuments',
+  });
+
+  searchCopyPipeline.push({
+    $limit: maxPagination,
   });
 
   req.searchPipeline = searchPipeline;
