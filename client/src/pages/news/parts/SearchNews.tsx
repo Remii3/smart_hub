@@ -18,13 +18,11 @@ const formSchema = z.object({
 });
 
 interface PropsTypes {
-  updateAllNews: () => void;
   changeSearchQUery: React.Dispatch<React.SetStateAction<string>>;
   changePage: React.Dispatch<React.SetStateAction<number>>;
 }
 
 export default function SearchNews({
-  updateAllNews,
   changePage,
   changeSearchQUery,
 }: PropsTypes) {
@@ -38,7 +36,6 @@ export default function SearchNews({
   const searchHandler = (formResponse: z.infer<typeof formSchema>) => {
     changeSearchQUery(formResponse.search || 'all');
     changePage(1);
-    updateAllNews();
     form.reset();
   };
 

@@ -9,11 +9,15 @@ interface PropsTypes {
 export default function AllNews({ updateAllNews, allNews }: PropsTypes) {
   return (
     <section className="space-y-4">
-      {allNews.map((item) => (
-        <div key={item._id}>
-          <NewsCard fetchData={updateAllNews} item={item} />
-        </div>
-      ))}
+      {allNews.length <= 0 && (
+        <div className="text-slate-400">No news found!</div>
+      )}
+      {allNews.length > 0 &&
+        allNews.map((item) => (
+          <div key={item._id}>
+            <NewsCard fetchData={updateAllNews} item={item} />
+          </div>
+        ))}
     </section>
   );
 }

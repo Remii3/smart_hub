@@ -81,7 +81,7 @@ export default function NewsPage() {
     }
     setLatestNews({ data, hasError: null, isLoading: false });
   }, []);
-
+  console.log(allNews);
   const fetchAllNews = useCallback(async () => {
     setAllNews((prevState) => {
       return { ...prevState, isLoading: true };
@@ -106,7 +106,7 @@ export default function NewsPage() {
       hasError: null,
       isLoading: false,
     });
-  }, [searchParams.get('page'), searchParams.get('search')]);
+  }, [searchQuery, page]);
 
   useEffect(() => {
     searchParams.set('search', searchQuery);
@@ -141,7 +141,6 @@ export default function NewsPage() {
             <div className="flex items-stretch gap-4">
               <div className="w-full">
                 <SearchNews
-                  updateAllNews={fetchAllNews}
                   changePage={setPage}
                   changeSearchQUery={setSearchQuery}
                 />
@@ -177,19 +176,21 @@ export default function NewsPage() {
             {allNews.data && (
               <AllNews allNews={allNews.data} updateAllNews={fetchAllNews} />
             )}
-            {allNews.rawData.totalPages && (
-              <div className="mt-4 flex w-full items-center justify-center">
-                <Pagination
-                  currentPage={page}
-                  onPageChange={(newPageNumber: number) => {
-                    setPage(newPageNumber);
-                  }}
-                  pageSize={currentPageSize}
-                  siblingCount={1}
-                  totalCount={allNews.rawData.totalPages}
-                />
-              </div>
-            )}
+            {allNews.data &&
+              allNews.data.length > 0 &&
+              allNews.rawData.totalPages && (
+                <div className="mt-4 flex w-full items-center justify-center">
+                  <Pagination
+                    currentPage={page}
+                    onPageChange={(newPageNumber: number) => {
+                      setPage(newPageNumber);
+                    }}
+                    pageSize={currentPageSize}
+                    siblingCount={1}
+                    totalCount={allNews.rawData.totalPages}
+                  />
+                </div>
+              )}
           </div>
         </main>
         <aside className="basis-full md:basis-1/3">
