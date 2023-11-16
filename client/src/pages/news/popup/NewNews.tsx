@@ -197,7 +197,11 @@ export default function NewNews({
                     <FormItem>
                       <FormLabel>Short description</FormLabel>
                       <FormControl>
-                        <Textarea className="block resize-y" {...field} />
+                        <Textarea
+                          className="block resize-y"
+                          maxLength={94}
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -230,37 +234,39 @@ export default function NewNews({
                   <FormMessage />
                 </FormItem>
                 {readyToShow && (
-                  <CKEditor
-                    editor={ClassicEditor}
-                    data={contentData}
-                    config={{
-                      mediaEmbed: { previewsInData: true },
-                      toolbar: {
-                        shouldNotGroupWhenFull: true,
-                        items: [
-                          'heading',
-                          '|',
-                          'bold',
-                          'italic',
-                          'bulletedList',
-                          'numberedList',
-                          '|',
-                          'outdent',
-                          'indent',
-                          '|',
-                          'blockQuote',
-                          'insertTable',
-                          'mediaEmbed',
-                          'undo',
-                          'redo',
-                        ],
-                      },
-                    }}
-                    onChange={(event, editor) => {
-                      const data = editor.getData();
-                      setContentData(data);
-                    }}
-                  />
+                  <div className="">
+                    <CKEditor
+                      editor={ClassicEditor}
+                      data={contentData}
+                      config={{
+                        mediaEmbed: { previewsInData: true },
+                        toolbar: {
+                          shouldNotGroupWhenFull: true,
+                          items: [
+                            'heading',
+                            '|',
+                            'bold',
+                            'italic',
+                            'mediaEmbed',
+                            'bulletedList',
+                            'numberedList',
+                            '|',
+                            'outdent',
+                            'indent',
+                            '|',
+                            'blockQuote',
+                            'insertTable',
+                            'undo',
+                            'redo',
+                          ],
+                        },
+                      }}
+                      onChange={(event, editor) => {
+                        const data = editor.getData();
+                        setContentData(data);
+                      }}
+                    />
+                  </div>
                 )}
               </div>
 

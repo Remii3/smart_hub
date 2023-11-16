@@ -53,7 +53,7 @@ export default function SearchNews({
               <FormControl className="h-full">
                 <div className="relative">
                   <Input
-                    className="h-full"
+                    className="h-full min-h-[38px]"
                     type="text"
                     placeholder="News title..."
                     {...field}

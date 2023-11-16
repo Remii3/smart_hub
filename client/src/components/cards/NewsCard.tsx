@@ -45,7 +45,7 @@ export default function NewsCard({
           } space-y-2 px-3 py-3`}
         >
           <strong className="line-clamp-2 text-2xl">{item.title}</strong>
-          {item.subtitle && (
+          {item.shortDescription && (
             <section className="line-clamp-2 text-base">
               {item.shortDescription}
             </section>
