@@ -12,7 +12,7 @@ const prepareNewsSearch = require('../Middleware/news/prepareNewsSearch');
 
 const router = express.Router();
 
-router.get('/all', checkSortMethod, getAllNews);
+router.get('/all', getAllNews);
 router.get('/one', getOneNews);
 router.get('/search', checkSortMethod, prepareNewsSearch, findSearchedNews);
 

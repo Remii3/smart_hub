@@ -3,10 +3,47 @@ const News = require('../Models/news');
 const Comment = require('../Models/comment');
 
 const getAllNews = async (req, res) => {
-  const sortMethod = req.sortMethod;
-  const { limit = 6 } = req.body;
+  const { limit = 6, sortOption } = req.query;
+
+  const pipeline = [];
+
+  switch (sortOption) {
+    case 'latest': {
+      pipeline.push({ $match: { img: { $exists: true } } });
+      pipeline.push({
+        $sort: { createdAt: -1 },
+      });
+      pipeline.push({
+        $limit: Number(limit),
+      });
+      break;
+    }
+    case 'top_rated': {
+      pipeline.push({
+        $match: {
+          'voting.quantity.likes': { $exists: true },
+          'voting.quantity.dislikes': { $exists: true },
+        },
+      });
+      pipeline.push({
+        $addFields: {
+          computedField: {
+            $subtract: ['$voting.quantity.likes', '$voting.quantity.dislikes'],
+          },
+        },
+      });
+      pipeline.push({
+        $sort: { computedField: -1 },
+      });
+      pipeline.push({
+        $limit: Number(limit),
+      });
+      break;
+    }
+  }
+
   try {
-    const data = await News.find({}).sort(sortMethod).limit(limit);
+    const data = await News.aggregate(pipeline);
     return res.status(200).json({ data });
   } catch (err) {
     return res.status(500).json({

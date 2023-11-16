@@ -73,7 +73,10 @@ export default function NewsPage() {
 
     const { data, error } = await useGetAccessDatabase({
       url: DATABASE_ENDPOINTS.NEWS_ALL,
-      params: { sortOption: 'latest', limit: 6 },
+      params: {
+        sortOption: 'latest',
+        limit: 6,
+      },
     });
     if (error) {
       errorToast(error);
@@ -81,7 +84,6 @@ export default function NewsPage() {
     }
     setLatestNews({ data, hasError: null, isLoading: false });
   }, []);
-  console.log(allNews);
   const fetchAllNews = useCallback(async () => {
     setAllNews((prevState) => {
       return { ...prevState, isLoading: true };
