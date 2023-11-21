@@ -15,7 +15,7 @@ export default function AllNews({ updateAllNews, allNews }: PropsTypes) {
       {allNews.length > 0 &&
         allNews.map((item) => (
           <div key={item._id}>
-            <NewsCard fetchData={updateAllNews} item={item} />
+            <NewsCard fetchData={updateAllNews} item={item} withRating />
           </div>
         ))}
     </section>

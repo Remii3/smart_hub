@@ -1,16 +1,13 @@
 import { FormEvent, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { CartContext } from '@context/CartProvider';
-import {
-  CartProductTypes,
-  CollectionCardTypes,
-  ProductCardTypes,
-} from '@customTypes/interfaces';
+import { CartProductTypes, CollectionCardTypes } from '@customTypes/interfaces';
 import LoadingCircle from '@components/Loaders/LoadingCircle';
 import { Button, buttonVariants } from '@components/UI/button';
 import StarRating from '@features/rating/StarRating';
 import { ShoppingCartIcon } from '@heroicons/react/24/solid';
 import { Badge } from '@components/UI/badge';
+import { ArrowRightIcon } from '@heroicons/react/24/outline';
 
 export default function CollectionCard({
   _id,
@@ -151,14 +148,16 @@ export default function CollectionCard({
           {type === 'collection' && (
             <div className="flex flex-col gap-3">
               <div className="flex flex-wrap items-end justify-between gap-3">
+                <h3 className="flex  items-center text-4xl">{price.value}</h3>
                 <Link
-                  to={`/shop/${_id}`}
+                  to={`/collection/${_id}`}
                   aria-label="Show product page"
                   className={`${buttonVariants({
                     variant: 'default',
-                  })} relative flex-grow`}
+                  })} relative flex-grow space-x-1`}
                 >
-                  See now
+                  <span>See now</span>
+                  <ArrowRightIcon className="h-4 w-4" />
                 </Link>
               </div>
             </div>

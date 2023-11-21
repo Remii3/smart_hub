@@ -62,7 +62,7 @@ export default function StarRating({
           key={i}
           className={`${
             showOnly ? '' : 'cursor-pointer'
-          } ${colorClass} h-5 w-5 transition duration-150 ease-out`}
+          } ${colorClass} h-5 w-5 transition ease-out`}
           onClick={() => handleStarClick(i)}
           onMouseEnter={() => handleStarHover(i)}
           onMouseLeave={handleStarLeave}

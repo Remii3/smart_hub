@@ -178,7 +178,7 @@ export default function Comments({
   };
   return (
     <div className="mt-8">
-      <h5 className="pb-2">Comments</h5>
+      <h3 className="mb-2 text-4xl">Comments</h3>
       <section className="mb-8">
         <div className="flex flex-col-reverse gap-8 md:flex-row">
           <div>

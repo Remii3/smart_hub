@@ -1,4 +1,4 @@
-import { useCallback, useContext, useEffect, useState } from 'react';
+import { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import AllNews from './parts/AllNews';
 import LatestNews from './parts/LatestNews';
 import TopRated from './parts/TopRated';
@@ -23,6 +23,9 @@ interface AllNewsTypes extends FetchDataTypes {
   rawData: { totalPages: number | null };
 }
 export default function NewsPage() {
+  const [isSticky, setIsSticky] = useState(false);
+  const elementRef = useRef(null);
+
   const { userData } = useContext(UserContext);
   const [searchParams, setSearchParams] = useSearchParams();
   const [page, setPage] = useState(Number(searchParams.get('page')) || 1);
@@ -54,7 +57,7 @@ export default function NewsPage() {
     });
     const { data, error } = await useGetAccessDatabase({
       url: DATABASE_ENDPOINTS.NEWS_ALL,
-      params: { sortOption: 'top_rated', limit: 6 },
+      params: { sortOption: 'top_rated', limit: 5 },
     });
 
     if (error) {
@@ -122,6 +125,27 @@ export default function NewsPage() {
     fetchTopRated();
   }, []);
 
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          // Update the state based on whether the bottom of the element is visible
+          setIsSticky(entry.isIntersecting);
+        });
+      },
+      { threshold: 0 } // Fire the callback when any part of the element is visible
+    );
+
+    if (elementRef.current) {
+      observer.observe(elementRef.current);
+    }
+
+    // Cleanup the observer when the component unmounts
+    return () => {
+      observer.disconnect();
+    };
+  }, [elementRef]);
+
   return (
     <section>
       <section className="-mx-4 -mt-6 mb-14 h-[40vh]">
@@ -136,8 +160,8 @@ export default function NewsPage() {
           />
         )}
       </section>
-      <section className="relative flex flex-col-reverse justify-between gap-4 md:flex-row">
-        <main className="flex flex-col gap-4 md:basis-3/5">
+      <section className="relative flex flex-col-reverse justify-between gap-4 lg:flex-row lg:items-baseline">
+        <main className="flex flex-col gap-4 lg:basis-3/5">
           <div>
             <h3 className="mb-2">Latest</h3>
             <div className="flex items-stretch gap-4">
@@ -195,7 +219,7 @@ export default function NewsPage() {
               )}
           </div>
         </main>
-        <aside className="basis-full md:basis-1/3">
+        <aside ref={elementRef} className="basis-full lg:basis-1/3 ">
           <h3 className="mb-2">Trending</h3>
           {topRatedNews.isLoading && !topRatedNews.data && (
             <div className="space-y-4">

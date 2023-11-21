@@ -10,11 +10,13 @@ import { useState } from 'react';
 export default function NewsCard({
   textOnly = false,
   withRating = false,
+  thumbnail = false,
   item,
   fetchData,
   updateTopRated,
 }: {
   textOnly?: boolean;
+  thumbnail?: boolean;
   withRating?: boolean;
   item: NewsType;
   fetchData: () => void;
@@ -37,16 +39,21 @@ export default function NewsCard({
         type="button"
         onClick={() => setNewsArticleDialogOpened(item._id)}
         aria-label="News article"
-        className="flex w-full items-center gap-3 rounded-md border border-slate-200 text-start shadow-sm transition-[box-shadow] duration-200 ease-in-out hover:shadow-md"
+        className="flex w-full items-center rounded-md border border-slate-200 text-start shadow-sm transition-[box-shadow] duration-200 ease-in-out hover:shadow-md"
       >
         <section
           className={`${
-            textOnly ? 'basis-full' : 'ml-3 basis-1/2'
-          } space-y-2 px-3 py-3`}
+            thumbnail ? 'basis-full ' : 'ml-3 basis-1/2 '
+          } space-y-1 p-3`}
         >
-          <strong className="line-clamp-2 text-2xl">{item.title}</strong>
+          <strong className={`line-clamp-2 text-xl`}>{item.title}</strong>
+
           {item.shortDescription && (
-            <section className="line-clamp-2 text-base">
+            <section
+              className={`${
+                thumbnail ? 'line-clamp-2' : 'line-clamp-3'
+              } text-base`}
+            >
               {item.shortDescription}
             </section>
           )}
@@ -65,11 +72,13 @@ export default function NewsCard({
         </section>
         {!textOnly && (
           <section className="basis-1/2">
-            <div className="flex h-48 justify-end">
+            <div
+              className={`${thumbnail ? 'h-[133px]' : 'h-48'} flex justify-end`}
+            >
               {item.img && (
                 <img
                   src={item.img.url}
-                  className="aspect-square h-full rounded-r-md object-cover object-center"
+                  className="aspect-[4/3] rounded-r-md object-cover object-center"
                   alt="news_img"
                 />
               )}

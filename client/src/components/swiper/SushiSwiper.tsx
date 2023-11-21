@@ -16,7 +16,7 @@ import { ReactNode } from 'react';
 interface PropsTypes {
   swiperCategory: string;
   arrayOfItems: any[] | null;
-  itemsType: MarketplaceTypes | 'Other';
+  itemsType: MarketplaceTypes | 'other';
   loadingState?: boolean;
   errorState?: string | null;
   children?: ReactNode;
@@ -148,7 +148,8 @@ export default function SushiSwiper({
                 )}
               </SwiperSlide>
             ))}
-          {itemsType === 'Other' && children}
+
+          {itemsType === 'other' && children}
         </SuspenseComponent>
         <div
           className={`swiper-button-next swiper-${swiperCategory}-button-next color-primary right-0 flex items-center justify-center rounded-full bg-white p-8 opacity-90 backdrop-blur-sm`}
