@@ -1,18 +1,16 @@
-const { default: mongoose } = require('mongoose');
-const Product = require('../Models/product');
-const Comment = require('../Models/comment');
-const Collection = require('../Models/collection');
-const Order = require('../Models/order');
+const { default: mongoose } = require("mongoose");
+const Product = require("../Models/product");
+const Comment = require("../Models/comment");
+const Order = require("../Models/order");
 
-const calculateFutureDeleteDate = require('../helpers/calculate/calculateFutureDeleteDate');
-const cashFormatter = require('../helpers/cashFormatter');
+const calculateFutureDeleteDate = require("../helpers/calculate/calculateFutureDeleteDate");
+const cashFormatter = require("../helpers/cashFormatter");
 
 const getAllProducts = async (req, res) => {
   const query = req.preparedData;
   const { skipPages, currentPageSize, currentPage } = req.pageData;
   const sortMethod = req.sortMethod;
   const rawData = {};
-  console.log(query);
   try {
     let flag = false;
     let skipPagesCopy = skipPages;
@@ -24,7 +22,7 @@ const getAllProducts = async (req, res) => {
         .sort(sortMethod)
         .skip(skipPagesCopy)
         .limit(currentPageSize)
-        .populate(['authors', 'categories'])
+        .populate(["authors", "categories"])
         .lean();
       if (productsData.length <= 0 && skipPages > 1 && currentPage > 1) {
         flag = true;
@@ -55,7 +53,7 @@ const getAllProducts = async (req, res) => {
   } catch (err) {
     return res
       .status(500)
-      .json({ message: 'Fetching data went wrong', error: err.message });
+      .json({ message: "Fetching data went wrong", error: err.message });
   }
 };
 
@@ -65,14 +63,14 @@ const getShopProducts = async (req, res) => {
   const query = req.queryData;
   try {
     const productsData = await Product.find({
-      marketplace: 'shop',
+      marketplace: "shop",
       quantity: { $gt: 0 },
       deleted: false,
       sold: false,
       ...query,
     })
       .sort(sortMethod)
-      .populate(['authors', 'categories'])
+      .populate(["authors", "categories"])
       .limit(limit)
       .lean();
 
@@ -98,7 +96,7 @@ const getShopProducts = async (req, res) => {
     pipeline.push({
       $group: {
         _id: null,
-        maxNumber: { $max: '$price.value' },
+        maxNumber: { $max: "$price.value" },
       },
     });
 
@@ -114,100 +112,92 @@ const getShopProducts = async (req, res) => {
   } catch (err) {
     return res
       .status(500)
-      .json({ message: 'Fetching shop data went wrong', error: err.message });
+      .json({ message: "Fetching shop data went wrong", error: err.message });
+  }
+};
+
+const getCollectionProducts = async (req, res) => {
+  const { limit = 10 } = req.query;
+  const sortMethod = req.sortMethod;
+  const query = req.queryData;
+  try {
+    const productsData = await Product.find({
+      marketplace: "collection",
+      quantity: { $gt: 0 },
+      deleted: false,
+      sold: false,
+      ...query,
+    })
+      .sort(sortMethod)
+      .populate(["authors", "categories"])
+      .limit(limit)
+      .lean();
+
+    const preparedData = [...productsData];
+
+    for (let i = 0; i < productsData.length; i++) {
+      preparedData[i].price = {
+        ...preparedData[i].price,
+        value: `${cashFormatter({
+          number: preparedData[i].price.value,
+        })}`,
+      };
+    }
+
+    const pipeline = [];
+    if (query.categories) {
+      pipeline.push({
+        $match: {
+          categories: query.categories,
+        },
+      });
+    }
+    pipeline.push({
+      $group: {
+        _id: null,
+        maxNumber: { $max: "$price.value" },
+      },
+    });
+
+    const highestPrice = await Product.aggregate(pipeline);
+
+    const rawData = {};
+    rawData.highestPrice =
+      highestPrice.length > 0
+        ? cashFormatter({ number: highestPrice[0].maxNumber })
+        : cashFormatter({ number: 0 });
+
+    return res.status(200).json({ data: { data: preparedData, rawData } });
+  } catch (err) {
+    return res
+      .status(500)
+      .json({ message: "Fetching shop data went wrong", error: err.message });
   }
 };
 
 const getOneProduct = async (req, res) => {
-  const { productId } = req.query;
+  const { _id } = req.query;
 
-  if (!productId) {
-    return res.status(422).json({ message: 'Product id is requried' });
+  if (!_id) {
+    return res.status(422).json({ message: "Product id is requried" });
   }
 
   try {
-    const product = await Product.findOne({ _id: productId })
+    const product = await Product.findOne({ _id })
       .populate([
-        { path: 'categories', select: ['value', 'label'] },
+        { path: "categories", select: ["value", "label"] },
         {
-          path: 'authors',
+          path: "authors",
           select: [
-            'user_info.credentials.full_name',
-            '_id',
-            'author_info.pseudonim',
+            "user_info.credentials.full_name",
+            "_id",
+            "author_info.pseudonim",
           ],
         },
       ])
       .lean();
 
     const preparedProduct = { ...product };
-    if (product.marketplace === 'collection') {
-      const collectionsData = await Collection.find({
-        products: product._id,
-        deleted: false,
-        sold: false,
-        quantity: { $gt: 0 },
-      })
-        .populate([
-          { path: 'creatorData' },
-          { path: 'products', populate: ['authors', 'categories'] },
-        ])
-        .lean();
-      const preparedData = [...collectionsData];
-
-      for (let i = 0; i < collectionsData.length; i++) {
-        const imgs = [];
-        const authors = [];
-        const categories = [];
-
-        for (let j = 0; j < collectionsData[i].products.length; j++) {
-          for (
-            let k = 0;
-            k < collectionsData[i].products[j].authors.length;
-            k++
-          ) {
-            if (
-              !authors.find(
-                author =>
-                  author._id == collectionsData[i].products[j].authors[k]._id,
-              )
-            ) {
-              authors.push(collectionsData[i].products[j].authors[k]);
-            }
-          }
-          for (
-            let k = 0;
-            k < collectionsData[i].products[j].categories.length;
-            k++
-          ) {
-            if (
-              !categories.find(
-                category =>
-                  category._id ==
-                  collectionsData[i].products[j].categories[k]._id,
-              )
-            ) {
-              categories.push(collectionsData[i].products[j].categories[k]);
-            }
-          }
-          if (collectionsData[i].products[j].imgs.length > 0) {
-            imgs.push(collectionsData[i].products[j].imgs[0]);
-          }
-        }
-
-        preparedData[i].imgs = imgs;
-        preparedData[i].authors = authors;
-        preparedData[i].categories = categories;
-        preparedData[i].price = {
-          ...preparedData[i].price,
-          value: `${cashFormatter({
-            number: preparedData[i].price.value,
-          })}`,
-        };
-      }
-
-      preparedProduct.collections = collectionsData;
-    }
 
     preparedProduct.price = {
       ...preparedProduct.price,
@@ -216,137 +206,83 @@ const getOneProduct = async (req, res) => {
       })}`,
     };
 
-    const comments = await Comment.find({ 'targetData._id': product._id })
-      .populate('creatorData')
+    const comments = await Comment.find({ "targetData._id": product._id })
+      .populate("creatorData")
       .lean();
     preparedProduct.comments = comments;
     return res.status(200).json({ data: preparedProduct });
   } catch (err) {
     return res
       .status(500)
-      .json({ message: 'Fetching data went wrong', error: err.message });
+      .json({ message: "Fetching data went wrong", error: err.message });
   }
 };
 
 const addOneProduct = async (req, res) => {
   const preparedData = req.productData;
-  const { selectedCollections } = req.body;
 
   try {
     const _id = new mongoose.Types.ObjectId();
     const createdAt = new Date().getTime();
 
-    if (preparedData.marketplace === 'shop') {
-      try {
-        await Product.create({
-          _id,
-          createdAt,
-          updatedAt: createdAt,
-          ...preparedData,
-        });
-      } catch (err) {
-        return res
-          .status(500)
-          .json({ message: 'Failed creating new product', error: err.message });
-      }
-    }
-    if (preparedData.marketplace === 'collection') {
-      try {
-        await Product.create({
-          _id,
-          createdAt,
-          updatedAt: createdAt,
-          ...preparedData,
-        });
-
-        for (let i = 0; i < selectedCollections.length; i++) {
-          await Collection.updateOne(
-            { _id: selectedCollections[i] },
-            {
-              $push: { products: _id },
-            },
-          );
-        }
-      } catch (err) {
-        return res
-          .status(500)
-          .json({ message: 'Failed creating new product', error: err.message });
-      }
+    try {
+      await Product.create({
+        _id,
+        createdAt,
+        updatedAt: createdAt,
+        ...preparedData,
+      });
+    } catch (err) {
+      return res
+        .status(500)
+        .json({ message: "Failed creating new product", error: err.message });
     }
 
     return res
       .status(201)
-      .json({ message: 'Succesfully added new product', id: _id });
+      .json({ message: "Succesfully added new product", id: _id });
   } catch (err) {
     return res
       .status(500)
-      .json({ message: 'Adding product failed', error: err.message });
+      .json({ message: "Adding product failed", error: err.message });
   }
 };
 
 const updateOneProduct = async (req, res) => {
-  const { _id, selectedCollections } = req.body;
+  const { _id } = req.body;
   const preparedData = req.preparedData;
   try {
     const updatedAt = new Date().getTime();
     const productData = await Product.findOne(
       { _id },
-      { marketplace: 1 },
+      { marketplace: 1 }
     ).lean();
 
-    if (
-      preparedData.marketplace &&
-      productData.marketplace !== preparedData.marketplace
-    ) {
-      await Collection.updateMany(
-        { products: _id },
-        { $pull: { products: _id } },
-      );
-    }
+    await Product.updateOne({ _id }, { ...preparedData, updatedAt });
 
-    if (preparedData.marketplace === 'collection') {
-      if (!selectedCollections || selectedCollections.length <= 0) {
-        return res.status(422).json({ message: 'Please select sollections' });
-      }
-
-      for (let i = 0; i < selectedCollections.length; i++) {
-        await Collection.updateOne(
-          { _id: selectedCollections[i] },
-          { $push: { products: _id } },
-        );
-      }
-      await Product.updateOne({ _id }, { ...preparedData, updatedAt });
-    } else {
-      await Product.updateOne({ _id }, { ...preparedData, updatedAt });
-    }
-
-    return res.status(200).json({ message: 'Success' });
+    return res.status(200).json({ message: "Success" });
   } catch (err) {
-    return res.status(500).json({ message: 'Failed', error: err.message });
+    return res.status(500).json({ message: "Failed", error: err.message });
   }
 };
 
 const deleteOneProduct = async (req, res) => {
-  const { _id, marketplace } = req.body;
+  const { _id } = req.body;
 
   if (!_id) {
-    return res.status(422).json({ message: 'Product id is required' });
+    return res.status(422).json({ message: "Product id is required" });
   }
 
   try {
-    if (marketplace === 'collection') {
-      await Collection.updateMany({}, { $pull: { products: _id } });
-    }
-
     const deleteDate = calculateFutureDeleteDate();
 
     await Product.updateOne({ _id }, { deleted: true, expireAt: deleteDate });
     return res
       .status(200)
-      .json({ message: 'Successfully deleted the product' });
+      .json({ message: "Successfully deleted the product" });
   } catch (err) {
     return res.status(500).json({
-      message: 'Failed deleting selected product',
+      message: "Failed deleting selected product",
       error: err.message,
     });
   }
@@ -355,24 +291,23 @@ const deleteOneProduct = async (req, res) => {
 const deleteAllProducts = async (req, res) => {
   const { userId } = req.body;
   if (!userId) {
-    return res.status(422).json({ message: 'User id is required' });
+    return res.status(422).json({ message: "User id is required" });
   }
   try {
     const deleteDate = calculateFutureDeleteDate();
 
     await Product.updateMany(
-      { 'creatorData._id': userId },
-      { deleted: true, expireAt: deleteDate },
+      { "creatorData._id": userId },
+      { deleted: true, expireAt: deleteDate }
     );
-    await Collection.updateMany({}, { products: [] });
 
     return res
       .status(200)
-      .json({ message: 'Successfully deleted all products' });
+      .json({ message: "Successfully deleted all products" });
   } catch (err) {
     return res
       .status(500)
-      .json({ message: 'Failed deleting all prodcuts', error: err.message });
+      .json({ message: "Failed deleting all prodcuts", error: err.message });
   }
 };
 
@@ -380,19 +315,20 @@ const productsQuantity = async (req, res) => {
   const { authorId } = req.query;
   try {
     const quantity = await Product.find({
-      'creatorData._id': authorId,
+      "creatorData._id": authorId,
     }).count();
     return res.status(200).json({ data: quantity });
   } catch (err) {
     return res
       .status(500)
-      .json({ message: 'Failed deleting all prodcuts', error: err.message });
+      .json({ message: "Failed deleting all prodcuts", error: err.message });
   }
 };
 
 module.exports = {
   productsQuantity,
   getAllProducts,
+  getCollectionProducts,
   getShopProducts,
   getOneProduct,
   addOneProduct,

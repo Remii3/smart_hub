@@ -167,7 +167,7 @@ export default function NewProduct() {
       return { ...prevState, isLoading: true };
     });
     const { data, error } = await useGetAccessDatabase({
-      url: DATABASE_ENDPOINTS.COLLECTION_ALL,
+      url: '#',
       params: { limit: 0, creatorId: userData.data?._id },
     });
     if (error) {
@@ -713,90 +713,9 @@ export default function NewProduct() {
                 </article>
 
                 <DialogFooter className="flex justify-end">
-                  <TabsContent
-                    value="collection"
-                    tabIndex={-1}
-                    className="flex justify-end"
-                  >
-                    <Sheet>
-                      <SheetTrigger asChild>
-                        <Button variant="outline" type="button">
-                          Choose collections
-                        </Button>
-                      </SheetTrigger>
-                      <SheetContent>
-                        <div className="relative flex h-full flex-col">
-                          <SheetHeader>
-                            <SheetTitle>Your collections</SheetTitle>
-                            <SheetDescription>
-                              Please select one/many of your collections you
-                              wish to upload this product to.
-                            </SheetDescription>
-                          </SheetHeader>
-                          <section className="my-4 h-full space-y-4 overflow-y-auto">
-                            {collectionsData.data &&
-                              collectionsData.data.map((collection) => (
-                                <div className="relative">
-                                  <Label
-                                    key={collection._id}
-                                    className="absolute inset-0 block h-full w-full cursor-pointer p-3 text-right"
-                                  >
-                                    <Checkbox
-                                      id={collection._id}
-                                      checked={selectedCollections.includes(
-                                        collection._id
-                                      )}
-                                      onCheckedChange={(checked) =>
-                                        changeSelectedCollectionsHandler(
-                                          checked as boolean,
-                                          collection._id
-                                        )
-                                      }
-                                    />
-                                  </Label>
-                                  <CollectionCard
-                                    _id={collection._id}
-                                    title={collection.title}
-                                    shortDescription={
-                                      collection.shortDescription
-                                    }
-                                    rating={collection.rating}
-                                    price={collection.price}
-                                    imgs={collection.imgs}
-                                    authors={collection.authors}
-                                    categories={collection.categories}
-                                    type="collection"
-                                    productQuantity={collection.productQuantity}
-                                    showOnly
-                                  />
-                                </div>
-                              ))}
-                          </section>
-                          <SheetFooter>
-                            <SheetTrigger asChild>
-                              <Button variant={'default'}>Proceed</Button>
-                            </SheetTrigger>
-                          </SheetFooter>
-                        </div>
-                      </SheetContent>
-                    </Sheet>
-                    <Button
-                      type="submit"
-                      variant={'default'}
-                      disabled={selectedCollections.length <= 0}
-                    >
-                      Submit
-                    </Button>
-                  </TabsContent>
-                  <TabsContent
-                    value="shop"
-                    tabIndex={-1}
-                    className="flex justify-end"
-                  >
-                    <Button variant="default" type="submit">
-                      Add
-                    </Button>
-                  </TabsContent>
+                  <Button variant="default" type="submit">
+                    Add
+                  </Button>
                 </DialogFooter>
               </form>
             </Form>

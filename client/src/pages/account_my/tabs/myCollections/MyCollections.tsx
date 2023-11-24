@@ -21,7 +21,7 @@ export default function MyCollections() {
       return { ...prevState, isLoading: true };
     });
     const { data, error } = await useGetAccessDatabase({
-      url: DATABASE_ENDPOINTS.COLLECTION_ALL,
+      url: '#',
     });
     if (error) {
       errorToast(error);

@@ -130,11 +130,6 @@ export interface PostDataTypes {
 
 // * Cart types
 
-export interface CartProductTypes {
-  inCartQuantity: number;
-  productData: ProductTypes;
-}
-
 export interface CartTypes {
   products: {
     inCartQuantity: number;
@@ -147,6 +142,9 @@ export interface CartTypes {
   isIncrementing: boolean | string;
   isDecrementing: boolean | string;
   isDeleting: boolean | string;
+  additionalData: {
+    [index: string]: unknown;
+  };
 }
 
 // * Card types

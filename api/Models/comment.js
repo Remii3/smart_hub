@@ -1,17 +1,17 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const CommentSchema = new mongoose.Schema({
   creatorData: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
-    ref: 'User',
+    ref: "User",
   },
   targetData: {
     _id: { type: mongoose.Schema.Types.ObjectId, required: true },
     type: {
       type: String,
       required: true,
-      enum: ['Product', 'News', 'Collection'],
+      enum: ["Product", "News"],
     },
   },
   value: { type: { rating: { type: Number }, text: { type: String } } },
@@ -19,6 +19,6 @@ const CommentSchema = new mongoose.Schema({
   updatedAt: { type: Date, required: true },
 });
 
-const CommentModel = mongoose.model('Comment', CommentSchema);
+const CommentModel = mongoose.model("Comment", CommentSchema);
 
 module.exports = CommentModel;

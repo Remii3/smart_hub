@@ -1,175 +1,54 @@
-const Cart = require('../Models/cart');
-const Product = require('../Models/product');
-const Collection = require('../Models/collection');
-const calculateOrderAmount = require('../helpers/calculate/calculateOrderAmount');
-const cashFormatter = require('../helpers/cashFormatter');
+const Cart = require("../Models/cart");
+const Product = require("../Models/product");
+const calculateOrderAmount = require("../helpers/calculate/calculateOrderAmount");
+const cashFormatter = require("../helpers/cashFormatter");
+const reverseCashFormatter = require("../helpers/reverseCashFormatter");
 
-const stripe = require('stripe')(
-  'sk_test_51NDZ0zHqBBlAtOOFMShIrv9OwdfC6958wOWqZa1X59kOeyY4hNtZ80ANZ6WYv67v4a8FOFguc04SCV84QKEf6nFf005r6tKBO6',
+const stripe = require("stripe")(
+  "sk_test_51NDZ0zHqBBlAtOOFMShIrv9OwdfC6958wOWqZa1X59kOeyY4hNtZ80ANZ6WYv67v4a8FOFguc04SCV84QKEf6nFf005r6tKBO6"
 );
-
-const addItemToCart = async (req, res) => {
-  const { userId, productId, productQuantity, type } = req.body;
-
-  if (!userId) {
-    return res.status(422).json({ message: 'User id is required!' });
-  }
-
-  if (!productId) {
-    return res.status(422).json({ message: 'Product id is required!' });
-  }
-
-  if (!productQuantity) {
-    return res.status(422).json({ message: 'Product quantity is required!' });
-  }
-
-  try {
-    const cart = await Cart.findOne({ user_id: userId });
-
-    if (!cart) {
-      await Cart.create({
-        user_id: userId,
-        products: [{ _id: productId, quantity: productQuantity }],
-      });
-      return res.status(201).json({ message: 'Successfully added' });
-    }
-
-    const existingItem = await Cart.findOne({
-      user_id: userId,
-      $or: [{ 'products._id': productId }, { 'collections._id': productId }],
-    });
-
-    if (existingItem) {
-      switch (type) {
-        case 'shop': {
-          await Cart.updateOne(
-            { user_id: userId, 'products._id': productId },
-            { $inc: { 'products.$.quantity': productQuantity } },
-          );
-          break;
-        }
-        case 'collection': {
-          await Cart.updateOne(
-            { user_id: userId, 'collections._id': productId },
-            { $inc: { 'collections.$.quantity': productQuantity } },
-          );
-          break;
-        }
-      }
-      return res.status(201).json({ message: 'Successfully added' });
-    }
-
-    switch (type) {
-      case 'shop': {
-        await Cart.updateOne(
-          { user_id: userId },
-          {
-            $push: {
-              products: {
-                _id: productId,
-                quantity: productQuantity,
-              },
-            },
-          },
-        );
-        break;
-      }
-      case 'collection': {
-        await Cart.updateOne(
-          { user_id: userId },
-          {
-            $push: {
-              collections: {
-                _id: productId,
-                quantity: productQuantity,
-              },
-            },
-          },
-        );
-        break;
-      }
-    }
-    return res.status(201).json({ message: 'Successfully added' });
-  } catch (err) {
-    return res.status(500).json({
-      message: `Failed adding ${type} to cart.`,
-      error: err.message,
-    });
-  }
-};
-
-const removeItemFromCart = async (req, res) => {
-  const { userId, productId, type } = req.body;
-
-  if (!userId) {
-    return res.status(422).json({ message: 'User id is required!' });
-  }
-
-  if (!productId) {
-    return res.status(422).json({ message: 'Product id is required!' });
-  }
-
-  try {
-    if (productId === 'all') {
-      await Cart.updateOne({ user_id: userId }, { $set: { products: [] } });
-    } else {
-      switch (type) {
-        case 'shop': {
-          await Cart.updateOne(
-            { user_id: userId },
-            { $pull: { products: { _id: productId } } },
-          );
-          break;
-        }
-        case 'collection': {
-          await Cart.updateOne(
-            { user_id: userId },
-            { $pull: { collections: { _id: productId } } },
-          );
-          break;
-        }
-      }
-    }
-    return res.status(200).json({ message: 'Success' });
-  } catch (err) {
-    const errorMessage =
-      productId === 'all'
-        ? "We couldn't remove your items from the cart"
-        : "We couldn't remove your item from the cart";
-    return res.status(500).json({
-      message: errorMessage,
-      error: err.message,
-    });
-  }
-};
 
 const getAllCartItems = async (req, res) => {
   const { userId } = req.query;
+
   if (!userId) {
     return res.status(422).json({ message: "User id is required!" });
   }
-  try {
-    const productsData = [];
-    let cartPrice = 0;
 
+  const preparedData = {
+    products: [],
+    cartPrice: 0,
+    additionalData: { discount: 0 },
+  };
+
+  try {
     const cartData = await Cart.findOne({
-      user_id: userId,
+      userId,
     }).lean();
 
     if (!cartData) {
-      cartPrice = `${cashFormatter({ number: 0 })}`;
+      await Cart.create({
+        userId: userId,
+      });
 
-      return res
-        .status(200)
-        .json({ data: { products: productsData, cartPrice } });
+      return res.status(200).json({
+        data: {
+          products: preparedData.products,
+          cartPrice: `${cashFormatter({ number: preparedData.cartPrice })}`,
+          additionalData: {
+            discount: `${cashFormatter({
+              number: preparedData.additionalData.discount,
+            })}`,
+          },
+        },
+      });
     }
-    const products = cartData.products;
-    const collections = cartData.collections;
 
-    for (let i = 0; i < products.length; i++) {
+    for (let i = 0; i < cartData.products.length; i++) {
+      const product = cartData.products[i];
       const productData = await Product.findOne(
         {
-          _id: products[i]._id,
+          _id: product._id,
           deleted: false,
           quantity: { $gt: 0 },
           sold: false,
@@ -183,140 +62,164 @@ const getAllCartItems = async (req, res) => {
         }
       ).lean();
 
-      if (productData) {
-        const dataCopy = { ...productData, price: { ...productData.price } };
-        dataCopy.price.value = `${cashFormatter({
-          number: dataCopy.price.value,
-        })}`;
-        productsData.push({
-          productData: dataCopy,
-          inCartQuantity: products[i].quantity,
-          totalPrice: productData.price.value * products[i].quantity,
-        });
-        cartPrice += productData.price.value * products[i].quantity;
-      } else {
+      if (!productData) {
         await Cart.updateOne(
-          { user_id: userId, "products._id": products[i]._id },
-          { $pull: { products: { _id: products[i]._id } } }
+          { userId, "products._id": product._id },
+          { $pull: { products: { _id: product._id } } }
         );
       }
-    }
-    for (let i = 0; i < collections.length; i++) {
-      const collectionData = await Collection.findOne(
-        {
-          _id: collections[i]._id,
-          deleted: false,
-          quantity: { $gt: 0 },
-          sold: false,
-        },
-        {
-          price: 1,
-          title: 1,
-          marketplace: 1,
-          quantity: 1,
-        }
-      ).lean();
 
-      if (collectionData) {
-        const dataCopy = {
-          ...collectionData,
-          price: { ...collectionData.price },
-        };
-        dataCopy.price.value = `${cashFormatter({
-          number: dataCopy.price.value,
-        })}`;
-        productsData.push({
-          productData: dataCopy,
-          inCartQuantity: collections[i].quantity,
-          totalPrice: collectionData.price.value * collections[i].quantity,
-        });
-        cartPrice += collectionData.price.value * collections[i].quantity;
-      } else {
-        await Cart.updateOne(
-          { user_id: userId, "products._id": collections[i]._id },
-          { $pull: { collections: { _id: collections[i]._id } } }
-        );
-      }
+      const dataCopy = { ...productData, price: { ...productData.price } };
+
+      preparedData.products.push({
+        productData: dataCopy,
+        inCartQuantity: product.quantity,
+        totalPrice: `${cashFormatter({
+          number: dataCopy.price.value * product.quantity,
+        })}`,
+      });
+      preparedData.cartPrice += dataCopy.price.value * product.quantity;
     }
-    cartPrice = `${cashFormatter({ number: cartPrice })}`;
+
+    preparedData.cartPrice = `${cashFormatter({
+      number: preparedData.cartPrice,
+    })}`;
+
+    preparedData.additionalData = {
+      discount: `${cashFormatter({
+        number: preparedData.additionalData.discount,
+      })}`,
+    };
+
     return res
       .status(200)
-      .json({ data: { products: productsData, cartPrice } });
+      .json({ data: preparedData, message: "Successfully fetched cart." });
   } catch (err) {
     return res.status(500).json({
-      message: "We couldn't update your cart data",
+      message: "We failed getting your cart.",
+      error: err.message,
+    });
+  }
+};
+
+const addItemToCart = async (req, res) => {
+  const { productQuantity } = req.body;
+  const { userId, productId } = req.preparedData;
+
+  if (!productQuantity) {
+    return res.status(422).json({ message: "Product quantity is required!" });
+  }
+
+  try {
+    const cart = await Cart.findOne({ userId });
+
+    if (!cart) {
+      await Cart.create({
+        userId: userId,
+        products: [{ _id: productId, quantity: productQuantity }],
+      });
+      return res
+        .status(201)
+        .json({ message: "Successfully added product to the cart." });
+    }
+
+    const existingItem = await Cart.findOne({
+      userId,
+      "products._id": productId,
+    });
+
+    if (existingItem) {
+      await Cart.updateOne(
+        { userId, "products._id": productId },
+        { $inc: { "products.$.quantity": productQuantity } }
+      );
+      return res
+        .status(201)
+        .json({ message: "Successfully added product to the cart." });
+    }
+
+    await Cart.updateOne(
+      { userId },
+      {
+        $push: {
+          products: {
+            _id: productId,
+            quantity: productQuantity,
+          },
+        },
+      }
+    );
+    return res
+      .status(201)
+      .json({ message: `Successfully added product to the cart.` });
+  } catch (err) {
+    return res.status(500).json({
+      message: `We failed adding product to the cart.`,
+      error: err.message,
+    });
+  }
+};
+
+const removeItemFromCart = async (req, res) => {
+  const { userId, productId } = req.preparedData;
+
+  try {
+    if (productId === "all") {
+      await Cart.updateOne({ userId }, { $set: { products: [] } });
+    } else {
+      await Cart.updateOne(
+        { userId },
+        { $pull: { products: { _id: productId } } }
+      );
+    }
+    return res.status(200).json({ message: "Successfully removed your item." });
+  } catch (err) {
+    const errorMessage =
+      productId === "all"
+        ? "We couldn't remove your items from the cart."
+        : "We couldn't remove your item from the cart.";
+    return res.status(500).json({
+      message: errorMessage,
       error: err.message,
     });
   }
 };
 
 const cartItemIncrement = async (req, res) => {
-  const { userId, productId, type } = req.body;
-  if (!userId) {
-    return res.status(422).json({ message: 'User id is required!' });
-  }
-
-  if (!productId) {
-    return res.status(422).json({ message: 'Product id is required!' });
-  }
+  const { userId, productId } = req.preparedData;
 
   try {
-    switch (type) {
-      case 'shop': {
-        await Cart.updateOne(
-          { user_id: userId, 'products._id': productId },
-          { $inc: { 'products.$.quantity': 1 } },
-        );
-        break;
-      }
-      case 'collection': {
-        await Cart.updateOne(
-          { user_id: userId, 'collections._id': productId },
-          { $inc: { 'collections.$.quantity': 1 } },
-        );
-        break;
-      }
-    }
+    await Cart.updateOne(
+      { userId: userId, "products._id": productId },
+      { $inc: { "products.$.quantity": 1 } }
+    );
 
-    return res.status(200).json({ message: 'Successfuly updated data' });
+    return res
+      .status(200)
+      .json({ message: "Successfuly added more products." });
   } catch (err) {
     return res.status(500).json({
-      message: 'Cart or product was not found',
+      message: "We failed adding more products to the cart.",
       error: err.message,
     });
   }
 };
 
 const cartItemDecrement = async (req, res) => {
-  const { userId, productId, type } = req.body;
-  if (!userId) {
-    return res.status(422).json({ message: 'User id is required!' });
-  }
-
-  if (!productId) {
-    return res.status(422).json({ message: 'Product id is required!' });
-  }
+  const { userId, productId } = req.preparedData;
 
   try {
-    switch (type) {
-      case 'shop': {
-        await Cart.updateOne(
-          { user_id: userId, 'products._id': productId },
-          { $inc: { 'products.$.quantity': -1 } },
-        );
-      }
-      case 'collection': {
-        await Cart.updateOne(
-          { user_id: userId, 'collections._id': productId },
-          { $inc: { 'collections.$.quantity': -1 } },
-        );
-      }
-    }
+    await Cart.updateOne(
+      { userId: userId, "products._id": productId },
+      { $inc: { "products.$.quantity": -1 } }
+    );
 
-    return res.status(200).json({ message: 'Successfuly updated data' });
+    return res
+      .status(200)
+      .json({ message: "Successfuly removed item from the cart." });
   } catch (err) {
     return res.status(500).json({
-      message: 'Cart or product was not found',
+      message: "We failed removing item from your cart.",
       error: err.message,
     });
   }
@@ -327,7 +230,7 @@ const initiatePayment = async (req, res) => {
   try {
     const paymentIntent = await stripe.paymentIntents.create({
       amount: calculateOrderAmount(items),
-      currency: 'usd',
+      currency: "usd",
       automatic_payment_methods: {
         enabled: true,
       },
@@ -339,14 +242,14 @@ const initiatePayment = async (req, res) => {
   } catch (err) {
     return res
       .status(500)
-      .json({ message: 'Failed to initiate payment', err: err.message });
+      .json({ message: "Failed to initiate payment", err: err.message });
   }
 };
 
 module.exports = {
+  getAllCartItems,
   addItemToCart,
   removeItemFromCart,
-  getAllCartItems,
   cartItemIncrement,
   cartItemDecrement,
   initiatePayment,

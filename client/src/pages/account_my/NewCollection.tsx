@@ -70,7 +70,7 @@ export default function NewCollection() {
     });
 
     const { error } = await usePostAccessDatabase({
-      url: DATABASE_ENDPOINTS.COLLECTION_ADD_ONE,
+      url: '#',
       body: {
         ...dirtyData,
         creatorData: {

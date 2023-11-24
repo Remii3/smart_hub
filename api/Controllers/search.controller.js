@@ -1,7 +1,6 @@
-const Order = require('../Models/order');
-const Product = require('../Models/product');
-const Collection = require('../Models/collection');
-const cashFormatter = require('../helpers/cashFormatter');
+const Order = require("../Models/order");
+const Product = require("../Models/product");
+const cashFormatter = require("../helpers/cashFormatter");
 
 const getHighestPrice = async (pipeline, rawData) => {
   const highestPrice = await Product.aggregate(pipeline);
@@ -13,7 +12,7 @@ const getHighestPrice = async (pipeline, rawData) => {
   return highestPrice;
 };
 
-const prepareData = originalData => {
+const prepareData = (originalData) => {
   const preparedData = [...originalData];
 
   for (let i = 0; i < originalData.length; i++) {
@@ -32,25 +31,25 @@ const getBestseller = async (
   query,
   marketplace,
   sortMethod,
-  currentPageSize,
+  currentPageSize
 ) => {
   const searchQuery = { ...query };
   const rawData = {};
   const top_selling_products = await Order.aggregate([
-    { $unwind: '$products' },
+    { $unwind: "$products" },
     {
       $lookup: {
-        from: 'products',
-        localField: 'products.product',
-        foreignField: '_id',
-        as: 'product_doc',
+        from: "products",
+        localField: "products.product",
+        foreignField: "_id",
+        as: "product_doc",
       },
     },
-    { $unwind: '$product_doc' },
+    { $unwind: "$product_doc" },
     {
       $group: {
-        _id: '$product_doc._id',
-        sum: { $sum: '$products.in_cart_quantity' },
+        _id: "$product_doc._id",
+        sum: { $sum: "$products.in_cart_quantity" },
       },
     },
     { $sort: { sum: -1 } },
@@ -59,7 +58,7 @@ const getBestseller = async (
       $group: {
         _id: null,
         top_selling_products: {
-          $push: '$_id',
+          $push: "$_id",
         },
       },
     },
@@ -75,7 +74,7 @@ const getBestseller = async (
     ...searchQuery,
     deleted: false,
   })
-    .populate('categories')
+    .populate("categories")
     .sort(sortMethod)
     .lean();
 
@@ -96,7 +95,7 @@ const getBestseller = async (
   pipeline.push({
     $group: {
       _id: null,
-      maxNumber: { $max: '$price.value' },
+      maxNumber: { $max: "$price.value" },
     },
   });
 
@@ -127,7 +126,7 @@ const getDefault = async () => {
     .sort(sortMethod)
     .skip(skipPagesCopy)
     .limit(currentPageSize)
-    .populate(['authors', 'categories'])
+    .populate(["authors", "categories"])
     .lean();
 
   totalDocuments = await Product.find(searchQuery).countDocuments();
@@ -143,7 +142,7 @@ const getDefault = async () => {
   pipeline.push({
     $group: {
       _id: null,
-      maxNumber: { $max: '$price.value' },
+      maxNumber: { $max: "$price.value" },
     },
   });
 };
@@ -155,19 +154,19 @@ const mainSearch = async (req, res) => {
   const sortMethod = req.sortMethod;
   try {
     switch (searchType) {
-      case 'bestseller': {
+      case "bestseller": {
         const data = await getBestseller(
           searchQuery,
           marketplace,
           sortMethod,
-          currentPageSize,
+          currentPageSize
         );
         console.log(data);
         return res.status(200).json({
           data,
         });
       }
-      case 'latest': {
+      case "latest": {
         const data = await getLatest();
         return res.status(200).json({
           data,
@@ -183,7 +182,7 @@ const mainSearch = async (req, res) => {
   } catch (err) {
     return res
       .status(500)
-      .json({ message: 'Faield fetching searched query', error: err.message });
+      .json({ message: "Faield fetching searched query", error: err.message });
   }
 };
 

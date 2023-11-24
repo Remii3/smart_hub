@@ -110,6 +110,11 @@ export default function Nav({ scrollFlag }: { scrollFlag: boolean }) {
   ) => {
     setSearchbarValue(e.target.value);
   };
+  console.log(cartState);
+  const totalProductQuantity =
+    cartState.products &&
+    cartState.products.reduce((acc, item) => acc + item.inCartQuantity, 0);
+
   const burgerColor = openedBurger
     ? 'bg-foreground'
     : scrollFlag
@@ -220,7 +225,7 @@ export default function Nav({ scrollFlag }: { scrollFlag: boolean }) {
                           : 'bg-background/90 text-foreground'
                       } absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full`}
                     >
-                      {cartState.products.length}
+                      {totalProductQuantity}
                     </span>
                   )}
                 </Suspense>

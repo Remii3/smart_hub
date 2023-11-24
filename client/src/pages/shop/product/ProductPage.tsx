@@ -206,7 +206,7 @@ export default function ProductPage() {
     });
     const { data, error } = await useGetAccessDatabase({
       url: DATABASE_ENDPOINTS.PRODUCT_ONE,
-      params: { productId: prodId },
+      params: { _id: prodId },
     });
     if (error) {
       errorToast(error);
@@ -433,7 +433,6 @@ export default function ProductPage() {
       navigate(-1);
     }
   };
-
 
   if (!productState.data || userData.isLoading) return <></>;
   return (

@@ -53,7 +53,7 @@ export default function BasicCollectionWidget({
       return { ...prevState, isLoading: false };
     });
     const { data, error } = await useGetAccessDatabase({
-      url: DATABASE_ENDPOINTS.COLLECTION_ALL,
+      url: DATABASE_ENDPOINTS.PRODUCT_COLLECTION_ALL,
       params: {
         category,
         minPrice,
@@ -61,6 +61,7 @@ export default function BasicCollectionWidget({
         sortOption: selectedSortOption,
       },
     });
+    console.log(data);
     if (error) {
       errorToast(error);
       return setCollections((prevState) => {

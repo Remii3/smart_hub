@@ -24,6 +24,9 @@ const initialState = {
   isIncrementing: false,
   isDecrementing: false,
   isDeleting: false,
+  additionalData: {
+    discount: 0,
+  },
 };
 
 export const CartContext = createContext<{
@@ -32,22 +35,20 @@ export const CartContext = createContext<{
   addProductToCart: ({
     productId,
     productQuantity,
-    type,
   }: {
     productId: string;
     productQuantity: number;
-    type: string;
   }) => void;
-  incrementCartItem: (productId: string, type: string) => void;
-  decrementCartItem: (productId: string, type: string) => void;
-  removeProductFromCart: (productId: string, type: string) => void;
+  incrementCartItem: (productId: string) => void;
+  decrementCartItem: (productId: string) => void;
+  removeProductFromCart: (productId: string) => void;
 }>({
   cartState: initialState,
-  fetchCartData: () => null,
-  addProductToCart: () => null,
-  incrementCartItem: () => null,
-  decrementCartItem: () => null,
-  removeProductFromCart: () => null,
+  fetchCartData: () => undefined,
+  addProductToCart: () => undefined,
+  incrementCartItem: () => undefined,
+  decrementCartItem: () => undefined,
+  removeProductFromCart: () => undefined,
 });
 
 export default function CartProvider({ children }: { children: ReactNode }) {
@@ -65,8 +66,7 @@ export default function CartProvider({ children }: { children: ReactNode }) {
       setCart((prevState) => {
         return {
           ...prevState,
-          products: data.products,
-          cartPrice: data.cartPrice,
+          ...data,
         };
       });
     }
@@ -76,19 +76,16 @@ export default function CartProvider({ children }: { children: ReactNode }) {
     async ({
       productId,
       productQuantity,
-      type,
     }: {
       productId: string;
       productQuantity: number;
-      type: string;
     }) => {
       setCart((prevState) => {
         return { ...prevState, isAdding: productId };
       });
-
       await usePostAccessDatabase({
         url: DATABASE_ENDPOINTS.CART_ADD,
-        body: { userId, productId, productQuantity, type },
+        body: { userId, productId, productQuantity },
       });
 
       await fetchCartData();
@@ -101,7 +98,7 @@ export default function CartProvider({ children }: { children: ReactNode }) {
   );
 
   const incrementCartItem = useCallback(
-    async (productId: string, type: string) => {
+    async (productId: string) => {
       if (!cartState) return;
 
       const newProducts = cartState.products;
@@ -117,9 +114,10 @@ export default function CartProvider({ children }: { children: ReactNode }) {
 
       await usePostAccessDatabase({
         url: DATABASE_ENDPOINTS.CART_INCREMENT,
-        body: { userId, productId, type },
+        body: { userId, productId },
       });
       await fetchCartData();
+
       setCart((prevState) => {
         return { ...prevState, isIncrementing: false };
       });
@@ -136,7 +134,7 @@ export default function CartProvider({ children }: { children: ReactNode }) {
   );
 
   const decrementCartItem = useCallback(
-    async (productId: string, type: string) => {
+    async (productId: string) => {
       if (!cartState) return;
 
       const newProducts = cartState.products;
@@ -153,7 +151,7 @@ export default function CartProvider({ children }: { children: ReactNode }) {
 
       await usePostAccessDatabase({
         url: DATABASE_ENDPOINTS.CART_DECREMENT,
-        body: { userId, productId, type },
+        body: { userId, productId },
       });
       await fetchCartData();
       setCart((prevState) => {
@@ -172,7 +170,7 @@ export default function CartProvider({ children }: { children: ReactNode }) {
   );
 
   const removeProductFromCart = useCallback(
-    async (productId: string, type: string) => {
+    async (productId: string) => {
       if (!cartState) return;
 
       const newProducts = cartState.products.filter(
@@ -184,7 +182,7 @@ export default function CartProvider({ children }: { children: ReactNode }) {
       });
       await usePostAccessDatabase({
         url: DATABASE_ENDPOINTS.CART_REMOVE,
-        body: { userId, productId, type },
+        body: { userId, productId },
       });
 
       await fetchCartData();

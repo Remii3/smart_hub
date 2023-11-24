@@ -115,7 +115,7 @@ export default function CollectionPage() {
     });
 
     const { data, error } = await useGetAccessDatabase({
-      url: DATABASE_ENDPOINTS.COLLECTION_ONE,
+      url: DATABASE_ENDPOINTS.PRODUCT_ONE,
       params: { _id: collectionId },
     });
 
@@ -174,7 +174,7 @@ export default function CollectionPage() {
     );
 
     const { error } = await usePostAccessDatabase({
-      url: DATABASE_ENDPOINTS.COLLECTION_UPDATE_ONE,
+      url: '#',
       body: { collectionId, description: newDescription, ...dirtyData },
     });
 
@@ -202,7 +202,7 @@ export default function CollectionPage() {
 
   const deleteHandler = async () => {
     const { error } = await usePostAccessDatabase({
-      url: DATABASE_ENDPOINTS.COLLECTION_DELETE_ONE,
+      url: DATABASE_ENDPOINTS.PRODUCT_DELETE,
       body: { collectionId },
     });
     if (error) {
@@ -220,11 +220,13 @@ export default function CollectionPage() {
 
   const addToCartHandler = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    console.log('object');
     if (collectionId) {
+      console.log(collectionId);
       addProductToCart({
         productId: collectionId,
         productQuantity: selectedQuantity,
-        type: 'collection',
+        type: 'shop',
       });
       setSelectedQuantity(1);
     }
