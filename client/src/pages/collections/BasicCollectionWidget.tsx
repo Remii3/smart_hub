@@ -54,6 +54,12 @@ export default function BasicCollectionWidget({
     });
     const { data, error } = await useGetAccessDatabase({
       url: DATABASE_ENDPOINTS.COLLECTION_ALL,
+      params: {
+        category,
+        minPrice,
+        maxPrice,
+        sortOption: selectedSortOption,
+      },
     });
     if (error) {
       errorToast(error);
@@ -62,16 +68,16 @@ export default function BasicCollectionWidget({
       });
     }
     setCollections({
-      data: data,
+      data: data.data,
       hasError: null,
       isLoading: false,
       rawData: data.rawData,
     });
-  }, []);
+  }, [selectedSortOption, minPrice, maxPrice]);
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [selectedSortOption, minPrice, maxPrice]);
 
   const sortOptionChangeHandler = (selectedOption: string) => {
     const selectedValue = selectedOption;

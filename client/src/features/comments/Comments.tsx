@@ -23,6 +23,7 @@ import {
 } from '@hooks/useAaccessDatabase';
 import { DialogClose } from '@radix-ui/react-dialog';
 import { useCallback, useContext, useEffect, useState } from 'react';
+import parse from 'html-react-parser';
 
 type CommentTargetTypes = 'Product' | 'News' | 'Collection';
 
@@ -176,6 +177,15 @@ export default function Comments({
       fetchData();
     }, 150);
   };
+
+  function limitLines(value: string, maxLines: number) {
+    const lines = value.split('\n');
+
+    if (lines.length > maxLines) {
+      return (value = lines.slice(0, maxLines).join('\n'));
+    }
+    return value;
+  }
   return (
     <div className="mt-8">
       <h3 className="mb-2 text-4xl">Comments</h3>
@@ -237,11 +247,12 @@ export default function Comments({
                 disabled={!userData.data}
                 placeholder={!userData.data ? '' : 'Enter new comment...'}
                 value={newComment.value}
-                onChange={(e) =>
+                onChange={(e) => {
+                  const test = limitLines(e.target.value, 10);
                   setNewComment((prevState) => {
-                    return { ...prevState, value: e.target.value };
-                  })
-                }
+                    return { ...prevState, value: test };
+                  });
+                }}
               />
               {!userData.data && (
                 <div className="absolute top-0 flex h-full w-full items-center justify-center bg-slate-300/20">
@@ -323,7 +334,7 @@ export default function Comments({
                     {comment.createdAt.slice(0, 10)}
                   </small>
                 </div>
-                <div>{comment.value.text}</div>
+                <div>{parse(comment.value.text.replaceAll('\n', '<br/>'))}</div>
               </div>
               {(userData.data?._id === comment.creatorData._id ||
                 userData.data?.role == UserRoleTypes.ADMIN) && (

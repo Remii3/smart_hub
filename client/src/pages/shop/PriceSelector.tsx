@@ -31,11 +31,11 @@ export default function PriceSelector({
   const [popoverOpenState, setPopoverOpenState] = useState(false);
   return (
     <div className="flex-grow sm:relative" id={`${category}-PriceSelector`}>
-      <Popover open={popoverOpenState}>
-        <PopoverTrigger
-          onClick={() => setPopoverOpenState((prevState) => !prevState)}
-          className="rounded-md"
-        >
+      <Popover
+        open={popoverOpenState}
+        onOpenChange={() => setPopoverOpenState((prevState) => !prevState)}
+      >
+        <PopoverTrigger className="rounded-md">
           <summary className="flex cursor-pointer items-center gap-2 border-b border-gray-400 px-2 pb-1 text-gray-900 transition hover:border-gray-600">
             <span className="text-sm font-medium">Price</span>
 

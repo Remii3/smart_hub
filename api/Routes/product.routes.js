@@ -14,7 +14,6 @@ const {
 } = require('../Controllers/product.controller');
 const prepareFindOne = require('../Middleware/product/prepareFindOne.middleware');
 const prepareNewProductData = require('../Middleware/product/prepareNewProductData.middleware');
-const prepareSearchedProductData = require('../Middleware/product/prepareSearchedProductData.middleware');
 const checkSortMethod = require('../Middleware/checkSortMethod.middleware');
 const prepareUpdate = require('../Middleware/product/prepareUpdate.middleware');
 const prepareFindAllData = require('../Middleware/product/prepareFindAllData.middleware');
@@ -22,12 +21,6 @@ const prepareFindAllData = require('../Middleware/product/prepareFindAllData.mid
 router.get('/all', checkSortMethod, prepareFindAllData, getAllProducts);
 router.get('/shop', prepareFindOne, getShopProducts);
 router.get('/one', getOneProduct);
-router.get(
-  '/searched',
-  checkSortMethod,
-  prepareSearchedProductData,
-  getSearchedProducts,
-);
 router.get('/quantity', productsQuantity);
 
 router.post('/one', prepareNewProductData, addOneProduct);

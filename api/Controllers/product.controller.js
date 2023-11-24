@@ -12,6 +12,7 @@ const getAllProducts = async (req, res) => {
   const { skipPages, currentPageSize, currentPage } = req.pageData;
   const sortMethod = req.sortMethod;
   const rawData = {};
+  console.log(query);
   try {
     let flag = false;
     let skipPagesCopy = skipPages;
@@ -227,170 +228,6 @@ const getOneProduct = async (req, res) => {
   }
 };
 
-const getSearchedProducts = async (req, res) => {
-  const { searchQuery, specialQuery } = req.finalSearchData;
-  let { skipPages, currentPageSize, currentPage } = req.pageData;
-
-  const sortMethod = req.sortMethod;
-
-  const rawData = {};
-
-  try {
-    let productsData = null;
-    let totalDocuments = null;
-    let totalPages = null;
-    if (specialQuery) {
-      switch (specialQuery) {
-        case 'bestseller': {
-          const top_selling_products = await Order.aggregate([
-            { $unwind: '$products' },
-            {
-              $lookup: {
-                from: 'products',
-                localField: 'products.product',
-                foreignField: '_id',
-                as: 'product_doc',
-              },
-            },
-            { $unwind: '$product_doc' },
-            {
-              $group: {
-                _id: '$product_doc._id',
-                sum: { $sum: '$products.in_cart_quantity' },
-              },
-            },
-            { $sort: { sum: -1 } },
-            { $limit: 6 },
-            {
-              $group: {
-                _id: null,
-                top_selling_products: {
-                  $push: '$_id',
-                },
-              },
-            },
-          ]);
-          if (top_selling_products.length > 0) {
-            searchQuery._id = {
-              $in: top_selling_products[0].top_selling_products,
-            };
-          }
-          productsData = await Product.find({
-            ...searchQuery,
-            deleted: false,
-          })
-            .populate('categories')
-            .sort(sortMethod)
-            .lean();
-
-          totalDocuments = productsData.length;
-          totalPages = Math.ceil(totalDocuments / currentPageSize);
-          const pipeline = [];
-
-          if (searchQuery) {
-            pipeline.push({
-              $match: {
-                ...searchQuery,
-              },
-            });
-          }
-          pipeline.push({
-            $group: {
-              _id: null,
-              maxNumber: { $max: '$price.value' },
-            },
-          });
-
-          const highestPrice = await Product.aggregate(pipeline);
-          rawData.highestPrice =
-            highestPrice.length > 0
-              ? cashFormatter({ number: highestPrice[0].maxNumber })
-              : cashFormatter({ number: 0 });
-          rawData.totalPages = totalPages;
-          rawData.totalProducts = totalDocuments;
-          break;
-        }
-        case 'latest': {
-          productsData = await Product.find({ ...searchQuery })
-            .lean()
-            .sort(sortMethod)
-            .limit(currentPageSize);
-          break;
-        }
-      }
-    } else {
-      let flag = false;
-      let skipPagesCopy = skipPages;
-      do {
-        productsData = await Product.find({
-          ...searchQuery,
-          deleted: false,
-        })
-          .sort(sortMethod)
-          .skip(skipPagesCopy)
-          .limit(currentPageSize)
-          .populate(['authors', 'categories'])
-          .lean();
-        if (productsData.length <= 0 && skipPages > 1 && currentPage > 1) {
-          flag = true;
-          skipPagesCopy -= skipPages;
-          currentPage -= 1;
-        } else {
-          flag = false;
-        }
-      } while (flag);
-
-      totalDocuments = await Product.find(searchQuery).countDocuments();
-      totalPages = Math.ceil(totalDocuments / currentPageSize);
-      const pipeline = [];
-      if (searchQuery) {
-        pipeline.push({
-          $match: {
-            ...searchQuery,
-          },
-        });
-      }
-      pipeline.push({
-        $group: {
-          _id: null,
-          maxNumber: { $max: '$price.value' },
-        },
-      });
-
-      const highestPrice = await Product.aggregate(pipeline);
-      rawData.highestPrice =
-        highestPrice.length > 0
-          ? cashFormatter({ number: highestPrice[0].maxNumber })
-          : cashFormatter({ number: 0 });
-      rawData.totalPages = totalPages;
-      rawData.totalProducts = totalDocuments;
-    }
-    let preparedData = null;
-
-    if (productsData) {
-      preparedData = [...productsData];
-      for (let i = 0; i < productsData.length; i++) {
-        preparedData[i].price = {
-          ...preparedData[i].price,
-          value: `${cashFormatter({
-            number: preparedData[i].price.value,
-          })}`,
-        };
-      }
-    }
-    return res.status(200).json({
-      data: {
-        products: preparedData,
-        rawData,
-      },
-    });
-  } catch (err) {
-    return res
-      .status(500)
-      .json({ message: 'Faield fetching searched query', error: err.message });
-  }
-};
-
 const addOneProduct = async (req, res) => {
   const preparedData = req.productData;
   const { selectedCollections } = req.body;
@@ -561,6 +398,5 @@ module.exports = {
   addOneProduct,
   updateOneProduct,
   deleteOneProduct,
-  getSearchedProducts,
   deleteAllProducts,
 };

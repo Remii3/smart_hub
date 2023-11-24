@@ -72,15 +72,15 @@ export default function SearchPage() {
       searchedPhrase: searchParams.get('phrase'),
       page: searchParams.get('page'),
       sortOption: searchParams.get('sortMethod'),
-      searchedSpecial: searchParams.get('special'),
     };
     const { data, error } = await useGetAccessDatabase({
-      url: DATABASE_ENDPOINTS.PRODUCT_SEARCHED,
+      url: DATABASE_ENDPOINTS.SEARCH_PRODCOL,
       params: {
         pageSize: pageIteration,
         filtersData: newFilters,
         sortOption: newFilters.sortOption,
         strictMarketplace: true,
+        searchType: searchParams.get('special'),
       },
     });
     if (error) {
@@ -94,7 +94,7 @@ export default function SearchPage() {
       });
     }
     setSearchedProductsData({
-      products: data.products,
+      products: data.data,
       rawData: data.rawData,
       isLoading: false,
     });

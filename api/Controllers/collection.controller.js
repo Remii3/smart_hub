@@ -1,27 +1,23 @@
 const { default: mongoose } = require('mongoose');
 const Collection = require('../Models/collection');
+const Product = require('../Models/product.js');
 const cashFormatter = require('../helpers/cashFormatter.js');
 
 const findAllCollections = async (req, res) => {
-  const { category, authorId, creatorId, limit = 10 } = req.query;
+  const { limit = 10 } = req.query;
+  const category = req.category;
   const sortMethod = req.sortMethod;
-  const query = {};
+  const query = req.searchQuery;
 
-  if (category) {
-    query.categories = category;
-  }
-
-  if (authorId) {
-    query.authors = authorId;
-  }
-
-  if (creatorId) {
-    query['creatorData._id'] = creatorId;
-  }
+  const rawData = {};
 
   try {
     const collectionData = await Collection.find(
-      { ...query, quantity: { $gt: 0 }, deleted: false, sold: false },
+      {
+        products: {
+          $in: await Product.find({ categories: category._id }).distinct('_id'),
+        },
+      },
       {
         _id: 1,
         title: 1,
@@ -84,7 +80,30 @@ const findAllCollections = async (req, res) => {
       };
     }
 
-    return res.status(200).json({ data: preparedData });
+    const pipeline = [];
+
+    pipeline.push({
+      $match: {
+        ...query,
+        quantity: { $gt: 0 },
+        deleted: false,
+        sold: false,
+      },
+    });
+    pipeline.push({
+      $group: {
+        _id: null,
+        maxNumber: { $max: '$price.value' },
+      },
+    });
+
+    const highestPrice = await Collection.aggregate(pipeline);
+    rawData.highestPrice =
+      highestPrice.length > 0
+        ? cashFormatter({ number: highestPrice[0].maxNumber })
+        : cashFormatter({ number: 0 });
+
+    return res.status(200).json({ data: { data: preparedData, rawData } });
   } catch (err) {
     return res
       .status(500)
@@ -172,8 +191,6 @@ const findOneCollection = async (req, res) => {
   }
 };
 
-const findSearchedCollections = async (req, res) => {};
-
 const createOneCollection = async (req, res) => {
   const preparedData = req.collectionData;
   try {
@@ -236,7 +253,6 @@ const deleteOneCollection = async (req, res) => {
 module.exports = {
   findAllCollections,
   findOneCollection,
-  findSearchedCollections,
   createOneCollection,
   updateOneCollection,
   deleteOneCollection,

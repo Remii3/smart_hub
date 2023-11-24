@@ -1,8 +1,9 @@
 const Category = require('../../Models/category');
 const User = require('../../Models/user');
 
-const prepareSearchedProductData = async (req, res, next) => {
+const prodCol = async (req, res, next) => {
   let { pageSize, filtersData, strictMarketplace } = req.query;
+
   if (!filtersData) {
     return res.status(422).json({
       message: 'No filters provided',
@@ -66,11 +67,12 @@ const prepareSearchedProductData = async (req, res, next) => {
     searchQuery['categories'] = { $in: categories };
   }
 
-  if (filtersData.marketplace) {
-    searchQuery['marketplace'] = { $in: filtersData.marketplace };
-  } else if (strictMarketplace) {
-    searchQuery['marketplace'] = { $in: [] };
-  }
+  // if (filtersData.marketplace) {
+  //   searchQuery['marketplace'] = { $in: filtersData.marketplace };
+  // } else if (strictMarketplace) {
+  //   searchQuery['marketplace'] = { $in: [] };
+  // }
+
   if (filtersData.selectedPriceRange) {
     if (
       filtersData.selectedPriceRange.minPrice &&
@@ -118,8 +120,9 @@ const prepareSearchedProductData = async (req, res, next) => {
     skipPages,
     currentPageSize,
     currentPage,
+    marketplace: filtersData.marketplace,
   };
   next();
 };
 
-module.exports = prepareSearchedProductData;
+module.exports = prodCol;

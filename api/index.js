@@ -12,6 +12,7 @@ const admin_routes = require('./Routes/admin.routes');
 const news_routes = require('./Routes/news.routes');
 const collection_routes = require('./Routes/collection.routes');
 const rating_routes = require('./Routes/rating.routes');
+const search_routes = require('./Routes/search.routes.js');
 
 const app = express();
 const server = require('http').createServer(app);
@@ -52,6 +53,7 @@ mongoose
     app.use('/news', news_routes);
     app.use('/collection', collection_routes);
     app.use('/rating', rating_routes);
+    app.use('/search', search_routes);
   })
   .catch(err => {
     console.log(err);

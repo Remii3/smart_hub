@@ -9,6 +9,7 @@ const MAIN_ROUTES = {
   NEWS: '/news',
   COLLECTION: '/collection',
   RATING: '/rating',
+  SEARCH: '/search',
 };
 
 const ADMIN_ENDPOINTS = {
@@ -93,6 +94,10 @@ const RATING_ENDPOINTS = {
   RATING_VOTE_REMOVE: `${MAIN_ROUTES.RATING}/vote-remove`,
 };
 
+const SEARCH_ENDPOINTS = {
+  SEARCH_PRODCOL: `${MAIN_ROUTES.SEARCH}/prodCol`,
+};
+
 export const DATABASE_ENDPOINTS = {
   ...ADMIN_ENDPOINTS,
   ...CART_ENDPOINTS,
@@ -104,6 +109,7 @@ export const DATABASE_ENDPOINTS = {
   ...PRODUCT_ENDPOINTS,
   ...USER_ENDPOINTS,
   ...RATING_ENDPOINTS,
+  ...SEARCH_ENDPOINTS,
 };
 
 export const COMMENT_TARGET = {
