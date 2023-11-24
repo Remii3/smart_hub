@@ -30,7 +30,7 @@ const getAllCartItems = async (req, res) => {
       await Cart.create({
         userId: userId,
       });
-
+      console.log("object");
       return res.status(200).json({
         data: {
           products: preparedData.products,
@@ -70,7 +70,6 @@ const getAllCartItems = async (req, res) => {
       }
 
       const dataCopy = { ...productData, price: { ...productData.price } };
-
       preparedData.products.push({
         productData: dataCopy,
         inCartQuantity: product.quantity,
@@ -90,7 +89,7 @@ const getAllCartItems = async (req, res) => {
         number: preparedData.additionalData.discount,
       })}`,
     };
-
+    console.log(preparedData);
     return res
       .status(200)
       .json({ data: preparedData, message: "Successfully fetched cart." });

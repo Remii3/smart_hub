@@ -131,11 +131,7 @@ export interface PostDataTypes {
 // * Cart types
 
 export interface CartTypes {
-  products: {
-    inCartQuantity: number;
-    productData: ProductTypes;
-    productsTotalPrice: number;
-  }[];
+  products: CartProductType[];
   cartPrice: number | null;
   isLoading: boolean;
   isAdding: boolean | string;
@@ -146,7 +142,11 @@ export interface CartTypes {
     [index: string]: unknown;
   };
 }
-
+export interface CartProductType {
+  inCartQuantity: number;
+  productData: ProductTypes;
+  totalPrice: number;
+}
 // * Card types
 
 export interface ProductCardTypes {

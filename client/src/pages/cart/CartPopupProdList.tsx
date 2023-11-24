@@ -15,6 +15,7 @@ export default function CartPopupProdList() {
             key={cartProduct.productData._id}
             productData={cartProduct.productData}
             inCartQuantity={cartProduct.inCartQuantity}
+            totalPrice={cartProduct.totalPrice}
           />
         ))}
       </ul>

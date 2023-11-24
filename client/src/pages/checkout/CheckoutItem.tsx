@@ -1,10 +1,11 @@
 import { Link } from 'react-router-dom';
-import { CartProductTypes } from '@customTypes/interfaces';
+import { CartProductType } from '@customTypes/interfaces';
 
 export default function CheckoutItem({
   productData,
   inCartQuantity,
-}: CartProductTypes) {
+  totalPrice,
+}: CartProductType) {
   if (!productData) return <div />;
   return (
     <li className="flex items-center gap-4">
@@ -30,7 +31,7 @@ export default function CheckoutItem({
 
         <dl className="mt-0.5 space-y-px text-[10px] text-gray-600">
           <div>
-            <span>{productData.price.value}</span>
+            <span>{totalPrice}</span>
           </div>
         </dl>
       </div>
