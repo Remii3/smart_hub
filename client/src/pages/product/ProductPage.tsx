@@ -68,6 +68,11 @@ import {
 } from '@components/UI/accordion';
 import DeleteDialog from '@components/UI/dialogs/DeleteDialog';
 import CreatableSelect from 'react-select/creatable';
+import { ChevronRightIcon, ChevronLeftIcon } from '@heroicons/react/24/solid';
+import SwiperArrowRight from '@components/swiper/navigation/SwiperArrowRight';
+import SwiperArrowLeft from '@components/swiper/navigation/SwiperArrowLeft';
+import SwiperDots from '@components/swiper/pagination/SwiperDots';
+
 interface ProductTypesLocal extends FetchDataTypes {
   data: null | ProductTypes;
 }
@@ -97,6 +102,10 @@ const formSchema = z.object({
   quantity: z.number().min(1),
   price: z.number(),
 });
+interface ProductRating {
+  quantity: number;
+  value: number;
+}
 interface EditingTypes extends PostDataTypes {
   isEditing: boolean;
 }
@@ -139,6 +148,7 @@ export default function ProductPage() {
     isLoading: false,
     options: [],
   });
+  const [productRating, setProductRating] = useState<ProductRating>();
 
   const headerHeight = 124;
   const shortDescriptionRef = useRef<null | HTMLDivElement>(null);
@@ -161,6 +171,14 @@ export default function ProductPage() {
     setCategoryState((prevState) => {
       return { ...prevState, options: [...data] };
     });
+  }, []);
+
+  const fetchComments = useCallback(async () => {
+    const { data } = await useGetAccessDatabase({
+      url: DATABASE_ENDPOINTS.RATING_RATING,
+      params: { targetId: productId },
+    });
+    setProductRating({ quantity: data.quantity, value: data.avgRating });
   }, []);
 
   const fetchAllAuthors = useCallback(async () => {
@@ -187,7 +205,10 @@ export default function ProductPage() {
       });
     }
     setProductState({ data, isLoading: false, hasError: null });
-
+    setProductRating({
+      quantity: data.rating.quantity,
+      value: data.rating.avgRating,
+    });
     setSelectedImgs({ imgs: data.imgs, isDirty: false });
     setNewDescription(data.description);
     form.reset({
@@ -529,6 +550,7 @@ export default function ProductPage() {
                               ? activeThumb
                               : null,
                         }}
+                        className="relative"
                       >
                         {selectedImgs.imgs.map((el, index) => {
                           return (
@@ -567,20 +589,21 @@ export default function ProductPage() {
                                     className={`aspect-[4/3] rounded-md object-cover`}
                                   />
                                 </DialogTrigger>
-                                <DialogContent className="w-screen max-w-[100vw] overflow-y-hidden p-0 sm:w-auto sm:max-w-3xl">
+                                <DialogContent className="w-screen max-w-[100vw] p-0 sm:w-auto sm:max-w-3xl">
                                   <Swiper
                                     navigation={{
-                                      nextEl: `.swiper-bigProductImg-button-next`,
-                                      prevEl: `.swiper-bigProductImg-button-prev`,
+                                      nextEl: `.swiper-preview-button-next`,
+                                      prevEl: `.swiper-preview-button-prev`,
+                                    }}
+                                    pagination={{
+                                      clickable: true,
+                                      el: '.swiper-latest-news-pagination',
                                     }}
                                     grabCursor
-                                    loop
+                                    spaceBetween={4}
                                     initialSlide={index}
                                     nested={true}
                                     slidesPerView={'auto'}
-                                    pagination={{
-                                      clickable: true,
-                                    }}
                                     direction="horizontal"
                                     modules={[Pagination, Navigation]}
                                   >
@@ -591,31 +614,23 @@ export default function ProductPage() {
                                             <img
                                               src={nestedImgs.url}
                                               alt={'Preview: ' + nestedImgs.id}
-                                              className="aspect-square h-full w-full object-cover"
+                                              className="aspect-[16/10] h-full w-full object-cover"
                                             />
                                           </div>
                                         </SwiperSlide>
                                       );
                                     })}
-                                    <div
-                                      className={`swiper-button-next swiper-bigProductImg-button-next color-primary right-0 flex items-center justify-center rounded-full bg-white p-8 opacity-90 backdrop-blur-sm`}
-                                    ></div>
-                                    <div
-                                      className={`swiper-button-prev swiper-bigProductImg-button-prev color-primary left-0 flex items-center justify-center rounded-full bg-white p-8 opacity-90 backdrop-blur-sm`}
-                                    ></div>
+                                    <SwiperArrowRight elId="swiper-preview-button-next" />
+                                    <SwiperArrowLeft elId="swiper-preview-button-prev" />
+                                    <SwiperDots elId="swiper-latest-news-pagination" />
                                   </Swiper>
                                 </DialogContent>
                               </Dialog>
                             </SwiperSlide>
                           );
                         })}
-
-                        <div
-                          className={`swiper-button-next swiper-productImage-button-next color-primary right-0 flex items-center justify-center rounded-full bg-white p-8 opacity-90 backdrop-blur-sm`}
-                        ></div>
-                        <div
-                          className={`swiper-button-prev swiper-productImage-button-prev color-primary left-0 flex items-center justify-center rounded-full bg-white p-8 opacity-90 backdrop-blur-sm`}
-                        ></div>
+                        <SwiperArrowRight elId="swiper-thumbPreview-button-next" />
+                        <SwiperArrowLeft elId="swiper-thumbPreview-button-prev" />
                       </Swiper>
                       <Swiper
                         onSwiper={setActiveThumb}
@@ -633,7 +648,7 @@ export default function ProductPage() {
                             <img
                               src={image.url}
                               alt={`Thumb ${image.id}`}
-                              className="aspect-square rounded-md object-cover"
+                              className="aspect-square cursor-pointer rounded-md object-cover"
                             />
                           </SwiperSlide>
                         ))}
@@ -656,13 +671,8 @@ export default function ProductPage() {
                             </div>
                           </SwiperSlide>
                         )}
-
-                        <div
-                          className={`swiper-button-next swiper-thumbs-button-next color-primary right-0 flex items-center justify-center rounded-full bg-white p-8 opacity-90 backdrop-blur-sm`}
-                        ></div>
-                        <div
-                          className={`swiper-button-prev swiper-thumbs-button-prev color-primary left-0 flex items-center justify-center rounded-full bg-white p-8 opacity-90 backdrop-blur-sm`}
-                        ></div>
+                        <SwiperArrowRight elId="swiper-thumbs-button-next" />
+                        <SwiperArrowLeft elId="swiper-thumbs-button-prev" />
                       </Swiper>
                     </div>
                   ) : (
@@ -711,11 +721,19 @@ export default function ProductPage() {
                         </div>
                         <div className="flex items-center gap-2 py-1">
                           <StarRating
-                            rating={productState.data.rating.avgRating}
+                            rating={
+                              productRating && productRating.value
+                                ? productRating.value
+                                : productState.data.rating.avgRating || 0
+                            }
                             showOnly
                           />
                           <span className="pt-[3px] text-sm text-slate-400">
-                            ( {productState.data.rating.quantity} )
+                            ({' '}
+                            {productRating && productRating.value
+                              ? productRating.quantity
+                              : productState.data.rating.quantity || 0}{' '}
+                            )
                           </span>
                         </div>
                       </div>
@@ -1195,6 +1213,7 @@ export default function ProductPage() {
               withRating
               target="Product"
               targetId={productState.data._id}
+              updateProductStatus={fetchComments}
             />
           </div>
         </div>

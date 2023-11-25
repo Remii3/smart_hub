@@ -12,6 +12,9 @@ import ErrorMessage from '@components/UI/error/ErrorMessage';
 import { Skeleton } from '@components/UI/skeleton';
 import CollectionCard from '@components/cards/CollectionCard';
 import { ReactNode } from 'react';
+import SwiperArrowRight from './navigation/SwiperArrowRight';
+import SwiperArrowLeft from './navigation/SwiperArrowLeft';
+import SwiperDots from './pagination/SwiperDots';
 
 interface PropsTypes {
   swiperCategory: string;
@@ -37,6 +40,7 @@ export default function SushiSwiper({
         slidesPerView={1.2}
         pagination={{
           clickable: true,
+          el: `.swiper-${swiperCategory}-pagination`,
         }}
         breakpoints={{
           540: {
@@ -129,12 +133,9 @@ export default function SushiSwiper({
               </SwiperSlide>
             ))}
         </SuspenseComponent>
-        <div
-          className={`swiper-button-next swiper-${swiperCategory}-button-next color-primary right-0 flex items-center justify-center rounded-full bg-white p-8 opacity-90 backdrop-blur-sm`}
-        ></div>
-        <div
-          className={`swiper-button-prev swiper-${swiperCategory}-button-prev color-primary left-0 flex items-center justify-center rounded-full bg-white p-8 opacity-90 backdrop-blur-sm`}
-        ></div>
+        <SwiperArrowRight elId={`swiper-${swiperCategory}-button-next`} />
+        <SwiperArrowLeft elId={`swiper-${swiperCategory}-button-prev`} />
+        <SwiperDots elId={`swiper-${swiperCategory}-pagination`} />
       </Swiper>
     </div>
   );

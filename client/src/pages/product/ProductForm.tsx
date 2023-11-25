@@ -44,9 +44,12 @@ export default function CollectionForm({
             >
               -
             </button>
+            <label htmlFor="selectedItemQuantity" className="sr-only">
+              Selected item quantity
+            </label>
             <input
               type="number"
-              id="quantity"
+              id="selectedItemQuantity"
               min="1"
               step="1"
               max={productQuantity}

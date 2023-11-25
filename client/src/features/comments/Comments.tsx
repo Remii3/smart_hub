@@ -24,6 +24,7 @@ import {
 import { DialogClose } from '@radix-ui/react-dialog';
 import { useCallback, useContext, useEffect, useState } from 'react';
 import parse from 'html-react-parser';
+import DeleteDialog from '@components/UI/dialogs/DeleteDialog';
 
 type CommentTargetTypes = 'Product' | 'News' | 'Collection';
 
@@ -75,7 +76,9 @@ export default function Comments({
     isLoading: false,
     error: null,
   });
-  const [showDeleteDialog, setShowDeleteDialog] = useState<null | string>(null);
+  const [showDeleteDialog, setShowDeleteDialog] = useState<
+    null | boolean | string
+  >(null);
   const { userData } = useContext(UserContext);
   const fetchData = useCallback(async () => {
     setComments((prevState) => {
@@ -186,6 +189,7 @@ export default function Comments({
     }
     return value;
   }
+
   return (
     <article>
       <h3 className="mb-2 text-4xl">Comments</h3>
@@ -338,45 +342,15 @@ export default function Comments({
               </div>
               {(userData.data?._id === comment.creatorData._id ||
                 userData.data?.role == UserRoleTypes.ADMIN) && (
-                <Dialog
-                  open={showDeleteDialog === comment._id}
-                  onOpenChange={() => setShowDeleteDialog(null)}
-                >
-                  <div className="flex items-center">
-                    <Button
-                      variant={'destructive'}
-                      onClick={() => setShowDeleteDialog(comment._id)}
-                      type="button"
-                    >
-                      <TrashIcon className="h-6 w-6" />
-                    </Button>
-                  </div>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>Are you sure?</DialogTitle>
-                      <DialogDescription>
-                        Deleting this will permamently remove the item from the
-                        database.
-                      </DialogDescription>
-                    </DialogHeader>
-                    <DialogFooter>
-                      <Button
-                        type="button"
-                        variant={'destructive'}
-                        onClick={() =>
-                          deleteCommentHandler(comment._id, comment.value)
-                        }
-                      >
-                        Delete
-                      </Button>
-                      <DialogClose asChild>
-                        <Button variant={'outline'} type="button">
-                          Cancel
-                        </Button>
-                      </DialogClose>
-                    </DialogFooter>
-                  </DialogContent>
-                </Dialog>
+                <DeleteDialog
+                  deleteHandler={() =>
+                    deleteCommentHandler(comment._id, comment.value)
+                  }
+                  openState={showDeleteDialog === comment._id}
+                  openStateHandler={setShowDeleteDialog}
+                  onlyIcon
+                  targetId={comment._id}
+                />
               )}
             </div>
           ))}
