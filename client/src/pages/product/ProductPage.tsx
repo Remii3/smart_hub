@@ -67,7 +67,7 @@ import {
   AccordionTrigger,
 } from '@components/UI/accordion';
 import DeleteDialog from '@components/UI/dialogs/DeleteDialog';
-
+import CreatableSelect from 'react-select/creatable';
 interface ProductTypesLocal extends FetchDataTypes {
   data: null | ProductTypes;
 }
@@ -91,13 +91,7 @@ const formSchema = z.object({
       authors_info: z.any(),
     })
   ),
-  categories: z.array(
-    z.object({
-      _id: z.string(),
-      label: z.string(),
-      value: z.string(),
-    })
-  ),
+  categories: z.any(),
   shortDescription: z.string(),
   marketplace: z.string(),
   quantity: z.number().min(1),
@@ -455,10 +449,25 @@ export default function ProductPage() {
                     deleteHandler={deleteHandler}
                     openState={deleteDialogState}
                     openStateHandler={setDeleteDialogState}
+                    disableCondition={isEditing.isLoading}
                   />
+                  {isEditing.isEditing && (
+                    <Button
+                      type="submit"
+                      variant={'outline'}
+                      disabled={isEditing.isLoading}
+                      className="relative text-green-600 hover:text-green-600"
+                    >
+                      {isEditing.isLoading && <LoadingCircle />}
+                      <span className={`${isEditing.isLoading && 'invisible'}`}>
+                        Accept
+                      </span>
+                    </Button>
+                  )}
                   <Button
                     type="button"
                     variant={'outline'}
+                    disabled={isEditing.isLoading}
                     onClick={() => {
                       clearForm();
                       setIsEditing((prevState) => {
@@ -469,20 +478,17 @@ export default function ProductPage() {
                       });
                     }}
                   >
-                    {isEditing.isEditing ? 'Cancel' : 'Edit'}
-                  </Button>
-                  {isEditing.isEditing && (
-                    <Button
-                      type="submit"
-                      variant={'outline'}
-                      className="relative text-green-600 hover:text-green-600"
+                    <span className={`${!isEditing.isEditing && 'invisible'}`}>
+                      Cancel
+                    </span>
+                    <span
+                      className={`${
+                        isEditing.isEditing && 'invisible'
+                      } absolute`}
                     >
-                      {isEditing.isLoading && <LoadingCircle />}
-                      <span className={`${isEditing.isLoading && 'invisible'}`}>
-                        Accept
-                      </span>
-                    </Button>
-                  )}
+                      Edit
+                    </span>
+                  </Button>
                 </div>
               )}
               <div className="grid grid-cols-1 items-start gap-8 md:grid-cols-2">
@@ -811,10 +817,15 @@ export default function ProductPage() {
                             <FormItem>
                               <FormLabel>Categories</FormLabel>
                               <FormControl>
-                                <Select
+                                <CreatableSelect
                                   {...field}
                                   isMulti
                                   options={categoryState.options}
+                                  filterOption={(option, rawInput) => {
+                                    const label = option.label.toLowerCase();
+                                    const input = rawInput.toLowerCase();
+                                    return label.includes(input);
+                                  }}
                                   onChange={field.onChange}
                                 />
                               </FormControl>

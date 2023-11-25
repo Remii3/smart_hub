@@ -13,18 +13,21 @@ interface PropsTypes {
   openState: boolean;
   openStateHandler: (state: boolean) => void;
   deleteHandler: () => void;
+  disableCondition?: boolean;
 }
 
 export default function ({
   openState,
   openStateHandler,
   deleteHandler,
+  disableCondition = false,
 }: PropsTypes) {
   return (
     <Dialog open={openState} onOpenChange={() => openStateHandler(false)}>
       <Button
         onClick={() => openStateHandler(true)}
         variant={'ghost'}
+        disabled={disableCondition}
         type="button"
         className="text-red-400 hover:text-red-400"
       >

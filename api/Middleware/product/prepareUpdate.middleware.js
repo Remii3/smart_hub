@@ -1,4 +1,7 @@
-const prepareUpdate = (req, res, next) => {
+const Category = require('../../Models/category');
+const mongoose = require('mongoose');
+
+const prepareUpdate = async (req, res, next) => {
   const {
     title,
     description,
@@ -33,6 +36,21 @@ const prepareUpdate = (req, res, next) => {
   }
 
   if (categories) {
+    for (let i = 0; i < categories.length; i++) {
+      const exists = await Category.findOne({
+        label: new RegExp(categories[i].label, 'i'),
+      });
+      if (!exists) {
+        const newCategoryId = new mongoose.Types.ObjectId();
+
+        await Category.create({
+          _id: newCategoryId,
+          label: categories[i].label,
+          value: categories[i].value,
+        });
+        categories[i] = newCategoryId;
+      }
+    }
     preparedData.categories = categories;
   }
 
