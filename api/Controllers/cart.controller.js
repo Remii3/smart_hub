@@ -1,18 +1,18 @@
-const Cart = require("../Models/cart");
-const Product = require("../Models/product");
-const calculateOrderAmount = require("../helpers/calculate/calculateOrderAmount");
-const cashFormatter = require("../helpers/cashFormatter");
-const reverseCashFormatter = require("../helpers/reverseCashFormatter");
+const Cart = require('../Models/cart');
+const Product = require('../Models/product');
+const calculateOrderAmount = require('../helpers/calculate/calculateOrderAmount');
+const cashFormatter = require('../helpers/cashFormatter');
+const reverseCashFormatter = require('../helpers/reverseCashFormatter');
 
-const stripe = require("stripe")(
-  "sk_test_51NDZ0zHqBBlAtOOFMShIrv9OwdfC6958wOWqZa1X59kOeyY4hNtZ80ANZ6WYv67v4a8FOFguc04SCV84QKEf6nFf005r6tKBO6"
+const stripe = require('stripe')(
+  'sk_test_51NDZ0zHqBBlAtOOFMShIrv9OwdfC6958wOWqZa1X59kOeyY4hNtZ80ANZ6WYv67v4a8FOFguc04SCV84QKEf6nFf005r6tKBO6',
 );
 
 const getAllCartItems = async (req, res) => {
   const { userId } = req.query;
 
   if (!userId) {
-    return res.status(422).json({ message: "User id is required!" });
+    return res.status(422).json({ message: 'User id is required!' });
   }
 
   const preparedData = {
@@ -30,7 +30,6 @@ const getAllCartItems = async (req, res) => {
       await Cart.create({
         userId: userId,
       });
-      console.log("object");
       return res.status(200).json({
         data: {
           products: preparedData.products,
@@ -59,13 +58,13 @@ const getAllCartItems = async (req, res) => {
           price: 1,
           title: 1,
           quantity: 1,
-        }
+        },
       ).lean();
 
       if (!productData) {
         await Cart.updateOne(
-          { userId, "products._id": product._id },
-          { $pull: { products: { _id: product._id } } }
+          { userId, 'products._id': product._id },
+          { $pull: { products: { _id: product._id } } },
         );
       }
 
@@ -89,13 +88,12 @@ const getAllCartItems = async (req, res) => {
         number: preparedData.additionalData.discount,
       })}`,
     };
-    console.log(preparedData);
     return res
       .status(200)
-      .json({ data: preparedData, message: "Successfully fetched cart." });
+      .json({ data: preparedData, message: 'Successfully fetched cart.' });
   } catch (err) {
     return res.status(500).json({
-      message: "We failed getting your cart.",
+      message: 'We failed getting your cart.',
       error: err.message,
     });
   }
@@ -106,7 +104,7 @@ const addItemToCart = async (req, res) => {
   const { userId, productId } = req.preparedData;
 
   if (!productQuantity) {
-    return res.status(422).json({ message: "Product quantity is required!" });
+    return res.status(422).json({ message: 'Product quantity is required!' });
   }
 
   try {
@@ -119,22 +117,22 @@ const addItemToCart = async (req, res) => {
       });
       return res
         .status(201)
-        .json({ message: "Successfully added product to the cart." });
+        .json({ message: 'Successfully added product to the cart.' });
     }
 
     const existingItem = await Cart.findOne({
       userId,
-      "products._id": productId,
+      'products._id': productId,
     });
 
     if (existingItem) {
       await Cart.updateOne(
-        { userId, "products._id": productId },
-        { $inc: { "products.$.quantity": productQuantity } }
+        { userId, 'products._id': productId },
+        { $inc: { 'products.$.quantity': productQuantity } },
       );
       return res
         .status(201)
-        .json({ message: "Successfully added product to the cart." });
+        .json({ message: 'Successfully added product to the cart.' });
     }
 
     await Cart.updateOne(
@@ -146,7 +144,7 @@ const addItemToCart = async (req, res) => {
             quantity: productQuantity,
           },
         },
-      }
+      },
     );
     return res
       .status(201)
@@ -163,18 +161,18 @@ const removeItemFromCart = async (req, res) => {
   const { userId, productId } = req.preparedData;
 
   try {
-    if (productId === "all") {
+    if (productId === 'all') {
       await Cart.updateOne({ userId }, { $set: { products: [] } });
     } else {
       await Cart.updateOne(
         { userId },
-        { $pull: { products: { _id: productId } } }
+        { $pull: { products: { _id: productId } } },
       );
     }
-    return res.status(200).json({ message: "Successfully removed your item." });
+    return res.status(200).json({ message: 'Successfully removed your item.' });
   } catch (err) {
     const errorMessage =
-      productId === "all"
+      productId === 'all'
         ? "We couldn't remove your items from the cart."
         : "We couldn't remove your item from the cart.";
     return res.status(500).json({
@@ -189,16 +187,16 @@ const cartItemIncrement = async (req, res) => {
 
   try {
     await Cart.updateOne(
-      { userId: userId, "products._id": productId },
-      { $inc: { "products.$.quantity": 1 } }
+      { userId: userId, 'products._id': productId },
+      { $inc: { 'products.$.quantity': 1 } },
     );
 
     return res
       .status(200)
-      .json({ message: "Successfuly added more products." });
+      .json({ message: 'Successfuly added more products.' });
   } catch (err) {
     return res.status(500).json({
-      message: "We failed adding more products to the cart.",
+      message: 'We failed adding more products to the cart.',
       error: err.message,
     });
   }
@@ -209,16 +207,16 @@ const cartItemDecrement = async (req, res) => {
 
   try {
     await Cart.updateOne(
-      { userId: userId, "products._id": productId },
-      { $inc: { "products.$.quantity": -1 } }
+      { userId: userId, 'products._id': productId },
+      { $inc: { 'products.$.quantity': -1 } },
     );
 
     return res
       .status(200)
-      .json({ message: "Successfuly removed item from the cart." });
+      .json({ message: 'Successfuly removed item from the cart.' });
   } catch (err) {
     return res.status(500).json({
-      message: "We failed removing item from your cart.",
+      message: 'We failed removing item from your cart.',
       error: err.message,
     });
   }
@@ -229,7 +227,7 @@ const initiatePayment = async (req, res) => {
   try {
     const paymentIntent = await stripe.paymentIntents.create({
       amount: calculateOrderAmount(items),
-      currency: "usd",
+      currency: 'usd',
       automatic_payment_methods: {
         enabled: true,
       },
@@ -241,7 +239,7 @@ const initiatePayment = async (req, res) => {
   } catch (err) {
     return res
       .status(500)
-      .json({ message: "Failed to initiate payment", err: err.message });
+      .json({ message: 'Failed to initiate payment', err: err.message });
   }
 };
 

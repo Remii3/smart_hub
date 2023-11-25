@@ -5,7 +5,7 @@ import { Button } from '@components/UI/button';
 import LoadingCircle from '@components/Loaders/LoadingCircle';
 
 type ProductFormType = {
-  addToCartHandler: (e: FormEvent<HTMLFormElement>) => void;
+  addToCartHandler: () => void;
   sold: boolean;
   selectedQuantity: number;
   decrementQuantityHandler: () => void;
@@ -31,7 +31,7 @@ export default function CollectionForm({
 }: ProductFormType) {
   const { cartState } = useContext(CartContext);
   return (
-    <form onSubmit={(e) => addToCartHandler(e)}>
+    <div>
       {sold && <h4 className="font-bold uppercase text-red-700">Sold out</h4>}
       {!sold && (
         <div className="flex gap-6">
@@ -65,7 +65,8 @@ export default function CollectionForm({
           </div>
           <Button
             variant="default"
-            type="submit"
+            type="button"
+            onClick={addToCartHandler}
             disabled={
               itemBtnCapacity ||
               isEditing ||
@@ -88,6 +89,6 @@ export default function CollectionForm({
           </Button>
         </div>
       )}
-    </form>
+    </div>
   );
 }

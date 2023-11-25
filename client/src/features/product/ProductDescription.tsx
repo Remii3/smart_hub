@@ -28,7 +28,6 @@ export default function ProductDescription({
               toolbar: {
                 shouldNotGroupWhenFull: true,
                 items: [
-                  'alignment',
                   'heading',
                   '|',
                   'bold',

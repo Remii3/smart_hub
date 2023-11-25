@@ -31,7 +31,6 @@ const prepareFindOne = async (req, res, next) => {
   if (creatorId) {
     query['creatorData._id'] = creatorId;
   }
-  console.log(query);
   req.queryData = query;
   next();
 };
