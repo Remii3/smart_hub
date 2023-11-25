@@ -63,7 +63,7 @@ export default function CartItem({
         )}
       </Link>
       <div className="flex-grow">
-        <Link to={`/shop/${productData._id}`} className="block">
+        <Link to={`/product/${productData._id}`} className="block">
           <h3 className="text-base text-foreground">{productData.title}</h3>
         </Link>
         <div className="text-sm text-slate-600">

@@ -1,7 +1,7 @@
 import { FormEvent, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { CartContext } from '@context/CartProvider';
-import { CartProductTypes, ProductCardTypes } from '@customTypes/interfaces';
+import { CartProductType, ProductCardTypes } from '@customTypes/interfaces';
 import LoadingCircle from '@components/Loaders/LoadingCircle';
 import { Button, buttonVariants } from '@components/UI/button';
 import StarRating from '@features/rating/StarRating';
@@ -28,12 +28,11 @@ export default function ShopCard({
     addProductToCart({
       productId: _id,
       productQuantity: 1,
-      type: 'shop',
     });
   };
 
   const currentItem = cartState.products.find(
-    (product: CartProductTypes) => product.productData._id === _id
+    (product: CartProductType) => product.productData._id === _id
   );
 
   if (currentItem) {
@@ -52,7 +51,7 @@ export default function ShopCard({
         className="flex h-full flex-col justify-between gap-1 rounded-lg bg-background shadow transition duration-200 ease-in-out hover:shadow-md"
       >
         <Link
-          to={`/shop/${_id}`}
+          to={`/product/${_id}`}
           aria-label="Show product page"
           className="absolute block h-full w-full rounded-lg indent-0 focus-visible:ring-ring"
         />
@@ -139,7 +138,7 @@ export default function ShopCard({
             <div className="flex flex-col gap-3">
               <div className="flex flex-wrap items-end justify-between gap-3">
                 <Link
-                  to={`/shop/${_id}`}
+                  to={`/product/${_id}`}
                   aria-label="Show product page"
                   className={`${buttonVariants({
                     variant: 'default',

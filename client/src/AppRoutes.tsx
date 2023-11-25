@@ -18,16 +18,13 @@ const CollectionsPage = lazy(
 const CartPage = lazy(() => import('@pages/cart/CartPage'));
 const CheckoutPage = lazy(() => import('@pages/checkout/CheckoutPage'));
 const NoPage404 = lazy(() => import('@pages/static/NoPage404'));
-const ProductPage = lazy(() => import('@pages/shop/product/ProductPage'));
+const ProductPage = lazy(() => import('@pages/product/ProductPage'));
 const SearchPage = lazy(() => import('@pages/search/SearchPage'));
 const OtherUserPage = lazy(() => import('@pages/account_other/OtherUserPage'));
 const OrderPage = lazy(() => import('@pages/account_my/OrderPage'));
 const ThankYouPage = lazy(() => import('@pages/checkout/ThankYouPage'));
 const ShopPage = lazy(() => import('@pages/shop/ShopPage'));
 const HomePage = lazy(() => import('@pages/home/HomePage'));
-const CollectionPage = lazy(
-  () => import('@pages/collections/collection/CollectionPage')
-);
 
 import LoadingCircle from '@components/Loaders/LoadingCircle';
 import { CartContext } from '@context/CartProvider';
@@ -56,9 +53,8 @@ export default function AppRoutes() {
         >
           <Route path="news" element={<NewsPage />} />
           <Route path="shop" element={<ShopPage />} />
-          <Route path="shop/:id" element={<ProductPage />} />
+          <Route path="product/:id" element={<ProductPage />} />
           <Route path="collection" element={<CollectionsPage />} />
-          <Route path="collection/:id" element={<CollectionPage />} />
           <Route path="search" element={<SearchPage />} />
           <Route path="cart" element={<CartPage />} />
           <Route path="checkout" element={<Outlet />}>

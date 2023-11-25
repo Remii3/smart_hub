@@ -3,9 +3,6 @@ import { CollectionCardTypes, FetchDataTypes } from '@customTypes/interfaces';
 import { useGetAccessDatabase } from '@hooks/useAaccessDatabase';
 import { DATABASE_ENDPOINTS } from '@data/endpoints';
 import errorToast from '@components/UI/error/errorToast';
-import ErrorMessage from '@components/UI/error/ErrorMessage';
-import LoadingCircle from '@components/Loaders/LoadingCircle';
-import CollectionCard from '@components/cards/CollectionCard';
 import { Link } from 'react-router-dom';
 import PriceSelector from '@pages/shop/PriceSelector';
 import SortProducts from '@features/sortProducts/SortProducts';
@@ -61,7 +58,6 @@ export default function BasicCollectionWidget({
         sortOption: selectedSortOption,
       },
     });
-    console.log(data);
     if (error) {
       errorToast(error);
       return setCollections((prevState) => {

@@ -2,7 +2,7 @@ const Category = require('../../Models/category');
 const User = require('../../Models/user');
 
 const prodCol = async (req, res, next) => {
-  let { pageSize, filtersData, strictMarketplace } = req.query;
+  let { pageSize, filtersData } = req.query;
 
   if (!filtersData) {
     return res.status(422).json({
@@ -67,11 +67,11 @@ const prodCol = async (req, res, next) => {
     searchQuery['categories'] = { $in: categories };
   }
 
-  // if (filtersData.marketplace) {
-  //   searchQuery['marketplace'] = { $in: filtersData.marketplace };
-  // } else if (strictMarketplace) {
-  //   searchQuery['marketplace'] = { $in: [] };
-  // }
+  if (filtersData.marketplace) {
+    searchQuery['marketplace'] = { $in: filtersData.marketplace };
+  } else if (strictMarketplace) {
+    searchQuery['marketplace'] = { $in: [] };
+  }
 
   if (filtersData.selectedPriceRange) {
     if (

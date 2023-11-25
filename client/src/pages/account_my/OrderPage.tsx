@@ -55,7 +55,7 @@ export default function OrderPage() {
         <div>
           {orderData.data.products.map((item) => (
             <Link
-              to={`/shop/${item.product._id}`}
+              to={`/product/${item.product._id}`}
               key={item.product._id}
               className="mb-4 block space-x-3 rounded-md border-2 border-gray-200 p-3"
             >

@@ -15,13 +15,8 @@ import {
 } from '@components/UI/form';
 import { Input } from '@components/UI/input';
 import { UserContext } from '@context/UserProvider';
-import {
-  AuthorTypes,
-  FetchDataTypes,
-  NewsType,
-  VotingTypes,
-} from '@customTypes/interfaces';
-import { ImgTypes, UserRoleTypes } from '@customTypes/types';
+import { FetchDataTypes, NewsType } from '@customTypes/interfaces';
+import { UserRoleTypes } from '@customTypes/types';
 import { DATABASE_ENDPOINTS } from '@data/endpoints';
 import Comments from '@features/comments/Comments';
 import VoteRating from '@features/rating/VoteRating';

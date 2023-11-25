@@ -189,6 +189,9 @@ export default function SearchPage() {
       setSearchParams(searchParams, { replace: true });
     }
   }, []);
+
+  console.log(searchedProductsData.products);
+
   return (
     <MainContainer>
       <div className="fixed left-0 right-0 top-16 z-10 flex w-full items-center justify-between bg-background px-4 pb-1 pt-2 md:static md:mb-2 md:px-0 md:pt-0">

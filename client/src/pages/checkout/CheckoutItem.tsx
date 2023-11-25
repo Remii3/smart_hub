@@ -9,7 +9,7 @@ export default function CheckoutItem({
   if (!productData) return <div />;
   return (
     <li className="flex items-center gap-4">
-      <Link to={`/shop/${productData._id}`} className="block">
+      <Link to={`/product/${productData._id}`} className="block">
         {productData.imgs && productData.imgs[0] ? (
           <img
             src={productData.imgs[0].url}
@@ -25,7 +25,7 @@ export default function CheckoutItem({
         )}
       </Link>
       <div>
-        <Link to={`/shop/${productData._id}`} className="block">
+        <Link to={`/product/${productData._id}`} className="block">
           <h3 className="m-0 text-sm text-gray-900">{productData.title}</h3>
         </Link>
 

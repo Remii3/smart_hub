@@ -110,7 +110,6 @@ export default function Nav({ scrollFlag }: { scrollFlag: boolean }) {
   ) => {
     setSearchbarValue(e.target.value);
   };
-  console.log(cartState);
   const totalProductQuantity =
     cartState.products &&
     cartState.products.reduce((acc, item) => acc + item.inCartQuantity, 0);

@@ -38,7 +38,7 @@ export default function CartPopupItem({
     cartState.isLoading;
 
   return (
-    <li className="flex flex-wrap gap-2">
+    <li className="flex flex-wrap gap-4">
       <div className="flex items-center gap-4">
         <Link
           to={`/${productData.marketplace}/${productData._id}`}

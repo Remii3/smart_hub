@@ -16,19 +16,15 @@ import { ReactNode } from 'react';
 interface PropsTypes {
   swiperCategory: string;
   arrayOfItems: any[] | null;
-  itemsType: MarketplaceTypes | 'other';
   loadingState?: boolean;
   errorState?: string | null;
-  children?: ReactNode;
 }
 
 export default function SushiSwiper({
   swiperCategory,
   arrayOfItems,
-  itemsType,
   loadingState,
   errorState,
-  children,
 }: PropsTypes) {
   return (
     <div className="relative">
@@ -116,40 +112,22 @@ export default function SushiSwiper({
                 style={{ height: 'auto' }}
                 className="min-w-[280px] pr-8"
               >
-                {itemsType === 'shop' && (
-                  <ShopCard
-                    _id={item._id}
-                    categories={item.categories}
-                    price={item.price.value}
-                    productQuantity={item.quantity}
-                    title={item.title}
-                    authors={item.authors}
-                    description={item.description}
-                    img={
-                      item.imgs && item.imgs.length > 0 ? item.imgs[0].url : ''
-                    }
-                    rating={item.rating}
-                    type={item.marketplace}
-                  />
-                )}
-                {itemsType === 'collection' && (
-                  <CollectionCard
-                    _id={item._id}
-                    imgs={item.imgs}
-                    price={item.price}
-                    rating={item.rating}
-                    shortDescription={item.shortDescription}
-                    title={item.title}
-                    authors={item.authors}
-                    categories={item.categories}
-                    type="collection"
-                    productQuantity={item.quantity}
-                  />
-                )}
+                <ShopCard
+                  _id={item._id}
+                  categories={item.categories}
+                  price={item.price.value}
+                  productQuantity={item.quantity}
+                  title={item.title}
+                  authors={item.authors}
+                  description={item.description}
+                  img={
+                    item.imgs && item.imgs.length > 0 ? item.imgs[0].url : ''
+                  }
+                  rating={item.rating}
+                  type={item.marketplace}
+                />
               </SwiperSlide>
             ))}
-
-          {itemsType === 'other' && children}
         </SuspenseComponent>
         <div
           className={`swiper-button-next swiper-${swiperCategory}-button-next color-primary right-0 flex items-center justify-center rounded-full bg-white p-8 opacity-90 backdrop-blur-sm`}
