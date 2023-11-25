@@ -24,11 +24,12 @@ export default function ({
     <Dialog open={openState} onOpenChange={() => openStateHandler(false)}>
       <Button
         onClick={() => openStateHandler(true)}
-        variant={'destructive'}
+        variant={'ghost'}
         type="button"
+        className="text-red-400 hover:text-red-400"
       >
-        Delete
-        <TrashIcon className="h-6 w-6" />
+        <span>Delete</span>
+        <TrashIcon className="h-5 w-5" />
       </Button>
       <DialogContent>
         <DialogHeader>
@@ -45,7 +46,11 @@ export default function ({
           >
             Delete
           </Button>
-          <Button variant={'ghost'} type="button">
+          <Button
+            variant={'outline'}
+            type="button"
+            onClick={() => openStateHandler(false)}
+          >
             Cancel
           </Button>
         </DialogFooter>

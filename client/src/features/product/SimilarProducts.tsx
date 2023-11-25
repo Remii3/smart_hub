@@ -1,12 +1,12 @@
 import errorToast from '@components/UI/error/errorToast';
 import ShopCard from '@components/cards/ShopCard';
 import SushiSwiper from '@components/swiper/SushiSwiper';
-import { FetchDataTypes, ShopProductTypes } from '@customTypes/interfaces';
+import { FetchDataTypes, ProductTypes } from '@customTypes/interfaces';
 import { DATABASE_ENDPOINTS } from '@data/endpoints';
 import { useGetAccessDatabase } from '@hooks/useAaccessDatabase';
 import { useCallback, useEffect, useState } from 'react';
 interface ProductsTypes extends FetchDataTypes {
-  data: null | ShopProductTypes[];
+  data: null | ProductTypes[];
 }
 interface PropsTypes {
   authorId: string;
@@ -48,8 +48,7 @@ export default function SimilarProducts({
           <SushiSwiper
             arrayOfItems={products.data}
             errorState={products.hasError}
-            itemsType={'Shop'}
-            swiperCategory={`similar-${authorPseudonim}`}
+            swiperCategory={`similar-products`}
             loadingState={products.isLoading}
           />
         )}

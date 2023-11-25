@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const OrderSchema = mongoose.Schema({
+const OrderSchema = new mongoose.Schema({
   buyer_id: { type: mongoose.Types.ObjectId, ref: 'User' },
   seller_id: { type: mongoose.Types.ObjectId, ref: 'User' },
   products: [
@@ -12,7 +12,7 @@ const OrderSchema = mongoose.Schema({
       },
     },
   ],
-  created_at: { type: Date, default: Date.now },
+  createdAt: { type: Date, default: Date.now },
 });
 
 const OrderModel = mongoose.model('Order', OrderSchema);

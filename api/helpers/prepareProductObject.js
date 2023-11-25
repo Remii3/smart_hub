@@ -11,11 +11,11 @@ const prepareProductObject = product => {
     rating,
     quantity,
     market_place,
-    created_at,
+    createdAt,
     sold,
     comments,
     currency,
-    shop_info,
+    price,
     auction_info,
     seller_data,
     deleted,
@@ -43,15 +43,13 @@ const prepareProductObject = product => {
     rating,
     quantity,
     market_place,
-    created_at,
+    createdAt,
     sold,
     comments,
     currency,
     seller_data,
     deleted,
-    shop_info: {
-      price: cashFormatter({ number: shop_info ? shop_info.price : 0 }),
-    },
+    price,
   };
 
   if (auction_info) {

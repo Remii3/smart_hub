@@ -30,18 +30,25 @@ import z from 'zod';
 import ErrorMessage from '@components/UI/error/ErrorMessage';
 import { CKEditor } from '@ckeditor/ckeditor5-react';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
-import { Skeleton } from '@components/UI/skeleton';
+import { Textarea } from '@components/UI/textarea';
+import { PlusCircleIcon } from '@heroicons/react/24/outline';
+import { Label } from '@components/UI/label';
 
 interface PropsTypes {
-  updateNewsList: () => void;
+  updateAllNews: () => void;
+  updateLatestNews: () => void;
 }
 
 const formSchema = z.object({
   title: z.string().nonempty(),
   subtitle: z.string(),
+  shortDescription: z.string(),
 });
 
-export default function NewNews({ updateNewsList }: PropsTypes) {
+export default function NewNews({
+  updateAllNews,
+  updateLatestNews,
+}: PropsTypes) {
   const [selectedImg, setSelectedImg] = useState<null | FileList>(null);
   const [openedDialog, setOpenedDialog] = useState(false);
   const [readyToShow, setReadyToShow] = useState(false);
@@ -56,13 +63,19 @@ export default function NewNews({ updateNewsList }: PropsTypes) {
     defaultValues: {
       title: '',
       subtitle: '',
+      shortDescription: '',
     },
   });
-  const addNewNewsHandler = async (
-    formResponse: z.infer<typeof formSchema>
-  ) => {
+  const addNewNewsHandler = async () => {
     if (!userData.data) return;
-    const { title, subtitle } = formResponse;
+
+    const dirtyData = Object.fromEntries(
+      Object.keys(form.formState.dirtyFields).map((x: string) => [
+        x,
+        form.getValues(x as keyof z.infer<typeof formSchema>),
+      ])
+    );
+
     setPushStatus((prevState) => {
       return { ...prevState, isLoading: true };
     });
@@ -70,10 +83,9 @@ export default function NewNews({ updateNewsList }: PropsTypes) {
     const { data, error } = await usePostAccessDatabase({
       url: DATABASE_ENDPOINTS.NEWS_ONE,
       body: {
-        userId: userData.data._id,
-        title,
-        subtitle,
+        creatorData: userData.data._id,
         content: contentData,
+        ...dirtyData,
       },
     });
     if (error) {
@@ -95,7 +107,8 @@ export default function NewNews({ updateNewsList }: PropsTypes) {
         return setPushStatus({ hasError: error, isLoading: false });
       }
     }
-    updateNewsList();
+    updateAllNews();
+    updateLatestNews();
     setOpenedDialog(false);
     setTimeout(() => {
       setPushStatus({ hasError: null, isLoading: false });
@@ -114,6 +127,7 @@ export default function NewNews({ updateNewsList }: PropsTypes) {
       form.reset();
     }, 100);
   };
+
   return (
     <Dialog open={openedDialog} onOpenChange={() => changeDialogVisiblity()}>
       <Button
@@ -124,29 +138,32 @@ export default function NewNews({ updateNewsList }: PropsTypes) {
           }, 100);
           setOpenedDialog(true);
         }}
+        className="whitespace-nowrap"
+        type="button"
       >
-        Add new
+        Add news
       </Button>
-      <DialogContent className="max-h-[90%] overflow-y-scroll">
+      <DialogContent className="h-full w-full p-7">
         {pushStatus.isLoading && (
-          <div>
+          <div className="relative min-h-[1vh]">
             <LoadingCircle />
           </div>
         )}
         {!pushStatus.isLoading && pushStatus.hasError && (
           <ErrorMessage message={pushStatus.hasError} />
         )}
-        {!pushStatus.hasError && (
+        {!pushStatus.hasError && !pushStatus.isLoading && (
           <Form {...form}>
             <form
-              className={`${pushStatus.isLoading && 'invisible'} space-y-4`}
+              className={`flex flex-col space-y-4`}
               onSubmit={form.handleSubmit(addNewNewsHandler)}
             >
               <DialogHeader>
                 <DialogTitle>News</DialogTitle>
                 <DialogDescription>Add new news</DialogDescription>
               </DialogHeader>
-              <div className="flex flex-col gap-4">
+
+              <div className="flex flex-grow flex-col gap-4">
                 <FormField
                   name="title"
                   control={form.control}
@@ -173,73 +190,86 @@ export default function NewNews({ updateNewsList }: PropsTypes) {
                     </FormItem>
                   )}
                 />
+                <FormField
+                  control={form.control}
+                  name="shortDescription"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Short description</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          className="block resize-y"
+                          maxLength={94}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
                 <FormItem>
                   <FormLabel>Image</FormLabel>
                   <FormControl>
-                    <Input
-                      type="file"
-                      className="block"
-                      name="mainImg"
-                      onChange={(e) => setSelectedImg(e.target.files)}
-                      accept="image/png, image/jpg, image/jpeg"
-                    />
+                    <Label className="cursor-pointer space-y-2">
+                      {selectedImg && selectedImg.length > 0 && (
+                        <div className="group relative">
+                          <PlusCircleIcon className="absolute left-1/2 top-1/2 z-10 h-12 w-12 -translate-x-1/2 -translate-y-1/2 transform text-slate-300 opacity-75 brightness-75 transition-[opacity,filter] group-hover:opacity-100 group-hover:brightness-100" />
+                          <img
+                            src={URL.createObjectURL(selectedImg[0])}
+                            alt="preview_img"
+                            className="aspect-square w-full rounded-xl object-cover brightness-75 transition-[filter] group-hover:brightness-50"
+                          />
+                        </div>
+                      )}
+                      <Input
+                        type="file"
+                        className="block cursor-pointer"
+                        name="mainImg"
+                        onChange={(e) => setSelectedImg(e.target.files)}
+                        accept="image/png, image/jpg, image/jpeg"
+                      />
+                    </Label>
                   </FormControl>
-                  {selectedImg && selectedImg.length > 0 && (
-                    <img
-                      src={URL.createObjectURL(selectedImg[0])}
-                      alt="preview_img"
-                      className="aspect-square w-full object-cover"
-                    />
-                  )}
+
                   <FormMessage />
                 </FormItem>
-                <div>
-                  {readyToShow ? (
-                    <div className="ck-body-wrapper">
-                      <CKEditor
-                        editor={ClassicEditor}
-                        data={contentData}
-                        config={{
-                          mediaEmbed: { previewsInData: true },
-                          toolbar: {
-                            shouldNotGroupWhenFull: true,
-                            items: [
-                              'alignment',
-                              'heading',
-                              '|',
-                              'bold',
-                              'italic',
-                              'link',
-                              'bulletedList',
-                              'numberedList',
-                              '|',
-                              'outdent',
-                              'indent',
-                              '|',
-
-                              'blockQuote',
-                              'insertTable',
-                              'mediaEmbed',
-                              'undo',
-                              'redo',
-                            ],
-                          },
-                        }}
-                        onChange={(event, editor) => {
-                          const data = editor.getData();
-                          setContentData(data);
-                        }}
-                      />
-                    </div>
-                  ) : (
-                    <Skeleton className="flex h-[132px] w-full gap-4 p-4">
-                      {[...Array(4)].map((el, index) => (
-                        <Skeleton key={index} className="h-6 w-10" />
-                      ))}
-                    </Skeleton>
-                  )}
-                </div>
+                {readyToShow && (
+                  <div className="">
+                    <CKEditor
+                      editor={ClassicEditor}
+                      data={contentData}
+                      config={{
+                        mediaEmbed: { previewsInData: true },
+                        toolbar: {
+                          shouldNotGroupWhenFull: true,
+                          items: [
+                            'heading',
+                            '|',
+                            'bold',
+                            'italic',
+                            'mediaEmbed',
+                            'bulletedList',
+                            'numberedList',
+                            '|',
+                            'outdent',
+                            'indent',
+                            '|',
+                            'blockQuote',
+                            'insertTable',
+                            'undo',
+                            'redo',
+                          ],
+                        },
+                      }}
+                      onChange={(event, editor) => {
+                        const data = editor.getData();
+                        setContentData(data);
+                      }}
+                    />
+                  </div>
+                )}
               </div>
+
               <DialogFooter>
                 <Button variant="default" type="submit">
                   Submit

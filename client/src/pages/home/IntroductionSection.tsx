@@ -5,7 +5,9 @@ export default function IntroductionSection() {
     <div className="relative flex w-full flex-col items-center">
       <section className="relative -top-4 left-0 w-full bg-gradient-to-b from-[#0D151C] to-pageBackground shadow-2xl">
         <div className="px-4 py-11 text-center md:py-28">
-          <h2 className={`text-6xl uppercase text-white`}>
+          <h2
+            className={`text-4xl/relaxed uppercase text-white sm:text-5xl md:text-6xl`}
+          >
             Welcome to the Smart
             <span className="font-bold text-primary">HUB</span>
           </h2>

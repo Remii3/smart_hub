@@ -2,7 +2,6 @@ import { Link } from 'react-router-dom';
 import { useContext } from 'react';
 import { CartContext } from '@context/CartProvider';
 import CartProdList from './CartProdList';
-import { TicketIcon } from '@heroicons/react/24/outline';
 import MainContainer from '@layout/MainContainer';
 import { Button, buttonVariants } from '@components/UI/button';
 

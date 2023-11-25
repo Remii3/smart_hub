@@ -23,7 +23,7 @@ import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import useUploadImg from '@hooks/useUploadImg';
 
 import { PlusCircleIcon } from '@heroicons/react/24/outline';
-import NewProduct from './NewProduct';
+import NewProduct from './newProduct/NewProduct';
 import {
   Select,
   SelectContent,
@@ -34,12 +34,15 @@ import {
 import { useToast } from '@components/UI/use-toast';
 import { UserCircleIcon } from '@heroicons/react/24/solid';
 import Follows from './tabs/Follows';
+import NewCollection from './NewCollection';
+import MyCollections from './tabs/myCollections/MyCollections';
 
 type TabKeysTypes =
   | 'MY_DATA'
   | 'SECURITY_PERMISSIONS'
   | 'HISTORY'
   | 'MY_PRODUCTS'
+  | 'MY_COLLECTIONS'
   | 'ADMIN'
   | 'FOLLOWING';
 
@@ -48,6 +51,7 @@ type TabNamesTypes =
   | 'security_permissions'
   | 'history'
   | 'my_products'
+  | 'my_collections'
   | 'admin'
   | 'following';
 
@@ -56,6 +60,7 @@ const tabNames: Record<TabKeysTypes, TabNamesTypes> = {
   SECURITY_PERMISSIONS: 'security_permissions',
   HISTORY: 'history',
   MY_PRODUCTS: 'my_products',
+  MY_COLLECTIONS: 'my_collections',
   ADMIN: 'admin',
   FOLLOWING: 'following',
 };
@@ -83,6 +88,11 @@ const TABS_ARRAY: {
   {
     text: 'My products',
     name: 'my_products',
+    icon: <Square2StackIcon height={20} width={20} />,
+  },
+  {
+    text: 'My collections',
+    name: 'my_collections',
     icon: <Square2StackIcon height={20} width={20} />,
   },
   {
@@ -120,7 +130,6 @@ export default function MyAccount() {
   const path = useLocation();
   const { userData, fetchUserData } = useContext(UserContext);
   const { toast } = useToast();
-
   const changeSelectedTab = (option: TabNamesTypes) => {
     setSelectedtab(option);
     navigate(
@@ -258,7 +267,12 @@ export default function MyAccount() {
               </div>
             </div>
           </div>
-          {userData.data.role !== UserRoleTypes.USER && <NewProduct />}
+          {userData.data.role !== UserRoleTypes.USER && (
+            <div className="space-y-1">
+              <NewProduct />
+              <NewCollection />
+            </div>
+          )}
         </div>
       </header>
       <div className="pb-8 sm:pb-12">
@@ -355,6 +369,7 @@ export default function MyAccount() {
           )}
           {selectedtab === tabNames.HISTORY && <OrderHistory />}
           {selectedtab === tabNames.MY_PRODUCTS && <MyShop />}
+          {selectedtab === tabNames.MY_COLLECTIONS && <MyCollections />}
           {selectedtab === tabNames.ADMIN && <Admin />}
           {selectedtab === tabNames.FOLLOWING && <Follows />}
         </div>

@@ -1,50 +1,111 @@
-import { useState } from 'react';
-import { UnknownProductTypes } from '@customTypes/interfaces';
-import AuctionCard from '@components/cards/AuctionCard';
+import { useCallback, useEffect, useState } from 'react';
+import {
+  FetchDataTypes,
+  ProductCardTypes,
+  ProductTypes,
+} from '@customTypes/interfaces';
 import ShopCard from '@components/cards/ShopCard';
 import { Button } from '@components/UI/button';
 import useSortProducts from '@hooks/useSortProducts';
+import { useGetAccessDatabase } from '@hooks/useAaccessDatabase';
+import { DATABASE_ENDPOINTS } from '@data/endpoints';
+import errorToast from '@components/UI/error/errorToast';
+import Pagination from '@components/paginations/Pagination';
 
 interface PropsTypes {
-  myProducts: UnknownProductTypes[];
-  quantity?: number;
-  unfold: boolean;
+  tag: string;
+  limit?: number;
 }
 
 const defaultProps = {
-  quantity: 3,
+  limit: 3,
 };
 
-export default function MyProducts({
-  myProducts,
-  quantity,
-  unfold,
-}: PropsTypes) {
-  const [showMore, setShowMore] = useState(false);
+interface ProductsTypes extends FetchDataTypes {
+  data: null | ProductTypes[];
+  rawData: null | any;
+}
 
-  let { sortedProducts } = useSortProducts({
-    products: myProducts,
-    sortType: 'Date, DESC',
+export default function MyProducts({ tag, limit }: PropsTypes) {
+  const [products, setProducts] = useState<ProductsTypes>({
+    data: null,
+    rawData: null,
+    hasError: null,
+    isLoading: false,
   });
-  sortedProducts = sortedProducts.slice(
-    0,
-    showMore ? myProducts.length : quantity
-  );
+  const [page, setPage] = useState(1);
+  const fetchData = useCallback(async () => {
+    setProducts((prevState) => {
+      return { ...prevState, isLoading: true };
+    });
+
+    let data = null;
+    let error = null;
+
+    if (tag === 'all') {
+      const productsResponse = await useGetAccessDatabase({
+        url: DATABASE_ENDPOINTS.PRODUCT_ALL,
+        params: {
+          currentPageSize: limit,
+          currentPage: page,
+          showSold: true,
+          filtersData: { searchedSpecial: tag },
+        },
+      });
+      data = productsResponse.data;
+      error = productsResponse.error;
+    } else {
+      const productsResponse = await useGetAccessDatabase({
+        url: DATABASE_ENDPOINTS.PRODUCT_SEARCHED,
+        params: {
+          pageSize: limit,
+          filtersData: { searchedSpecial: tag, showSold: true },
+        },
+      });
+      data = productsResponse.data;
+      error = productsResponse.error;
+    }
+    if (error) {
+      errorToast(error);
+      return setProducts({
+        data: null,
+        rawData: null,
+        hasError: error,
+        isLoading: false,
+      });
+    }
+    setProducts({
+      data: data.products,
+      rawData: data.rawData,
+      hasError: null,
+      isLoading: false,
+    });
+  }, [page]);
+
+  useEffect(() => {
+    fetchData();
+  }, [page]);
+
+  const changeCurrentPageHandler = (newPage: number) => {
+    setPage(newPage);
+  };
 
   return (
     <div>
       <div className="grid h-full grid-cols-1 gap-4 overflow-hidden pb-4 transition-[max-height] duration-300 ease-in-out sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {sortedProducts.map((product) => {
-          return (
-            product.market_place === 'Shop' && (
+        {products.data &&
+          products.data.map((product) => {
+            return (
               <ShopCard
                 key={product._id}
                 _id={product._id}
-                price={product.shop_info.price}
+                categories={product.categories}
+                price={product.price.value}
                 productQuantity={product.quantity}
                 title={product.title}
                 authors={product.authors}
                 description={product.description}
+                type={product.marketplace}
                 img={
                   (product.imgs &&
                     product.imgs.length > 0 &&
@@ -53,18 +114,20 @@ export default function MyProducts({
                 }
                 rating={product.rating}
               />
-            )
-          ); 
-        })}
+            );
+          })}
       </div>
-      {unfold && quantity && myProducts.length > quantity && (
-        <div className="flex items-center justify-center">
-          <Button
-            variant="default"
-            onClick={() => setShowMore((prevState) => !prevState)}
-          >
-            {showMore ? 'Show less' : 'Show more'}
-          </Button>
+      {tag === 'all' && limit && (
+        <div className="flex justify-center">
+          <Pagination
+            currentPage={page}
+            pageSize={limit}
+            onPageChange={(newPageNumber: number) =>
+              changeCurrentPageHandler(newPageNumber)
+            }
+            totalCount={products.rawData && products.rawData.totalProducts}
+            siblingCount={1}
+          />
         </div>
       )}
     </div>
