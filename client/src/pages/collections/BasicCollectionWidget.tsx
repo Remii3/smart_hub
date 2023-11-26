@@ -140,7 +140,6 @@ export default function BasicCollectionWidget({
       <section>
         <SushiSwiper
           swiperCategory={category}
-          itemsType="collection"
           arrayOfItems={collections.data}
           loadingState={collections.isLoading}
           errorState={collections.hasError}
