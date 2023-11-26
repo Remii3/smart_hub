@@ -42,29 +42,19 @@ export default function MyProducts({ tag, limit }: PropsTypes) {
     let data = null;
     let error = null;
 
-    if (tag === 'all') {
-      const productsResponse = await useGetAccessDatabase({
-        url: DATABASE_ENDPOINTS.PRODUCT_ALL,
-        params: {
-          currentPageSize: limit,
-          currentPage: page,
-          showSold: true,
-          filtersData: { searchedSpecial: tag },
+    const productsResponse = await useGetAccessDatabase({
+      url: DATABASE_ENDPOINTS.SEARCH_PRODCOL,
+      params: {
+        pageSize: limit,
+
+        filtersData: {
+          page,
+          marketplace: 'shop',
         },
-      });
-      data = productsResponse.data;
-      error = productsResponse.error;
-    } else {
-      const productsResponse = await useGetAccessDatabase({
-        url: DATABASE_ENDPOINTS.PRODUCT_SEARCHED,
-        params: {
-          pageSize: limit,
-          filtersData: { searchedSpecial: tag, showSold: true },
-        },
-      });
-      data = productsResponse.data;
-      error = productsResponse.error;
-    }
+      },
+    });
+    data = productsResponse.data;
+    error = productsResponse.error;
     if (error) {
       errorToast(error);
       return setProducts({
@@ -75,7 +65,7 @@ export default function MyProducts({ tag, limit }: PropsTypes) {
       });
     }
     setProducts({
-      data: data.products,
+      data: data.data,
       rawData: data.rawData,
       hasError: null,
       isLoading: false,

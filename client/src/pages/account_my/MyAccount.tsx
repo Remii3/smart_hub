@@ -32,7 +32,6 @@ import {
 } from '@components/UI/select';
 
 import { useToast } from '@components/UI/use-toast';
-import { UserCircleIcon } from '@heroicons/react/24/solid';
 import Follows from './tabs/Follows';
 import NewCollection from './NewCollection';
 import MyCollections from './tabs/myCollections/MyCollections';
@@ -197,7 +196,7 @@ export default function MyAccount() {
     );
 
   return (
-    <MainContainer>
+    <>
       <header className="py-8 sm:pb-9 sm:pt-12">
         <div className="gap-2 sm:flex sm:items-end sm:justify-between md:items-center">
           <div className="flex flex-col items-center gap-4 sm:items-start md:flex-row">
@@ -270,7 +269,6 @@ export default function MyAccount() {
           {userData.data.role !== UserRoleTypes.USER && (
             <div className="space-y-1">
               <NewProduct />
-              <NewCollection />
             </div>
           )}
         </div>
@@ -374,6 +372,6 @@ export default function MyAccount() {
           {selectedtab === tabNames.FOLLOWING && <Follows />}
         </div>
       </div>
-    </MainContainer>
+    </>
   );
 }

@@ -5,15 +5,15 @@ import parse from 'html-react-parser';
 interface ProductDescriptionTypes {
   newDescription: string;
   setNewDescription: React.Dispatch<React.SetStateAction<string>>;
-  show: boolean;
-  descriptionToShow: string;
+  show?: boolean;
+  descriptionToShow?: string;
 }
 
 export default function ProductDescription({
   newDescription,
   setNewDescription,
-  show,
-  descriptionToShow,
+  show = false,
+  descriptionToShow = '',
 }: ProductDescriptionTypes) {
   return (
     <article>

@@ -114,7 +114,6 @@ const getDefault = async (
 ) => {
   const searchQuery = { ...query };
   const rawData = {};
-
   const productsData = await Product.find({
     ...searchQuery,
     deleted: false,
@@ -146,7 +145,6 @@ const getDefault = async (
   getHighestPrice(pipeline, rawData);
 
   const preparedData = prepareData(productsData);
-
   return { data: preparedData, rawData };
 };
 

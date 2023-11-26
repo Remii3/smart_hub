@@ -12,7 +12,6 @@ const prepareNewProductData = (req, res, next) => {
     authors,
   } = req.body;
   const preparedData = {};
-
   if (creatorData) {
     preparedData.creatorData = {
       _id: creatorData._id,

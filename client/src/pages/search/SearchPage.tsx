@@ -99,7 +99,17 @@ export default function SearchPage() {
       isLoading: false,
     });
   }, [searchParams]);
-
+  useEffect(() => {
+    searchParams.set('page', '1');
+    setSearchParams(searchParams);
+  }, [
+    searchParams.get('marketplace'),
+    searchParams.get('maxPrice'),
+    searchParams.get('minPrice'),
+    searchParams.get('rating'),
+    searchParams.get('category'),
+    searchParams.get('author'),
+  ]);
   const removeQueryHandler = (paramValue: string, paramKey: FilterParams) => {
     switch (paramKey) {
       case 'phrase': {

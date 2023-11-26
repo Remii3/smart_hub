@@ -2,16 +2,14 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination } from 'swiper';
 import SuspenseComponent from '@components/suspense/SuspenseComponent';
 import LoadingCircle from '@components/Loaders/LoadingCircle';
+import { useEffect } from 'react';
 
 import 'swiper/css';
 import 'swiper/css/pagination';
 import 'swiper/css/navigation';
-import { MarketplaceTypes } from '@customTypes/types';
 import ShopCard from '@components/cards/ShopCard';
 import ErrorMessage from '@components/UI/error/ErrorMessage';
 import { Skeleton } from '@components/UI/skeleton';
-import CollectionCard from '@components/cards/CollectionCard';
-import { ReactNode } from 'react';
 import SwiperArrowRight from './navigation/SwiperArrowRight';
 import SwiperArrowLeft from './navigation/SwiperArrowLeft';
 import SwiperDots from './pagination/SwiperDots';
@@ -29,12 +27,13 @@ export default function SushiSwiper({
   loadingState,
   errorState,
 }: PropsTypes) {
+  useEffect(() => {}, [swiperCategory]);
   return (
     <div className="relative">
       <Swiper
         navigation={{
-          nextEl: `.swiper-${swiperCategory}-button-next`,
-          prevEl: `.swiper-${swiperCategory}-button-prev`,
+          nextEl: `.swiper-${swiperCategory}-next`,
+          prevEl: `.swiper-${swiperCategory}-prev`,
         }}
         grabCursor
         slidesPerView={1.2}
@@ -133,8 +132,8 @@ export default function SushiSwiper({
               </SwiperSlide>
             ))}
         </SuspenseComponent>
-        <SwiperArrowRight elId={`swiper-${swiperCategory}-button-next`} />
-        <SwiperArrowLeft elId={`swiper-${swiperCategory}-button-prev`} />
+        <SwiperArrowRight elId={`swiper-${swiperCategory}-next`} />
+        <SwiperArrowLeft elId={`swiper-${swiperCategory}-prev`} />
         <SwiperDots elId={`swiper-${swiperCategory}-pagination`} />
       </Swiper>
     </div>

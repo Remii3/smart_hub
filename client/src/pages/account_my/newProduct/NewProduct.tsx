@@ -22,7 +22,6 @@ import {
 } from 'react';
 import { Button } from '@components/UI/button';
 import { Input } from '@components/UI/input';
-import { RadioGroup, RadioGroupItem } from '@components/UI/radio-group';
 import { Label } from '@components/UI/label';
 
 import * as z from 'zod';
@@ -44,81 +43,51 @@ import { v4 } from 'uuid';
 import useUploadImg from '@hooks/useUploadImg';
 import { Textarea } from '@components/UI/textarea';
 import { MarketplaceTypes } from '@customTypes/types';
-import SushiSwiper from '@components/swiper/SushiSwiper';
+
+import { Tabs, TabsList, TabsTrigger } from '@components/UI/tabs';
 import errorToast from '@components/UI/error/errorToast';
-import { CollectionCardTypes, FetchDataTypes } from '@customTypes/interfaces';
-import { Checkbox } from '@components/UI/checkbox';
-import { SwiperSlide } from 'swiper/react';
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from '@components/UI/sheet';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@components/UI/tabs';
-import CollectionCard from '@components/cards/CollectionCard';
+import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
+import { CKEditor } from '@ckeditor/ckeditor5-react';
 
 type SelectedImgsTypes = {
-  id: string;
-  data: File;
-  url: string;
-}[];
-
-interface CollectionsDataTypes extends FetchDataTypes {
-  data: null | CollectionCardTypes[];
-}
+  isDirty: boolean;
+  imgs: {
+    id: string;
+    data?: File;
+    url: string;
+  }[];
+};
 
 const MarketPlaceTypes = { shop: 'shop', collection: 'collection' } as {
   shop: MarketplaceTypes;
   collection: MarketplaceTypes;
 };
+
 const formSchema = z.object({
-  title: z.string().nonempty({ message: 'Please provide book title!' }).min(2, {
+  title: z.string().min(2, {
     message: 'Title must be at least 2 characters.',
   }),
-  authors: z
-    .array(
-      z.object({
-        _id: z.string(),
-        label: z.string(),
-        value: z.string(),
-      })
-    )
-    .nonempty({ message: 'Please provide book authors!' }),
-  categories: z
-    .array(
-      z.object({
-        _id: z.string(),
-        label: z.string(),
-        value: z.string(),
-        description: z.string(),
-      })
-    )
-    .optional(),
-  description: z.string().optional(),
+  authors: z.any(),
+  categories: z.any(),
+  shortDescription: z.string().optional(),
   quantity: z.number().min(1),
-  price: z
-    .string()
-    .nonempty({ message: 'Please provide book price' })
-    .or(z.number()),
   marketplace: z.enum([MarketPlaceTypes.shop, MarketPlaceTypes.collection]),
+  price: z.number(),
 });
 
 export default function NewProduct() {
-  const [selectedImgs, setSelectedImgs] = useState<SelectedImgsTypes>([]);
-  const [openDialog, setOpenDialog] = useState(false);
-  const [selectedCollections, setSelectedCollections] = useState<string[]>([]);
-  const initalMarketplace = 'shop' as MarketplaceTypes;
-  const [selectedMarketplace, setSelectedMarketplace] =
-    useState(initalMarketplace);
-  const [collectionsData, setCollectionsData] = useState<CollectionsDataTypes>({
-    data: null,
-    hasError: null,
-    isLoading: false,
+  const [selectedImgs, setSelectedImgs] = useState<SelectedImgsTypes>({
+    imgs: [],
+    isDirty: false,
   });
+  const [newDescription, setNewDescription] = useState({
+    value: '',
+    show: false,
+  });
+  const [openDialog, setOpenDialog] = useState(false);
+
+  const [selectedMarketplace, setSelectedMarketplace] =
+    useState<MarketplaceTypes>('shop');
 
   const [categoryState, setCategoryState] = useState<{
     isLoading: boolean;
@@ -162,92 +131,75 @@ export default function NewProduct() {
     });
   }, []);
 
-  const fetchAllCollections = useCallback(async () => {
-    setCollectionsData((prevState) => {
-      return { ...prevState, isLoading: true };
-    });
-    const { data, error } = await useGetAccessDatabase({
-      url: '#',
-      params: { limit: 0, creatorId: userData.data?._id },
-    });
-    if (error) {
-      errorToast(error);
-      return setCollectionsData({
-        data: null,
-        hasError: error,
-        isLoading: false,
-      });
-    }
-    setCollectionsData({
-      data,
-      hasError: null,
-      isLoading: false,
-    });
-  }, []);
-
-  if (!userData.data) return <div>Please log in!</div>;
-
   useEffect(() => {
     fetchAllAuthors();
     fetchAllCategories();
-    fetchAllCollections();
   }, []);
 
-  const form = useForm<any>({
+  const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
       title: '',
-      description: '',
+      shortDescription: '',
       quantity: 0,
       price: '',
-      categories: [],
-      authors: [],
+      categories: [] as any[],
+      authors: [] as any[],
       marketplace: MarketPlaceTypes.shop,
     },
   });
-  const { handleSubmit, control, watch, reset } = form;
-  const marketplaceValue = watch('marketplace');
+  const { handleSubmit, control, reset } = form;
 
   const onImageChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const eventFiles = e.target.files;
       setSelectedImgs((prevState) => {
-        return [
-          ...prevState,
-          {
-            id: eventFiles[0].name + v4(),
-            data: eventFiles[0],
-            url: URL.createObjectURL(eventFiles[0]),
-          },
-        ];
+        return {
+          isDirty: true,
+          imgs: [
+            ...prevState.imgs,
+            {
+              id: eventFiles[0].name + v4(),
+              data: eventFiles[0],
+              url: URL.createObjectURL(eventFiles[0]),
+            },
+          ],
+        };
       });
     }
   };
 
   const removeImg = (clieckedId: string) => {
-    const updatedImgs = [...selectedImgs];
+    const updatedImgs = [...selectedImgs.imgs];
     const indexToRemove = updatedImgs.findIndex(
       (item) => item.id === clieckedId
     );
     if (indexToRemove !== -1) {
       const newArray = updatedImgs.filter((item) => item.id !== clieckedId);
-      setSelectedImgs(newArray);
+      setSelectedImgs({ imgs: newArray, isDirty: true });
     }
   };
 
   const onSubmit = async (formResponse: any) => {
-    const {
-      title,
-      description,
-      price,
-      categories,
-      authors,
-      quantity,
-      marketplace,
-    } = formResponse;
+    const dirtyData = Object.fromEntries(
+      Object.keys(form.formState.dirtyFields).map((x: string) => [
+        x,
+        form.getValues(x as keyof z.infer<typeof formSchema>),
+      ])
+    ) as any;
+
+    if (newDescription.value !== newDescription.value) {
+      dirtyData.description = newDescription.value;
+    }
+
+    if (selectedImgs.isDirty) {
+      dirtyData.imgs = selectedImgs.imgs;
+    }
+    dirtyData.marketplace = formResponse.marketplace;
     setStatus((prevState) => {
       return { ...prevState, isLoading: true };
     });
+
     const { error, data } = await usePostAccessDatabase({
       url: DATABASE_ENDPOINTS.PRODUCT_ONE,
       body: {
@@ -256,22 +208,15 @@ export default function NewProduct() {
           pseudonim: userData.data?.author_info.pseudonim,
           profile_img: userData.data?.user_info.profile_img.url,
         },
-        title,
-        description,
-        price,
-        categories,
-        authors,
-        quantity,
-        marketplace: selectedMarketplace,
-        selectedCollections,
+        ...dirtyData,
       },
     });
-    if (data.id && selectedImgs.length > 0) {
+    if (data.id && selectedImgs.imgs.length > 0) {
       const urls = [];
-      for (let i = 0; i < selectedImgs.length; i++) {
+      for (let i = 0; i < selectedImgs.imgs.length; i++) {
         const url = await useUploadImg({
           ownerId: data.id,
-          selectedFile: selectedImgs[i].data,
+          selectedFile: selectedImgs.imgs[i].data || null,
           targetLocation: 'Product_imgs',
         });
         urls.push(url);
@@ -282,6 +227,7 @@ export default function NewProduct() {
       });
     }
     if (error) {
+      errorToast(error);
       setStatus((prevState) => {
         return { ...prevState, isLoading: false, hasFailed: true };
       });
@@ -294,36 +240,26 @@ export default function NewProduct() {
 
   const clearForm = () => {
     setOpenDialog(false);
+
     setTimeout(() => {
-      setSelectedCollections([]);
       setStatus({ hasFailed: false, isLoading: false, isSuccess: false });
-      setSelectedImgs([]);
+      setSelectedImgs({ imgs: [], isDirty: false });
       reset();
-    }, 100);
-  };
-  const changeSelectedCollectionsHandler = (
-    checked: boolean,
-    collectionId: string
-  ) => {
-    if (checked) {
-      setSelectedCollections((prevState) => [...prevState, collectionId]);
-    } else {
-      let selectedCollectionsCopy = [...selectedCollections];
-      const idIndex = selectedCollections.findIndex(
-        (id) => id === collectionId
-      );
-      selectedCollectionsCopy.splice(idIndex, 1);
-      setSelectedCollections(selectedCollectionsCopy);
-    }
+    }, 50);
   };
 
   return (
-    <Dialog open={openDialog} onOpenChange={clearForm} modal={true}>
+    <Dialog open={openDialog} onOpenChange={clearForm}>
       <div className="mt-4 flex flex-col sm:mt-0 sm:flex-row sm:items-center">
         <Button
           variant="default"
           className="w-full"
-          onClick={() => setOpenDialog(true)}
+          onClick={() => {
+            setOpenDialog(true);
+            setTimeout(() => {
+              setNewDescription({ value: '', show: true });
+            }, 100);
+          }}
         >
           Add new book
         </Button>
@@ -331,7 +267,7 @@ export default function NewProduct() {
       <DialogContent
         className={`${
           status.isLoading ? 'overflow-y-hidden' : 'overflow-y-auto'
-        }  `}
+        } h-full w-full p-7 `}
       >
         {status.isLoading && (
           <div className="flex items-center justify-center">
@@ -404,7 +340,10 @@ export default function NewProduct() {
                       <FormItem>
                         <FormLabel>Marketplace</FormLabel>
                         <FormControl>
-                          <TabsList className="grid w-full grid-cols-2">
+                          <TabsList
+                            defaultValue={'shop'}
+                            className="grid w-full grid-cols-2"
+                          >
                             <TabsTrigger value="shop">Shop</TabsTrigger>
                             <TabsTrigger value="collection">
                               Collection
@@ -466,22 +405,20 @@ export default function NewProduct() {
                           <FormDescription>
                             This is your book's imgs.
                           </FormDescription>
-                          {selectedImgs.map((item) => (
+                          {selectedImgs.imgs.map((item) => (
                             <div
                               key={item.id}
                               className="group relative me-2 inline-block cursor-pointer rounded-md"
                               onClick={() => removeImg(item.id)}
                             >
+                              <XCircleIcon className="absolute left-1/2 top-1/2 z-10 h-12 w-12 -translate-x-1/2 -translate-y-1/2 transform text-slate-200 opacity-75 transition-[opacity,filter] group-hover:opacity-100" />
                               <img
                                 key={item.id}
                                 id={item.id}
-                                alt="preview_image"
-                                className="aspect-square h-24 w-24 rounded-md"
+                                alt="Product preview remove img."
+                                className="aspect-[4/3] h-24 w-24 rounded-md object-cover brightness-[40%] transition group-hover:brightness-[20%]"
                                 src={item.url}
                               />
-                              <div className="absolute inset-0 flex items-center justify-center bg-slate-100/80 opacity-0 transition duration-150 ease-out group-hover:opacity-90">
-                                <XCircleIcon className="h-12 w-12" />
-                              </div>
                             </div>
                           ))}
                           <FormMessage />
@@ -491,12 +428,15 @@ export default function NewProduct() {
                   />
                   <FormField
                     control={control}
-                    name="description"
+                    name="shortDescription"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Desciption</FormLabel>
+                        <FormLabel>Short description</FormLabel>
                         <FormControl>
-                          <Textarea placeholder="Description..." {...field} />
+                          <Textarea
+                            placeholder="Short description..."
+                            {...field}
+                          />
                         </FormControl>
                         <FormDescription>
                           This is your book's description.
@@ -588,6 +528,12 @@ export default function NewProduct() {
                                 borderRadius: '0 0.75rem 0.75rem 0',
                               }),
                             }}
+                            getOptionValue={(author) =>
+                              author.author_info.pseudonim
+                            }
+                            getOptionLabel={(author) =>
+                              author.author_info.pseudonim
+                            }
                           />
                         </FormControl>
                         <FormDescription>
@@ -679,27 +625,9 @@ export default function NewProduct() {
                               step="0.01"
                               type="number"
                               value={field.value}
-                              onBlur={(e) => {
-                                if (e.target.value.trim().length > 0) {
-                                  return field.onChange(
-                                    e.target.value
-                                      ? parseFloat(e.target.value).toFixed(2)
-                                      : 0
-                                  );
-                                }
-                              }}
-                              onKeyDown={(e) => {
-                                if (['.'].includes(e.key)) {
-                                  e.preventDefault();
-                                }
-                              }}
-                              onChange={(e) => {
-                                return field.onChange(
-                                  e.target.value
-                                    ? parseFloat(e.target.value)
-                                    : 0
-                                );
-                              }}
+                              onChange={(e) =>
+                                field.onChange(Number(e.target.value))
+                              }
                             />
                           </div>
                         </FormControl>
@@ -710,6 +638,39 @@ export default function NewProduct() {
                       </FormItem>
                     )}
                   />
+                  {newDescription.show && (
+                    <CKEditor
+                      editor={ClassicEditor}
+                      data={newDescription.value}
+                      config={{
+                        mediaEmbed: { previewsInData: true },
+                        toolbar: {
+                          shouldNotGroupWhenFull: true,
+                          items: [
+                            'heading',
+                            '|',
+                            'bold',
+                            'italic',
+                            'mediaEmbed',
+                            'bulletedList',
+                            'numberedList',
+                            '|',
+                            'outdent',
+                            'indent',
+                            '|',
+                            'blockQuote',
+                            'insertTable',
+                            'undo',
+                            'redo',
+                          ],
+                        },
+                      }}
+                      onChange={(event, editor) => {
+                        const data = editor.getData();
+                        setNewDescription({ show: true, value: data });
+                      }}
+                    />
+                  )}
                 </article>
 
                 <DialogFooter className="flex justify-end">

@@ -8,10 +8,8 @@ import {
 } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
-  AuthorTypes,
   FetchDataTypes,
   PostDataTypes,
-  ProductCategories,
   ProductTypes,
 } from '@customTypes/interfaces';
 import { UserContext } from '@context/UserProvider';
@@ -26,7 +24,6 @@ import {
 } from '../../hooks/useAaccessDatabase';
 import { DATABASE_ENDPOINTS } from '../../data/endpoints';
 import Comments from '@features/comments/Comments';
-import { Skeleton } from '@components/UI/skeleton';
 import { Textarea } from '@components/UI/textarea';
 import { Input } from '@components/UI/input';
 import { UserRoleTypes } from '@customTypes/types';
@@ -68,7 +65,6 @@ import {
 } from '@components/UI/accordion';
 import DeleteDialog from '@components/UI/dialogs/DeleteDialog';
 import CreatableSelect from 'react-select/creatable';
-import { ChevronRightIcon, ChevronLeftIcon } from '@heroicons/react/24/solid';
 import SwiperArrowRight from '@components/swiper/navigation/SwiperArrowRight';
 import SwiperArrowLeft from '@components/swiper/navigation/SwiperArrowLeft';
 import SwiperDots from '@components/swiper/pagination/SwiperDots';
@@ -220,7 +216,7 @@ export default function ProductPage() {
       shortDescription: data.shortDescription,
       marketplace: data.marketplace,
     });
-  }, []);
+  }, [productId]);
 
   const clearForm = () => {
     setNewDescription(productState.data ? productState.data.description : '');
@@ -245,7 +241,7 @@ export default function ProductPage() {
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [productId]);
 
   useEffect(() => {
     if (
@@ -455,12 +451,15 @@ export default function ProductPage() {
     itemBtnCapacity = productState.data.quantity! < selectedQuantity || false;
   }
   return (
-    <section ref={shortDescriptionRef} className="relative">
+    <section
+      ref={shortDescriptionRef}
+      className="relative min-h-[calc(100vh-64px)]"
+    >
       {productState.isLoading && <LoadingCircle />}
       {productState.hasError && (
         <ErrorMessage message={productState.hasError} />
       )}
-      {productState.data && (
+      {!productState.isLoading && productState.data && (
         <div className="flex flex-col gap-8">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(updateProductData)}>
@@ -538,8 +537,8 @@ export default function ProductPage() {
                     <div className="space-y-3">
                       <Swiper
                         navigation={{
-                          nextEl: `.swiper-productImage-button-next`,
-                          prevEl: `.swiper-productImage-button-prev`,
+                          nextEl: `.swiper-thumbPreview-button-next`,
+                          prevEl: `.swiper-thumbPreview-button-prev`,
                         }}
                         spaceBetween={12}
                         modules={[Navigation, Thumbs]}
@@ -844,6 +843,48 @@ export default function ProductPage() {
                                     const input = rawInput.toLowerCase();
                                     return label.includes(input);
                                   }}
+                                  className="shadow-sm"
+                                  styles={{
+                                    control: (base, state) => ({
+                                      ...base,
+                                      outline: state.isFocused
+                                        ? '2px solid transparent'
+                                        : '',
+                                      outlineColor: state.isFocused
+                                        ? 'hsl(215, 20.2%, 65.1%)'
+                                        : 'transparent',
+                                      outlineOffset: state.isFocused ? '0' : '',
+                                      border: state.isFocused
+                                        ? '1px hsl(214, 32%, 91%) solid'
+                                        : '1px hsl(214, 32%, 91%) solid',
+                                      '&:hover': {
+                                        border:
+                                          '1px var hsl(214, 30%, 95%) solid',
+                                      },
+                                      borderRadius: 'calc(var(--radius) - 2px)',
+                                      padding: '',
+                                      transition: 'none',
+                                    }),
+                                    option: (base, state) => ({
+                                      ...base,
+                                      backgroundColor: state.isFocused
+                                        ? 'hsl(214, 30%, 95%)'
+                                        : undefined,
+                                      ':active': {
+                                        backgroundColor: 'hsl(214, 30%, 95%)',
+                                      },
+                                    }),
+                                    multiValue: (base) => ({
+                                      ...base,
+                                      backgroundColor: 'hsl(214, 30%, 95%)',
+                                      borderRadius: '0.75rem',
+                                      paddingLeft: '2px',
+                                    }),
+                                    multiValueRemove: (base) => ({
+                                      ...base,
+                                      borderRadius: '0 0.75rem 0.75rem 0',
+                                    }),
+                                  }}
                                   onChange={field.onChange}
                                 />
                               </FormControl>
@@ -885,6 +926,48 @@ export default function ProductPage() {
                                   isMulti
                                   options={authorState.options}
                                   onChange={field.onChange}
+                                  className="shadow-sm"
+                                  styles={{
+                                    control: (base, state) => ({
+                                      ...base,
+                                      outline: state.isFocused
+                                        ? '2px solid transparent'
+                                        : '',
+                                      outlineColor: state.isFocused
+                                        ? 'hsl(215, 20.2%, 65.1%)'
+                                        : 'transparent',
+                                      outlineOffset: state.isFocused ? '0' : '',
+                                      border: state.isFocused
+                                        ? '1px hsl(214, 32%, 91%) solid'
+                                        : '1px hsl(214, 32%, 91%) solid',
+                                      '&:hover': {
+                                        border:
+                                          '1px var hsl(214, 30%, 95%) solid',
+                                      },
+                                      borderRadius: 'calc(var(--radius) - 2px)',
+                                      padding: '',
+                                      transition: 'none',
+                                    }),
+                                    option: (base, state) => ({
+                                      ...base,
+                                      backgroundColor: state.isFocused
+                                        ? 'hsl(214, 30%, 95%)'
+                                        : undefined,
+                                      ':active': {
+                                        backgroundColor: 'hsl(214, 30%, 95%)',
+                                      },
+                                    }),
+                                    multiValue: (base) => ({
+                                      ...base,
+                                      backgroundColor: 'hsl(214, 30%, 95%)',
+                                      borderRadius: '0.75rem',
+                                      paddingLeft: '2px',
+                                    }),
+                                    multiValueRemove: (base) => ({
+                                      ...base,
+                                      borderRadius: '0 0.75rem 0.75rem 0',
+                                    }),
+                                  }}
                                   getOptionValue={(author) =>
                                     author.author_info.pseudonim
                                   }

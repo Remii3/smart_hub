@@ -48,7 +48,7 @@ export default function SimilarProducts({
           <SushiSwiper
             arrayOfItems={products.data}
             errorState={products.hasError}
-            swiperCategory={`similar-products`}
+            swiperCategory={`similarProducts`}
             loadingState={products.isLoading}
           />
         )}

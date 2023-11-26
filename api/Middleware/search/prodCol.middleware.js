@@ -3,12 +3,8 @@ const User = require('../../Models/user');
 
 const prodCol = async (req, res, next) => {
   let { pageSize, filtersData } = req.query;
-
   if (!filtersData) {
-    return res.status(422).json({
-      message: 'No filters provided',
-      error: 'Please provide filters data',
-    });
+    filtersData = {};
   }
 
   let currentPage = filtersData.page;
@@ -68,8 +64,11 @@ const prodCol = async (req, res, next) => {
   }
 
   if (filtersData.marketplace) {
-    searchQuery['marketplace'] = { $in: filtersData.marketplace };
-  } else if (strictMarketplace) {
+    searchQuery['marketplace'] =
+      typeof filtersData.marketplace === 'string'
+        ? filtersData.marketplace
+        : { $in: filtersData.marketplace };
+  } else if (filtersData.strictMarketplace) {
     searchQuery['marketplace'] = { $in: [] };
   }
 

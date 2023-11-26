@@ -225,19 +225,12 @@ const addOneProduct = async (req, res) => {
     const _id = new mongoose.Types.ObjectId();
     const createdAt = new Date().getTime();
 
-    try {
-      await Product.create({
-        _id,
-        createdAt,
-        updatedAt: createdAt,
-        ...preparedData,
-      });
-    } catch (err) {
-      return res
-        .status(500)
-        .json({ message: 'Failed creating new product', error: err.message });
-    }
-
+    await Product.create({
+      _id,
+      createdAt,
+      updatedAt: createdAt,
+      ...preparedData,
+    });
     return res
       .status(201)
       .json({ message: 'Succesfully added new product', id: _id });
