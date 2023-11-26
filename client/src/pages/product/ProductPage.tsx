@@ -68,6 +68,7 @@ import CreatableSelect from 'react-select/creatable';
 import SwiperArrowRight from '@components/swiper/navigation/SwiperArrowRight';
 import SwiperArrowLeft from '@components/swiper/navigation/SwiperArrowLeft';
 import SwiperDots from '@components/swiper/pagination/SwiperDots';
+import MarketplaceBadge from '@components/UI/badges/MarketplaceBadge';
 
 interface ProductTypesLocal extends FetchDataTypes {
   data: null | ProductTypes;
@@ -736,8 +737,13 @@ export default function ProductPage() {
                           </span>
                         </div>
                       </div>
-                      <div className="mb-2">
-                        In stock: <span>{productState.data.quantity}</span>
+                      <div className="mb-2 flex gap-4">
+                        <div>
+                          In stock: <span>{productState.data.quantity}</span>
+                        </div>
+                        <MarketplaceBadge
+                          type={productState.data.marketplace}
+                        />
                       </div>
                       <div className="mb-2">
                         <h3 className="text-3xl">

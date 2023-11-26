@@ -7,12 +7,13 @@ import { Button, buttonVariants } from '@components/UI/button';
 import StarRating from '@features/rating/StarRating';
 import { ShoppingCartIcon } from '@heroicons/react/24/solid';
 import { Badge } from '@components/UI/badge';
+import MarketplaceBadge from '@components/UI/badges/MarketplaceBadge';
 
 export default function ShopCard({
   _id,
   title,
   authors,
-  description,
+  shortDescription,
   price,
   img,
   productQuantity,
@@ -75,6 +76,9 @@ export default function ShopCard({
                 className="h-[160px] w-full rounded-t-lg object-cover"
               />
             )}
+            <div className="absolute left-3 top-3">
+              <MarketplaceBadge type={type} />
+            </div>
           </div>
           <div className="px-3 pt-3">
             <strong className="m-0 line-clamp-1 text-xl">{title}</strong>
@@ -85,7 +89,9 @@ export default function ShopCard({
                 </span>
               ))}
             </div>
-            <p className="mb-1 line-clamp-3 min-h-[72px]">{description}</p>
+            <div className="mb-1 line-clamp-3 min-h-[72px]">
+              {shortDescription}
+            </div>
           </div>
         </div>
         <div className="px-3 pb-3">
@@ -103,52 +109,35 @@ export default function ShopCard({
             />
           </div>
 
-          {type === 'shop' && (
-            <div className="flex flex-col gap-3">
-              <div className="flex flex-wrap items-end justify-between gap-3">
-                <h3 className="flex basis-[50%] items-center text-4xl">
-                  {price}
-                </h3>
-                <Button
-                  type="submit"
-                  variant="default"
-                  disabled={
-                    cartState.isAdding === _id ||
-                    cartState.isDeleting === _id ||
-                    itemBtnCapacity
-                  }
-                  className="relative max-h-[40px] flex-grow"
+          <div className="flex flex-col gap-3">
+            <div className="flex flex-wrap items-end justify-between gap-3">
+              <h3 className="flex basis-[50%] items-center text-4xl">
+                {price}
+              </h3>
+              <Button
+                type="submit"
+                variant="default"
+                disabled={
+                  cartState.isAdding === _id ||
+                  cartState.isDeleting === _id ||
+                  itemBtnCapacity
+                }
+                className="relative max-h-[40px] flex-grow"
+              >
+                {cartState.isAdding === _id && <LoadingCircle />}
+                <div
+                  className={`${
+                    cartState.isAdding === _id && 'invisible'
+                  } space-x-1`}
                 >
-                  {cartState.isAdding === _id && <LoadingCircle />}
-                  <div
-                    className={`${
-                      cartState.isAdding === _id && 'invisible'
-                    } space-x-1`}
-                  >
-                    <span>
-                      +
-                      <ShoppingCartIcon className="inline-block h-6 w-6" />
-                    </span>
-                  </div>
-                </Button>
-              </div>
+                  <span>
+                    +
+                    <ShoppingCartIcon className="inline-block h-6 w-6" />
+                  </span>
+                </div>
+              </Button>
             </div>
-          )}
-          {type === 'collection' && (
-            <div className="flex flex-col gap-3">
-              <div className="flex flex-wrap items-end justify-between gap-3">
-                <Link
-                  to={`/product/${_id}`}
-                  aria-label="Show product page"
-                  className={`${buttonVariants({
-                    variant: 'default',
-                  })} relative flex-grow`}
-                >
-                  See now
-                </Link>
-              </div>
-            </div>
-          )}
+          </div>
         </div>
       </form>
     </div>

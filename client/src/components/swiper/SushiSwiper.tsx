@@ -122,7 +122,7 @@ export default function SushiSwiper({
                   productQuantity={item.quantity}
                   title={item.title}
                   authors={item.authors}
-                  description={item.description}
+                  shortDescription={item.shortDescription}
                   img={
                     item.imgs && item.imgs.length > 0 ? item.imgs[0].url : ''
                   }

@@ -1,5 +1,6 @@
 import errorToast from '@components/UI/error/errorToast';
 import CollectionCard from '@components/cards/CollectionCard';
+import ShopCard from '@components/cards/ShopCard';
 import Pagination from '@components/paginations/Pagination';
 import {
   CollectionObjectTypes,
@@ -37,6 +38,7 @@ export default function MyCollections() {
           page,
           marketplace: 'collection',
         },
+        withPagination: true,
       },
     });
     if (error) {
@@ -70,13 +72,17 @@ export default function MyCollections() {
         !collections.isLoading && (
           <div className="grid h-full grid-cols-1 gap-4 overflow-hidden pb-4 transition-[max-height] duration-300 ease-in-out sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {collections.data.map((collection) => (
-              <CollectionCard
+              <ShopCard
                 key={collection._id}
                 _id={collection._id}
                 title={collection.title}
-                price={collection.price}
+                price={collection.price.value}
                 rating={collection.rating}
-                imgs={collection.imgs}
+                img={
+                  collection.imgs && collection.imgs.length > 0
+                    ? collection.imgs[0].url
+                    : ''
+                }
                 shortDescription={collection.shortDescription}
                 authors={collection.authors}
                 categories={collection.categories}

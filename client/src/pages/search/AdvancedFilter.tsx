@@ -22,7 +22,7 @@ export default function AdvancedFilter({ highestPrice }: AdvancedFilterTypes) {
   const [searchParams, setSearchParams] = useSearchParams();
   const [openCollapsible, setOpenCollapsible] = useState(false);
   const clearSelectedMarketplace = () => {
-    searchParams.set('marketplace', 'shop');
+    searchParams.delete('marketplace');
     setSearchParams(searchParams, { replace: true });
   };
   const clearSelectedPriceRange = () => {

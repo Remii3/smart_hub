@@ -62,6 +62,7 @@ export default function SearchPage() {
 
     const newFilters = {
       marketplace: searchParams.getAll('marketplace'),
+      strictMarketplace: true,
       selectedPriceRange: {
         maxPrice: searchParams.get('maxPrice') || '',
         minPrice: searchParams.get('minPrice') || '',
@@ -81,6 +82,8 @@ export default function SearchPage() {
         sortOption: newFilters.sortOption,
         strictMarketplace: true,
         searchType: searchParams.get('special'),
+        withPagination: true,
+        withHighestPrice: true,
       },
     });
     if (error) {
@@ -184,7 +187,8 @@ export default function SearchPage() {
       const searchSortMethod = searchParams.get('sortMethod');
 
       if (!searchMarketplace) {
-        searchParams.set('marketplace', 'shop');
+        searchParams.append('marketplace', 'shop');
+        searchParams.append('marketplace', 'collection');
       }
 
       if (!searchRating) {
@@ -348,7 +352,7 @@ export default function SearchPage() {
                       productQuantity={item.quantity}
                       title={item.title}
                       authors={item.authors}
-                      description={item.description}
+                      shortDescription={item.shortDescription}
                       img={
                         item.imgs && item.imgs.length > 0
                           ? item.imgs[0].url

@@ -30,17 +30,19 @@ export default function AuthorsFilter() {
   const selectHandler = (actionMeta: any) => {
     switch (actionMeta.action) {
       case 'select-option': {
-        searchParams.append('author', actionMeta.option.value);
+        searchParams.append('author', actionMeta.option.author_info.pseudonim);
         setSearchParams(searchParams, { replace: true });
         break;
       }
       case 'remove-value': {
-        const categories = searchParams
+        const authors = searchParams
           .getAll('author')
-          .filter((item) => item !== actionMeta.removedValue.value);
+          .filter(
+            (item) => item !== actionMeta.removedValue.author_info.pseudonim
+          );
         searchParams.delete('author');
-        if (categories) {
-          categories.forEach((item) => searchParams.append('author', item));
+        if (authors) {
+          authors.forEach((item) => searchParams.append('author', item));
         }
         setSearchParams(searchParams, { replace: true });
         break;
@@ -54,10 +56,6 @@ export default function AuthorsFilter() {
         break;
     }
   };
-  const defaultValue = searchParams.getAll('author').map((item) => {
-    return { label: item, value: item };
-  });
-
   return (
     <div>
       <Label htmlFor="filterAuthors">Authors filter</Label>
@@ -104,13 +102,18 @@ export default function AuthorsFilter() {
         isMulti
         inputId="filterAuthors"
         options={authorsState.options}
-        defaultValue={defaultValue && defaultValue}
         onChange={(newValue, actionMeta) => selectHandler(actionMeta)}
+        getOptionValue={(author) => author.author_info.pseudonim}
+        getOptionLabel={(author) => author.author_info.pseudonim}
         value={
           searchParams.getAll('author').length <= 0
             ? null
             : searchParams.getAll('author').map((item) => {
-                return { label: item, value: item };
+                return {
+                  label: item,
+                  value: item,
+                  author_info: { pseudonim: item },
+                };
               })
         }
       />
