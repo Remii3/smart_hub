@@ -224,10 +224,18 @@ const getOtherProfile = async (req, res) => {
   }
 
   try {
-    const { role, email, username, user_info, author_info, security_settings } =
-      await User.findOne({
-        _id: userId,
-      }).populate('author_info');
+    const {
+      role,
+      email,
+      username,
+      user_info,
+      author_info,
+      security_settings,
+      _id,
+    } = await User.findOne({
+      _id: userId,
+    }).populate('author_info');
+
     const {
       avg_products_grade,
       categories,
@@ -236,7 +244,6 @@ const getOtherProfile = async (req, res) => {
       quote,
       short_description,
       sold_books_quantity,
-      _id,
     } = author_info;
 
     const userProducts = await Product.find({
@@ -266,7 +273,6 @@ const getOtherProfile = async (req, res) => {
       quote,
       short_description,
       sold_books_quantity,
-      _id,
     };
     let preparedUserInfo = null;
     if (!security_settings.hide_private_information) {
@@ -276,6 +282,7 @@ const getOtherProfile = async (req, res) => {
       return res.status(200).json({
         data: {
           email,
+          _id,
           username,
           user_info: preparedUserInfo,
           author_info: preparedAuthorInfo,
@@ -286,6 +293,7 @@ const getOtherProfile = async (req, res) => {
       return res.status(200).json({
         data: {
           email,
+          _id,
           username,
           user_info: preparedUserInfo,
           role,
@@ -518,6 +526,21 @@ const getFollowedUsers = async (req, res) => {
   }
 };
 
+const getFollowes = async (req, res) => {
+  const { _id } = req.query;
+  try {
+    const data = await User.findOne({ _id }, { 'author_info.followers': 1 });
+    if (data) {
+      return res.json({ data: data.author_info.followers });
+    }
+    return res.json({ data: data });
+  } catch (err) {
+    return res
+      .status(500)
+      .json({ message: 'Failed fetching followers.', error: error.message });
+  }
+};
+
 module.exports = {
   login,
   register,
@@ -531,4 +554,5 @@ module.exports = {
   updateOneUser,
   getFollowedUsers,
   deleteOneUser,
+  getFollowes,
 };

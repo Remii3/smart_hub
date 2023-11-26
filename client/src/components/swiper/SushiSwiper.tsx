@@ -84,7 +84,7 @@ export default function SushiSwiper({
             <div className="flex items-center sm:flex-row">
               {[...Array(3)].map((el, index) => (
                 <div
-                  key={index}
+                  key={index + 'skeletonCard'}
                   className="h-[383px] w-[calc(100%/1.5)] min-w-[280px] pr-8 sm:w-[calc(100%/1.9)] md:w-[calc(100%/2.9)] lg:w-[calc(100%/3.2)] xl:w-[calc(100%/4.2)]"
                 >
                   <Skeleton
@@ -110,8 +110,8 @@ export default function SushiSwiper({
             arrayOfItems.length > 0 &&
             arrayOfItems.map((item) => (
               <SwiperSlide
-                key={swiperCategory + item._id}
-                id={swiperCategory + item._id}
+                key={item._id}
+                id={item._id}
                 style={{ height: 'auto' }}
                 className="min-w-[280px] pr-8"
               >

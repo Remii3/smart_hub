@@ -72,8 +72,9 @@ const USER_ENDPOINTS = {
   USER_LOGIN: `${MAIN_ROUTES.USER}/login`,
   USER_FOLLOW_ADD: `${MAIN_ROUTES.USER}/follow-add`,
   USER_FOLLOW_REMOVE: `${MAIN_ROUTES.USER}/follow-remove`,
-  USER_UPDATE: `${MAIN_ROUTES.USER}/update`,
   USER_FOLLOWS: `${MAIN_ROUTES.USER}/followed`,
+  USER_FOLLOWERS: `${MAIN_ROUTES.USER}/followers`,
+  USER_UPDATE: `${MAIN_ROUTES.USER}/update`,
   USER_DELETE_ONE: `${MAIN_ROUTES.USER}/delete-one`,
 };
 

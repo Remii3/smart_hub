@@ -108,6 +108,8 @@ const getLatest = async () => {
 
 const getDefault = async (
   query,
+  withPagination,
+  widthHighestPrice,
   sortMethod,
   currentPageSize,
   skipPagesCopy,
@@ -124,32 +126,41 @@ const getDefault = async (
     .populate(['authors', 'categories'])
     .lean();
 
-  const totalDocuments = await Product.find(searchQuery).countDocuments();
-  const totalPages = Math.ceil(totalDocuments / currentPageSize);
-  rawData.totalPages = totalPages;
-  rawData.totalProducts = totalDocuments;
-  const pipeline = [];
-  if (searchQuery) {
+  if (withPagination) {
+    const totalDocuments = await Product.find(searchQuery).countDocuments();
+    const totalPages = Math.ceil(totalDocuments / currentPageSize);
+    rawData.totalPages = totalPages;
+    rawData.totalProducts = totalDocuments;
+  }
+  if (widthHighestPrice) {
+    const pipeline = [];
+    if (searchQuery) {
+      pipeline.push({
+        $match: {
+          ...searchQuery,
+        },
+      });
+    }
     pipeline.push({
-      $match: {
-        ...searchQuery,
+      $group: {
+        _id: null,
+        maxNumber: { $max: '$price.value' },
       },
     });
+
+    getHighestPrice(pipeline, rawData);
   }
-  pipeline.push({
-    $group: {
-      _id: null,
-      maxNumber: { $max: '$price.value' },
-    },
-  });
-  getHighestPrice(pipeline, rawData);
 
   const preparedData = prepareData(productsData);
   return { data: preparedData, rawData };
 };
 
 const mainSearch = async (req, res) => {
-  const { searchType } = req.query;
+  const {
+    searchType,
+    withPagination = false,
+    widthHighestPrice = false,
+  } = req.query;
   const { searchQuery } = req.finalSearchData;
   let { skipPages, currentPageSize, currentPage, marketplace } = req.pageData;
   const sortMethod = req.sortMethod;
@@ -174,6 +185,8 @@ const mainSearch = async (req, res) => {
       default: {
         const data = await getDefault(
           searchQuery,
+          withPagination,
+          widthHighestPrice,
           sortMethod,
           currentPageSize,
           skipPages,
