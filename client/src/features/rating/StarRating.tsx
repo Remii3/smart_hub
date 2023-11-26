@@ -49,7 +49,6 @@ export default function StarRating({
       setHoveredValue(0);
     }
   };
-
   const renderStars = () => {
     const stars = [];
     for (let i = 1; i <= 5; i++) {
@@ -63,7 +62,7 @@ export default function StarRating({
           key={i}
           className={`${
             showOnly ? '' : 'cursor-pointer'
-          } ${colorClass} h-5 w-5 transition duration-150 ease-out`}
+          } ${colorClass} h-5 w-5 transition ease-out`}
           onClick={() => handleStarClick(i)}
           onMouseEnter={() => handleStarHover(i)}
           onMouseLeave={handleStarLeave}

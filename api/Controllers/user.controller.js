@@ -4,8 +4,9 @@ const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
 const Cart = require('../Models/cart');
 const getRandomString = require('../helpers/getRandomString');
-const prepareProductObject = require('../helpers/prepareProductObject');
 const salt = bcrypt.genSaltSync(12);
+const Product = require('../Models/product');
+const cashFormatter = require('../helpers/cashFormatter');
 
 const login = async (req, res) => {
   const { email, password } = req.body;
@@ -138,10 +139,6 @@ const getMyProfile = async (req, res) => {
       { password: 0 },
     ).populate([
       {
-        path: 'author_info',
-        populate: { path: 'my_products' },
-      },
-      {
         path: 'orders',
       },
       {
@@ -164,15 +161,29 @@ const getMyProfile = async (req, res) => {
       sold_books_quantity,
     } = author_info;
 
-    const preparedMyProducts = author_info.my_products.map(item => {
-      return prepareProductObject(item);
-    });
+    const userProducts = await Product.find({
+      $or: [{ authors: _id }, { 'creatorData._id': _id }],
+      sold: false,
+      deleted: false,
+      quantity: { $gt: 0 },
+    }).lean();
+
+    const userProductsCopy = userProducts.map(product => ({
+      ...product,
+      price: {
+        ...product.price,
+        value: `${cashFormatter({
+          number: product.price.value,
+        })}`,
+      },
+    }));
 
     const preparedAuthorInfo = {
       avg_products_grade,
       categories,
       followers,
-      my_products: preparedMyProducts,
+      my_products: userProductsCopy,
+      myCollections: [],
       pseudonim,
       quote,
       short_description,
@@ -194,11 +205,14 @@ const getMyProfile = async (req, res) => {
     };
 
     if (role !== 'User') {
+      preparedAuthorInfo.myCollections = [];
       preparedUserData.author_info = preparedAuthorInfo;
     }
     res.status(200).json({ data: preparedUserData });
   } catch (err) {
-    res.status(500).json({ message: 'Failed to fetch user data' });
+    res
+      .status(500)
+      .json({ message: 'Failed to fetch user data', error: err.message });
   }
 };
 
@@ -210,10 +224,18 @@ const getOtherProfile = async (req, res) => {
   }
 
   try {
-    const { role, email, username, user_info, author_info, security_settings } =
-      await User.findOne({
-        _id: userId,
-      }).populate('author_info.my_products');
+    const {
+      role,
+      email,
+      username,
+      user_info,
+      author_info,
+      security_settings,
+      _id,
+    } = await User.findOne({
+      _id: userId,
+    }).populate('author_info');
+
     const {
       avg_products_grade,
       categories,
@@ -222,23 +244,35 @@ const getOtherProfile = async (req, res) => {
       quote,
       short_description,
       sold_books_quantity,
-      _id,
     } = author_info;
 
-    const preparedMyProducts = author_info.my_products.map(item => {
-      return prepareProductObject(item);
-    });
+    const userProducts = await Product.find({
+      $or: [{ authors: userId }, { 'creatorData._id': userId }],
+      sold: false,
+      deleted: false,
+      quantity: { $gt: 0 },
+    }).lean();
+
+    const userProductsCopy = userProducts.map(product => ({
+      ...product,
+      price: {
+        ...product.price,
+        value: `${cashFormatter({
+          number: product.price.value,
+        })}`,
+      },
+    }));
 
     const preparedAuthorInfo = {
       avg_products_grade,
       categories,
       followers,
-      my_products: preparedMyProducts,
+      my_products: userProductsCopy,
+      myCollections: [],
       pseudonim,
       quote,
       short_description,
       sold_books_quantity,
-      _id,
     };
     let preparedUserInfo = null;
     if (!security_settings.hide_private_information) {
@@ -248,6 +282,7 @@ const getOtherProfile = async (req, res) => {
       return res.status(200).json({
         data: {
           email,
+          _id,
           username,
           user_info: preparedUserInfo,
           author_info: preparedAuthorInfo,
@@ -258,6 +293,7 @@ const getOtherProfile = async (req, res) => {
       return res.status(200).json({
         data: {
           email,
+          _id,
           username,
           user_info: preparedUserInfo,
           role,
@@ -290,16 +326,16 @@ const getGuestProfile = async (req, res) => {
 const getAllAuthors = async (req, res) => {
   try {
     const authors = await User.find({ role: 'Author' });
-    const authorsData = [];
-    for (const author of authors) {
-      authorsData.push({
-        label: author.author_info.pseudonim,
-        value: author.author_info.pseudonim,
-        _id: author._id,
-      });
-    }
+    // const authorsData = [];
+    // for (const author of authors) {
+    //   authorsData.push({
+    //     label: author.author_info.pseudonim,
+    //     value: author.author_info.pseudonim,
+    //     _id: author._id,
+    //   });
+    // }
 
-    return res.status(200).json({ data: authorsData });
+    return res.status(200).json({ data: authors });
   } catch (err) {
     return res
       .status(500)
@@ -358,73 +394,42 @@ const removeOneFollow = async (req, res) => {
   const { followGiverId, followReceiverId } = req.body;
 
   if (!followGiverId) {
-    return res.status(422).json({ message: "Giver id is required" });
+    return res.status(422).json({ message: 'Giver id is required' });
   }
   if (!followReceiverId) {
-    return res.status(422).json({ message: "Receiver id is required" });
+    return res.status(422).json({ message: 'Receiver id is required' });
   }
   try {
     await User.updateOne(
       { _id: followGiverId },
-      { $pull: { following: followReceiverId } }
+      { $pull: { following: followReceiverId } },
     );
     await User.updateOne(
       { _id: followReceiverId },
-      { $pull: { "author_info.followers": followGiverId } }
+      { $pull: { 'author_info.followers': followGiverId } },
     );
-    return res.status(200).json({ message: "success" });
+    return res.status(200).json({ message: 'success' });
   } catch (err) {
     return res
       .status(500)
-      .json({ message: "Failed removing follow", error: err.message });
+      .json({ message: 'Failed removing follow', error: err.message });
   }
 };
 
 const updateOneUser = async (req, res) => {
-  const { userEmail, fieldValue } = req.body;
-  const { fieldPath } = req;
-  try {
-    if (fieldPath === null) {
-      const mainData = {
-        username: fieldValue.username,
-        email: fieldValue.email,
-        role: fieldValue.role,
-      };
-      if (fieldValue.password.trim().length > 0) {
-        mainData.password = bcrypt.hashSync(fieldValue.password, salt);
-      }
-      await User.updateOne(
-        {
-          email: userEmail,
-        },
-        {
-          $set: {
-            ...mainData,
-            "user_info.phone": fieldValue.phone,
-            "user_info.profile_img": fieldValue.profileImg,
-            "user_info.credentials.first_name": fieldValue.firstName,
-            "user_info.credentials.last_name": fieldValue.lastName,
-            "author_info.quote": fieldValue.quote,
-            "author_info.short_description": fieldValue.shortDescription,
-            "author_info.pseudonim": fieldValue.pseudonim,
-          },
-        },
-        { upsert: true }
-      );
-    }
-    if (typeof fieldValue == "object") {
-      await User.updateOne(
-        { email: userEmail },
-        { $set: { [fieldPath]: { ...fieldValue } } }
-      );
-    } else {
-      await User.updateOne(
-        { email: userEmail },
-        { $set: { [fieldPath]: fieldValue } }
-      );
-    }
+  const { userEmail } = req.body;
+  const preparedData = req.preparedData;
 
-    return res.status(200).json({ message: "Successfully updated data" });
+  try {
+    await User.updateOne(
+      {
+        email: userEmail,
+      },
+      preparedData,
+      { upsert: true },
+    );
+
+    return res.status(200).json({ message: 'Successfully updated data' });
   } catch (err) {
     if (err.code === 11000) {
       return res.status(422).json({
@@ -434,7 +439,7 @@ const updateOneUser = async (req, res) => {
     } else {
       return res
         .status(500)
-        .json({ message: "Failed to update data", error: err.message });
+        .json({ message: 'Failed to update data', error: err.message });
     }
   }
 };
@@ -444,11 +449,11 @@ const deleteOneUser = async (req, res) => {
   try {
     await User.deleteOne({ _id: userId });
     await Cart.deleteOne({ user_id: userId });
-    return res.status(200).json({ message: "Success" });
+    return res.status(200).json({ message: 'Success' });
   } catch (err) {
     return res
       .status(500)
-      .json({ message: "Failed deleting user", error: err.message });
+      .json({ message: 'Failed deleting user', error: err.message });
   }
 };
 
@@ -457,7 +462,7 @@ const getFollowedUsers = async (req, res) => {
   const fetchedUserData = [];
 
   if (!userId) {
-    return res.status(402).json({ message: "UserId is required" });
+    return res.status(402).json({ message: 'UserId is required' });
   }
 
   try {
@@ -474,7 +479,7 @@ const getFollowedUsers = async (req, res) => {
           role: authorsData.role,
           user_info: { profile_img: authorsData.user_info.profile_img },
         };
-        if (authorsData.role !== "User") {
+        if (authorsData.role !== 'User') {
           preparedData.author_info = {
             pseudonim: authorsData.author_info.pseudonim,
           };
@@ -486,7 +491,22 @@ const getFollowedUsers = async (req, res) => {
   } catch (err) {
     return res
       .status(500)
-      .json({ message: "Failed loading followed users", error: err.message });
+      .json({ message: 'Failed loading followed users', error: err.message });
+  }
+};
+
+const getFollowes = async (req, res) => {
+  const { _id } = req.query;
+  try {
+    const data = await User.findOne({ _id }, { 'author_info.followers': 1 });
+    if (data) {
+      return res.json({ data: data.author_info.followers });
+    }
+    return res.json({ data: data });
+  } catch (err) {
+    return res
+      .status(500)
+      .json({ message: 'Failed fetching followers.', error: error.message });
   }
 };
 
@@ -503,4 +523,5 @@ module.exports = {
   updateOneUser,
   getFollowedUsers,
   deleteOneUser,
+  getFollowes,
 };

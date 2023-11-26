@@ -23,8 +23,10 @@ import {
 } from '@hooks/useAaccessDatabase';
 import { DialogClose } from '@radix-ui/react-dialog';
 import { useCallback, useContext, useEffect, useState } from 'react';
+import parse from 'html-react-parser';
+import DeleteDialog from '@components/UI/dialogs/DeleteDialog';
 
-type CommentTargetTypes = 'Product' | 'News';
+type CommentTargetTypes = 'Product' | 'News' | 'Collection';
 
 type CommentsTypes = {
   isLoading: boolean;
@@ -33,10 +35,13 @@ type CommentsTypes = {
     | null
     | {
         _id: string;
-        product_id: string;
-        user: AuthorTypes;
+        creatorData: AuthorTypes;
+        targetData: {
+          _id: string;
+        };
         value: { rating: number; text: string };
-        created_at: string;
+        createdAt: string;
+        updatedAt: string;
       }[];
 };
 
@@ -71,7 +76,9 @@ export default function Comments({
     isLoading: false,
     error: null,
   });
-  const [showDeleteDialog, setShowDeleteDialog] = useState<null | string>(null);
+  const [showDeleteDialog, setShowDeleteDialog] = useState<
+    null | boolean | string
+  >(null);
   const { userData } = useContext(UserContext);
   const fetchData = useCallback(async () => {
     setComments((prevState) => {
@@ -96,7 +103,7 @@ export default function Comments({
         isLoading: false,
       });
     }
-  }, []);
+  }, [targetId]);
 
   const addNewCommentHandler = async () => {
     const preparedValue = {} as {
@@ -120,8 +127,10 @@ export default function Comments({
       url: DATABASE_ENDPOINTS.COMMENT_ONE,
       body: {
         userId: userData.data?._id,
-        targetId,
-        target: target,
+        targetData: {
+          _id: targetId,
+          type: target,
+        },
         value: preparedValue,
       },
     });
@@ -171,9 +180,19 @@ export default function Comments({
       fetchData();
     }, 150);
   };
+
+  function limitLines(value: string, maxLines: number) {
+    const lines = value.split('\n');
+
+    if (lines.length > maxLines) {
+      return (value = lines.slice(0, maxLines).join('\n'));
+    }
+    return value;
+  }
+
   return (
-    <div className="mt-8">
-      <h5 className="pb-2">Comments</h5>
+    <article>
+      <h3 className="mb-2 text-4xl">Comments</h3>
       <section className="mb-8">
         <div className="flex flex-col-reverse gap-8 md:flex-row">
           <div>
@@ -232,11 +251,12 @@ export default function Comments({
                 disabled={!userData.data}
                 placeholder={!userData.data ? '' : 'Enter new comment...'}
                 value={newComment.value}
-                onChange={(e) =>
+                onChange={(e) => {
+                  const test = limitLines(e.target.value, 10);
                   setNewComment((prevState) => {
-                    return { ...prevState, value: e.target.value };
-                  })
-                }
+                    return { ...prevState, value: test };
+                  });
+                }}
               />
               {!userData.data && (
                 <div className="absolute top-0 flex h-full w-full items-center justify-center bg-slate-300/20">
@@ -295,9 +315,9 @@ export default function Comments({
                 )}
                 <div className="flex gap-4">
                   <div className="h-14 w-14">
-                    {comment.user.user_info.profile_img.url ? (
+                    {comment.creatorData.user_info.profile_img.url ? (
                       <img
-                        src={comment.user.user_info.profile_img.url}
+                        src={comment.creatorData.user_info.profile_img.url}
                         alt="profile_img"
                         className="h-8 w-8 rounded-full object-cover"
                       />
@@ -306,65 +326,35 @@ export default function Comments({
                     )}
                   </div>
                   <p className="font-semibold">
-                    {comment.user.role !== UserRoleTypes.USER
-                      ? comment.user.author_info.pseudonim
-                      : comment.user.username}
+                    {comment.creatorData.role !== UserRoleTypes.USER
+                      ? comment.creatorData.author_info.pseudonim
+                      : comment.creatorData.username}
                   </p>
                 </div>
               </div>
               <div className="flex w-full flex-col gap-4">
                 <div className="flex justify-end">
                   <small className="text-sm">
-                    {comment.created_at.slice(0, 10)}
+                    {comment.createdAt.slice(0, 10)}
                   </small>
                 </div>
-                <div>{comment.value.text}</div>
+                <div>{parse(comment.value.text.replaceAll('\n', '<br/>'))}</div>
               </div>
-              {(userData.data?._id === comment.user._id ||
+              {(userData.data?._id === comment.creatorData._id ||
                 userData.data?.role == UserRoleTypes.ADMIN) && (
-                <Dialog
-                  open={showDeleteDialog === comment._id}
-                  onOpenChange={() => setShowDeleteDialog(null)}
-                >
-                  <div className="flex items-center">
-                    <Button
-                      variant={'destructive'}
-                      onClick={() => setShowDeleteDialog(comment._id)}
-                      type="button"
-                    >
-                      <TrashIcon className="h-6 w-6" />
-                    </Button>
-                  </div>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>Are you sure?</DialogTitle>
-                      <DialogDescription>
-                        Deleting this will permamently remove the item from the
-                        database.
-                      </DialogDescription>
-                    </DialogHeader>
-                    <DialogFooter>
-                      <Button
-                        type="button"
-                        variant={'destructive'}
-                        onClick={() =>
-                          deleteCommentHandler(comment._id, comment.value)
-                        }
-                      >
-                        Delete
-                      </Button>
-                      <DialogClose asChild>
-                        <Button variant={'outline'} type="button">
-                          Cancel
-                        </Button>
-                      </DialogClose>
-                    </DialogFooter>
-                  </DialogContent>
-                </Dialog>
+                <DeleteDialog
+                  deleteHandler={() =>
+                    deleteCommentHandler(comment._id, comment.value)
+                  }
+                  openState={showDeleteDialog === comment._id}
+                  openStateHandler={setShowDeleteDialog}
+                  onlyIcon
+                  targetId={comment._id}
+                />
               )}
             </div>
           ))}
       </section>
-    </div>
+    </article>
   );
 }

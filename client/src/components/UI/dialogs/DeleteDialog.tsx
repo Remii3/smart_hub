@@ -11,24 +11,35 @@ import {
 
 interface PropsTypes {
   openState: boolean;
-  openStateHandler: (state: boolean) => void;
+  openStateHandler: (state: any) => void;
   deleteHandler: () => void;
+  disableCondition?: boolean;
+  onlyIcon?: boolean;
+  targetId?: string;
 }
 
 export default function ({
   openState,
   openStateHandler,
   deleteHandler,
+  disableCondition = false,
+  onlyIcon = false,
+  targetId,
 }: PropsTypes) {
   return (
-    <Dialog open={openState} onOpenChange={() => openStateHandler(false)}>
+    <Dialog
+      open={openState}
+      onOpenChange={() => openStateHandler(targetId ? null : false)}
+    >
       <Button
-        onClick={() => openStateHandler(true)}
-        variant={'destructive'}
+        onClick={() => openStateHandler(targetId ? targetId : true)}
+        variant={'ghost'}
+        disabled={disableCondition}
         type="button"
+        className="text-red-400 hover:text-red-400"
       >
-        Delete
-        <TrashIcon className="h-6 w-6" />
+        {!onlyIcon && <span>Delete</span>}
+        <TrashIcon className="h-5 w-5" />
       </Button>
       <DialogContent>
         <DialogHeader>
@@ -45,7 +56,11 @@ export default function ({
           >
             Delete
           </Button>
-          <Button variant={'ghost'} type="button">
+          <Button
+            variant={'outline'}
+            type="button"
+            onClick={() => openStateHandler(targetId ? null : false)}
+          >
             Cancel
           </Button>
         </DialogFooter>

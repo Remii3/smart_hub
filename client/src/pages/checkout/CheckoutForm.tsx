@@ -134,7 +134,7 @@ export default function CheckoutForm({
       }
     } else {
       const currentUserId = userData.data?._id || getCookie('guestToken');
-      await usePostAccessDatabase({
+      const { data } = await usePostAccessDatabase({
         url: DATABASE_ENDPOINTS.ORDER_ONE,
         body: {
           buyerId: currentUserId,
@@ -151,7 +151,7 @@ export default function CheckoutForm({
 
       fetchCartData();
       fetchUserData();
-      navigate('/thankyou');
+      navigate(`${data.data._id}/thankyou`);
     }
     setIsLoading(false);
   };

@@ -1,4 +1,4 @@
-import { UnknownProductTypes } from '@customTypes/interfaces';
+import { ProductTypes } from '@customTypes/interfaces';
 
 type FilterTypes = 'Marketplace' | 'Price';
 
@@ -14,7 +14,7 @@ interface FilterProductsTypes {
       }[];
     };
   };
-  products: UnknownProductTypes[];
+  products: ProductTypes[];
 }
 
 export default function useFilterProducts({
@@ -31,8 +31,8 @@ export default function useFilterProducts({
         marketplaces.push(type.name.toLowerCase());
       }
     }
-    filteredProducts = products.filter((product: UnknownProductTypes) => {
-      return marketplaces.includes(product.market_place.toLowerCase());
+    filteredProducts = products.filter((product: ProductTypes) => {
+      return marketplaces.includes(product.marketplace.toLowerCase());
     });
   }
 
@@ -41,17 +41,17 @@ export default function useFilterProducts({
       filteredProducts = products;
     } else if (minPrice === '') {
       filteredProducts = products.filter(
-        (product) => product.shop_info.price <= Number(maxPrice)
+        (product) => Number(product.price.value.slice(1)) <= Number(maxPrice)
       );
     } else if (maxPrice === '') {
       filteredProducts = products.filter(
-        (product) => product.shop_info.price >= Number(minPrice)
+        (product) => Number(product.price.value.slice(1)) >= Number(minPrice)
       );
     } else {
       filteredProducts = products.filter((product) => {
         return (
-          product.shop_info.price >= Number(minPrice) &&
-          product.shop_info.price <= Number(maxPrice)
+          Number(product.price.value.slice(1)) >= Number(minPrice) &&
+          Number(product.price.value.slice(1)) <= Number(maxPrice)
         );
       });
     }

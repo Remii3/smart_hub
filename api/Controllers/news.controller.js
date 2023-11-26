@@ -1,11 +1,49 @@
 const { default: mongoose } = require('mongoose');
 const News = require('../Models/news');
-const User = require('../Models/user');
 const Comment = require('../Models/comment');
 
 const getAllNews = async (req, res) => {
+  const { limit = 6, sortOption } = req.query;
+
+  const pipeline = [];
+
+  switch (sortOption) {
+    case 'latest': {
+      pipeline.push({ $match: { img: { $exists: true } } });
+      pipeline.push({
+        $sort: { createdAt: -1 },
+      });
+      pipeline.push({
+        $limit: Number(limit),
+      });
+      break;
+    }
+    case 'top_rated': {
+      pipeline.push({
+        $match: {
+          'voting.quantity.likes': { $exists: true },
+          'voting.quantity.dislikes': { $exists: true },
+        },
+      });
+      pipeline.push({
+        $addFields: {
+          computedField: {
+            $subtract: ['$voting.quantity.likes', '$voting.quantity.dislikes'],
+          },
+        },
+      });
+      pipeline.push({
+        $sort: { computedField: -1 },
+      });
+      pipeline.push({
+        $limit: Number(limit),
+      });
+      break;
+    }
+  }
+
   try {
-    const data = await News.find({}, { comments: 0 }).sort({ created_at: -1 });
+    const data = await News.aggregate(pipeline);
     return res.status(200).json({ data });
   } catch (err) {
     return res.status(500).json({
@@ -23,12 +61,30 @@ const getOneNews = async (req, res) => {
   }
 
   try {
-    const data = await News.findOne({ _id: newsId }).populate([
-      {
-        path: 'user',
+    const newsData = await News.findOne({ _id: newsId })
+      .populate([
+        {
+          path: 'creatorData',
+          select: ['user_info.profile_img', 'author_info.pseudonim'],
+        },
+      ])
+      .lean();
+    const comments = await Comment.find({ 'targetData._id': newsData._id })
+      .populate('creatorData')
+      .lean();
+
+    const creatorData = newsData.creatorData;
+
+    const preparedData = {
+      ...newsData,
+      comments,
+      creatorData: {
+        _id: creatorData._id,
+        pseudonim: creatorData.author_info.pseudonim,
+        profile_img: creatorData.user_info.profile_img,
       },
-    ]);
-    return res.status(200).json({ data });
+    };
+    return res.status(200).json({ data: preparedData });
   } catch (err) {
     return res.status(500).json({
       message: 'Failed fetching news',
@@ -37,17 +93,13 @@ const getOneNews = async (req, res) => {
   }
 };
 const deleteOneNews = async (req, res) => {
-  const { userId, newsId } = req.body;
+  const { newsId } = req.body;
 
-  if (!userId) {
-    return res.json({ message: 'Provide user id' });
-  }
   if (!newsId) {
     return res.json({ message: 'Provide news id' });
   }
 
   try {
-    await User.updateOne({ _id: userId }, { $pull: { news: newsId } });
     await News.deleteOne({ _id: newsId });
     return res.json({ message: 'News was deleted' });
   } catch (err) {
@@ -65,6 +117,7 @@ const updateOne = async (req, res) => {
   if (img) {
     preparedData.img = img;
   }
+
   try {
     await News.updateOne(
       { _id },
@@ -82,26 +135,28 @@ const updateOne = async (req, res) => {
 };
 
 const addOneNews = async (req, res) => {
-  const { userId, title, subtitle, img, content } = req.body;
+  const { creatorData, title, subtitle, img, shortDescription, content } =
+    req.body;
 
-  if (!userId) {
-    return res.status(422).json({ message: 'Provide user id' });
+  if (!creatorData) {
+    return res.status(422).json({ message: 'Provide creatorData' });
   }
 
   try {
-    const created_at = new Date().getTime();
+    const createdAt = new Date().getTime();
     const _id = new mongoose.Types.ObjectId();
 
     await News.create({
-      user: userId,
+      creatorData,
       _id,
       title,
-      subtitle: subtitle || null,
-      img: img || null,
-      content: content || null,
-      created_at,
+      subtitle,
+      img,
+      shortDescription,
+      content: content,
+      createdAt,
+      updatedAt: createdAt,
     });
-    await User.updateOne({ _id: userId }, { $push: { news: _id } });
     return res.status(201).json({ message: 'Success', id: _id });
   } catch (err) {
     return res.status(500).json({
@@ -111,87 +166,24 @@ const addOneNews = async (req, res) => {
   }
 };
 
-const addOneVote = async (req, res) => {
-  const { userId, newsId, vote } = req.body;
-
-  const voteValue = vote === 'Like' || 'Dislike' ? vote : null;
-
-  if (!userId) {
-    return res.status(422).json({ message: 'Provide user id' });
-  }
-
-  if (!newsId) {
-    return res.status(422).json({ message: 'Provide news id' });
-  }
-
-  if (voteValue === null) {
-    return res.status(422).json({ message: 'Provide proper vote' });
-  }
+const findSearchedNews = async (req, res) => {
+  const searchCopyPipeline = req.searchCopyPipeline;
+  const searchPipeline = req.searchPipeline;
 
   try {
-    await News.updateOne(
-      { _id: newsId },
-      {
-        $push: { 'voting.votes': { userId: userId, vote: voteValue } },
-        $inc: {
-          [`voting.quantity.${vote === 'Like' ? 'likes' : 'dislikes'}`]: 1,
-        },
-      },
-    );
-    return res.status(200).json({ message: 'Succesfully added vote' });
+    const [countResult, newsData] = await Promise.all([
+      News.aggregate(searchPipeline),
+      News.aggregate(searchCopyPipeline),
+    ]);
+    const totalPages =
+      countResult.length > 0 ? countResult[0].totalDocuments : 0;
+
+    return res.json({ data: { data: newsData, rawData: { totalPages } } });
   } catch (err) {
-    return res
-      .status(500)
-      .json({ message: 'Failed adding vote', error: err.message });
-  }
-};
-
-const removeOneVote = async (req, res) => {
-  const { userId, newsId, vote } = req.body;
-
-  const voteValue = vote === 'Like' || 'Dislike' ? vote : null;
-
-  if (!userId) {
-    return res.status(422).json({ message: 'Provide user id' });
-  }
-
-  if (!newsId) {
-    return res.status(422).json({ message: 'Provide news id' });
-  }
-
-  if (voteValue === null) {
-    return res.status(422).json({ message: 'Provide proper vote' });
-  }
-
-  try {
-    await News.updateOne(
-      { _id: newsId },
-      {
-        $pull: { 'voting.votes': { userId: userId } },
-        $inc: {
-          [`voting.quantity.${vote === 'Like' ? 'likes' : 'dislikes'}`]: -1,
-        },
-      },
-    );
-    return res.status(200).json({ message: 'Succesfully removed vote' });
-  } catch (err) {
-    return res
-      .status(500)
-      .json({ message: 'Failed adding vote', error: err.message });
-  }
-};
-
-const getAllVotes = async (req, res) => {
-  const { newsId } = req.query;
-  if (!newsId) {
-    return res.json({ message: 'Provide news id' });
-  }
-
-  try {
-    const data = await News.findOne({ _id: newsId }).select('voting');
-    return res.json({ data });
-  } catch (err) {
-    return res.json({ message: 'Failed getting votes', error: err.message });
+    return res.status(500).json({
+      message: 'Failed searching for news',
+      error: err.message,
+    });
   }
 };
 
@@ -200,8 +192,6 @@ module.exports = {
   getOneNews,
   addOneNews,
   deleteOneNews,
-  addOneVote,
-  removeOneVote,
-  getAllVotes,
   updateOne,
+  findSearchedNews,
 };

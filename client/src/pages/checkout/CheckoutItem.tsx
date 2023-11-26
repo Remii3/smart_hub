@@ -1,14 +1,15 @@
 import { Link } from 'react-router-dom';
-import { CartProductTypes } from '@customTypes/interfaces';
+import { CartProductType } from '@customTypes/interfaces';
 
 export default function CheckoutItem({
   productData,
   inCartQuantity,
-}: CartProductTypes) {
+  totalPrice,
+}: CartProductType) {
   if (!productData) return <div />;
   return (
     <li className="flex items-center gap-4">
-      <Link to={`/shop/${productData._id}`} className="block">
+      <Link to={`/product/${productData._id}`} className="block">
         {productData.imgs && productData.imgs[0] ? (
           <img
             src={productData.imgs[0].url}
@@ -24,14 +25,13 @@ export default function CheckoutItem({
         )}
       </Link>
       <div>
-        <Link to={`/shop/${productData._id}`} className="block">
+        <Link to={`/product/${productData._id}`} className="block">
           <h3 className="m-0 text-sm text-gray-900">{productData.title}</h3>
         </Link>
 
         <dl className="mt-0.5 space-y-px text-[10px] text-gray-600">
           <div>
-            <dt className="inline">Price:</dt>
-            <dd className="inline">{productData.shop_info.price}</dd>
+            <span>{totalPrice}</span>
           </div>
         </dl>
       </div>

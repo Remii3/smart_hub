@@ -1,46 +1,48 @@
-const mongoose = require('mongoose');
-const ShopDataSchema = mongoose.Schema({
-  seller_data: {
-    type: { _id: mongoose.Types.ObjectId, pseudonim: String },
+const { Schema, model } = require('mongoose');
+const ShopDataSchema = new Schema({
+  creatorData: {
+    type: {
+      _id: { type: Schema.Types.ObjectId, required: true },
+      pseudonim: { type: String, required: true },
+    },
     ref: 'User',
   },
   title: { type: String, required: true },
-  description: { type: String },
+  description: { type: String, default: '' },
+  shortDescription: { type: String, default: '' },
+  quantity: { type: Number, required: true },
+  createdAt: { type: Date, required: true, default: Date.now },
+  updatedAt: { type: Date, required: true, default: Date.now },
   imgs: { type: [{ url: String, id: String }] },
   categories: [
     {
-      type: mongoose.Types.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: 'Category',
     },
   ],
-  authors: [{ type: mongoose.Types.ObjectId, ref: 'User' }],
-  avgRating: { type: Number },
-  rating: [
-    {
-      type: {
-        value: Number,
-        commentId: { type: mongoose.Types.ObjectId, ref: 'Comment' },
-        userId: { type: mongoose.Types.ObjectId, ref: 'User' },
-      },
+  rating: {
+    type: {
+      avgRating: { type: Number },
+      quantity: { type: Number },
     },
-  ],
-  quantity: { type: Number, required: true },
-  market_place: { type: String, enum: ['Shop', 'Auction'], required: true },
-  created_at: { type: Date, required: true, default: Date.now },
-  comments: [{ type: mongoose.Types.ObjectId, ref: 'Comment' }],
-  sold: { type: Boolean, default: false },
-  currency: { type: String, default: 'USD' },
-  shop_info: {
-    price: { type: Number },
+    default: {
+      avgRating: 0,
+      quantity: 0,
+    },
   },
-  auction_info: {
-    starting_price: { type: mongoose.Types.Decimal128 },
-    auction_end_date: { type: String },
+  authors: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+  marketplace: { type: String, enum: ['shop', 'collection'], required: true },
+  sold: { type: Boolean, required: true, default: false },
+  price: {
+    type: {
+      value: { type: Number, required: true },
+      currency: { type: String, required: true, default: 'USD' },
+    },
   },
   deleted: { type: Boolean, required: true, default: false },
   expireAt: { type: Date, expires: 0 },
 });
 
-const ShopDataModel = mongoose.model('Product', ShopDataSchema);
+const ShopDataModel = model('Product', ShopDataSchema);
 
 module.exports = ShopDataModel;

@@ -1,7 +1,7 @@
 import { useState, useEffect, ChangeEvent, useCallback, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import AdvancedFilter from '@pages/search/AdvancedFilter';
-import { UnknownProductTypes } from '@customTypes/interfaces';
+import { ProductTypes } from '@customTypes/interfaces';
 import ShopCard from '@components/cards/ShopCard';
 import MainContainer from '@layout/MainContainer';
 import Pagination from '@components/paginations/Pagination';
@@ -12,9 +12,10 @@ import { sortOptions, sortOptionsArray } from '@hooks/useSortProducts';
 import { Badge } from '@components/UI/badge';
 import LoadingCircle from '@components/Loaders/LoadingCircle';
 import { toast } from '@components/UI/use-toast';
+import CollectionCard from '@components/cards/CollectionCard';
 
 interface SearchedProductsDataTypes {
-  products: UnknownProductTypes[];
+  products: ProductTypes[];
   rawData: {
     queries: {
       phrase: string;
@@ -71,13 +72,15 @@ export default function SearchPage() {
       searchedPhrase: searchParams.get('phrase'),
       page: searchParams.get('page'),
       sortOption: searchParams.get('sortMethod'),
-      searchedSpecial: searchParams.get('special'),
     };
     const { data, error } = await useGetAccessDatabase({
-      url: DATABASE_ENDPOINTS.PRODUCT_SEARCHED,
+      url: DATABASE_ENDPOINTS.SEARCH_PRODCOL,
       params: {
         pageSize: pageIteration,
         filtersData: newFilters,
+        sortOption: newFilters.sortOption,
+        strictMarketplace: true,
+        searchType: searchParams.get('special'),
       },
     });
     if (error) {
@@ -91,12 +94,22 @@ export default function SearchPage() {
       });
     }
     setSearchedProductsData({
-      products: data.products,
+      products: data.data,
       rawData: data.rawData,
       isLoading: false,
     });
   }, [searchParams]);
-
+  useEffect(() => {
+    searchParams.set('page', '1');
+    setSearchParams(searchParams);
+  }, [
+    searchParams.get('marketplace'),
+    searchParams.get('maxPrice'),
+    searchParams.get('minPrice'),
+    searchParams.get('rating'),
+    searchParams.get('category'),
+    searchParams.get('author'),
+  ]);
   const removeQueryHandler = (paramValue: string, paramKey: FilterParams) => {
     switch (paramKey) {
       case 'phrase': {
@@ -186,6 +199,7 @@ export default function SearchPage() {
       setSearchParams(searchParams, { replace: true });
     }
   }, []);
+
   return (
     <MainContainer>
       <div className="fixed left-0 right-0 top-16 z-10 flex w-full items-center justify-between bg-background px-4 pb-1 pt-2 md:static md:mb-2 md:px-0 md:pt-0">
@@ -313,7 +327,6 @@ export default function SearchPage() {
           )}
 
           {!searchedProductsData.isLoading &&
-            searchedProductsData.rawData.queries &&
             searchedProductsData.products &&
             searchedProductsData.products.length === 0 && (
               <div className="flex h-full w-full items-center justify-center">
@@ -327,23 +340,23 @@ export default function SearchPage() {
                 searchedProductsData.products &&
                 searchedProductsData.products.map((item) => {
                   return (
-                    item.market_place === 'Shop' && (
-                      <ShopCard
-                        key={item._id}
-                        _id={item._id}
-                        price={item.shop_info.price}
-                        productQuantity={item.quantity}
-                        title={item.title}
-                        authors={item.authors}
-                        description={item.description}
-                        img={
-                          item.imgs && item.imgs.length > 0
-                            ? item.imgs[0].url
-                            : null
-                        }
-                        rating={item.rating}
-                      />
-                    )
+                    <ShopCard
+                      key={item._id}
+                      _id={item._id}
+                      categories={item.categories}
+                      price={item.price.value}
+                      productQuantity={item.quantity}
+                      title={item.title}
+                      authors={item.authors}
+                      description={item.description}
+                      img={
+                        item.imgs && item.imgs.length > 0
+                          ? item.imgs[0].url
+                          : null
+                      }
+                      rating={item.rating}
+                      type={item.marketplace}
+                    />
                   );
                 })}
             </div>

@@ -2,41 +2,44 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination } from 'swiper';
 import SuspenseComponent from '@components/suspense/SuspenseComponent';
 import LoadingCircle from '@components/Loaders/LoadingCircle';
+import { useEffect } from 'react';
 
 import 'swiper/css';
 import 'swiper/css/pagination';
 import 'swiper/css/navigation';
-import { MarketplaceTypes } from '@customTypes/types';
 import ShopCard from '@components/cards/ShopCard';
 import ErrorMessage from '@components/UI/error/ErrorMessage';
 import { Skeleton } from '@components/UI/skeleton';
+import SwiperArrowRight from './navigation/SwiperArrowRight';
+import SwiperArrowLeft from './navigation/SwiperArrowLeft';
+import SwiperDots from './pagination/SwiperDots';
 
 interface PropsTypes {
   swiperCategory: string;
   arrayOfItems: any[] | null;
-  itemsType: MarketplaceTypes;
-  loadingState: boolean;
-  errorState: string | null;
+  loadingState?: boolean;
+  errorState?: string | null;
 }
 
 export default function SushiSwiper({
   swiperCategory,
   arrayOfItems,
-  itemsType,
   loadingState,
   errorState,
 }: PropsTypes) {
+  useEffect(() => {}, [swiperCategory]);
   return (
     <div className="relative">
       <Swiper
         navigation={{
-          nextEl: `.swiper-${swiperCategory}-button-next`,
-          prevEl: `.swiper-${swiperCategory}-button-prev`,
+          nextEl: `.swiper-${swiperCategory}-next`,
+          prevEl: `.swiper-${swiperCategory}-prev`,
         }}
         grabCursor
         slidesPerView={1.2}
         pagination={{
           clickable: true,
+          el: `.swiper-${swiperCategory}-pagination`,
         }}
         breakpoints={{
           540: {
@@ -81,7 +84,7 @@ export default function SushiSwiper({
             <div className="flex items-center sm:flex-row">
               {[...Array(3)].map((el, index) => (
                 <div
-                  key={index}
+                  key={index + 'skeletonCard'}
                   className="h-[383px] w-[calc(100%/1.5)] min-w-[280px] pr-8 sm:w-[calc(100%/1.9)] md:w-[calc(100%/2.9)] lg:w-[calc(100%/3.2)] xl:w-[calc(100%/4.2)]"
                 >
                   <Skeleton
@@ -105,37 +108,33 @@ export default function SushiSwiper({
           {!loadingState &&
             arrayOfItems &&
             arrayOfItems.length > 0 &&
-            arrayOfItems.map(
-              (item) =>
-                itemsType === 'Shop' && (
-                  <SwiperSlide
-                    key={swiperCategory + item._id}
-                    className="min-w-[280px] pr-8"
-                  >
-                    <ShopCard
-                      _id={item._id}
-                      price={item.shop_info.price}
-                      productQuantity={item.quantity}
-                      title={item.title}
-                      authors={item.authors}
-                      description={item.description}
-                      img={
-                        item.imgs && item.imgs.length > 0
-                          ? item.imgs[0].url
-                          : ''
-                      }
-                      rating={item.rating}
-                    />
-                  </SwiperSlide>
-                )
-            )}
+            arrayOfItems.map((item) => (
+              <SwiperSlide
+                key={item._id}
+                id={item._id}
+                style={{ height: 'auto' }}
+                className="min-w-[280px] pr-8"
+              >
+                <ShopCard
+                  _id={item._id}
+                  categories={item.categories}
+                  price={item.price.value}
+                  productQuantity={item.quantity}
+                  title={item.title}
+                  authors={item.authors}
+                  description={item.description}
+                  img={
+                    item.imgs && item.imgs.length > 0 ? item.imgs[0].url : ''
+                  }
+                  rating={item.rating}
+                  type={item.marketplace}
+                />
+              </SwiperSlide>
+            ))}
         </SuspenseComponent>
-        <div
-          className={`swiper-button-next swiper-${swiperCategory}-button-next color-primary right-0 flex items-center justify-center rounded-full bg-white p-8 opacity-90 backdrop-blur-sm`}
-        ></div>
-        <div
-          className={`swiper-button-prev swiper-${swiperCategory}-button-prev color-primary left-0 flex items-center justify-center rounded-full bg-white p-8 opacity-90 backdrop-blur-sm`}
-        ></div>
+        <SwiperArrowRight elId={`swiper-${swiperCategory}-next`} />
+        <SwiperArrowLeft elId={`swiper-${swiperCategory}-prev`} />
+        <SwiperDots elId={`swiper-${swiperCategory}-pagination`} />
       </Swiper>
     </div>
   );
