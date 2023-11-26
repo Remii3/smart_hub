@@ -12,7 +12,7 @@ export default function ShopCard({
   _id,
   title,
   authors,
-  description,
+  shortDescription,
   price,
   img,
   productQuantity,
@@ -85,7 +85,9 @@ export default function ShopCard({
                 </span>
               ))}
             </div>
-            <p className="mb-1 line-clamp-3 min-h-[72px]">{description}</p>
+            <div className="mb-1 line-clamp-3 min-h-[72px]">
+              {shortDescription}
+            </div>
           </div>
         </div>
         <div className="px-3 pb-3">

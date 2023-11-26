@@ -2,12 +2,8 @@ const Order = require('../Models/order');
 const Product = require('../Models/product');
 const cashFormatter = require('../helpers/cashFormatter');
 
-const getHighestPrice = async (pipeline, rawData) => {
+const getHighestPrice = async pipeline => {
   const highestPrice = await Product.aggregate(pipeline);
-  rawData.highestPrice =
-    highestPrice.length > 0
-      ? cashFormatter({ number: highestPrice[0].maxNumber })
-      : cashFormatter({ number: 0 });
 
   return highestPrice;
 };
@@ -109,7 +105,7 @@ const getLatest = async () => {
 const getDefault = async (
   query,
   withPagination,
-  widthHighestPrice,
+  withHighestPrice,
   sortMethod,
   currentPageSize,
   skipPagesCopy,
@@ -132,7 +128,7 @@ const getDefault = async (
     rawData.totalPages = totalPages;
     rawData.totalProducts = totalDocuments;
   }
-  if (widthHighestPrice) {
+  if (withHighestPrice) {
     const pipeline = [];
     if (searchQuery) {
       pipeline.push({
@@ -148,7 +144,11 @@ const getDefault = async (
       },
     });
 
-    getHighestPrice(pipeline, rawData);
+    const highestPrice = await getHighestPrice(pipeline, rawData);
+    rawData.highestPrice =
+      highestPrice.length > 0
+        ? cashFormatter({ number: highestPrice[0].maxNumber })
+        : cashFormatter({ number: 0 });
   }
 
   const preparedData = prepareData(productsData);
@@ -159,7 +159,7 @@ const mainSearch = async (req, res) => {
   const {
     searchType,
     withPagination = false,
-    widthHighestPrice = false,
+    withHighestPrice = false,
   } = req.query;
   const { searchQuery } = req.finalSearchData;
   let { skipPages, currentPageSize, currentPage, marketplace } = req.pageData;
@@ -186,7 +186,7 @@ const mainSearch = async (req, res) => {
         const data = await getDefault(
           searchQuery,
           withPagination,
-          widthHighestPrice,
+          withHighestPrice,
           sortMethod,
           currentPageSize,
           skipPages,

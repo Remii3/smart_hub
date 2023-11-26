@@ -152,7 +152,7 @@ export interface CartProductType {
 export interface ProductCardTypes {
   _id: string;
   title: string;
-  description: string;
+  shortDescription: string;
   authors: AuthorTypes[];
   price: string;
   img: string | null;

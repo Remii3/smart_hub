@@ -141,7 +141,6 @@ export default function BasicShopWidget({
 
       <SushiSwiper
         swiperCategory={category}
-        itemsType="shop"
         arrayOfItems={products.data}
         loadingState={products.isLoading}
         errorState={products.hasError}
