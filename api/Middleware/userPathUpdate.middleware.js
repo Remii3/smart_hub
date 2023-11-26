@@ -1,51 +1,96 @@
 const { verifyNewUserData } = require('../helpers/verify');
+const bcrypt = require('bcrypt');
 
 const userPathUpdate = (req, res, next) => {
-  let { fieldKey, fieldValue } = req.body;
-  const errors = verifyNewUserData(fieldKey, fieldValue);
+  const salt = bcrypt.genSaltSync(12);
+  const { dirtyData } = req.body;
+  const preparedData = {};
 
-  if (errors.length > 0) {
-    return res.status(422).json(errors[0]);
+  if (dirtyData.username) {
+    preparedData['$set'] = { username: dirtyData.username };
   }
 
-  let fieldPath = fieldKey;
-
-  switch (fieldKey) {
-    case null:
-      fieldPath = null;
-      break;
-    case 'phone':
-      fieldPath = `user_info.${fieldKey}`;
-      break;
-    case 'first_name':
-      fieldPath = `user_info.credentials.${fieldKey}`;
-      break;
-    case 'last_name':
-      fieldPath = `user_info.credentials.${fieldKey}`;
-      break;
-    case 'address':
-      fieldPath = `user_info.${fieldKey}`;
-      break;
-    case 'password':
-      fieldValue = bcrypt.hashSync(fieldValue, salt);
-      break;
-    case 'pseudonim':
-      fieldPath = `author_info.${fieldKey}`;
-      break;
-    case 'short_description':
-      fieldPath = `author_info.${fieldKey}`;
-      break;
-    case 'quote':
-      fieldPath = `author_info.${fieldKey}`;
-      break;
-    case 'hide_private_information':
-      fieldPath = `security_settings.${fieldKey}`;
-      break;
-    case 'profile_img':
-      fieldPath = `user_info.${fieldKey}`;
-      break;
+  if (dirtyData.firstName) {
+    preparedData['$set'] = {
+      ...preparedData['$set'],
+      'user_info.credentials.first_name': dirtyData.firstName,
+    };
   }
-  req.fieldPath = fieldPath;
+
+  if (dirtyData.lastName) {
+    preparedData['$set'] = {
+      ...preparedData['$set'],
+      'user_info.credentials.last_name': dirtyData.lastName,
+    };
+  }
+
+  if (dirtyData.password) {
+    const copyPassword = bcrypt.hashSync(dirtyData.password, salt);
+    preparedData['$set'] = { password: copyPassword };
+  }
+
+  if (dirtyData.phone) {
+    preparedData['$set'] = { 'user_info.phone': dirtyData.phone };
+  }
+
+  if (dirtyData.quote) {
+    preparedData['$set'] = { 'author_info.quote': dirtyData.quote };
+  }
+
+  if (dirtyData.pseudonim) {
+    preparedData['$set'] = { 'author_info.pseudonim': dirtyData.pseudonim };
+  }
+
+  if (dirtyData.shortDescription) {
+    preparedData['$set'] = {
+      'author_info.short_description': dirtyData.shortDescription,
+    };
+  }
+
+  if (dirtyData.line1) {
+    preparedData['$set'] = {
+      ...preparedData['$set'],
+      'user_info.address.line1': dirtyData.line1,
+    };
+  }
+  if (dirtyData.line2) {
+    preparedData['$set'] = {
+      ...preparedData['$set'],
+      'user_info.address.line2': dirtyData.line2,
+    };
+  }
+  if (dirtyData.city) {
+    preparedData['$set'] = {
+      ...preparedData['$set'],
+      'user_info.address.city': dirtyData.city,
+    };
+  }
+  if (dirtyData.state) {
+    preparedData['$set'] = {
+      ...preparedData['$set'],
+      'user_info.address.state': dirtyData.state,
+    };
+  }
+  if (dirtyData.postalCode) {
+    preparedData['$set'] = {
+      ...preparedData['$set'],
+      'user_info.address.postal_code': dirtyData.postalCode,
+    };
+  }
+  if (dirtyData.country) {
+    preparedData['$set'] = {
+      ...preparedData['$set'],
+      'user_info.address.country': dirtyData.country,
+    };
+  }
+  if (dirtyData.profileImg) {
+    preparedData['$set'] = {
+      ...preparedData['$set'],
+      'user_info.profile_img': dirtyData.profileImg,
+    };
+  }
+
+  req.preparedData = preparedData;
   next();
 };
 

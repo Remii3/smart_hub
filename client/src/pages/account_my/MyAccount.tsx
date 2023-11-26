@@ -33,7 +33,6 @@ import {
 
 import { useToast } from '@components/UI/use-toast';
 import Follows from './tabs/Follows';
-import NewCollection from './NewCollection';
 import MyCollections from './tabs/myCollections/MyCollections';
 
 type TabKeysTypes =
@@ -118,12 +117,6 @@ export default function MyAccount() {
   const initialTab = (lastSearchQuery as TabNamesTypes) || TABS_ARRAY[0].name;
 
   const [selectedtab, setSelectedtab] = useState<TabNamesTypes>(initialTab);
-  const [selecteProfiledImg, setSelectedProfileImg] =
-    useState<SelectedProfileImgTypes>({
-      isLoading: false,
-      data: null,
-      error: null,
-    });
 
   const navigate = useNavigate();
   const path = useLocation();
@@ -135,53 +128,6 @@ export default function MyAccount() {
       { pathname: path.pathname, search: `tab=${option}` },
       { replace: true }
     );
-  };
-
-  const uploadProfileImg = async (e: ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files)
-      return setSelectedProfileImg((prevState) => {
-        return { ...prevState, error: 'No img was selected' };
-      });
-
-    setSelectedProfileImg((prevState) => {
-      return { ...prevState, isLoading: true };
-    });
-    if (!userData.data && !userData.isLoading) {
-      navigate('/account/register');
-    }
-    if (!userData.data) {
-      return <></>;
-    }
-
-    const uploadData = await useUploadImg({
-      selectedFile: e.target.files[0],
-      ownerId: userData.data._id,
-      targetLocation: 'Profile_img',
-    });
-
-    if (uploadData) {
-      await usePostAccessDatabase({
-        url: DATABASE_ENDPOINTS.USER_UPDATE,
-        body: {
-          userEmail: userData.data.email,
-          fieldValue: uploadData,
-          fieldKey: e.target.name,
-        },
-      });
-      fetchUserData();
-      setSelectedProfileImg({ data: null, error: null, isLoading: false });
-    } else {
-      toast({
-        variant: 'destructive',
-        title: 'Uh oh! Something went wrong.',
-        description: 'Failed adding profile img',
-      });
-      setSelectedProfileImg({
-        data: null,
-        error: 'Failed adding profile img',
-        isLoading: false,
-      });
-    }
   };
 
   if (!userData.data || userData.isLoading) return <></>;
@@ -200,46 +146,19 @@ export default function MyAccount() {
       <header className="py-8 sm:pb-9 sm:pt-12">
         <div className="gap-2 sm:flex sm:items-end sm:justify-between md:items-center">
           <div className="flex flex-col items-center gap-4 sm:items-start md:flex-row">
-            <button type="button" className="group relative ">
-              <label
-                className={`${
-                  selecteProfiledImg.isLoading && 'opacity-100'
-                } absolute flex h-full w-full cursor-pointer items-center justify-center rounded-full bg-slate-200/60 opacity-50 transition duration-150 ease-in-out group-hover:opacity-100`}
-              >
-                <input
-                  type="file"
-                  name="profile_img"
-                  onChange={(e) => uploadProfileImg(e)}
-                  className="hidden"
-                  accept="image/png, image/jpg, image/jpeg"
-                />
-                {!selecteProfiledImg.isLoading && (
-                  <PlusCircleIcon className="h-10 w-10 text-slate-800" />
-                )}
-                {selecteProfiledImg.isLoading && (
-                  <div
-                    className="absolute mx-auto block h-6 w-6 animate-spin rounded-full border-[3px] border-current border-t-primary text-background"
-                    role="status"
-                    aria-label="loading"
-                  >
-                    <span className="sr-only">Loading...</span>
-                  </div>
-                )}
-              </label>
-              {userData.data.user_info.profile_img.url ? (
-                <img
-                  className="inline-block h-24 w-24 rounded-full object-cover ring-2 ring-white"
-                  src={userData.data.user_info.profile_img.url}
-                  alt="avatar_img"
-                />
-              ) : (
-                <img
-                  src="https://firebasestorage.googleapis.com/v0/b/smarthub-75eab.appspot.com/o/static_imgs%2Fnophoto.webp?alt=media&token=a974d32e-108a-4c21-be71-de358368a167"
-                  className="inline-block h-24 w-24 rounded-full object-cover ring-2 ring-white"
-                  alt="profile_img"
-                />
-              )}
-            </button>
+            {userData.data.user_info.profile_img.url ? (
+              <img
+                className="inline-block h-24 w-24 rounded-full object-cover ring-2 ring-white"
+                src={userData.data.user_info.profile_img.url}
+                alt="avatar_img"
+              />
+            ) : (
+              <img
+                src="https://firebasestorage.googleapis.com/v0/b/smarthub-75eab.appspot.com/o/static_imgs%2Fnophoto.webp?alt=media&token=a974d32e-108a-4c21-be71-de358368a167"
+                className="inline-block h-24 w-24 rounded-full object-cover ring-2 ring-white"
+                alt="profile_img"
+              />
+            )}
 
             <div className="pt-1 text-center sm:text-left">
               <h1 className="text-2xl font-bold text-foreground sm:text-5xl">
