@@ -12,6 +12,7 @@ import {
 } from '@hooks/useAaccessDatabase';
 import { DATABASE_ENDPOINTS } from '@data/endpoints';
 import errorToast from '@components/UI/error/errorToast';
+import { Badge } from '@components/UI/badge';
 
 interface FollowersTypes extends FetchDataTypes {
   followers: null | string[];
@@ -108,15 +109,19 @@ export default function OtherUserInfo({
           />
         )}
       </div>
-      <MarketplaceBadge
-        message={otherUserData.role}
-        color={
-          otherUserData.role === 'Author' ? 'text-purple-700' : 'text-cyan-700'
-        }
-        bgColor={
-          otherUserData.role === 'Author' ? 'bg-purple-100' : 'bg-cyan-100'
-        }
-      />
+      <Badge
+        variant={'outline'}
+        className={`${
+          otherUserData.role === UserRoleTypes.AUTHOR &&
+          'bg-purple-100 text-purple-700'
+        } ${
+          otherUserData.role === UserRoleTypes.ADMIN &&
+          'bg-cyan-100 text-cyan-700'
+        }`}
+      >
+        {otherUserData.role}
+      </Badge>
+
       <h3 className="mb-4">
         {otherUserData.author_info
           ? otherUserData.author_info.pseudonim

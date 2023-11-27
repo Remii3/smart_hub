@@ -94,7 +94,7 @@ export default function MyProducts({ tag, limit }: PropsTypes) {
                 productQuantity={product.quantity}
                 title={product.title}
                 authors={product.authors}
-                description={product.description}
+                shortDescription={product.shortDescription}
                 type={product.marketplace}
                 img={
                   (product.imgs &&

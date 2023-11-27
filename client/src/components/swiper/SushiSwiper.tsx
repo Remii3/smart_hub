@@ -1,5 +1,5 @@
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Navigation, Pagination } from 'swiper';
+import { Navigation, Pagination } from 'swiper/modules';
 import SuspenseComponent from '@components/suspense/SuspenseComponent';
 import LoadingCircle from '@components/Loaders/LoadingCircle';
 import { useEffect } from 'react';

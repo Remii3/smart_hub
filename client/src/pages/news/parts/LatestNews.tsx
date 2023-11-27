@@ -1,6 +1,6 @@
 import { NewsType } from '@customTypes/interfaces';
 import { useState } from 'react';
-import { Autoplay, Navigation, Pagination } from 'swiper';
+import { Autoplay, Navigation, Pagination } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Dialog, DialogContent } from '@components/UI/dialog';
 import NewsArticle from '../popup/NewsArticle';

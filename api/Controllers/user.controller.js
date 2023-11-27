@@ -1,12 +1,12 @@
-const User = require('../Models/user');
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-const mongoose = require('mongoose');
-const Cart = require('../Models/cart');
-const getRandomString = require('../helpers/getRandomString');
+const User = require("../Models/user");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const mongoose = require("mongoose");
+const Cart = require("../Models/cart");
+const getRandomString = require("../helpers/getRandomString");
 const salt = bcrypt.genSaltSync(12);
-const Product = require('../Models/product');
-const cashFormatter = require('../helpers/cashFormatter');
+const Product = require("../Models/product");
+const cashFormatter = require("../helpers/cashFormatter");
 
 const login = async (req, res) => {
   const { email, password } = req.body;
@@ -14,16 +14,16 @@ const login = async (req, res) => {
   const userDoc = await User.findOne({ email });
   if (!userDoc)
     return res.status(422).json({
-      name: 'email',
-      error: 'No account found',
-      message: 'No account found',
+      name: "email",
+      error: "No account found",
+      message: "No account found",
     });
   const passwordVerification = bcrypt.compareSync(password, userDoc.password);
   if (!passwordVerification)
     return res.status(422).json({
-      name: 'password',
-      error: 'Invalid password',
-      message: 'Invalid password',
+      name: "password",
+      error: "Invalid password",
+      message: "Invalid password",
     });
   jwt.sign(
     {
@@ -33,9 +33,9 @@ const login = async (req, res) => {
     process.env.JWT_SECRET,
     {},
     (err, token) => {
-      if (err) throw 'firts';
-      return res.status(200).cookie('token', token).json({ data: userDoc });
-    },
+      if (err) throw "firts";
+      return res.status(200).cookie("token", token).json({ data: userDoc });
+    }
   );
 };
 
@@ -59,14 +59,14 @@ const register = async (req, res) => {
           full_name: `${credentials.firstName} ${credentials.lastName}`,
         },
         address: {
-          line1: '',
-          line2: '',
-          city: '',
-          state: '',
-          postal_code: '',
-          country: '',
+          line1: "",
+          line2: "",
+          city: "",
+          state: "",
+          postal_code: "",
+          country: "",
         },
-        phone: '',
+        phone: "",
       },
       cart: cartId,
       following: [],
@@ -74,8 +74,8 @@ const register = async (req, res) => {
       author_info: {
         categories: [],
         pseudonim: `${credentials.firstName} ${credentials.lastName}`,
-        short_description: '',
-        quote: '',
+        short_description: "",
+        quote: "",
         avg_products_grade: 0,
         sold_books_quantity: 0,
         my_products: [],
@@ -97,12 +97,12 @@ const register = async (req, res) => {
       process.env.JWT_SECRET,
       {},
       (err, token) => {
-        if (err) throw 'firts';
+        if (err) throw "firts";
         return res
           .status(201)
-          .cookie('token', token)
-          .json({ message: 'Succesfully created an account' });
-      },
+          .cookie("token", token)
+          .json({ message: "Succesfully created an account" });
+      }
     );
   } catch (err) {
     if (err.code === 11000) {
@@ -110,12 +110,12 @@ const register = async (req, res) => {
       return res.status(422).json({
         message: Object.values(responseObject)[0] + ` already exists`,
         error: err.message,
-        name: 'email',
+        name: "email",
       });
     }
     return res
       .status(500)
-      .json({ message: 'Failed to register', error: err.message });
+      .json({ message: "Failed to register", error: err.message });
   }
 };
 
@@ -136,14 +136,14 @@ const getMyProfile = async (req, res) => {
       {
         _id: req.user.user_id,
       },
-      { password: 0 },
+      { password: 0 }
     ).populate([
       {
-        path: 'orders',
+        path: "orders",
       },
       {
-        path: 'orders',
-        populate: { path: 'products.product' },
+        path: "orders",
+        populate: { path: "products.product" },
       },
     ]);
 
@@ -162,13 +162,13 @@ const getMyProfile = async (req, res) => {
     } = author_info;
 
     const userProducts = await Product.find({
-      $or: [{ authors: _id }, { 'creatorData._id': _id }],
+      $or: [{ authors: _id }, { "creatorData._id": _id }],
       sold: false,
       deleted: false,
       quantity: { $gt: 0 },
     }).lean();
 
-    const userProductsCopy = userProducts.map(product => ({
+    const userProductsCopy = userProducts.map((product) => ({
       ...product,
       price: {
         ...product.price,
@@ -204,7 +204,7 @@ const getMyProfile = async (req, res) => {
       news,
     };
 
-    if (role !== 'User') {
+    if (role !== "User") {
       preparedAuthorInfo.myCollections = [];
       preparedUserData.author_info = preparedAuthorInfo;
     }
@@ -212,7 +212,7 @@ const getMyProfile = async (req, res) => {
   } catch (err) {
     res
       .status(500)
-      .json({ message: 'Failed to fetch user data', error: err.message });
+      .json({ message: "Failed to fetch user data", error: err.message });
   }
 };
 
@@ -220,7 +220,7 @@ const getOtherProfile = async (req, res) => {
   const { userId } = req.query;
 
   if (!userId) {
-    return res.status(422).json({ message: 'user id is required' });
+    return res.status(422).json({ message: "user id is required" });
   }
 
   try {
@@ -234,7 +234,7 @@ const getOtherProfile = async (req, res) => {
       _id,
     } = await User.findOne({
       _id: userId,
-    }).populate('author_info');
+    }).populate("author_info");
 
     const {
       avg_products_grade,
@@ -247,13 +247,13 @@ const getOtherProfile = async (req, res) => {
     } = author_info;
 
     const userProducts = await Product.find({
-      $or: [{ authors: userId }, { 'creatorData._id': userId }],
+      $or: [{ authors: userId }, { "creatorData._id": userId }],
       sold: false,
       deleted: false,
       quantity: { $gt: 0 },
     }).lean();
 
-    const userProductsCopy = userProducts.map(product => ({
+    const userProductsCopy = userProducts.map((product) => ({
       ...product,
       price: {
         ...product.price,
@@ -278,7 +278,7 @@ const getOtherProfile = async (req, res) => {
     if (!security_settings.hide_private_information) {
       preparedUserInfo = user_info;
     }
-    if (role !== 'User') {
+    if (role !== "User") {
       return res.status(200).json({
         data: {
           email,
@@ -303,7 +303,7 @@ const getOtherProfile = async (req, res) => {
   } catch (err) {
     return res
       .status(500)
-      .json({ message: 'Failed to fetch user data', error: err.message });
+      .json({ message: "Failed to fetch user data", error: err.message });
   }
 };
 
@@ -316,16 +316,16 @@ const getGuestProfile = async (req, res) => {
     getRandomString(40),
     {},
     (err, token) => {
-      if (err) res.status(500).json({ message: 'Failed to fetch guest Data' });
+      if (err) res.status(500).json({ message: "Failed to fetch guest Data" });
       token = token.slice(token.length - 12, token.length);
-      res.status(200).cookie('guestToken', token).json('Success');
-    },
+      res.status(200).cookie("guestToken", token).json("Success");
+    }
   );
 };
 
 const getAllAuthors = async (req, res) => {
   try {
-    const authors = await User.find({ role: 'Author' });
+    const authors = await User.find({ role: "Author" });
     // const authorsData = [];
     // for (const author of authors) {
     //   authorsData.push({
@@ -339,13 +339,13 @@ const getAllAuthors = async (req, res) => {
   } catch (err) {
     return res
       .status(500)
-      .json({ message: 'Failed to fetch authors', error: err.message });
+      .json({ message: "Failed to fetch authors", error: err.message });
   }
 };
 
 const getAllAdmins = async (req, res) => {
   try {
-    const admins = await User.find({ role: 'Admin' });
+    const admins = await User.find({ role: "Admin" });
     const adminData = [];
     for (const admin of admins) {
       adminData.push({
@@ -359,7 +359,7 @@ const getAllAdmins = async (req, res) => {
   } catch (err) {
     return res
       .status(500)
-      .json({ message: 'Failed to fetch authors', error: err.message });
+      .json({ message: "Failed to fetch authors", error: err.message });
   }
 };
 
@@ -367,26 +367,26 @@ const addOneFollow = async (req, res) => {
   const { followGiverId, followReceiverId } = req.body;
 
   if (!followGiverId) {
-    return res.status(422).json({ message: 'Giver id is required' });
+    return res.status(422).json({ message: "Giver id is required" });
   }
   if (!followReceiverId) {
-    return res.status(422).json({ message: 'Receiver id is required' });
+    return res.status(422).json({ message: "Receiver id is required" });
   }
 
   try {
     await User.updateOne(
       { _id: followGiverId },
-      { $addToSet: { following: followReceiverId } },
+      { $addToSet: { following: followReceiverId } }
     );
     await User.updateOne(
       { _id: followReceiverId },
-      { $addToSet: { 'author_info.followers': followGiverId } },
+      { $addToSet: { "author_info.followers": followGiverId } }
     );
-    return res.status(200).json({ message: 'success' });
+    return res.status(200).json({ message: "success" });
   } catch (err) {
     return res
       .status(500)
-      .json({ message: 'Failed adding follow', error: err.message });
+      .json({ message: "Failed adding follow", error: err.message });
   }
 };
 
@@ -394,25 +394,25 @@ const removeOneFollow = async (req, res) => {
   const { followGiverId, followReceiverId } = req.body;
 
   if (!followGiverId) {
-    return res.status(422).json({ message: 'Giver id is required' });
+    return res.status(422).json({ message: "Giver id is required" });
   }
   if (!followReceiverId) {
-    return res.status(422).json({ message: 'Receiver id is required' });
+    return res.status(422).json({ message: "Receiver id is required" });
   }
   try {
     await User.updateOne(
       { _id: followGiverId },
-      { $pull: { following: followReceiverId } },
+      { $pull: { following: followReceiverId } }
     );
     await User.updateOne(
       { _id: followReceiverId },
-      { $pull: { 'author_info.followers': followGiverId } },
+      { $pull: { "author_info.followers": followGiverId } }
     );
-    return res.status(200).json({ message: 'success' });
+    return res.status(200).json({ message: "success" });
   } catch (err) {
     return res
       .status(500)
-      .json({ message: 'Failed removing follow', error: err.message });
+      .json({ message: "Failed removing follow", error: err.message });
   }
 };
 
@@ -426,10 +426,10 @@ const updateOneUser = async (req, res) => {
         email: userEmail,
       },
       preparedData,
-      { upsert: true },
+      { upsert: true }
     );
 
-    return res.status(200).json({ message: 'Successfully updated data' });
+    return res.status(200).json({ message: "Successfully updated data" });
   } catch (err) {
     if (err.code === 11000) {
       return res.status(422).json({
@@ -439,7 +439,7 @@ const updateOneUser = async (req, res) => {
     } else {
       return res
         .status(500)
-        .json({ message: 'Failed to update data', error: err.message });
+        .json({ message: "Failed to update data", error: err.message });
     }
   }
 };
@@ -449,11 +449,11 @@ const deleteOneUser = async (req, res) => {
   try {
     await User.deleteOne({ _id: userId });
     await Cart.deleteOne({ user_id: userId });
-    return res.status(200).json({ message: 'Success' });
+    return res.status(200).json({ message: "Success" });
   } catch (err) {
     return res
       .status(500)
-      .json({ message: 'Failed deleting user', error: err.message });
+      .json({ message: "Failed deleting user", error: err.message });
   }
 };
 
@@ -462,7 +462,7 @@ const getFollowedUsers = async (req, res) => {
   const fetchedUserData = [];
 
   if (!userId) {
-    return res.status(402).json({ message: 'UserId is required' });
+    return res.status(402).json({ message: "UserId is required" });
   }
 
   try {
@@ -479,7 +479,7 @@ const getFollowedUsers = async (req, res) => {
           role: authorsData.role,
           user_info: { profile_img: authorsData.user_info.profile_img },
         };
-        if (authorsData.role !== 'User') {
+        if (authorsData.role !== "User") {
           preparedData.author_info = {
             pseudonim: authorsData.author_info.pseudonim,
           };
@@ -491,14 +491,14 @@ const getFollowedUsers = async (req, res) => {
   } catch (err) {
     return res
       .status(500)
-      .json({ message: 'Failed loading followed users', error: err.message });
+      .json({ message: "Failed loading followed users", error: err.message });
   }
 };
 
 const getFollowes = async (req, res) => {
   const { _id } = req.query;
   try {
-    const data = await User.findOne({ _id }, { 'author_info.followers': 1 });
+    const data = await User.findOne({ _id }, { "author_info.followers": 1 });
     if (data) {
       return res.json({ data: data.author_info.followers });
     }
@@ -506,7 +506,7 @@ const getFollowes = async (req, res) => {
   } catch (err) {
     return res
       .status(500)
-      .json({ message: 'Failed fetching followers.', error: error.message });
+      .json({ message: "Failed fetching followers.", error: error.message });
   }
 };
 

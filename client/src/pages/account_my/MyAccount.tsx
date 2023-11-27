@@ -34,6 +34,7 @@ import {
 import { useToast } from '@components/UI/use-toast';
 import Follows from './tabs/Follows';
 import MyCollections from './tabs/myCollections/MyCollections';
+import { Badge } from '@components/UI/badge';
 
 type TabKeysTypes =
   | 'MY_DATA'
@@ -168,19 +169,18 @@ export default function MyAccount() {
               <div className="mt-1.5 space-x-2 text-lg text-gray-500">
                 {subtitle}
                 {userData.data && userData.data.role !== 'User' && (
-                  <MarketplaceBadge
-                    message={userData.data.role}
-                    color={
-                      userData.data.role === 'Author'
-                        ? 'text-purple-700'
-                        : 'text-cyan-700'
-                    }
-                    bgColor={
-                      userData.data.role === 'Author'
-                        ? 'bg-purple-100'
-                        : 'bg-cyan-100'
-                    }
-                  />
+                  <Badge
+                    variant={'outline'}
+                    className={`${
+                      userData.data.role === UserRoleTypes.AUTHOR &&
+                      'bg-purple-100 text-purple-700'
+                    } ${
+                      userData.data.role === UserRoleTypes.ADMIN &&
+                      'bg-cyan-100 text-cyan-700'
+                    }`}
+                  >
+                    {userData.data.role}
+                  </Badge>
                 )}
               </div>
             </div>
