@@ -1,7 +1,7 @@
 import NewsCard from '@components/cards/NewsCard';
 import SushiSwiper from '@components/swiper/SushiSwiper';
 import { NewsType } from '@customTypes/interfaces';
-import { Navigation, Pagination } from 'swiper';
+import { Navigation, Pagination } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 
 interface PropsTypes {

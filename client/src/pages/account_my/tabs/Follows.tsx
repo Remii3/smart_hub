@@ -1,3 +1,4 @@
+import { Badge } from '@components/UI/badge';
 import MarketplaceBadge from '@components/UI/badges/MarketplaceBadge';
 import { Button } from '@components/UI/button';
 import errorToast from '@components/UI/error/errorToast';
@@ -76,19 +77,18 @@ export default function Follows() {
                   : followedUser.username}
               </a>
               {followedUser.role !== 'User' && (
-                <MarketplaceBadge
-                  message={followedUser.role}
-                  color={
-                    followedUser.role === 'Author'
-                      ? 'text-purple-700'
-                      : 'text-cyan-700'
-                  }
-                  bgColor={
-                    followedUser.role === 'Author'
-                      ? 'bg-purple-100'
-                      : 'bg-cyan-100'
-                  }
-                />
+                <Badge
+                  variant={'outline'}
+                  className={`${
+                    followedUser.role === UserRoleTypes.AUTHOR &&
+                    'text-purple-700 bg-purple-100'
+                  } ${
+                    followedUser.role === UserRoleTypes.ADMIN &&
+                    'text-cyan-700 bg-cyan-100'
+                  }`}
+                >
+                  {followedUser.role}
+                </Badge>
               )}
             </div>
             <div>
