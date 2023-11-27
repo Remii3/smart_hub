@@ -9,8 +9,10 @@ import { resolve } from 'path';
 export default defineConfig({
   plugins: [react(), viteTsconfigPaths()],
   test: {
+    globals: true,
     environment: 'jsdom',
     setupFiles: './src/tests/setup.js',
+    exclude: ['node_modules'],
   },
   resolve: {
     alias: [{ find: '@', replacement: resolve(__dirname, './') }],
