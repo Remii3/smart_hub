@@ -20,8 +20,5 @@
   "homepage": "https://github.com/Remii3/smart_hub#readme",
   "devDependencies": {
     "concurrently": "^8.2.0"
-  },
-  "dependencies": {
-    "uuid": "^9.0.1"
   }
 }

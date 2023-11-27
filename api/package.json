@@ -20,6 +20,6 @@
     "stripe": "^12.7.0"
   },
   "devDependencies": {
-    "@types/mongoose": "~5.2.0"
+    "@types/mongoose": "^5.11.97"
   }
 }
