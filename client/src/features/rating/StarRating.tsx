@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { StarIcon } from '@heroicons/react/24/solid';
+import { StarIcon } from '@heroicons/react/24/outline';
 import { useSearchParams } from 'react-router-dom';
 
 export default function StarRating({
@@ -55,14 +55,14 @@ export default function StarRating({
       const isClicked = i <= rating;
       const isHovered = i <= hoveredValue;
 
-      const colorClass = isClicked || isHovered ? 'text-yellow-400' : '';
+      const colorClass = (isClicked || isHovered) && 'fill-yellow-400';
 
       stars.push(
         <StarIcon
           key={i}
           className={`${
             showOnly ? '' : 'cursor-pointer'
-          } ${colorClass} h-5 w-5 transition ease-out`}
+          } ${colorClass} w-5 transition ease-in-out text-yellow-400`}
           onClick={() => handleStarClick(i)}
           onMouseEnter={() => handleStarHover(i)}
           onMouseLeave={handleStarLeave}
