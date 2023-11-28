@@ -5,7 +5,7 @@
   :root {
     --background: 0 0% 100%;
     --foreground: 214 10% 3.9%;
-    --card: 214, 33%, 98%;
+    --card: 0 0% 100%;
     --card-foreground: 214 10% 3.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 214 10% 3.9%;
@@ -60,7 +60,9 @@
   }
   body {
     @apply bg-background text-foreground;
-    font-feature-settings: 'rlig' 1, 'calt' 1;
+    font-feature-settings:
+      'rlig' 1,
+      'calt' 1;
   }
   h1,
   h2,

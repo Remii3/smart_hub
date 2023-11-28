@@ -36,7 +36,7 @@ export interface ProductTypes {
       user: UserTypes;
       value: { rating: number; text: string };
       createdAt: string;
-    }
+    },
   ];
   price: {
     currency: string;
@@ -199,10 +199,14 @@ export interface CategoryTypes {
 }
 export interface CommentTypes {
   _id: string;
-  product_id: string;
-  user: AuthorTypes;
-  value: { rating: number; text: string };
+  creatorData: AuthorTypes;
+  targetData: {
+    _id: string;
+  };
+  value: { rating: number; text: string; nickname: string };
   createdAt: string;
+  updatedAt: string;
+  product_id: string;
 }
 
 export interface CollectionObjectTypes {
