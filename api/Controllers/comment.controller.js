@@ -5,7 +5,7 @@ const News = require('../Models/news');
 const calculateAvgRating = require('../helpers/calculate/calculateAvgRating');
 
 const getAllComments = async (req, res) => {
-  const { targetId } = req.query;
+  const { targetId, limit, skip } = req.query;
 
   if (!targetId) {
     return res.status(422).json({ message: 'Provide comment target id' });
@@ -15,9 +15,23 @@ const getAllComments = async (req, res) => {
       .sort({
         createdAt: -1,
       })
+      .skip(skip)
+      .limit(limit)
       .populate('creatorData');
 
-    return res.status(200).json({ data });
+    const documentsQuantity = await Comment.find({
+      'targetData._id': targetId,
+    }).countDocuments();
+
+    let canShowMoreDocuments = true;
+
+    if (Number(limit) + Number(skip * 2) > documentsQuantity) {
+      canShowMoreDocuments = false;
+    }
+
+    return res
+      .status(200)
+      .json({ data: { data, rawData: { canShowMoreDocuments } } });
   } catch (err) {
     return res
       .status(500)

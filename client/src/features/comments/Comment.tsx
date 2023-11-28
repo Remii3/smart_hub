@@ -100,7 +100,7 @@ export default function Comment({
               onClick={() => setShowDeleteDialog(commentData._id)}
               variant={'ghost'}
               type="button"
-              className="text-red-400 hover:text-red-400 p-2 rounded-xl"
+              className="text-destructive hover:text-destructive p-2 rounded-xl"
             >
               <TrashIcon className="h-6 w-6" />
             </Button>

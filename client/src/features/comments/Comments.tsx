@@ -5,11 +5,16 @@ import { useCallback, useEffect, useState } from 'react';
 import NewComment from './NewComment';
 import Comment from './Comment';
 import errorToast from '@components/UI/error/errorToast';
+import { Button } from '@components/UI/button';
 
 type CommentTargetTypes = 'Product' | 'News';
 
 interface CommentsTypes extends FetchDataTypes {
-  data: null | CommentTypes[];
+  data: CommentTypes[];
+  rawData: null | {
+    [index: string]: unknown;
+    canShowMoreDocuments: boolean;
+  };
 }
 
 export interface CommentsPropsTypes {
@@ -26,9 +31,14 @@ export default function Comments({
   starRating,
 }: CommentsPropsTypes) {
   const [comments, setComments] = useState<CommentsTypes>({
-    data: null,
+    data: [],
+    rawData: null,
     hasError: null,
     isLoading: false,
+  });
+  const [shownComments, setShownComments] = useState({
+    limit: 6,
+    additionalShownComments: 0,
   });
 
   const fetchData = useCallback(async () => {
@@ -37,7 +47,11 @@ export default function Comments({
     });
     const { data, error } = await useGetAccessDatabase({
       url: DATABASE_ENDPOINTS.COMMENT_ALL,
-      params: { targetId },
+      params: {
+        targetId,
+        skip: shownComments.additionalShownComments,
+        limit: shownComments.limit,
+      },
     });
     if (error) {
       errorToast(error);
@@ -50,15 +64,16 @@ export default function Comments({
       });
     }
     setComments({
-      data,
+      data: [...comments.data, ...data.data],
+      rawData: data.rawData,
       hasError: null,
       isLoading: false,
     });
-  }, [targetId]);
+  }, [targetId, shownComments]);
 
   useEffect(() => {
     fetchData();
-  }, [targetId]);
+  }, [targetId, shownComments]);
 
   return (
     <article>
@@ -73,30 +88,44 @@ export default function Comments({
       <section>
         {!comments.isLoading &&
           !comments.hasError &&
-          comments.data &&
           comments.data.length <= 0 && (
             <div className="text-center">
               <span className="text-muted-foreground">No comments.</span>
             </div>
           )}
-        {comments.data &&
-          !comments.isLoading &&
-          !comments.hasError &&
-          comments.data.length > 0 && (
-            <div className="space-y-4">
-              {comments.data.map((comment) => (
-                <Comment
-                  key={comment._id}
-                  commentData={comment}
-                  starRating={starRating}
-                  target={target}
-                  targetId={targetId}
-                  updateComments={fetchData}
-                  updateTargetData={updateTargetData}
-                />
-              ))}
-            </div>
-          )}
+        {comments.data && !comments.hasError && comments.data.length > 0 && (
+          <div className="space-y-4">
+            {comments.data.map((comment) => (
+              <Comment
+                key={comment._id}
+                commentData={comment}
+                starRating={starRating}
+                target={target}
+                targetId={targetId}
+                updateComments={fetchData}
+                updateTargetData={updateTargetData}
+              />
+            ))}
+            {comments.rawData && comments.rawData.canShowMoreDocuments && (
+              <div className="text-center">
+                <Button
+                  variant={'outline'}
+                  onClick={() =>
+                    setShownComments((prevState) => {
+                      return {
+                        ...prevState,
+                        additionalShownComments:
+                          prevState.additionalShownComments + prevState.limit,
+                      };
+                    })
+                  }
+                >
+                  Show more
+                </Button>
+              </div>
+            )}
+          </div>
+        )}
       </section>
     </article>
   );
