@@ -116,7 +116,7 @@ export default function NewComment({
   };
 
   return (
-    <Card className="p-4 mb-5">
+    <Card className="p-4">
       {userData.data ? (
         <Form {...form}>
           <form

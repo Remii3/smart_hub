@@ -76,8 +76,10 @@ export default function Comments({
   }, [targetId, shownComments]);
 
   return (
-    <article>
-      <h3 className="mb-2 text-4xl">Comments</h3>
+    <article className="space-y-5">
+      <h3 className="text-4xl border-b-2 border-border inline-block">
+        Comments
+      </h3>
       <NewComment
         starRating={starRating}
         target={target}
@@ -94,7 +96,7 @@ export default function Comments({
             </div>
           )}
         {comments.data && !comments.hasError && comments.data.length > 0 && (
-          <div className="space-y-4">
+          <div className="space-y-5">
             {comments.data.map((comment) => (
               <Comment
                 key={comment._id}
