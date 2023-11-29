@@ -72,7 +72,7 @@ const formSchema = z.object({
   shortDescription: z.string().optional(),
   quantity: z.number().min(1),
   marketplace: z.enum([MarketPlaceTypes.shop, MarketPlaceTypes.collection]),
-  price: z.number(),
+  price: z.number().min(0.01),
 });
 
 export default function NewProduct() {
@@ -180,7 +180,7 @@ export default function NewProduct() {
     }
   };
 
-  const onSubmit = async (formResponse: any) => {
+  const onSubmit = async () => {
     const dirtyData = Object.fromEntries(
       Object.keys(form.formState.dirtyFields).map((x: string) => [
         x,
@@ -195,7 +195,8 @@ export default function NewProduct() {
     if (selectedImgs.isDirty) {
       dirtyData.imgs = selectedImgs.imgs;
     }
-    dirtyData.marketplace = formResponse.marketplace;
+    dirtyData.marketplace = selectedMarketplace;
+
     setStatus((prevState) => {
       return { ...prevState, isLoading: true };
     });

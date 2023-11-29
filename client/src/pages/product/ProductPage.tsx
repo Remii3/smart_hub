@@ -13,7 +13,6 @@ import {
   ProductTypes,
 } from '@customTypes/interfaces';
 import { UserContext } from '@context/UserProvider';
-import ProductPill from './ProductPill';
 import StarRating from '@features/rating/StarRating';
 import ProductForm from '@pages/product/ProductForm';
 import { Button, buttonVariants } from '@components/UI/button';
@@ -69,6 +68,8 @@ import SwiperArrowRight from '@components/swiper/navigation/SwiperArrowRight';
 import SwiperArrowLeft from '@components/swiper/navigation/SwiperArrowLeft';
 import SwiperDots from '@components/swiper/pagination/SwiperDots';
 import MarketplaceBadge from '@components/UI/badges/MarketplaceBadge';
+import { TrashIcon } from '@radix-ui/react-icons';
+import RatingSummary from '@features/product/RatingSummary';
 
 interface ProductTypesLocal extends FetchDataTypes {
   data: null | ProductTypes;
@@ -102,6 +103,7 @@ const formSchema = z.object({
 interface ProductRating {
   quantity: number;
   value: number;
+  reviews: [];
 }
 interface EditingTypes extends PostDataTypes {
   isEditing: boolean;
@@ -175,8 +177,12 @@ export default function ProductPage() {
       url: DATABASE_ENDPOINTS.RATING_RATING,
       params: { targetId: productId },
     });
-    setProductRating({ quantity: data.quantity, value: data.avgRating });
-  }, []);
+    setProductRating({
+      quantity: data.quantity,
+      value: data.avgRating,
+      reviews: data.reviews,
+    });
+  }, [productId]);
 
   const fetchAllAuthors = useCallback(async () => {
     const { data } = await useGetAccessDatabase({
@@ -202,10 +208,7 @@ export default function ProductPage() {
       });
     }
     setProductState({ data, isLoading: false, hasError: null });
-    setProductRating({
-      quantity: data.rating.quantity,
-      value: data.rating.avgRating,
-    });
+
     setSelectedImgs({ imgs: data.imgs, isDirty: false });
     setNewDescription(data.description);
     form.reset({
@@ -242,6 +245,7 @@ export default function ProductPage() {
 
   useEffect(() => {
     fetchData();
+    fetchComments();
   }, [productId]);
 
   useEffect(() => {
@@ -470,8 +474,15 @@ export default function ProductPage() {
                     deleteHandler={deleteHandler}
                     openState={deleteDialogState}
                     openStateHandler={setDeleteDialogState}
-                    disableCondition={isEditing.isLoading}
-                  />
+                  >
+                    <Button
+                      variant={'destructive'}
+                      size={'default'}
+                      disabled={isEditing.isLoading}
+                    >
+                      <TrashIcon className="w-5 h-5" />
+                    </Button>
+                  </DeleteDialog>
                   {isEditing.isEditing && (
                     <Button
                       type="submit"
@@ -1297,7 +1308,17 @@ export default function ProductPage() {
               }
             />
           </div>
-          <div ref={commentsRef}>
+          <div ref={commentsRef} className="space-y-5">
+            <h3 className="text-4xl border-b-2 border-border inline-block">
+              Comments
+            </h3>
+            {productRating && (
+              <RatingSummary
+                avgRating={productRating.value}
+                quantity={productRating.quantity}
+                reviews={productRating.reviews}
+              />
+            )}
             <Comments
               starRating
               target="Product"

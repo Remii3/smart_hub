@@ -8,7 +8,8 @@ const getRating = async (req, res) => {
     const comments = await Comment.find({ 'targetData._id': targetId })
       .populate('creatorData')
       .lean();
-    const rating = calculateAvgRating(comments);
+    const rating = { ...calculateAvgRating(comments), reviews: comments };
+
     return res.json({ data: rating });
   } catch (err) {
     res

@@ -29,10 +29,6 @@ const prepareNewProductData = (req, res, next) => {
     preparedData.authors = authors;
   }
 
-  if (marketplace) {
-    preparedData.marketplace = marketplace;
-  }
-
   if (description) {
     preparedData.description = description;
   }

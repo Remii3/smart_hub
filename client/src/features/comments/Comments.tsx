@@ -77,9 +77,6 @@ export default function Comments({
 
   return (
     <article className="space-y-5">
-      <h3 className="text-4xl border-b-2 border-border inline-block">
-        Comments
-      </h3>
       <NewComment
         starRating={starRating}
         target={target}
