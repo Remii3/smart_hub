@@ -1,4 +1,3 @@
-import { TrashIcon } from '@radix-ui/react-icons';
 import { Button } from '../button';
 import {
   Dialog,
@@ -13,34 +12,23 @@ interface PropsTypes {
   openState: boolean;
   openStateHandler: (state: any) => void;
   deleteHandler: () => void;
-  disableCondition?: boolean;
-  onlyIcon?: boolean;
   targetId?: string;
+  children: React.ReactNode;
 }
 
 export default function ({
   openState,
   openStateHandler,
   deleteHandler,
-  disableCondition = false,
-  onlyIcon = false,
   targetId,
+  children,
 }: PropsTypes) {
   return (
     <Dialog
       open={openState}
       onOpenChange={() => openStateHandler(targetId ? null : false)}
     >
-      <Button
-        onClick={() => openStateHandler(targetId ? targetId : true)}
-        variant={'ghost'}
-        disabled={disableCondition}
-        type="button"
-        className="text-red-400 hover:text-red-400"
-      >
-        {!onlyIcon && <span>Delete</span>}
-        <TrashIcon className="h-5 w-5" />
-      </Button>
+      {children}
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Are you sure?</DialogTitle>
@@ -53,12 +41,14 @@ export default function ({
             type="button"
             variant={'destructive'}
             onClick={() => deleteHandler()}
+            className="rounded-xl"
           >
             Delete
           </Button>
           <Button
             variant={'outline'}
             type="button"
+            className="rounded-xl"
             onClick={() => openStateHandler(targetId ? null : false)}
           >
             Cancel

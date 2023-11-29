@@ -1299,10 +1299,10 @@ export default function ProductPage() {
           </div>
           <div ref={commentsRef}>
             <Comments
-              withRating
+              starRating
               target="Product"
               targetId={productState.data._id}
-              updateProductStatus={fetchComments}
+              updateTargetData={fetchComments}
             />
           </div>
         </div>
