@@ -1,4 +1,4 @@
-import { ChangeEvent, useContext, useState } from 'react';
+import { useContext, useState } from 'react';
 import {
   UserIcon,
   ArchiveBoxIcon,
@@ -7,22 +7,15 @@ import {
   RocketLaunchIcon,
   StarIcon,
 } from '@heroicons/react/24/outline';
-import MainContainer from '@layout/MainContainer';
 import EditUserData from './tabs/EditUserData';
-import MyShop from './tabs/my_products/MyShop';
 import { UserContext } from '@context/UserProvider';
-import MarketplaceBadge from '@components/UI/badges/MarketplaceBadge';
 import SecurityPermissions from './tabs/SecurityPermissions';
 import OrderHistory from './tabs/OrderHistory';
 import Admin from './tabs/admin/Admin';
 import { UserRoleTypes } from '@customTypes/types';
 
-import { usePostAccessDatabase } from '@hooks/useAaccessDatabase';
-import { DATABASE_ENDPOINTS } from '@data/endpoints';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
-import useUploadImg from '@hooks/useUploadImg';
 
-import { PlusCircleIcon } from '@heroicons/react/24/outline';
 import NewProduct from './newProduct/NewProduct';
 import {
   Select,
@@ -35,6 +28,7 @@ import { useToast } from '@components/UI/use-toast';
 import Follows from './tabs/Follows';
 import MyCollections from './tabs/myCollections/MyCollections';
 import { Badge } from '@components/UI/badge';
+import MyProducts from './tabs/myProducts/MyProducts';
 
 type TabKeysTypes =
   | 'MY_DATA'
@@ -285,7 +279,7 @@ export default function MyAccount() {
             <SecurityPermissions />
           )}
           {selectedtab === tabNames.HISTORY && <OrderHistory />}
-          {selectedtab === tabNames.MY_PRODUCTS && <MyShop />}
+          {selectedtab === tabNames.MY_PRODUCTS && <MyProducts />}
           {selectedtab === tabNames.MY_COLLECTIONS && <MyCollections />}
           {selectedtab === tabNames.ADMIN && <Admin />}
           {selectedtab === tabNames.FOLLOWING && <Follows />}

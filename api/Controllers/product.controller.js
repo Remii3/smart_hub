@@ -289,16 +289,22 @@ const deleteAllCreatorProducts = async (req, res) => {
 };
 
 const productsQuantity = async (req, res) => {
-  const { authorId } = req.query;
+  const { authorId, marketplace } = req.query;
+  const query = {
+    ["creatorData._id"]: authorId,
+  };
+  if (marketplace) {
+    query.marketplace = marketplace;
+  }
   try {
-    const quantity = await Product.find({
-      "creatorData._id": authorId,
-    }).count();
+    const quantity = await Product.find(query).countDocuments();
+
     return res.status(200).json({ data: quantity });
   } catch (err) {
-    return res
-      .status(500)
-      .json({ message: "Failed deleting all prodcuts", error: err.message });
+    return res.status(500).json({
+      message: "Failed checking quantity of products.",
+      error: err.message,
+    });
   }
 };
 

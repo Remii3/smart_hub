@@ -1,32 +1,21 @@
 import { useCallback, useEffect, useState } from 'react';
-import {
-  FetchDataTypes,
-  ProductCardTypes,
-  ProductTypes,
-} from '@customTypes/interfaces';
+import { FetchDataTypes, ProductTypes } from '@customTypes/interfaces';
 import ShopCard from '@components/cards/ShopCard';
-import { Button } from '@components/UI/button';
-import useSortProducts from '@hooks/useSortProducts';
 import { useGetAccessDatabase } from '@hooks/useAaccessDatabase';
 import { DATABASE_ENDPOINTS } from '@data/endpoints';
 import errorToast from '@components/UI/error/errorToast';
 import Pagination from '@components/paginations/Pagination';
 
 interface PropsTypes {
-  tag: string;
-  limit?: number;
+  limit: number;
 }
-
-const defaultProps = {
-  limit: 3,
-};
 
 interface ProductsTypes extends FetchDataTypes {
   data: null | ProductTypes[];
   rawData: null | any;
 }
 
-export default function MyProducts({ tag, limit }: PropsTypes) {
+export default function AllProducts({ limit }: PropsTypes) {
   const [products, setProducts] = useState<ProductsTypes>({
     data: null,
     rawData: null,
@@ -107,7 +96,7 @@ export default function MyProducts({ tag, limit }: PropsTypes) {
             );
           })}
       </div>
-      {tag === 'all' && limit && (
+      {limit && (
         <div className="flex justify-center">
           <Pagination
             currentPage={page}
@@ -123,4 +112,3 @@ export default function MyProducts({ tag, limit }: PropsTypes) {
     </div>
   );
 }
-MyProducts.defaultProps = defaultProps;
