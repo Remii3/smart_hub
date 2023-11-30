@@ -1,4 +1,3 @@
-import AllCollectionsList from './AllCollections';
 import { useCallback, useContext, useEffect, useState } from 'react';
 import { UserContext } from '@context/UserProvider';
 import { Button } from '@components/UI/button';
@@ -11,13 +10,15 @@ import errorToast from '@components/UI/error/errorToast';
 import DeleteDialog from '@components/UI/dialogs/DeleteDialog';
 import { FetchDataTypes, PostDataTypes } from '@customTypes/interfaces';
 import { MarketplaceTypes } from '@customTypes/types';
+import AllProducts from './AllProducts';
 
 interface ProductQuantityTypes extends FetchDataTypes {
   quantity: null | number;
 }
 
 interface DeleteAllTypes extends PostDataTypes {}
-export default function MyCollections() {
+
+export default function MyProducts() {
   const [productsQuantity, setProductsQuantity] =
     useState<ProductQuantityTypes>({
       hasError: null,
@@ -82,6 +83,7 @@ export default function MyCollections() {
       });
     }, 500);
   };
+
   return (
     <div className="relative px-3">
       {!deleteAllStatus.isLoading &&
@@ -106,7 +108,7 @@ export default function MyCollections() {
         <section className="px-2">
           <h5 className="mb-2">All:</h5>
           <div>
-            <AllCollectionsList limit={8} />
+            <AllProducts limit={8} />
           </div>
         </section>
       </div>
