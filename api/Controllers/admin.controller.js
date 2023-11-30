@@ -1,9 +1,20 @@
 const User = require('../Models/user');
 
-const getAllUsers = async (req, res) => {
+const getSearchedUsers = async (req, res) => {
+  const { skipPages, currentPageSize } = req.paginationInfo;
+  const sort = req.sortMethod;
+  const query = req.searchQuery;
+  const rawData = {};
+
   try {
-    const users = await User.find({});
-    return res.status(200).json({ data: users });
+    const users = await User.find(query)
+      .sort(sort)
+      .skip(skipPages)
+      .limit(currentPageSize);
+    const userQuantity = await User.find(query).countDocuments();
+    rawData.quantity = userQuantity;
+
+    return res.status(200).json({ data: { data: users, rawData } });
   } catch (err) {
     return res
       .status(500)
@@ -30,4 +41,4 @@ const getOneUser = async (req, res) => {
   }
 };
 
-module.exports = { getAllUsers, getOneUser };
+module.exports = { getSearchedUsers, getOneUser };
