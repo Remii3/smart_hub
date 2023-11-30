@@ -1,7 +1,7 @@
-const Category = require('../../Models/category');
-const mongoose = require('mongoose');
+const Category = require("../../Models/category");
+const mongoose = require("mongoose");
 
-const prepareUpdate = async (req, res, next) => {
+const prepareUpdateProduct = async (req, res, next) => {
   const {
     title,
     description,
@@ -38,7 +38,7 @@ const prepareUpdate = async (req, res, next) => {
   if (categories) {
     for (let i = 0; i < categories.length; i++) {
       const exists = await Category.findOne({
-        label: new RegExp(categories[i].label, 'i'),
+        label: new RegExp(categories[i].label, "i"),
       });
       if (!exists) {
         const newCategoryId = new mongoose.Types.ObjectId();
@@ -63,11 +63,11 @@ const prepareUpdate = async (req, res, next) => {
   }
 
   if (price) {
-    preparedData['price.value'] = Number(price);
+    preparedData["price.value"] = Number(price);
   }
 
   req.preparedData = preparedData;
   next();
 };
 
-module.exports = prepareUpdate;
+module.exports = prepareUpdateProduct;

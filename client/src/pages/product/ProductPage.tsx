@@ -13,7 +13,6 @@ import {
   ProductTypes,
 } from '@customTypes/interfaces';
 import { UserContext } from '@context/UserProvider';
-import ProductPill from './ProductPill';
 import StarRating from '@features/rating/StarRating';
 import ProductForm from '@pages/product/ProductForm';
 import { Button, buttonVariants } from '@components/UI/button';
@@ -69,6 +68,8 @@ import SwiperArrowRight from '@components/swiper/navigation/SwiperArrowRight';
 import SwiperArrowLeft from '@components/swiper/navigation/SwiperArrowLeft';
 import SwiperDots from '@components/swiper/pagination/SwiperDots';
 import MarketplaceBadge from '@components/UI/badges/MarketplaceBadge';
+import { TrashIcon } from '@radix-ui/react-icons';
+import RatingSummary from '@features/comments/RatingSummary';
 
 interface ProductTypesLocal extends FetchDataTypes {
   data: null | ProductTypes;
@@ -102,6 +103,7 @@ const formSchema = z.object({
 interface ProductRating {
   quantity: number;
   value: number;
+  reviews: [];
 }
 interface EditingTypes extends PostDataTypes {
   isEditing: boolean;
@@ -175,8 +177,12 @@ export default function ProductPage() {
       url: DATABASE_ENDPOINTS.RATING_RATING,
       params: { targetId: productId },
     });
-    setProductRating({ quantity: data.quantity, value: data.avgRating });
-  }, []);
+    setProductRating({
+      quantity: data.quantity,
+      value: data.avgRating,
+      reviews: data.reviews,
+    });
+  }, [productId]);
 
   const fetchAllAuthors = useCallback(async () => {
     const { data } = await useGetAccessDatabase({
@@ -202,10 +208,7 @@ export default function ProductPage() {
       });
     }
     setProductState({ data, isLoading: false, hasError: null });
-    setProductRating({
-      quantity: data.rating.quantity,
-      value: data.rating.avgRating,
-    });
+
     setSelectedImgs({ imgs: data.imgs, isDirty: false });
     setNewDescription(data.description);
     form.reset({
@@ -242,6 +245,7 @@ export default function ProductPage() {
 
   useEffect(() => {
     fetchData();
+    fetchComments();
   }, [productId]);
 
   useEffect(() => {
@@ -470,8 +474,15 @@ export default function ProductPage() {
                     deleteHandler={deleteHandler}
                     openState={deleteDialogState}
                     openStateHandler={setDeleteDialogState}
-                    disableCondition={isEditing.isLoading}
-                  />
+                  >
+                    <Button
+                      variant={'destructive'}
+                      size={'default'}
+                      disabled={isEditing.isLoading}
+                    >
+                      <TrashIcon className="w-5 h-5" />
+                    </Button>
+                  </DeleteDialog>
                   {isEditing.isEditing && (
                     <Button
                       type="submit"
@@ -741,9 +752,11 @@ export default function ProductPage() {
                         <div>
                           In stock: <span>{productState.data.quantity}</span>
                         </div>
-                        <MarketplaceBadge
-                          type={productState.data.marketplace}
-                        />
+                        <Link to={`/${productState.data.marketplace}`}>
+                          <MarketplaceBadge
+                            type={productState.data.marketplace}
+                          />
+                        </Link>
                       </div>
                       <div className="mb-2">
                         <h3 className="text-3xl">
@@ -769,8 +782,8 @@ export default function ProductPage() {
                         <div>
                           <Button
                             variant={'link'}
+                            size={'clear'}
                             type="button"
-                            className="py-0"
                             onClick={() =>
                               window.scrollTo({
                                 top:
@@ -1042,24 +1055,9 @@ export default function ProductPage() {
               </div>
             </form>
           </Form>
-          <section className="sticky top-[63px] z-10 -mx-4 bg-background shadow-sm sm:top-16">
-            <article className="hidden items-center justify-around lg:flex">
-              <div className="flex gap-4">
-                <img
-                  src={
-                    productState.data.imgs.length > 0
-                      ? productState.data.imgs[0].url
-                      : 'https://firebasestorage.googleapis.com/v0/b/smarthub-75eab.appspot.com/o/static_imgs%2Fnophoto.webp?alt=media&token=a974d32e-108a-4c21-be71-de358368a167'
-                  }
-                  alt="bar_img"
-                  className="aspect-square h-14 rounded-md object-cover"
-                />
-                <div>
-                  <h4>{productState.data.title}</h4>
-                  <span>{productState.data.price.value}</span>
-                </div>
-              </div>
-              <div>
+          <section className="sticky top-[63px] z-10 -mx-4 bg-background border-b border-border sm:top-16">
+            <article className=" items-center justify-around flex">
+              <div className="py-2 space-x-2">
                 <Button
                   variant={'link'}
                   onClick={() =>
@@ -1075,6 +1073,7 @@ export default function ProductPage() {
                 >
                   Overview
                 </Button>
+
                 <Button
                   variant={'link'}
                   onClick={() =>
@@ -1095,13 +1094,13 @@ export default function ProductPage() {
                     window.scrollTo({
                       top:
                         window.scrollY +
-                        descriptionRef.current!.getBoundingClientRect().top -
+                        similarRef.current!.getBoundingClientRect().top -
                         headerHeight,
                       behavior: 'smooth',
                     })
                   }
                 >
-                  Description
+                  Similar
                 </Button>
                 <Button
                   variant={'link'}
@@ -1115,124 +1114,12 @@ export default function ProductPage() {
                     })
                   }
                 >
-                  Comments
+                  Reviews
                 </Button>
               </div>
-              <div>
-                <ProductForm
-                  addToCartHandler={addToCartHandler}
-                  decrementQuantityHandler={decrementQuantityHandler}
-                  incrementQuantityHandler={incrementQuantityHandler}
-                  isEditing={isEditing.isEditing}
-                  itemBtnCapacity={itemBtnCapacity}
-                  itemCapacity={itemCapacity}
-                  productId={productId || ''}
-                  productQuantity={productState.data.quantity}
-                  selectedQuantity={selectedQuantity}
-                  sold={productState.data.sold}
-                />
-              </div>
             </article>
-            <Accordion type="single" collapsible className="block lg:hidden">
-              <AccordionItem value="item-1" className="px-4">
-                <AccordionTrigger className="p-0 hover:no-underline [&[data-state=open]]:bg-background">
-                  <div className="flex gap-4">
-                    <img
-                      src={
-                        productState.data.imgs.length > 0
-                          ? productState.data.imgs[0].url
-                          : 'https://firebasestorage.googleapis.com/v0/b/smarthub-75eab.appspot.com/o/static_imgs%2Fnophoto.webp?alt=media&token=a974d32e-108a-4c21-be71-de358368a167'
-                      }
-                      alt="bar_img"
-                      className="aspect-square h-14 rounded-md object-cover"
-                    />
-                    <div>
-                      <h4>{productState.data.title}</h4>
-                      <span className="text-base">
-                        {productState.data.price.value}
-                      </span>
-                    </div>
-                  </div>
-                </AccordionTrigger>
-                <AccordionContent>
-                  <div className="mt-2">
-                    <Button
-                      variant={'link'}
-                      onClick={() =>
-                        window.scrollTo({
-                          top:
-                            window.scrollY +
-                            shortDescriptionRef.current!.getBoundingClientRect()
-                              .top -
-                            headerHeight,
-                          behavior: 'smooth',
-                        })
-                      }
-                    >
-                      Overview
-                    </Button>
-                    <Button
-                      variant={'link'}
-                      onClick={() =>
-                        window.scrollTo({
-                          top:
-                            window.scrollY +
-                            detailsRef.current!.getBoundingClientRect().top -
-                            headerHeight,
-                          behavior: 'smooth',
-                        })
-                      }
-                    >
-                      Details
-                    </Button>
-                    <Button
-                      variant={'link'}
-                      onClick={() =>
-                        window.scrollTo({
-                          top:
-                            window.scrollY +
-                            descriptionRef.current!.getBoundingClientRect()
-                              .top -
-                            headerHeight,
-                          behavior: 'smooth',
-                        })
-                      }
-                    >
-                      Description
-                    </Button>
-                    <Button
-                      variant={'link'}
-                      onClick={() =>
-                        window.scrollTo({
-                          top:
-                            window.scrollY +
-                            commentsRef.current!.getBoundingClientRect().top -
-                            headerHeight,
-                          behavior: 'smooth',
-                        })
-                      }
-                    >
-                      Comments
-                    </Button>
-                  </div>
-                  <div className="mt-2">
-                    <ProductForm
-                      addToCartHandler={addToCartHandler}
-                      decrementQuantityHandler={decrementQuantityHandler}
-                      incrementQuantityHandler={incrementQuantityHandler}
-                      isEditing={isEditing.isEditing}
-                      itemBtnCapacity={itemBtnCapacity}
-                      itemCapacity={itemCapacity}
-                      productId={productId || ''}
-                      productQuantity={productState.data.quantity}
-                      selectedQuantity={selectedQuantity}
-                      sold={productState.data.sold}
-                    />
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
-            </Accordion>
           </section>
+
           <article ref={detailsRef}>
             <h3 className="mb-2 text-4xl">Details:</h3>
             <div className="mb-2 grid grid-cols-2">
@@ -1276,20 +1163,20 @@ export default function ProductPage() {
                 ))}
               </div>
             </div>
-            <div className="mb-2 grid grid-cols-2">
-              <span>Short description: </span>
-              <div>{productState.data.shortDescription}</div>
+            <div className="mb-2">
+              <span>Description: </span>
+              <ProductDescription
+                show={isEditing.isEditing}
+                descriptionToShow={productState.data.description}
+                newDescription={newDescription}
+                setNewDescription={setNewDescription}
+              />
             </div>
           </article>
-          <div ref={descriptionRef}>
-            <ProductDescription
-              show={isEditing.isEditing}
-              descriptionToShow={productState.data.description}
-              newDescription={newDescription}
-              setNewDescription={setNewDescription}
-            />
-          </div>
-          <div ref={similarRef}>
+          <div ref={similarRef} className="space-y-5">
+            <h3 className="text-4xl border-b-2 border-border inline-block">
+              Similar
+            </h3>
             <SimilarProducts
               authorId={productState.data.authors[0]._id}
               authorPseudonim={
@@ -1297,7 +1184,17 @@ export default function ProductPage() {
               }
             />
           </div>
-          <div ref={commentsRef}>
+          <div ref={commentsRef} className="space-y-5">
+            <h3 className="text-4xl border-b-2 border-border inline-block">
+              Reviews
+            </h3>
+            {productRating && (
+              <RatingSummary
+                avgRating={productRating.value}
+                quantity={productRating.quantity}
+                reviews={productRating.reviews}
+              />
+            )}
             <Comments
               starRating
               target="Product"

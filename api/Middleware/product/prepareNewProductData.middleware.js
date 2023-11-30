@@ -1,4 +1,4 @@
-const prepareNewProductData = (req, res, next) => {
+const prepareCreateProduct = (req, res, next) => {
   const {
     creatorData,
     title,
@@ -11,7 +11,9 @@ const prepareNewProductData = (req, res, next) => {
     categories,
     authors,
   } = req.body;
+
   const preparedData = {};
+
   if (creatorData) {
     preparedData.creatorData = {
       _id: creatorData._id,
@@ -27,10 +29,6 @@ const prepareNewProductData = (req, res, next) => {
   }
   if (authors && authors.length > 0) {
     preparedData.authors = authors;
-  }
-
-  if (marketplace) {
-    preparedData.marketplace = marketplace;
   }
 
   if (description) {
@@ -64,8 +62,9 @@ const prepareNewProductData = (req, res, next) => {
   if (price) {
     preparedData.price = { value: Number(price) };
   }
+
   req.productData = preparedData;
   next();
 };
 
-module.exports = prepareNewProductData;
+module.exports = prepareCreateProduct;

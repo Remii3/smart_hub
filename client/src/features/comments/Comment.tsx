@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader } from '@components/UI/card';
+import { Card } from '@components/UI/card';
 import { CommentsPropsTypes } from './Comments';
 import { useContext, useState } from 'react';
 import { UserContext } from '@context/UserProvider';
@@ -15,7 +15,7 @@ import { Separator } from '@components/UI/separator';
 import { Button } from '@components/UI/button';
 import { TrashIcon } from '@radix-ui/react-icons';
 
-interface CommentPropsTypes extends CommentsPropsTypes {
+export interface CommentPropsTypes extends CommentsPropsTypes {
   commentData: CommentTypes;
   updateComments: () => void;
 }
@@ -97,6 +97,7 @@ export default function Comment({
             targetId={commentData._id}
           >
             <Button
+              aria-label="Remove comment"
               onClick={() => setShowDeleteDialog(commentData._id)}
               variant={'ghost'}
               type="button"

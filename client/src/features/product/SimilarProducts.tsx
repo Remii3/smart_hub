@@ -12,10 +12,7 @@ interface PropsTypes {
   authorId: string;
   authorPseudonim: string;
 }
-export default function SimilarProducts({
-  authorId,
-  authorPseudonim,
-}: PropsTypes) {
+export default function SimilarProducts({ authorId }: PropsTypes) {
   const [products, setProducts] = useState<ProductsTypes>({
     data: null,
     hasError: null,
@@ -27,8 +24,8 @@ export default function SimilarProducts({
       return { ...prevState, isLoading: true };
     });
     const { data, error } = await useGetAccessDatabase({
-      url: DATABASE_ENDPOINTS.PRODUCT_SHOP_ALL,
-      params: { authorId, limit: 10 },
+      url: DATABASE_ENDPOINTS.PRODUCT_ALL,
+      params: { authorId, limit: 10, withHighPrice: true },
     });
     if (error) {
       errorToast(error);
@@ -39,20 +36,18 @@ export default function SimilarProducts({
 
   useEffect(() => {
     fetchData();
-  }, [fetchData]);
+  }, [authorId]);
+
   return (
-    <div>
-      <h2 className="mb-4 text-3xl">Similar products from {authorPseudonim}</h2>
-      <section className="px-2">
-        {products.data && (
-          <SushiSwiper
-            arrayOfItems={products.data}
-            errorState={products.hasError}
-            swiperCategory={`similarProducts`}
-            loadingState={products.isLoading}
-          />
-        )}
-      </section>
-    </div>
+    <article>
+      {products.data && (
+        <SushiSwiper
+          arrayOfItems={products.data}
+          errorState={products.hasError}
+          swiperCategory={`similarProducts`}
+          loadingState={products.isLoading}
+        />
+      )}
+    </article>
   );
 }

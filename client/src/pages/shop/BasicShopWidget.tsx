@@ -12,6 +12,7 @@ import { useGetAccessDatabase } from '@hooks/useAaccessDatabase';
 import { DATABASE_ENDPOINTS } from '@data/endpoints';
 import SushiSwiper from '@components/swiper/SushiSwiper';
 import errorToast from '@components/UI/error/errorToast';
+import { MarketplaceTypes } from '@customTypes/types';
 
 type PropsTypes = {
   title: string;
@@ -47,6 +48,7 @@ export default function BasicShopWidget({
     hasError: null,
     isLoading: false,
   });
+  const marketplace = 'shop' as MarketplaceTypes;
 
   const fetchData = useCallback(async () => {
     setProducts((prevState) => {
@@ -58,7 +60,9 @@ export default function BasicShopWidget({
         category,
         minPrice,
         maxPrice,
+        marketplace,
         sortOption: selectedSortOption,
+        withHighPrice: true,
       },
     });
     if (error) {

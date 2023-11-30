@@ -13,6 +13,7 @@ export default function StarRating({
   changeUrl?: boolean;
   changeRatingHandler?: (rateValue: number) => void;
 }) {
+  const roundedRating = Math.round(rating);
   const [searchParams, setSearchParams] = useSearchParams();
   const [hoveredValue, setHoveredValue] = useState(0);
 
@@ -23,7 +24,7 @@ export default function StarRating({
 
   const handleStarClick = (value: number) => {
     if (!showOnly && (changeRatingHandler || changeUrlHandler)) {
-      if (value === rating) {
+      if (value === roundedRating) {
         if (changeUrl) {
           changeUrlHandler(0);
         } else if (changeRatingHandler) {
@@ -52,7 +53,7 @@ export default function StarRating({
   const renderStars = () => {
     const stars = [];
     for (let i = 1; i <= 5; i++) {
-      const isClicked = i <= rating;
+      const isClicked = i <= roundedRating;
       const isHovered = i <= hoveredValue;
 
       const colorClass = (isClicked || isHovered) && 'fill-yellow-400';

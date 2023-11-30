@@ -17,46 +17,45 @@ export default function ProductDescription({
 }: ProductDescriptionTypes) {
   return (
     <article>
-      <h3 className="mb-2 text-4xl">Description</h3>
-      <div>
-        {show ? (
-          <CKEditor
-            editor={ClassicEditor}
-            data={newDescription}
-            config={{
-              mediaEmbed: { previewsInData: true },
-              toolbar: {
-                shouldNotGroupWhenFull: true,
-                items: [
-                  'heading',
-                  '|',
-                  'bold',
-                  'italic',
-                  'link',
-                  'bulletedList',
-                  'numberedList',
-                  '|',
-                  'outdent',
-                  'indent',
-                  '|',
+      {show ? (
+        <CKEditor
+          editor={ClassicEditor}
+          data={newDescription}
+          config={{
+            mediaEmbed: { previewsInData: true },
+            toolbar: {
+              shouldNotGroupWhenFull: true,
+              items: [
+                'heading',
+                '|',
+                'bold',
+                'italic',
+                'link',
+                'bulletedList',
+                'numberedList',
+                '|',
+                'outdent',
+                'indent',
+                '|',
 
-                  'blockQuote',
-                  'insertTable',
-                  'mediaEmbed',
-                  'undo',
-                  'redo',
-                ],
-              },
-            }}
-            onChange={(event, editor) => {
-              const data = editor.getData();
-              setNewDescription(data);
-            }}
-          />
-        ) : (
-          <article className="prose">{parse(descriptionToShow)}</article>
-        )}
-      </div>
+                'blockQuote',
+                'insertTable',
+                'mediaEmbed',
+                'undo',
+                'redo',
+              ],
+            },
+          }}
+          onChange={(event, editor) => {
+            const data = editor.getData();
+            setNewDescription(data);
+          }}
+        />
+      ) : (
+        <article className="prose max-w-full">
+          {parse(descriptionToShow)}
+        </article>
+      )}
     </article>
   );
 }

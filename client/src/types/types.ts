@@ -1,4 +1,4 @@
-import { AuthorTypes } from './interfaces';
+import { AuthorTypes, CommentTypes } from './interfaces';
 
 export enum UserRoleTypes {
   USER = 'User',
@@ -28,6 +28,7 @@ export type VoteType = 'Like' | 'Dislike';
 export type RatingTypes = {
   avgRating: number;
   quantity: number;
+  reviews?: CommentTypes[];
 };
 
 export type PriceTypes = {

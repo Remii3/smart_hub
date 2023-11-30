@@ -105,7 +105,7 @@ export default function NewComment({
       isLoading: false,
       rating: 0,
     });
-
+    form.reset();
     if (updateComments) {
       updateComments();
     }

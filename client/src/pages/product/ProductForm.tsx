@@ -34,7 +34,7 @@ export default function CollectionForm({
     <div>
       {sold && <h4 className="font-bold uppercase text-red-700">Sold out</h4>}
       {!sold && (
-        <div className="flex gap-6">
+        <div className="flex flex-col gap-3">
           <div>
             <button
               type="button"

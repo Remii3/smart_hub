@@ -12,6 +12,7 @@ import {
   sortOptionsArray,
 } from '@hooks/useSortProducts';
 import SushiSwiper from '@components/swiper/SushiSwiper';
+import { MarketplaceTypes } from '@customTypes/types';
 
 interface CollectionsTypes extends FetchDataTypes {
   data: null | CollectionCardTypes[];
@@ -44,6 +45,7 @@ export default function BasicCollectionWidget({
     isLoading: false,
     rawData: null,
   });
+  const marketplace = 'collection' as MarketplaceTypes;
 
   const fetchData = useCallback(async () => {
     setCollections((prevState) => {
@@ -55,7 +57,9 @@ export default function BasicCollectionWidget({
         category,
         minPrice,
         maxPrice,
+        marketplace,
         sortOption: selectedSortOption,
+        withHighPrice: true,
       },
     });
     if (error) {
