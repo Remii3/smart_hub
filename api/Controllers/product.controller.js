@@ -1,10 +1,10 @@
-const { default: mongoose } = require('mongoose');
-const Product = require('../Models/product');
-const Comment = require('../Models/comment');
-const Order = require('../Models/order');
+const { default: mongoose } = require("mongoose");
+const Product = require("../Models/product");
+const Comment = require("../Models/comment");
+const Order = require("../Models/order");
 
-const calculateFutureDeleteDate = require('../helpers/calculate/calculateFutureDeleteDate');
-const cashFormatter = require('../helpers/cashFormatter');
+const calculateFutureDeleteDate = require("../helpers/calculate/calculateFutureDeleteDate");
+const cashFormatter = require("../helpers/cashFormatter");
 
 const getHighestPrice = async ({ pipeline, rawData, limit }) => {
   const highestPrice = await Product.aggregate(pipeline).limit(Number(limit));
@@ -15,18 +15,30 @@ const getHighestPrice = async ({ pipeline, rawData, limit }) => {
   return highestPrice;
 };
 
-const prepareData = originalData => {
-  const preparedData = [...originalData];
+const prepareData = (originalData) => {
+  if (Array.isArray(originalData)) {
+    const preparedData = [...originalData];
 
-  for (let i = 0; i < originalData.length; i++) {
-    preparedData[i].price = {
-      ...preparedData[i].price,
+    for (let i = 0; i < originalData.length; i++) {
+      preparedData[i].price = {
+        ...preparedData[i].price,
+        value: `${cashFormatter({
+          number: preparedData[i].price.value,
+        })}`,
+      };
+    }
+    return preparedData;
+  } else {
+    const preparedData = { ...originalData };
+
+    preparedProduct.price = {
+      ...preparedProduct.price,
       value: `${cashFormatter({
-        number: preparedData[i].price.value,
+        number: preparedProduct.price.value,
       })}`,
     };
+    return preparedData;
   }
-  return preparedData;
 };
 
 const getAllProducts = async (req, res) => {
@@ -39,7 +51,7 @@ const getAllProducts = async (req, res) => {
       ...query,
     })
       .sort(sortMethod)
-      .populate(['authors', 'categories'])
+      .populate(["authors", "categories"])
       .limit(Number(limit))
       .lean();
 
@@ -57,7 +69,7 @@ const getAllProducts = async (req, res) => {
       pipeline.push({
         $group: {
           _id: null,
-          maxNumber: { $max: '$price.value' },
+          maxNumber: { $max: "$price.value" },
         },
       });
 
@@ -67,7 +79,7 @@ const getAllProducts = async (req, res) => {
   } catch (err) {
     return res
       .status(500)
-      .json({ message: 'We failed fetching products.', error: err.message });
+      .json({ message: "We failed fetching products.", error: err.message });
   }
 };
 
@@ -82,7 +94,7 @@ const getShopProducts = async (req, res) => {
       ...query,
     })
       .sort(sortMethod)
-      .populate(['authors', 'categories'])
+      .populate(["authors", "categories"])
       .limit(limit)
       .lean();
 
@@ -97,7 +109,7 @@ const getShopProducts = async (req, res) => {
       pipeline.push({
         $group: {
           _id: null,
-          maxNumber: { $max: '$price.value' },
+          maxNumber: { $max: "$price.value" },
         },
       });
       await getHighestPrice({ pipeline, rawData, limit });
@@ -106,7 +118,7 @@ const getShopProducts = async (req, res) => {
     return res.status(200).json({ data: { data: preparedData, rawData } });
   } catch (err) {
     return res.status(500).json({
-      message: 'We failed fetching shop products.',
+      message: "We failed fetching shop products.",
       error: err.message,
     });
   }
@@ -123,7 +135,7 @@ const getCollectionProducts = async (req, res) => {
       ...query,
     })
       .sort(sortMethod)
-      .populate(['authors', 'categories'])
+      .populate(["authors", "categories"])
       .limit(limit)
       .lean();
 
@@ -139,7 +151,7 @@ const getCollectionProducts = async (req, res) => {
       pipeline.push({
         $group: {
           _id: null,
-          maxNumber: { $max: '$price.value' },
+          maxNumber: { $max: "$price.value" },
         },
       });
       await getHighestPrice({ pipeline, rawData, limit });
@@ -148,7 +160,7 @@ const getCollectionProducts = async (req, res) => {
     return res.status(200).json({ data: { data: preparedData, rawData } });
   } catch (err) {
     return res.status(500).json({
-      message: 'Fetching collections data went wrong',
+      message: "Fetching collections data went wrong",
       error: err.message,
     });
   }
@@ -158,42 +170,38 @@ const getOneProduct = async (req, res) => {
   const { _id } = req.query;
 
   if (!_id) {
-    return res.status(422).json({ message: 'Product id is requried' });
+    return res.status(422).json({ message: "Product id is requried" });
   }
 
   try {
-    const product = await Product.findOne({ _id })
+    const productData = await Product.findOne({ _id })
       .populate([
-        { path: 'categories', select: ['value', 'label'] },
+        { path: "categories", select: ["value", "label"] },
         {
-          path: 'authors',
+          path: "authors",
           select: [
-            'user_info.credentials.full_name',
-            '_id',
-            'author_info.pseudonim',
+            "user_info.credentials.full_name",
+            "_id",
+            "author_info.pseudonim",
           ],
         },
       ])
       .lean();
 
-    const preparedProduct = { ...product };
+    const preparedProduct = prepareData(productData);
 
-    preparedProduct.price = {
-      ...preparedProduct.price,
-      value: `${cashFormatter({
-        number: preparedProduct.price.value,
-      })}`,
-    };
-
-    const comments = await Comment.find({ 'targetData._id': product._id })
-      .populate('creatorData')
+    const comments = await Comment.find({ "targetData._id": productData._id })
+      .populate("creatorData")
       .lean();
+
     preparedProduct.comments = comments;
+
     return res.status(200).json({ data: preparedProduct });
   } catch (err) {
-    return res
-      .status(500)
-      .json({ message: 'Fetching data went wrong', error: err.message });
+    return res.status(500).json({
+      message: "We failed fetching product's data",
+      error: err.message,
+    });
   }
 };
 
@@ -212,11 +220,11 @@ const addOneProduct = async (req, res) => {
     });
     return res
       .status(201)
-      .json({ message: 'Succesfully added new product', id: _id });
+      .json({ message: "Succesfully added new product", id: _id });
   } catch (err) {
     return res
       .status(500)
-      .json({ message: 'Adding product failed', error: err.message });
+      .json({ message: "Adding product failed", error: err.message });
   }
 };
 
@@ -228,9 +236,9 @@ const updateOneProduct = async (req, res) => {
 
     await Product.updateOne({ _id }, { updatedAt, ...preparedData });
 
-    return res.status(200).json({ message: 'Success' });
+    return res.status(200).json({ message: "Success" });
   } catch (err) {
-    return res.status(500).json({ message: 'Failed', error: err.message });
+    return res.status(500).json({ message: "Failed", error: err.message });
   }
 };
 
@@ -238,7 +246,7 @@ const deleteOneProduct = async (req, res) => {
   const { _id } = req.body;
 
   if (!_id) {
-    return res.status(422).json({ message: 'Product id is required' });
+    return res.status(422).json({ message: "Product id is required" });
   }
 
   try {
@@ -247,35 +255,36 @@ const deleteOneProduct = async (req, res) => {
     await Product.updateOne({ _id }, { deleted: true, expireAt: deleteDate });
     return res
       .status(200)
-      .json({ message: 'Successfully deleted the product' });
+      .json({ message: "Successfully deleted the product" });
   } catch (err) {
     return res.status(500).json({
-      message: 'Failed deleting selected product',
+      message: "Failed deleting selected product.",
       error: err.message,
     });
   }
 };
 
-const deleteAllProducts = async (req, res) => {
+const deleteAllCreatorProducts = async (req, res) => {
   const { userId } = req.body;
   if (!userId) {
-    return res.status(422).json({ message: 'User id is required' });
+    return res.status(422).json({ message: "User id is required" });
   }
   try {
     const deleteDate = calculateFutureDeleteDate();
 
     await Product.updateMany(
-      { 'creatorData._id': userId },
-      { deleted: true, expireAt: deleteDate },
+      { "creatorData._id": userId },
+      { deleted: true, expireAt: deleteDate }
     );
 
     return res
       .status(200)
-      .json({ message: 'Successfully deleted all products' });
+      .json({ message: "Successfully deleted all your products." });
   } catch (err) {
-    return res
-      .status(500)
-      .json({ message: 'Failed deleting all prodcuts', error: err.message });
+    return res.status(500).json({
+      message: "Failed deleting all your prodcuts.",
+      error: err.message,
+    });
   }
 };
 
@@ -283,13 +292,13 @@ const productsQuantity = async (req, res) => {
   const { authorId } = req.query;
   try {
     const quantity = await Product.find({
-      'creatorData._id': authorId,
+      "creatorData._id": authorId,
     }).count();
     return res.status(200).json({ data: quantity });
   } catch (err) {
     return res
       .status(500)
-      .json({ message: 'Failed deleting all prodcuts', error: err.message });
+      .json({ message: "Failed deleting all prodcuts", error: err.message });
   }
 };
 
@@ -302,5 +311,5 @@ module.exports = {
   addOneProduct,
   updateOneProduct,
   deleteOneProduct,
-  deleteAllProducts,
+  deleteAllCreatorProducts,
 };
