@@ -27,7 +27,7 @@ export default function SimilarProducts({
       return { ...prevState, isLoading: true };
     });
     const { data, error } = await useGetAccessDatabase({
-      url: DATABASE_ENDPOINTS.PRODUCT_SHOP_ALL,
+      url: DATABASE_ENDPOINTS.PRODUCT_ALL,
       params: { authorId, limit: 10 },
     });
     if (error) {
@@ -41,18 +41,15 @@ export default function SimilarProducts({
     fetchData();
   }, [fetchData]);
   return (
-    <div>
-      <h2 className="mb-4 text-3xl">Similar products from {authorPseudonim}</h2>
-      <section className="px-2">
-        {products.data && (
-          <SushiSwiper
-            arrayOfItems={products.data}
-            errorState={products.hasError}
-            swiperCategory={`similarProducts`}
-            loadingState={products.isLoading}
-          />
-        )}
-      </section>
-    </div>
+    <article className="px-2">
+      {products.data && (
+        <SushiSwiper
+          arrayOfItems={products.data}
+          errorState={products.hasError}
+          swiperCategory={`similarProducts`}
+          loadingState={products.isLoading}
+        />
+      )}
+    </article>
   );
 }

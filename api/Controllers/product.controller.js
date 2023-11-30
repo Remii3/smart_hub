@@ -7,34 +7,18 @@ const calculateFutureDeleteDate = require('../helpers/calculate/calculateFutureD
 const cashFormatter = require('../helpers/cashFormatter');
 
 const getAllProducts = async (req, res) => {
+  const { limit = 10 } = req.query;
   const query = req.preparedData;
-  const { skipPages, currentPageSize, currentPage } = req.pageData;
   const sortMethod = req.sortMethod;
-  const rawData = {};
   try {
-    let flag = false;
-    let skipPagesCopy = skipPages;
-    do {
-      productsData = await Product.find({
-        ...query,
-        deleted: false,
-      })
-        .sort(sortMethod)
-        .skip(skipPagesCopy)
-        .limit(currentPageSize)
-        .populate(['authors', 'categories'])
-        .lean();
-      if (productsData.length <= 0 && skipPages > 1 && currentPage > 1) {
-        flag = true;
-        skipPagesCopy -= skipPages;
-        currentPage -= 1;
-      } else {
-        flag = false;
-      }
-    } while (flag);
-
-    totalDocuments = await Product.find(query).countDocuments();
-    totalPages = Math.ceil(totalDocuments / currentPageSize);
+    const productsData = await Product.find({
+      deleted: false,
+      ...query,
+    })
+      .sort(sortMethod)
+      .populate(['authors', 'categories'])
+      .limit(limit)
+      .lean();
 
     const preparedData = [...productsData];
 
@@ -46,10 +30,31 @@ const getAllProducts = async (req, res) => {
         })}`,
       };
     }
-    rawData.totalPages = totalPages;
-    rawData.totalProducts = totalDocuments;
 
-    return res.status(200).json({ data: { products: preparedData, rawData } });
+    const pipeline = [];
+    if (query.categories) {
+      pipeline.push({
+        $match: {
+          categories: query.categories,
+        },
+      });
+    }
+    pipeline.push({
+      $group: {
+        _id: null,
+        maxNumber: { $max: '$price.value' },
+      },
+    });
+
+    const highestPrice = await Product.aggregate(pipeline);
+
+    const rawData = {};
+    rawData.highestPrice =
+      highestPrice.length > 0
+        ? cashFormatter({ number: highestPrice[0].maxNumber })
+        : cashFormatter({ number: 0 });
+
+    return res.status(200).json({ data: { data: preparedData, rawData } });
   } catch (err) {
     return res
       .status(500)
