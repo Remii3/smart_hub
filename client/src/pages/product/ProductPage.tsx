@@ -69,7 +69,7 @@ import SwiperArrowLeft from '@components/swiper/navigation/SwiperArrowLeft';
 import SwiperDots from '@components/swiper/pagination/SwiperDots';
 import MarketplaceBadge from '@components/UI/badges/MarketplaceBadge';
 import { TrashIcon } from '@radix-ui/react-icons';
-import RatingSummary from '@features/product/RatingSummary';
+import RatingSummary from '@features/comments/RatingSummary';
 
 interface ProductTypesLocal extends FetchDataTypes {
   data: null | ProductTypes;

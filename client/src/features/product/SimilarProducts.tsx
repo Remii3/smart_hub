@@ -12,10 +12,7 @@ interface PropsTypes {
   authorId: string;
   authorPseudonim: string;
 }
-export default function SimilarProducts({
-  authorId,
-  authorPseudonim,
-}: PropsTypes) {
+export default function SimilarProducts({ authorId }: PropsTypes) {
   const [products, setProducts] = useState<ProductsTypes>({
     data: null,
     hasError: null,
@@ -28,7 +25,7 @@ export default function SimilarProducts({
     });
     const { data, error } = await useGetAccessDatabase({
       url: DATABASE_ENDPOINTS.PRODUCT_ALL,
-      params: { authorId, limit: 10 },
+      params: { authorId, limit: 10, withHighPrice: true },
     });
     if (error) {
       errorToast(error);
@@ -39,9 +36,10 @@ export default function SimilarProducts({
 
   useEffect(() => {
     fetchData();
-  }, [fetchData]);
+  }, [authorId]);
+
   return (
-    <article className="px-2">
+    <article>
       {products.data && (
         <SushiSwiper
           arrayOfItems={products.data}

@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader } from '@components/UI/card';
+import { Card } from '@components/UI/card';
 import { CommentsPropsTypes } from './Comments';
 import { useContext, useState } from 'react';
 import { UserContext } from '@context/UserProvider';

@@ -16,15 +16,14 @@ const prepareFindOne = require('../Middleware/product/prepareFindOne.middleware'
 const prepareNewProductData = require('../Middleware/product/prepareNewProductData.middleware');
 const checkSortMethod = require('../Middleware/checkSortMethod.middleware');
 const prepareUpdate = require('../Middleware/product/prepareUpdate.middleware');
-const prepareFindAllData = require('../Middleware/product/prepareFindAllData.middleware');
-const prepareFindShop = require('../Middleware/product/prepareFindShop.middleware');
+const prepareFindProducts = require('../Middleware/product/prepareFindProducts.middleware');
 
-router.get('/all', checkSortMethod, prepareFindAllData, getAllProducts);
-router.get('/shop', checkSortMethod, prepareFindShop, getShopProducts);
+router.get('/all', checkSortMethod, prepareFindProducts, getAllProducts);
+router.get('/shop', checkSortMethod, prepareFindProducts, getShopProducts);
 router.get(
   '/collection',
   checkSortMethod,
-  prepareFindOne,
+  prepareFindProducts,
   getCollectionProducts,
 );
 router.get('/one', getOneProduct);

@@ -1,18 +1,12 @@
 import { Progress } from '@components/UI/progress';
-import { CommentTypes } from '@customTypes/interfaces';
+import { RatingTypes } from '@customTypes/types';
 import { StarIcon } from '@heroicons/react/24/solid';
-
-interface PropsRatingSummaryTypes {
-  avgRating: number;
-  quantity: number;
-  reviews: CommentTypes[];
-}
 
 export default function RatingSummary({
   avgRating,
   quantity,
   reviews,
-}: PropsRatingSummaryTypes) {
+}: RatingTypes) {
   const ratingComments = reviews.filter((comment) => comment.value.rating);
   const countVotes = (value: number) =>
     ratingComments.filter((comment) => comment.value.rating === value).length;

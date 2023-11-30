@@ -6,72 +6,79 @@ const Order = require('../Models/order');
 const calculateFutureDeleteDate = require('../helpers/calculate/calculateFutureDeleteDate');
 const cashFormatter = require('../helpers/cashFormatter');
 
+const getHighestPrice = async ({ pipeline, rawData, limit }) => {
+  const highestPrice = await Product.aggregate(pipeline).limit(Number(limit));
+  rawData.highestPrice =
+    highestPrice.length > 0
+      ? cashFormatter({ number: highestPrice[0].maxNumber })
+      : cashFormatter({ number: 0 });
+  return highestPrice;
+};
+
+const prepareData = originalData => {
+  const preparedData = [...originalData];
+
+  for (let i = 0; i < originalData.length; i++) {
+    preparedData[i].price = {
+      ...preparedData[i].price,
+      value: `${cashFormatter({
+        number: preparedData[i].price.value,
+      })}`,
+    };
+  }
+  return preparedData;
+};
+
 const getAllProducts = async (req, res) => {
-  const { limit = 10 } = req.query;
-  const query = req.preparedData;
+  const { limit = 10, withHighPrice } = req.query;
+  const rawData = {};
+  const query = req.queryData;
   const sortMethod = req.sortMethod;
   try {
     const productsData = await Product.find({
-      deleted: false,
       ...query,
     })
       .sort(sortMethod)
       .populate(['authors', 'categories'])
-      .limit(limit)
+      .limit(Number(limit))
       .lean();
 
-    const preparedData = [...productsData];
+    const preparedData = prepareData(productsData);
 
-    for (let i = 0; i < productsData.length; i++) {
-      preparedData[i].price = {
-        ...preparedData[i].price,
-        value: `${cashFormatter({
-          number: preparedData[i].price.value,
-        })}`,
-      };
-    }
+    if (withHighPrice) {
+      const pipeline = [];
 
-    const pipeline = [];
-    if (query.categories) {
       pipeline.push({
         $match: {
-          categories: query.categories,
+          ...query,
         },
       });
+
+      pipeline.push({
+        $group: {
+          _id: null,
+          maxNumber: { $max: '$price.value' },
+        },
+      });
+
+      await getHighestPrice({ pipeline, rawData, limit });
     }
-    pipeline.push({
-      $group: {
-        _id: null,
-        maxNumber: { $max: '$price.value' },
-      },
-    });
-
-    const highestPrice = await Product.aggregate(pipeline);
-
-    const rawData = {};
-    rawData.highestPrice =
-      highestPrice.length > 0
-        ? cashFormatter({ number: highestPrice[0].maxNumber })
-        : cashFormatter({ number: 0 });
-
     return res.status(200).json({ data: { data: preparedData, rawData } });
   } catch (err) {
     return res
       .status(500)
-      .json({ message: 'Fetching data went wrong', error: err.message });
+      .json({ message: 'We failed fetching products.', error: err.message });
   }
 };
 
 const getShopProducts = async (req, res) => {
-  const { limit = 10 } = req.query;
+  const { limit = 10, withHighPrice } = req.query;
   const sortMethod = req.sortMethod;
+  const rawData = {};
   const query = req.queryData;
+
   try {
     const productsData = await Product.find({
-      marketplace: 'shop',
-      quantity: { $gt: 0 },
-      deleted: false,
-      sold: false,
       ...query,
     })
       .sort(sortMethod)
@@ -79,58 +86,40 @@ const getShopProducts = async (req, res) => {
       .limit(limit)
       .lean();
 
-    const preparedData = [...productsData];
-
-    for (let i = 0; i < productsData.length; i++) {
-      preparedData[i].price = {
-        ...preparedData[i].price,
-        value: `${cashFormatter({
-          number: preparedData[i].price.value,
-        })}`,
-      };
-    }
-
-    const pipeline = [];
-    if (query.categories) {
+    const preparedData = prepareData(productsData);
+    if (withHighPrice) {
+      const pipeline = [];
       pipeline.push({
         $match: {
-          categories: query.categories,
+          ...query,
         },
       });
+      pipeline.push({
+        $group: {
+          _id: null,
+          maxNumber: { $max: '$price.value' },
+        },
+      });
+      await getHighestPrice({ pipeline, rawData, limit });
     }
-    pipeline.push({
-      $group: {
-        _id: null,
-        maxNumber: { $max: '$price.value' },
-      },
-    });
-
-    const highestPrice = await Product.aggregate(pipeline);
-
-    const rawData = {};
-    rawData.highestPrice =
-      highestPrice.length > 0
-        ? cashFormatter({ number: highestPrice[0].maxNumber })
-        : cashFormatter({ number: 0 });
 
     return res.status(200).json({ data: { data: preparedData, rawData } });
   } catch (err) {
-    return res
-      .status(500)
-      .json({ message: 'Fetching shop data went wrong', error: err.message });
+    return res.status(500).json({
+      message: 'We failed fetching shop products.',
+      error: err.message,
+    });
   }
 };
 
 const getCollectionProducts = async (req, res) => {
-  const { limit = 10 } = req.query;
+  const { limit = 10, withHighPrice } = req.query;
   const sortMethod = req.sortMethod;
+  const rawData = {};
   const query = req.queryData;
+
   try {
     const productsData = await Product.find({
-      marketplace: 'collection',
-      quantity: { $gt: 0 },
-      deleted: false,
-      sold: false,
       ...query,
     })
       .sort(sortMethod)
@@ -138,45 +127,30 @@ const getCollectionProducts = async (req, res) => {
       .limit(limit)
       .lean();
 
-    const preparedData = [...productsData];
+    const preparedData = prepareData(productsData);
 
-    for (let i = 0; i < productsData.length; i++) {
-      preparedData[i].price = {
-        ...preparedData[i].price,
-        value: `${cashFormatter({
-          number: preparedData[i].price.value,
-        })}`,
-      };
-    }
-
-    const pipeline = [];
-    if (query.categories) {
+    if (withHighPrice) {
+      const pipeline = [];
       pipeline.push({
         $match: {
-          categories: query.categories,
+          ...query,
         },
       });
+      pipeline.push({
+        $group: {
+          _id: null,
+          maxNumber: { $max: '$price.value' },
+        },
+      });
+      await getHighestPrice({ pipeline, rawData, limit });
     }
-    pipeline.push({
-      $group: {
-        _id: null,
-        maxNumber: { $max: '$price.value' },
-      },
-    });
-
-    const highestPrice = await Product.aggregate(pipeline);
-
-    const rawData = {};
-    rawData.highestPrice =
-      highestPrice.length > 0
-        ? cashFormatter({ number: highestPrice[0].maxNumber })
-        : cashFormatter({ number: 0 });
 
     return res.status(200).json({ data: { data: preparedData, rawData } });
   } catch (err) {
-    return res
-      .status(500)
-      .json({ message: 'Fetching shop data went wrong', error: err.message });
+    return res.status(500).json({
+      message: 'Fetching collections data went wrong',
+      error: err.message,
+    });
   }
 };
 
