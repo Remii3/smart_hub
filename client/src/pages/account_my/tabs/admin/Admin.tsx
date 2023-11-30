@@ -27,7 +27,7 @@ export default function Admin() {
   });
   const [page, setPage] = useState(1);
   const { userData } = useContext(UserContext);
-  const limit = 3;
+  const limit = 10;
 
   const fetchData = useCallback(async () => {
     setAllUsers((prevState) => {
@@ -61,14 +61,13 @@ export default function Admin() {
   }, [page]);
 
   if (!userData.data) return <div>Please log in</div>;
-
   return (
     <div className="sm:px-3">
       <h4 className="mb-4">Users</h4>
       <div className="sm:px-2">
-        <Accordion type="multiple">
-          {allUsers.isLoading && <LoadingCircle />}
+        <Accordion type="multiple" className="relative">
           {allUsers.users && allUsers.users.length <= 0 && <div>No users</div>}
+
           {allUsers.users &&
             allUsers.users.map((user) => (
               <AdminTabs
@@ -78,15 +77,19 @@ export default function Admin() {
                 fetchData={fetchData}
               />
             ))}
+
+          {allUsers.isLoading && !allUsers.users && <LoadingCircle />}
         </Accordion>
         {allUsers.rawData && (
-          <Pagination
-            totalCount={allUsers.rawData.quantity}
-            currentPage={page}
-            onPageChange={(newPageNumber: number) => setPage(newPageNumber)}
-            pageSize={limit}
-            siblingCount={1}
-          />
+          <div className="flex justify-center items-center mt-5">
+            <Pagination
+              totalCount={allUsers.rawData.quantity}
+              currentPage={page}
+              onPageChange={(newPageNumber: number) => setPage(newPageNumber)}
+              pageSize={limit}
+              siblingCount={1}
+            />
+          </div>
         )}
       </div>
     </div>
