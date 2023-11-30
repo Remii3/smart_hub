@@ -46,7 +46,7 @@ export default function MyProducts({ tag, limit }: PropsTypes) {
       url: DATABASE_ENDPOINTS.SEARCH_PRODCOL,
       params: {
         pageSize: limit,
-
+        withPagination: true,
         filtersData: {
           page,
           marketplace: 'shop',

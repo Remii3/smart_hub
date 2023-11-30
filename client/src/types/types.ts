@@ -28,7 +28,7 @@ export type VoteType = 'Like' | 'Dislike';
 export type RatingTypes = {
   avgRating: number;
   quantity: number;
-  reviews: CommentTypes[];
+  reviews?: CommentTypes[];
 };
 
 export type PriceTypes = {

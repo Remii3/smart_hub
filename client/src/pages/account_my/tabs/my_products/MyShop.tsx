@@ -98,12 +98,6 @@ export default function MyShop() {
       <h4 className="mb-4">My products</h4>
       <div className="space-y-4">
         <section className="px-2">
-          <h5 className="mb-2">Latest:</h5>
-          <div>
-            <MyProducts tag="latest" limit={4} />
-          </div>
-        </section>
-        <section className="px-2">
           <h5 className="mb-2">All:</h5>
           <div>
             <MyProducts tag="all" limit={8} />
