@@ -31,10 +31,10 @@ const prepareData = (originalData) => {
   } else {
     const preparedData = { ...originalData };
 
-    preparedProduct.price = {
-      ...preparedProduct.price,
+    preparedData.price = {
+      ...preparedData.price,
       value: `${cashFormatter({
-        number: preparedProduct.price.value,
+        number: preparedData.price.value,
       })}`,
     };
     return preparedData;
