@@ -30,8 +30,7 @@ const prepareCreateProduct = (req, res, next) => {
   if (authors && authors.length > 0) {
     preparedData.authors = authors;
   }
-
-  if (description) {
+  if (req.body.description !== undefined) {
     preparedData.description = description;
   }
 

@@ -67,7 +67,14 @@ const formSchema = z.object({
   title: z.string().min(2, {
     message: 'Title must be at least 2 characters.',
   }),
-  authors: z.any(),
+  authors: z
+    .array(
+      z.object({
+        _id: z.string(),
+        authors_info: z.any(),
+      })
+    )
+    .min(1),
   categories: z.any(),
   shortDescription: z.string().optional(),
   quantity: z.number().min(1),
@@ -188,9 +195,7 @@ export default function NewProduct() {
       ])
     ) as any;
 
-    if (newDescription.value !== newDescription.value) {
-      dirtyData.description = newDescription.value;
-    }
+    dirtyData.description = newDescription.value;
 
     if (selectedImgs.isDirty) {
       dirtyData.imgs = selectedImgs.imgs;
