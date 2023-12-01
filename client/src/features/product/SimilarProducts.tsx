@@ -1,5 +1,4 @@
 import errorToast from '@components/UI/error/errorToast';
-import ShopCard from '@components/cards/ShopCard';
 import SushiSwiper from '@components/swiper/SushiSwiper';
 import { FetchDataTypes, ProductTypes } from '@customTypes/interfaces';
 import { DATABASE_ENDPOINTS } from '@data/endpoints';

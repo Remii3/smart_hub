@@ -2,7 +2,7 @@ import { useState, useEffect, ChangeEvent, useCallback, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import AdvancedFilter from '@pages/search/AdvancedFilter';
 import { ProductTypes } from '@customTypes/interfaces';
-import ShopCard from '@components/cards/ShopCard';
+import ProductCard from '@components/cards/ProductCard';
 import MainContainer from '@layout/MainContainer';
 import Pagination from '@components/paginations/Pagination';
 import SortProducts from '@features/sortProducts/SortProducts';
@@ -344,7 +344,7 @@ export default function SearchPage() {
                 searchedProductsData.products &&
                 searchedProductsData.products.map((item) => {
                   return (
-                    <ShopCard
+                    <ProductCard
                       key={item._id}
                       _id={item._id}
                       categories={item.categories}

@@ -9,7 +9,7 @@ import { ShoppingCartIcon } from '@heroicons/react/24/solid';
 import { Badge } from '@components/UI/badge';
 import MarketplaceBadge from '@components/UI/badges/MarketplaceBadge';
 
-export default function ShopCard({
+export default function ProductCard({
   _id,
   title,
   authors,

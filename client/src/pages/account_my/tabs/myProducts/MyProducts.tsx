@@ -8,14 +8,24 @@ import {
 import { DATABASE_ENDPOINTS } from '@data/endpoints';
 import errorToast from '@components/UI/error/errorToast';
 import DeleteDialog from '@components/UI/dialogs/DeleteDialog';
-import { FetchDataTypes, PostDataTypes } from '@customTypes/interfaces';
+import {
+  FetchDataTypes,
+  PostDataTypes,
+  ProductTypes,
+} from '@customTypes/interfaces';
 import { MarketplaceTypes } from '@customTypes/types';
 import AllProducts from './AllProducts';
 
 interface ProductQuantityTypes extends FetchDataTypes {
   quantity: null | number;
 }
-
+interface ProductsTypes extends FetchDataTypes {
+  data: null | ProductTypes[];
+  rawData: null | {
+    [index: string]: unknown;
+    totalProducts: number;
+  };
+}
 interface DeleteAllTypes extends PostDataTypes {}
 
 export default function MyProducts() {
@@ -33,6 +43,14 @@ export default function MyProducts() {
   });
   const marketplace = 'shop' as MarketplaceTypes;
   const { userData, fetchUserData } = useContext(UserContext);
+  const [products, setProducts] = useState<ProductsTypes>({
+    data: null,
+    rawData: null,
+    hasError: null,
+    isLoading: false,
+  });
+  const [page, setPage] = useState(1);
+  const allLimit = 8;
 
   const fetchData = useCallback(async () => {
     if (!userData.data) return;
@@ -51,13 +69,54 @@ export default function MyProducts() {
         return { ...prevState, hasError: error, isLoading: false };
       });
     }
-
     setProductsQuantity({ hasError: null, isLoading: false, quantity: data });
   }, []);
 
+  const fetchAllData = useCallback(async () => {
+    setProducts((prevState) => {
+      return { ...prevState, isLoading: true };
+    });
+
+    let data = null;
+    let error = null;
+
+    const productsResponse = await useGetAccessDatabase({
+      url: DATABASE_ENDPOINTS.SEARCH_PRODCOL,
+      params: {
+        pageSize: allLimit,
+        withPagination: true,
+        filtersData: {
+          page,
+          marketplace: 'shop',
+        },
+      },
+    });
+    data = productsResponse.data;
+    error = productsResponse.error;
+    if (error) {
+      errorToast(error);
+      return setProducts({
+        data: null,
+        rawData: null,
+        hasError: error,
+        isLoading: false,
+      });
+    }
+    setProducts({
+      data: data.data,
+      rawData: data.rawData,
+      hasError: null,
+      isLoading: false,
+    });
+  }, [page]);
+
+  useEffect(() => {
+    fetchAllData();
+  }, [page, userData]);
+
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [userData]);
 
   const deleteAllItemsHandler = async () => {
     setDeleteAllStatus((prevState) => {
@@ -66,7 +125,7 @@ export default function MyProducts() {
 
     const { error } = await usePostAccessDatabase({
       url: DATABASE_ENDPOINTS.PRODUCT_DELETE_ALL,
-      body: { userId: userData.data && userData.data._id },
+      body: { userId: userData.data && userData.data._id, marketplace },
     });
     if (error) {
       errorToast(error);
@@ -75,6 +134,8 @@ export default function MyProducts() {
       });
     }
     fetchUserData();
+    fetchData();
+    fetchAllData();
     setDeleteDialog(false);
     setDeleteAllStatus({ hasError: null, isLoading: false, isSuccess: true });
     setTimeout(() => {
@@ -86,29 +147,38 @@ export default function MyProducts() {
 
   return (
     <div className="relative px-3">
-      {!deleteAllStatus.isLoading &&
-        !!productsQuantity.quantity &&
-        productsQuantity.quantity > 0 && (
-          <DeleteDialog
-            openState={deleteDialog}
-            openStateHandler={() => setDeleteDialog(false)}
-            deleteHandler={deleteAllItemsHandler}
-          >
-            <Button
-              type="button"
-              variant={'destructive'}
-              onClick={() => setDeleteDialog(true)}
+      <section className="flex justify-between items-center">
+        <h4 className="mb-4">My products</h4>
+        {!deleteAllStatus.isLoading &&
+          !!productsQuantity.quantity &&
+          productsQuantity.quantity > 0 && (
+            <DeleteDialog
+              openState={deleteDialog}
+              openStateHandler={() => setDeleteDialog(false)}
+              deleteHandler={deleteAllItemsHandler}
             >
-              Delete all
-            </Button>
-          </DeleteDialog>
-        )}
-      <h4 className="mb-4">My products</h4>
+              <Button
+                type="button"
+                variant={'destructive'}
+                onClick={() => setDeleteDialog(true)}
+              >
+                Delete all
+              </Button>
+            </DeleteDialog>
+          )}
+      </section>
       <div className="space-y-4">
         <section className="px-2">
-          <h5 className="mb-2">All:</h5>
           <div>
-            <AllProducts limit={8} />
+            {products.data && (
+              <AllProducts
+                limit={allLimit}
+                onPageChange={setPage}
+                page={page}
+                products={products.data}
+                totalPages={products.rawData?.totalProducts}
+              />
+            )}
           </div>
         </section>
       </div>

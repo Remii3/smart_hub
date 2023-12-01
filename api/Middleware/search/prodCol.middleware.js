@@ -111,6 +111,10 @@ const prodCol = async (req, res, next) => {
     searchQuery.quantity = { $gt: 0 };
   }
 
+  if (!filtersData.showDeleted) {
+    searchQuery.deleted = false;
+  }
+
   req.finalSearchData = {
     searchQuery,
     specialQuery,

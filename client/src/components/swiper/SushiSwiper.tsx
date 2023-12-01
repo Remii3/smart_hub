@@ -7,7 +7,7 @@ import { useEffect } from 'react';
 import 'swiper/css';
 import 'swiper/css/pagination';
 import 'swiper/css/navigation';
-import ShopCard from '@components/cards/ShopCard';
+import ProductCard from '@components/cards/ProductCard';
 import ErrorMessage from '@components/UI/error/ErrorMessage';
 import { Skeleton } from '@components/UI/skeleton';
 import SwiperArrowRight from './navigation/SwiperArrowRight';
@@ -115,7 +115,7 @@ export default function SushiSwiper({
                 style={{ height: 'auto' }}
                 className="min-w-[280px] pr-8"
               >
-                <ShopCard
+                <ProductCard
                   _id={item._id}
                   categories={item.categories}
                   price={item.price.value}
