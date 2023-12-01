@@ -72,48 +72,46 @@ export default function CartItem({
       </div>
 
       <div className="flex flex-grow items-center justify-between gap-3 sm:flex-grow-0 sm:justify-end sm:gap-6">
-        <form>
-          <div className="flex items-center">
-            <Button
-              variant={'ghost'}
-              type="button"
-              className={`${
-                (!(inCartQuantity > 1) || isBusy) && 'text-slate-800'
-              } max-h-9 text-base`}
-              disabled={!(inCartQuantity > 1) || isBusy}
-              onClick={() => decrementHandler()}
-              aria-label="Decrement item in your cart."
-            >
-              -
-            </Button>
-            <label htmlFor="cartProductQuantity" className="sr-only">
-              Quantity
-            </label>
-            <Input
-              type="number"
-              min="1"
-              max={productData.quantity}
-              value={inCartQuantity}
-              readOnly
-              disabled
-              id="cartProductQuantity"
-              className="w-[60px] text-center text-foreground [-moz-appearance:_textfield] focus:outline-none [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none"
-            />
-            <Button
-              variant={'ghost'}
-              type="button"
-              className={`${
-                (inCartQuantity >= productData.quantity || isBusy) &&
-                'text-gray-800'
-              } max-h-9 text-base`}
-              disabled={inCartQuantity >= productData.quantity || isBusy}
-              onClick={() => incrementHandler()}
-              aria-label="Increment item in your cart."
-            >
-              +
-            </Button>
-          </div>
-        </form>
+        <div className="flex items-center">
+          <Button
+            variant={'ghost'}
+            type="button"
+            className={`${
+              (!(inCartQuantity > 1) || isBusy) && 'text-slate-800'
+            } max-h-9 text-base`}
+            disabled={!(inCartQuantity > 1) || isBusy}
+            onClick={() => decrementHandler()}
+            aria-label="Decrement item in your cart."
+          >
+            -
+          </Button>
+          <label htmlFor="cartProductQuantity" className="sr-only">
+            Quantity
+          </label>
+          <Input
+            type="number"
+            min="1"
+            max={productData.quantity}
+            value={inCartQuantity}
+            readOnly
+            disabled
+            id="cartProductQuantity"
+            className="w-[60px] text-center text-foreground [-moz-appearance:_textfield] focus:outline-none [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none"
+          />
+          <Button
+            variant={'ghost'}
+            type="button"
+            className={`${
+              (inCartQuantity >= productData.quantity || isBusy) &&
+              'text-gray-800'
+            } max-h-9 text-base`}
+            disabled={inCartQuantity >= productData.quantity || isBusy}
+            onClick={() => incrementHandler()}
+            aria-label="Increment item in your cart."
+          >
+            +
+          </Button>
+        </div>
 
         <Button
           variant={'ghost'}

@@ -70,6 +70,7 @@ import SwiperDots from '@components/swiper/pagination/SwiperDots';
 import MarketplaceBadge from '@components/UI/badges/MarketplaceBadge';
 import { TrashIcon } from '@radix-ui/react-icons';
 import RatingSummary from '@features/comments/RatingSummary';
+import { Separator } from '@components/UI/separator';
 
 interface ProductTypesLocal extends FetchDataTypes {
   data: null | ProductTypes;
@@ -88,12 +89,14 @@ const formSchema = z.object({
   title: z.string().min(2, {
     message: 'Title must be at least 2 characters.',
   }),
-  authors: z.array(
-    z.object({
-      _id: z.string(),
-      authors_info: z.any(),
-    })
-  ),
+  authors: z
+    .array(
+      z.object({
+        _id: z.string(),
+        authors_info: z.any(),
+      })
+    )
+    .min(1),
   categories: z.any(),
   shortDescription: z.string(),
   marketplace: z.string(),
@@ -152,7 +155,6 @@ export default function ProductPage() {
   const headerHeight = 124;
   const shortDescriptionRef = useRef<null | HTMLDivElement>(null);
   const detailsRef = useRef<null | HTMLDivElement>(null);
-  const descriptionRef = useRef<null | HTMLDivElement>(null);
   const similarRef = useRef<null | HTMLDivElement>(null);
   const commentsRef = useRef<null | HTMLDivElement>(null);
 
@@ -362,10 +364,10 @@ export default function ProductPage() {
         form.getValues(x as keyof z.infer<typeof formSchema>),
       ])
     );
-    if (newDescription !== newDescription) {
+
+    if (newDescription !== productState.data?.description) {
       dirtyData.description = newDescription;
     }
-
     if (selectedImgs.isDirty) {
       dirtyData.imgs = selectedImgs.imgs;
     }
@@ -455,6 +457,7 @@ export default function ProductPage() {
     itemCapacity = productState.data.quantity! <= selectedQuantity || false;
     itemBtnCapacity = productState.data.quantity! < selectedQuantity || false;
   }
+
   return (
     <section
       ref={shortDescriptionRef}
@@ -465,7 +468,7 @@ export default function ProductPage() {
         <ErrorMessage message={productState.hasError} />
       )}
       {!productState.isLoading && productState.data && (
-        <div className="flex flex-col gap-8">
+        <div className="flex flex-col gap-10">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(updateProductData)}>
               {isMyProduct && (
@@ -523,214 +526,226 @@ export default function ProductPage() {
                   </Button>
                 </div>
               )}
-              <div className="grid grid-cols-1 items-start gap-8 md:grid-cols-2">
+              <div className="flex gap-2 mb-2 justify-between flex-col md:flex-row">
                 <div>
-                  {isEditing.isEditing && (
-                    <div className="mb-4 flex flex-wrap gap-4">
-                      {selectedImgs.imgs.map((item) => (
-                        <div
-                          key={item.id}
-                          className="group relative basis-1/4 cursor-pointer"
-                          onClick={() => removeImg(item.id)}
-                        >
-                          <XCircleIcon className="absolute left-1/2 top-1/2 z-10 h-12 w-12 -translate-x-1/2 -translate-y-1/2 transform text-slate-200 opacity-75 transition-[opacity,filter] group-hover:opacity-100" />
-                          <img
+                  <div className="max-w-screen md:max-w-sm lg:max-w-xl xl:max-w-3xl 2xl:max-w-4xl w-full">
+                    {isEditing.isEditing && (
+                      <div className="mb-4 flex flex-wrap gap-4">
+                        {selectedImgs.imgs.map((item) => (
+                          <div
                             key={item.id}
-                            id={item.id}
-                            alt="Product preview remove img."
-                            className="aspect-[4/3] w-full rounded-md object-cover brightness-[40%] transition group-hover:brightness-[20%]"
-                            src={item.url}
-                          />
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                  {selectedImgs.imgs.length > 0 ? (
-                    <div className="space-y-3">
-                      <Swiper
-                        navigation={{
-                          nextEl: `.swiper-thumbPreview-button-next`,
-                          prevEl: `.swiper-thumbPreview-button-prev`,
-                        }}
-                        spaceBetween={12}
-                        modules={[Navigation, Thumbs]}
-                        grabCursor
-                        thumbs={{
-                          swiper:
-                            activeThumb && !activeThumb.destroyed
-                              ? activeThumb
-                              : null,
-                        }}
-                        className="relative"
-                      >
-                        {selectedImgs.imgs.map((el, index) => {
-                          return (
-                            <SwiperSlide key={el.id} className="relative">
-                              <Dialog>
-                                {isEditing.isEditing && (
-                                  <Label className="group absolute left-0 top-0 z-20 block h-full w-full cursor-pointer ">
-                                    <Input
-                                      name="file"
-                                      accept=".jpg, .jpeg, .png"
-                                      type="file"
-                                      value={''}
-                                      onChange={(e) => onImageChange(e, el.id)}
-                                      className="hidden"
-                                    />
+                            className="group relative basis-1/4 cursor-pointer"
+                            onClick={() => removeImg(item.id)}
+                          >
+                            <XCircleIcon className="absolute left-1/2 top-1/2 z-10 h-12 w-12 -translate-x-1/2 -translate-y-1/2 transform text-slate-200 opacity-75 transition-[opacity,filter] group-hover:opacity-100" />
+                            <img
+                              key={item.id}
+                              id={item.id}
+                              alt="Product preview remove img."
+                              className="aspect-[4/3] w-full rounded-md object-cover brightness-[40%] transition group-hover:brightness-[20%]"
+                              src={item.url}
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    {selectedImgs.imgs.length > 0 ? (
+                      <div className="space-y-3 w-full">
+                        <Swiper
+                          navigation={{
+                            nextEl: `.swiper-thumbPreview-button-next`,
+                            prevEl: `.swiper-thumbPreview-button-prev`,
+                          }}
+                          spaceBetween={12}
+                          modules={[Navigation, Thumbs]}
+                          grabCursor
+                          thumbs={{
+                            swiper:
+                              activeThumb && !activeThumb.destroyed
+                                ? activeThumb
+                                : null,
+                          }}
+                          className="relative"
+                        >
+                          {selectedImgs.imgs.map((el, index) => {
+                            return (
+                              <SwiperSlide key={el.id} className="relative">
+                                <Dialog>
+                                  {isEditing.isEditing && (
+                                    <Label className="group absolute left-0 top-0 z-20 block h-full w-full cursor-pointer ">
+                                      <Input
+                                        name="file"
+                                        accept=".jpg, .jpeg, .png"
+                                        type="file"
+                                        value={''}
+                                        onChange={(e) =>
+                                          onImageChange(e, el.id)
+                                        }
+                                        className="hidden"
+                                      />
+                                      <img
+                                        src={el.url}
+                                        key={el.id}
+                                        alt="product_img"
+                                        className={`${
+                                          isEditing.isEditing
+                                            ? 'w-full brightness-50 transition-[filter] group-hover:brightness-[25%]'
+                                            : ''
+                                        } aspect-[4/3] rounded-md object-cover`}
+                                      />
+
+                                      <PlusCircleIcon className="absolute left-1/2 top-1/2 z-10 h-24 w-24 -translate-x-1/2 -translate-y-1/2 transform text-slate-300 opacity-95 brightness-95 transition-[opacity,filter] group-hover:opacity-100 group-hover:brightness-100" />
+                                    </Label>
+                                  )}
+
+                                  <DialogTrigger className="block">
                                     <img
                                       src={el.url}
                                       key={el.id}
                                       alt="product_img"
-                                      className={`${
-                                        isEditing.isEditing
-                                          ? 'w-full brightness-50 transition-[filter] group-hover:brightness-[25%]'
-                                          : ''
-                                      } aspect-[4/3] rounded-md object-cover`}
+                                      className={`aspect-[4/3] rounded-md object-cover`}
                                     />
-
-                                    <PlusCircleIcon className="absolute left-1/2 top-1/2 z-10 h-24 w-24 -translate-x-1/2 -translate-y-1/2 transform text-slate-300 opacity-95 brightness-95 transition-[opacity,filter] group-hover:opacity-100 group-hover:brightness-100" />
-                                  </Label>
-                                )}
-
-                                <DialogTrigger className="block">
-                                  <img
-                                    src={el.url}
-                                    key={el.id}
-                                    alt="product_img"
-                                    className={`aspect-[4/3] rounded-md object-cover`}
-                                  />
-                                </DialogTrigger>
-                                <DialogContent className="w-screen max-w-[100vw] p-0 sm:w-auto sm:max-w-3xl">
-                                  <Swiper
-                                    navigation={{
-                                      nextEl: `.swiper-preview-button-next`,
-                                      prevEl: `.swiper-preview-button-prev`,
-                                    }}
-                                    pagination={{
-                                      clickable: true,
-                                      el: '.swiper-latest-news-pagination',
-                                    }}
-                                    grabCursor
-                                    spaceBetween={4}
-                                    initialSlide={index}
-                                    nested={true}
-                                    slidesPerView={'auto'}
-                                    direction="horizontal"
-                                    modules={[Pagination, Navigation]}
-                                  >
-                                    {selectedImgs.imgs.map((nestedImgs) => {
-                                      return (
-                                        <SwiperSlide key={nestedImgs.id}>
-                                          <div className="relative">
-                                            <img
-                                              src={nestedImgs.url}
-                                              alt={'Preview: ' + nestedImgs.id}
-                                              className="aspect-[16/10] h-full w-full object-cover"
-                                            />
-                                          </div>
-                                        </SwiperSlide>
-                                      );
-                                    })}
-                                    <SwiperArrowRight elId="swiper-preview-button-next" />
-                                    <SwiperArrowLeft elId="swiper-preview-button-prev" />
-                                    <SwiperDots elId="swiper-latest-news-pagination" />
-                                  </Swiper>
-                                </DialogContent>
-                              </Dialog>
+                                  </DialogTrigger>
+                                  <DialogContent className="w-screen max-w-[100vw] p-0 sm:w-auto sm:max-w-3xl">
+                                    <Swiper
+                                      navigation={{
+                                        nextEl: `.swiper-preview-button-next`,
+                                        prevEl: `.swiper-preview-button-prev`,
+                                      }}
+                                      pagination={{
+                                        clickable: true,
+                                        el: '.swiper-latest-news-pagination',
+                                      }}
+                                      grabCursor
+                                      spaceBetween={4}
+                                      initialSlide={index}
+                                      nested={true}
+                                      slidesPerView={'auto'}
+                                      direction="horizontal"
+                                      modules={[Pagination, Navigation]}
+                                    >
+                                      {selectedImgs.imgs.map((nestedImgs) => {
+                                        return (
+                                          <SwiperSlide key={nestedImgs.id}>
+                                            <div className="relative">
+                                              <img
+                                                src={nestedImgs.url}
+                                                alt={
+                                                  'Preview: ' + nestedImgs.id
+                                                }
+                                                className="aspect-[16/10] h-full w-full object-cover"
+                                              />
+                                            </div>
+                                          </SwiperSlide>
+                                        );
+                                      })}
+                                      <SwiperArrowRight elId="swiper-preview-button-next" />
+                                      <SwiperArrowLeft elId="swiper-preview-button-prev" />
+                                      <SwiperDots elId="swiper-latest-news-pagination" />
+                                    </Swiper>
+                                  </DialogContent>
+                                </Dialog>
+                              </SwiperSlide>
+                            );
+                          })}
+                          <SwiperArrowRight elId="swiper-thumbPreview-button-next" />
+                          <SwiperArrowLeft elId="swiper-thumbPreview-button-prev" />
+                        </Swiper>
+                        <Swiper
+                          onSwiper={setActiveThumb}
+                          navigation={{
+                            nextEl: '.swiper-thumbs-button-next',
+                            prevEl: '.swiper-thumbs-button-prev',
+                          }}
+                          spaceBetween={12}
+                          slidesPerView={5}
+                          watchSlidesProgress={true}
+                          modules={[Navigation, Thumbs]}
+                        >
+                          {selectedImgs.imgs.map((image) => (
+                            <SwiperSlide key={image.id}>
+                              <img
+                                src={image.url}
+                                alt={`Thumb ${image.id}`}
+                                className="aspect-square cursor-pointer rounded-md object-cover"
+                              />
                             </SwiperSlide>
-                          );
-                        })}
-                        <SwiperArrowRight elId="swiper-thumbPreview-button-next" />
-                        <SwiperArrowLeft elId="swiper-thumbPreview-button-prev" />
-                      </Swiper>
-                      <Swiper
-                        onSwiper={setActiveThumb}
-                        navigation={{
-                          nextEl: '.swiper-thumbs-button-next',
-                          prevEl: '.swiper-thumbs-button-prev',
-                        }}
-                        spaceBetween={12}
-                        slidesPerView={5}
-                        watchSlidesProgress={true}
-                        modules={[Navigation, Thumbs]}
-                      >
-                        {selectedImgs.imgs.map((image) => (
-                          <SwiperSlide key={image.id}>
-                            <img
-                              src={image.url}
-                              alt={`Thumb ${image.id}`}
-                              className="aspect-square cursor-pointer rounded-md object-cover"
-                            />
-                          </SwiperSlide>
-                        ))}
+                          ))}
+                          {isEditing.isEditing && (
+                            <SwiperSlide>
+                              <div className="relative aspect-square rounded-md object-cover">
+                                <Label className="absolute left-0 top-0 block h-full w-full">
+                                  <Input
+                                    name="file"
+                                    accept=".jpg, .jpeg, .png"
+                                    type="file"
+                                    value={''}
+                                    onChange={(e) => onImageChange(e, v4())}
+                                    className="hidden"
+                                  />
+                                  <div className="flex h-full w-full cursor-pointer items-center justify-center rounded-md bg-black/20 p-1 transition-colors duration-150 ease-out hover:bg-black/30">
+                                    <PlusCircleIcon className="h-12 w-12" />
+                                  </div>
+                                </Label>
+                              </div>
+                            </SwiperSlide>
+                          )}
+                          <SwiperArrowRight elId="swiper-thumbs-button-next" />
+                          <SwiperArrowLeft elId="swiper-thumbs-button-prev" />
+                        </Swiper>
+                      </div>
+                    ) : (
+                      <div className="relative">
                         {isEditing.isEditing && (
-                          <SwiperSlide>
-                            <div className="relative aspect-square rounded-md object-cover">
-                              <Label className="absolute left-0 top-0 block h-full w-full">
-                                <Input
-                                  name="file"
-                                  accept=".jpg, .jpeg, .png"
-                                  type="file"
-                                  value={''}
-                                  onChange={(e) => onImageChange(e, v4())}
-                                  className="hidden"
-                                />
-                                <div className="flex h-full w-full cursor-pointer items-center justify-center rounded-md bg-black/20 p-1 transition-colors duration-150 ease-out hover:bg-black/30">
-                                  <PlusCircleIcon className="h-12 w-12" />
-                                </div>
-                              </Label>
-                            </div>
-                          </SwiperSlide>
+                          <Label className="absolute left-0 top-0 block h-full w-full">
+                            <Input
+                              name="file"
+                              accept=".jpg, .jpeg, .png"
+                              type="file"
+                              value={''}
+                              onChange={(e) => onImageChange(e, v4())}
+                              className="hidden"
+                            />
+
+                            <div className="flex h-full w-full cursor-pointer items-center justify-center rounded-md bg-black/30 p-1 transition-colors duration-150 ease-out hover:bg-black/40"></div>
+
+                            <PlusCircleIcon className="absolute left-1/2 top-1/2 z-10 h-24 w-24 -translate-x-1/2 -translate-y-1/2 transform text-slate-300 opacity-95 brightness-95 transition-[opacity,filter] group-hover:opacity-100 group-hover:brightness-100" />
+                          </Label>
                         )}
-                        <SwiperArrowRight elId="swiper-thumbs-button-next" />
-                        <SwiperArrowLeft elId="swiper-thumbs-button-prev" />
-                      </Swiper>
-                    </div>
-                  ) : (
-                    <div className="relative">
-                      {isEditing.isEditing && (
-                        <Label className="absolute left-0 top-0 block h-full w-full">
-                          <Input
-                            name="file"
-                            accept=".jpg, .jpeg, .png"
-                            type="file"
-                            value={''}
-                            onChange={(e) => onImageChange(e, v4())}
-                            className="hidden"
-                          />
-
-                          <div className="flex h-full w-full cursor-pointer items-center justify-center rounded-md bg-black/30 p-1 transition-colors duration-150 ease-out hover:bg-black/40"></div>
-
-                          <PlusCircleIcon className="absolute left-1/2 top-1/2 z-10 h-24 w-24 -translate-x-1/2 -translate-y-1/2 transform text-slate-300 opacity-95 brightness-95 transition-[opacity,filter] group-hover:opacity-100 group-hover:brightness-100" />
-                        </Label>
-                      )}
-                      <img
-                        src={
-                          'https://firebasestorage.googleapis.com/v0/b/smarthub-75eab.appspot.com/o/static_imgs%2Fnophoto.webp?alt=media&token=a974d32e-108a-4c21-be71-de358368a167'
-                        }
-                        alt="product_img"
-                        className="aspect-[4/3] rounded-md object-cover"
-                      />
-                    </div>
-                  )}
+                        <img
+                          src={
+                            'https://firebasestorage.googleapis.com/v0/b/smarthub-75eab.appspot.com/o/static_imgs%2Fnophoto.webp?alt=media&token=a974d32e-108a-4c21-be71-de358368a167'
+                          }
+                          alt="product_img"
+                          className="aspect-[4/3] rounded-md object-cover"
+                        />
+                      </div>
+                    )}
+                  </div>
                 </div>
-                <div className="sticky top-16">
+
+                <div className="md:max-w-[400px] flex-grow">
                   {!isEditing.isEditing && (
                     <div>
                       <h2 className="text-4xl">{productState.data.title}</h2>
-                      <div className="flex items-start gap-4">
+                      <section
+                        className="grid gap-2 mb-2"
+                        style={{ gridTemplateColumns: '1fr auto' }}
+                      >
+                        <span>Seller:</span>
                         <div>
-                          Seller:{' '}
                           <Link
                             to={`/account/${productState.data.creatorData._id}`}
                             className={`${buttonVariants({
                               variant: 'link',
+                              size: 'clear',
                             })}`}
                           >
                             {productState.data.creatorData.pseudonim}
                           </Link>
                         </div>
-                        <div className="flex items-center gap-2 py-1">
+                        <span>Rating:</span>
+                        <div className="flex items-center flex-wrap gap-2">
                           <StarRating
                             rating={
                               productRating && productRating.value
@@ -747,23 +762,30 @@ export default function ProductPage() {
                             )
                           </span>
                         </div>
-                      </div>
-                      <div className="mb-2 flex gap-4">
+
+                        <span>Publish date: </span>
+                        <span>{productState.data.createdAt.slice(0, 10)}</span>
+                        <span>Authors: </span>
                         <div>
-                          In stock: <span>{productState.data.quantity}</span>
+                          {productState.data.authors.map((author) => (
+                            <Link
+                              key={author._id}
+                              to={`/account/${author._id}`}
+                              className={`${buttonVariants({
+                                variant: 'link',
+                                size: 'clear',
+                              })} mr-4`}
+                            >
+                              {author.author_info.pseudonim}
+                            </Link>
+                          ))}
                         </div>
+                        <span>Tags: </span>
                         <Link to={`/${productState.data.marketplace}`}>
                           <MarketplaceBadge
                             type={productState.data.marketplace}
                           />
                         </Link>
-                      </div>
-                      <div className="mb-2">
-                        <h3 className="text-3xl">
-                          {productState.data.price.value}
-                        </h3>
-                      </div>
-                      <div className="mb-3">
                         <ProductForm
                           addToCartHandler={addToCartHandler}
                           decrementQuantityHandler={decrementQuantityHandler}
@@ -775,9 +797,9 @@ export default function ProductPage() {
                           productQuantity={productState.data.quantity}
                           selectedQuantity={selectedQuantity}
                           sold={productState.data.sold}
+                          productPrice={productState.data.price.value}
+                          totalQuantity={productState.data.quantity}
                         />
-                      </div>
-                      <div className="mb-2 grid grid-cols-2">
                         <span>Detailed information:</span>
                         <div>
                           <Button
@@ -798,32 +820,12 @@ export default function ProductPage() {
                             Show
                           </Button>
                         </div>
-                      </div>
-                      <div className="mb-2 grid grid-cols-2">
-                        <span>Commencement date: </span>
-                        <span>{productState.data.createdAt.slice(0, 10)}</span>
-                      </div>
-                      <div className="mb-2 grid grid-cols-2">
-                        <span>Authors: </span>
-                        <div>
-                          {productState.data.authors.map((author) => (
-                            <Link
-                              key={author._id}
-                              to={`/account/${author._id}`}
-                              className={`${buttonVariants({
-                                variant: 'link',
-                                size: 'clear',
-                              })} mr-4`}
-                            >
-                              {author.author_info.pseudonim}
-                            </Link>
-                          ))}
-                        </div>
-                      </div>
-                      <div className="mb-2 grid grid-cols-2">
-                        <span>Short description: </span>
-                        <div>{productState.data.shortDescription}</div>
-                      </div>
+                      </section>
+
+                      <section className="flex flex-col gap-2">
+                        <strong>Short description: </strong>
+                        <span>{productState.data.shortDescription}</span>
+                      </section>
                     </div>
                   )}
                   {isEditing.isEditing && (
@@ -1055,123 +1057,194 @@ export default function ProductPage() {
               </div>
             </form>
           </Form>
-          <section className="sticky top-[63px] z-10 -mx-4 bg-background border-b border-border sm:top-16">
-            <article className=" items-center justify-around flex">
-              <div className="py-2 space-x-2">
-                <Button
-                  variant={'link'}
-                  onClick={() =>
-                    window.scrollTo({
-                      top:
-                        window.scrollY +
-                        shortDescriptionRef.current!.getBoundingClientRect()
-                          .top -
-                        headerHeight,
-                      behavior: 'smooth',
-                    })
-                  }
-                >
-                  Overview
-                </Button>
+          <article className="sticky top-[63px] z-10 -mx-4 bg-background border-b border-border sm:top-16 items-center justify-around flex">
+            <div className="py-2 flex flex-wrap gap-1">
+              <Button
+                variant={'link'}
+                onClick={() =>
+                  window.scrollTo({
+                    top:
+                      window.scrollY +
+                      shortDescriptionRef.current!.getBoundingClientRect().top -
+                      headerHeight,
+                    behavior: 'smooth',
+                  })
+                }
+              >
+                Overview
+              </Button>
 
-                <Button
-                  variant={'link'}
-                  onClick={() =>
-                    window.scrollTo({
-                      top:
-                        window.scrollY +
-                        detailsRef.current!.getBoundingClientRect().top -
-                        headerHeight,
-                      behavior: 'smooth',
-                    })
-                  }
-                >
-                  Details
-                </Button>
-                <Button
-                  variant={'link'}
-                  onClick={() =>
-                    window.scrollTo({
-                      top:
-                        window.scrollY +
-                        similarRef.current!.getBoundingClientRect().top -
-                        headerHeight,
-                      behavior: 'smooth',
-                    })
-                  }
-                >
-                  Similar
-                </Button>
-                <Button
-                  variant={'link'}
-                  onClick={() =>
-                    window.scrollTo({
-                      top:
-                        window.scrollY +
-                        commentsRef.current!.getBoundingClientRect().top -
-                        headerHeight,
-                      behavior: 'smooth',
-                    })
-                  }
-                >
-                  Reviews
-                </Button>
-              </div>
-            </article>
-          </section>
-
-          <article ref={detailsRef}>
-            <h3 className="mb-2 text-4xl">Details:</h3>
-            <div className="mb-2 grid grid-cols-2">
-              <span>Title: </span>
-              <div>{productState.data.title}</div>
+              <Button
+                variant={'link'}
+                onClick={() =>
+                  window.scrollTo({
+                    top:
+                      window.scrollY +
+                      detailsRef.current!.getBoundingClientRect().top -
+                      headerHeight,
+                    behavior: 'smooth',
+                  })
+                }
+              >
+                Details
+              </Button>
+              <Button
+                variant={'link'}
+                onClick={() =>
+                  window.scrollTo({
+                    top:
+                      window.scrollY +
+                      similarRef.current!.getBoundingClientRect().top -
+                      headerHeight,
+                    behavior: 'smooth',
+                  })
+                }
+              >
+                Similar
+              </Button>
+              <Button
+                variant={'link'}
+                onClick={() =>
+                  window.scrollTo({
+                    top:
+                      window.scrollY +
+                      commentsRef.current!.getBoundingClientRect().top -
+                      headerHeight,
+                    behavior: 'smooth',
+                  })
+                }
+              >
+                Reviews
+              </Button>
             </div>
-            <div className="mb-2 grid grid-cols-2">
-              <span>Authors: </span>
-              <div>
-                {productState.data.authors.map((author) => (
+          </article>
+
+          <article ref={detailsRef} className="space-y-5">
+            <h3 className="text-4xl border-b-2 border-border inline-block">
+              Details
+            </h3>
+            <table className="border-collapse w-full max-w-xl">
+              <tr className="group border-border border-b sm:border-none">
+                <th className="text-start font-normal w-1/2 px-1 py-2 group-hover:bg-accent transition-colors ease-in-out rounded-l-md">
+                  Title:
+                </th>
+                <td className="sm:text-left text-right w-1/2 px-1 py-2 group-hover:bg-accent transition-colors ease-in-out rounded-r-md">
+                  {productState.data.title}
+                </td>
+              </tr>
+              <tr className="group border-border border-b sm:border-none">
+                <th className="text-start font-normal w-1/2 px-1 py-2 group-hover:bg-accent transition-colors ease-in-out rounded-l-md">
+                  Publish date:{' '}
+                </th>
+                <td className="sm:text-left text-right w-1/2 px-1 py-2 group-hover:bg-accent transition-colors ease-in-out rounded-r-md">
+                  {productState.data.createdAt.slice(0, 10)}
+                </td>
+              </tr>
+              <tr className="group border-border border-b sm:border-none">
+                <th className="text-start font-normal w-1/2 px-1 py-2 group-hover:bg-accent transition-colors ease-in-out rounded-l-md">
+                  Last updated:{' '}
+                </th>
+                <td className="sm:text-left text-right w-1/2 px-1 py-2 group-hover:bg-accent transition-colors ease-in-out rounded-r-md">
+                  {productState.data.updatedAt.slice(0, 10)}
+                </td>
+              </tr>
+              <tr className="group border-border border-b sm:border-none">
+                <th className="text-start font-normal w-1/2 px-1 py-2 group-hover:bg-accent transition-colors ease-in-out rounded-l-md">
+                  Seller:{' '}
+                </th>
+                <td className="sm:text-left text-right w-1/2 px-1 py-2 group-hover:bg-accent transition-colors ease-in-out rounded-r-md">
                   <Link
-                    key={author._id}
-                    to={`/account/${author._id}`}
+                    to={`/account/${productState.data.creatorData._id}`}
                     className={`${buttonVariants({
                       variant: 'link',
                       size: 'clear',
                     })} mr-4`}
                   >
-                    {author.author_info.pseudonim}
+                    {productState.data.creatorData.pseudonim}
                   </Link>
-                ))}
-              </div>
-            </div>
-            <div className="mb-2 grid grid-cols-2">
-              <span>Categories: </span>
-              <div>
-                {productState.data.categories.map((category) => (
-                  <Link
-                    key={category._id}
-                    to={{
-                      pathname: '/search',
-                      search: `category=${category.value}`,
-                    }}
-                    className={`${buttonVariants({
-                      variant: 'link',
-                      size: 'clear',
-                    })} mr-4`}
-                  >
-                    {category.label}
+                </td>
+              </tr>
+
+              <tr className="group border-border border-b sm:border-none">
+                <th className="text-start font-normal w-1/2 px-1 py-2 group-hover:bg-accent transition-colors ease-in-out rounded-l-md">
+                  In stock:{' '}
+                </th>
+                <td className="sm:text-left text-right w-1/2 px-1 py-2 group-hover:bg-accent transition-colors ease-in-out rounded-r-md">
+                  {productState.data.quantity}
+                  <span className="text-muted-foreground">x</span>
+                </td>
+              </tr>
+
+              <tr className="group border-border border-b sm:border-none">
+                <th className="text-start font-normal w-1/2 px-1 py-2 group-hover:bg-accent transition-colors ease-in-out rounded-l-md">
+                  Authors:{' '}
+                </th>
+                <td className="sm:text-left text-right w-1/2 px-1 py-2 group-hover:bg-accent transition-colors ease-in-out rounded-r-md">
+                  {productState.data.authors.map((author) => (
+                    <Link
+                      key={author._id}
+                      to={`/account/${author._id}`}
+                      className={`${buttonVariants({
+                        variant: 'link',
+                        size: 'clear',
+                      })} mr-4`}
+                    >
+                      {author.author_info.pseudonim}
+                    </Link>
+                  ))}
+                </td>
+              </tr>
+              {productState.data.categories.length > 0 && (
+                <tr className="group border-border border-b sm:border-none">
+                  <th className="text-start font-normal w-1/2 px-1 py-2 group-hover:bg-accent transition-colors ease-in-out rounded-l-md">
+                    Categories:{' '}
+                  </th>
+                  <td className="sm:text-left text-right w-1/2 px-1 py-2 group-hover:bg-accent transition-colors ease-in-out rounded-r-md">
+                    {productState.data.categories.map((category) => (
+                      <Link
+                        key={category._id}
+                        to={{
+                          pathname: '/search',
+                          search: `category=${category.value}`,
+                        }}
+                        className={`${buttonVariants({
+                          variant: 'link',
+                          size: 'clear',
+                        })} mr-4`}
+                      >
+                        {category.label}
+                      </Link>
+                    ))}
+                  </td>
+                </tr>
+              )}
+              <tr className="group border-border border-b sm:border-none">
+                <th className="text-start font-normal w-1/2 px-1 py-2 group-hover:bg-accent transition-colors ease-in-out rounded-l-md">
+                  Tags:{' '}
+                </th>
+                <td className="sm:text-left text-right w-1/2 px-1 py-2 group-hover:bg-accent transition-colors ease-in-out rounded-r-md">
+                  <Link to={`/${productState.data.marketplace}`}>
+                    <MarketplaceBadge type={productState.data.marketplace} />
                   </Link>
-                ))}
-              </div>
-            </div>
-            <div className="mb-2">
-              <span>Description: </span>
-              <ProductDescription
-                show={isEditing.isEditing}
-                descriptionToShow={productState.data.description}
-                newDescription={newDescription}
-                setNewDescription={setNewDescription}
-              />
-            </div>
+                </td>
+              </tr>
+              {(productState.data.description || isEditing.isEditing) && (
+                <>
+                  <Separator className="my-4" />
+                  <li className="space-y-5">
+                    <h4 className="border-b-2 border-border inline-block">
+                      Description
+                    </h4>
+                    <ProductDescription
+                      show={isEditing.isEditing}
+                      descriptionToShow={productState.data.description}
+                      newDescription={newDescription}
+                      setNewDescription={setNewDescription}
+                    />
+                  </li>
+                </>
+              )}
+            </table>
           </article>
           <div ref={similarRef} className="space-y-5">
             <h3 className="text-4xl border-b-2 border-border inline-block">

@@ -29,7 +29,7 @@ export default function MainContainer({
   return (
     <div
       className={
-        'relative py-6 ' + cn(containerVariants({ variant }), className)
+        'relative py-4 ' + cn(containerVariants({ variant }), className)
       }
       {...props}
     >
