@@ -401,7 +401,6 @@ export default function ProductPage() {
   };
 
   const deleteHandler = async () => {
-    console.log(productId);
     const { error } = await usePostAccessDatabase({
       url: DATABASE_ENDPOINTS.PRODUCT_DELETE,
       body: { _id: productId },
@@ -792,11 +791,14 @@ export default function ProductPage() {
                           ))}
                         </div>
                         <span>Tags: </span>
-                        <Link to={`/${productState.data.marketplace}`}>
-                          <MarketplaceBadge
-                            type={productState.data.marketplace}
-                          />
-                        </Link>
+                        <div>
+                          <Link to={`/${productState.data.marketplace}`}>
+                            <MarketplaceBadge
+                              type={productState.data.marketplace}
+                            />
+                          </Link>
+                        </div>
+
                         <ProductForm
                           addToCartHandler={addToCartHandler}
                           decrementQuantityHandler={decrementQuantityHandler}
@@ -1136,110 +1138,112 @@ export default function ProductPage() {
               Details
             </h3>
             <table className="border-collapse w-full max-w-xl">
-              <tr className="group border-border border-b sm:border-none">
-                <th className="text-start font-normal w-1/2 px-1 py-2 group-hover:bg-accent transition-colors ease-in-out rounded-l-md">
-                  Title:
-                </th>
-                <td className="sm:text-left text-right w-1/2 px-1 py-2 group-hover:bg-accent transition-colors ease-in-out rounded-r-md">
-                  {productState.data.title}
-                </td>
-              </tr>
-              <tr className="group border-border border-b sm:border-none">
-                <th className="text-start font-normal w-1/2 px-1 py-2 group-hover:bg-accent transition-colors ease-in-out rounded-l-md">
-                  Publish date:{' '}
-                </th>
-                <td className="sm:text-left text-right w-1/2 px-1 py-2 group-hover:bg-accent transition-colors ease-in-out rounded-r-md">
-                  {productState.data.createdAt.slice(0, 10)}
-                </td>
-              </tr>
-              <tr className="group border-border border-b sm:border-none">
-                <th className="text-start font-normal w-1/2 px-1 py-2 group-hover:bg-accent transition-colors ease-in-out rounded-l-md">
-                  Last updated:{' '}
-                </th>
-                <td className="sm:text-left text-right w-1/2 px-1 py-2 group-hover:bg-accent transition-colors ease-in-out rounded-r-md">
-                  {productState.data.updatedAt.slice(0, 10)}
-                </td>
-              </tr>
-              <tr className="group border-border border-b sm:border-none">
-                <th className="text-start font-normal w-1/2 px-1 py-2 group-hover:bg-accent transition-colors ease-in-out rounded-l-md">
-                  Seller:{' '}
-                </th>
-                <td className="sm:text-left text-right w-1/2 px-1 py-2 group-hover:bg-accent transition-colors ease-in-out rounded-r-md">
-                  <Link
-                    to={`/account/${productState.data.creatorData._id}`}
-                    className={`${buttonVariants({
-                      variant: 'link',
-                      size: 'clear',
-                    })} mr-4`}
-                  >
-                    {productState.data.creatorData.pseudonim}
-                  </Link>
-                </td>
-              </tr>
-
-              <tr className="group border-border border-b sm:border-none">
-                <th className="text-start font-normal w-1/2 px-1 py-2 group-hover:bg-accent transition-colors ease-in-out rounded-l-md">
-                  In stock:{' '}
-                </th>
-                <td className="sm:text-left text-right w-1/2 px-1 py-2 group-hover:bg-accent transition-colors ease-in-out rounded-r-md">
-                  {productState.data.quantity}
-                  <span className="text-muted-foreground">x</span>
-                </td>
-              </tr>
-
-              <tr className="group border-border border-b sm:border-none">
-                <th className="text-start font-normal w-1/2 px-1 py-2 group-hover:bg-accent transition-colors ease-in-out rounded-l-md">
-                  Authors:{' '}
-                </th>
-                <td className="sm:text-left text-right w-1/2 px-1 py-2 group-hover:bg-accent transition-colors ease-in-out rounded-r-md">
-                  {productState.data.authors.map((author) => (
+              <tbody>
+                <tr className="group border-border border-b sm:border-none">
+                  <th className="text-start font-normal w-1/2 px-1 py-2 group-hover:bg-accent transition-colors ease-in-out rounded-l-md">
+                    Title:
+                  </th>
+                  <td className="sm:text-left text-right w-1/2 px-1 py-2 group-hover:bg-accent transition-colors ease-in-out rounded-r-md">
+                    {productState.data.title}
+                  </td>
+                </tr>
+                <tr className="group border-border border-b sm:border-none">
+                  <th className="text-start font-normal w-1/2 px-1 py-2 group-hover:bg-accent transition-colors ease-in-out rounded-l-md">
+                    Publish date:{' '}
+                  </th>
+                  <td className="sm:text-left text-right w-1/2 px-1 py-2 group-hover:bg-accent transition-colors ease-in-out rounded-r-md">
+                    {productState.data.createdAt.slice(0, 10)}
+                  </td>
+                </tr>
+                <tr className="group border-border border-b sm:border-none">
+                  <th className="text-start font-normal w-1/2 px-1 py-2 group-hover:bg-accent transition-colors ease-in-out rounded-l-md">
+                    Last updated:{' '}
+                  </th>
+                  <td className="sm:text-left text-right w-1/2 px-1 py-2 group-hover:bg-accent transition-colors ease-in-out rounded-r-md">
+                    {productState.data.updatedAt.slice(0, 10)}
+                  </td>
+                </tr>
+                <tr className="group border-border border-b sm:border-none">
+                  <th className="text-start font-normal w-1/2 px-1 py-2 group-hover:bg-accent transition-colors ease-in-out rounded-l-md">
+                    Seller:{' '}
+                  </th>
+                  <td className="sm:text-left text-right w-1/2 px-1 py-2 group-hover:bg-accent transition-colors ease-in-out rounded-r-md">
                     <Link
-                      key={author._id}
-                      to={`/account/${author._id}`}
+                      to={`/account/${productState.data.creatorData._id}`}
                       className={`${buttonVariants({
                         variant: 'link',
                         size: 'clear',
                       })} mr-4`}
                     >
-                      {author.author_info.pseudonim}
+                      {productState.data.creatorData.pseudonim}
                     </Link>
-                  ))}
-                </td>
-              </tr>
-              {productState.data.categories.length > 0 && (
+                  </td>
+                </tr>
+
                 <tr className="group border-border border-b sm:border-none">
                   <th className="text-start font-normal w-1/2 px-1 py-2 group-hover:bg-accent transition-colors ease-in-out rounded-l-md">
-                    Categories:{' '}
+                    In stock:{' '}
                   </th>
                   <td className="sm:text-left text-right w-1/2 px-1 py-2 group-hover:bg-accent transition-colors ease-in-out rounded-r-md">
-                    {productState.data.categories.map((category) => (
+                    {productState.data.quantity}
+                    <span className="text-muted-foreground">x</span>
+                  </td>
+                </tr>
+
+                <tr className="group border-border border-b sm:border-none">
+                  <th className="text-start font-normal w-1/2 px-1 py-2 group-hover:bg-accent transition-colors ease-in-out rounded-l-md">
+                    Authors:{' '}
+                  </th>
+                  <td className="sm:text-left text-right w-1/2 px-1 py-2 group-hover:bg-accent transition-colors ease-in-out rounded-r-md">
+                    {productState.data.authors.map((author) => (
                       <Link
-                        key={category._id}
-                        to={{
-                          pathname: '/search',
-                          search: `category=${category.value}`,
-                        }}
+                        key={author._id}
+                        to={`/account/${author._id}`}
                         className={`${buttonVariants({
                           variant: 'link',
                           size: 'clear',
                         })} mr-4`}
                       >
-                        {category.label}
+                        {author.author_info.pseudonim}
                       </Link>
                     ))}
                   </td>
                 </tr>
-              )}
-              <tr className="group border-border border-b sm:border-none">
-                <th className="text-start font-normal w-1/2 px-1 py-2 group-hover:bg-accent transition-colors ease-in-out rounded-l-md">
-                  Tags:{' '}
-                </th>
-                <td className="sm:text-left text-right w-1/2 px-1 py-2 group-hover:bg-accent transition-colors ease-in-out rounded-r-md">
-                  <Link to={`/${productState.data.marketplace}`}>
-                    <MarketplaceBadge type={productState.data.marketplace} />
-                  </Link>
-                </td>
-              </tr>
+                {productState.data.categories.length > 0 && (
+                  <tr className="group border-border border-b sm:border-none">
+                    <th className="text-start font-normal w-1/2 px-1 py-2 group-hover:bg-accent transition-colors ease-in-out rounded-l-md">
+                      Categories:{' '}
+                    </th>
+                    <td className="sm:text-left text-right w-1/2 px-1 py-2 group-hover:bg-accent transition-colors ease-in-out rounded-r-md">
+                      {productState.data.categories.map((category) => (
+                        <Link
+                          key={category._id}
+                          to={{
+                            pathname: '/search',
+                            search: `category=${category.value}`,
+                          }}
+                          className={`${buttonVariants({
+                            variant: 'link',
+                            size: 'clear',
+                          })} mr-4`}
+                        >
+                          {category.label}
+                        </Link>
+                      ))}
+                    </td>
+                  </tr>
+                )}
+                <tr className="group border-border border-b sm:border-none">
+                  <th className="text-start font-normal w-1/2 px-1 py-2 group-hover:bg-accent transition-colors ease-in-out rounded-l-md">
+                    Tags:{' '}
+                  </th>
+                  <td className="sm:text-left text-right w-1/2 px-1 py-2 group-hover:bg-accent transition-colors ease-in-out rounded-r-md">
+                    <Link to={`/${productState.data.marketplace}`}>
+                      <MarketplaceBadge type={productState.data.marketplace} />
+                    </Link>
+                  </td>
+                </tr>
+              </tbody>
             </table>
             {(productState.data.description || isEditing.isEditing) && (
               <>
