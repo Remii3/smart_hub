@@ -401,9 +401,10 @@ export default function ProductPage() {
   };
 
   const deleteHandler = async () => {
+    console.log(productId);
     const { error } = await usePostAccessDatabase({
       url: DATABASE_ENDPOINTS.PRODUCT_DELETE,
-      body: { productId },
+      body: { _id: productId },
     });
     if (error) {
       return errorToast(error);
@@ -458,6 +459,17 @@ export default function ProductPage() {
     itemBtnCapacity = productState.data.quantity! < selectedQuantity || false;
   }
 
+  const buyNowHandler = async () => {
+    if (productId) {
+      await addProductToCart({
+        productId: productId,
+        productQuantity: selectedQuantity,
+      });
+      setSelectedQuantity(1);
+      navigate('/checkout');
+    }
+  };
+
   return (
     <section
       ref={shortDescriptionRef}
@@ -479,9 +491,11 @@ export default function ProductPage() {
                     openStateHandler={setDeleteDialogState}
                   >
                     <Button
+                      type="button"
                       variant={'destructive'}
                       size={'default'}
                       disabled={isEditing.isLoading}
+                      onClick={() => setDeleteDialogState(true)}
                     >
                       <TrashIcon className="w-5 h-5" />
                     </Button>
@@ -728,10 +742,7 @@ export default function ProductPage() {
                   {!isEditing.isEditing && (
                     <div>
                       <h2 className="text-4xl">{productState.data.title}</h2>
-                      <section
-                        className="grid gap-2 mb-2"
-                        style={{ gridTemplateColumns: '1fr auto' }}
-                      >
+                      <section className="grid grid-cols-2 gap-2 mb-2">
                         <span>Seller:</span>
                         <div>
                           <Link
@@ -799,6 +810,7 @@ export default function ProductPage() {
                           sold={productState.data.sold}
                           productPrice={productState.data.price.value}
                           totalQuantity={productState.data.quantity}
+                          buyNowHandler={buyNowHandler}
                         />
                         <span>Detailed information:</span>
                         <div>
@@ -1228,23 +1240,23 @@ export default function ProductPage() {
                   </Link>
                 </td>
               </tr>
-              {(productState.data.description || isEditing.isEditing) && (
-                <>
-                  <Separator className="my-4" />
-                  <li className="space-y-5">
-                    <h4 className="border-b-2 border-border inline-block">
-                      Description
-                    </h4>
-                    <ProductDescription
-                      show={isEditing.isEditing}
-                      descriptionToShow={productState.data.description}
-                      newDescription={newDescription}
-                      setNewDescription={setNewDescription}
-                    />
-                  </li>
-                </>
-              )}
             </table>
+            {(productState.data.description || isEditing.isEditing) && (
+              <>
+                <Separator className="my-4" />
+                <section className="space-y-5">
+                  <h4 className="border-b-2 border-border inline-block">
+                    Description
+                  </h4>
+                  <ProductDescription
+                    show={isEditing.isEditing}
+                    descriptionToShow={productState.data.description}
+                    newDescription={newDescription}
+                    setNewDescription={setNewDescription}
+                  />
+                </section>
+              </>
+            )}
           </article>
           <div ref={similarRef} className="space-y-5">
             <h3 className="text-4xl border-b-2 border-border inline-block">
