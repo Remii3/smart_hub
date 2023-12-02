@@ -35,5 +35,4 @@ export type PriceTypes = {
   value: string;
   currency: string;
 };
-
 export type ImgTargets = 'ProfileImg' | 'ProductImgs' | 'NewsImg';

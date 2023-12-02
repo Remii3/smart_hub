@@ -24,7 +24,6 @@ import {
   SelectTrigger,
 } from '@components/UI/select';
 
-import { useToast } from '@components/UI/use-toast';
 import Follows from './tabs/Follows';
 import MyCollections from './tabs/myCollections/MyCollections';
 import { Badge } from '@components/UI/badge';
@@ -58,7 +57,7 @@ const tabNames: Record<TabKeysTypes, TabNamesTypes> = {
   FOLLOWING: 'following',
 };
 
-const TABS_ARRAY: {
+const USER_TABS: {
   text: string;
   name: TabNamesTypes;
   icon: JSX.Element;
@@ -78,6 +77,18 @@ const TABS_ARRAY: {
     name: 'history',
     icon: <ArchiveBoxIcon height={20} width={20} />,
   },
+
+  {
+    text: 'Following',
+    name: 'following',
+    icon: <StarIcon height={20} width={20} />,
+  },
+];
+const AUTHOR_TABS: {
+  text: string;
+  name: TabNamesTypes;
+  icon: JSX.Element;
+}[] = [
   {
     text: 'My products',
     name: 'my_products',
@@ -88,35 +99,29 @@ const TABS_ARRAY: {
     name: 'my_collections',
     icon: <Square2StackIcon height={20} width={20} />,
   },
+];
+const ADMIN_TABS: {
+  text: string;
+  name: TabNamesTypes;
+  icon: JSX.Element;
+}[] = [
   {
     text: 'Admin',
     name: 'admin',
     icon: <RocketLaunchIcon height={20} width={20} />,
   },
-  {
-    text: 'Following',
-    name: 'following',
-    icon: <StarIcon height={20} width={20} />,
-  },
 ];
-
-interface SelectedProfileImgTypes {
-  data: null | File[];
-  isLoading: boolean;
-  error: null | string;
-}
 
 export default function MyAccount() {
   const [searchParams] = useSearchParams();
   const lastSearchQuery = searchParams.get('tab');
-  const initialTab = (lastSearchQuery as TabNamesTypes) || TABS_ARRAY[0].name;
+  const initialTab = (lastSearchQuery as TabNamesTypes) || USER_TABS[0].name;
 
   const [selectedtab, setSelectedtab] = useState<TabNamesTypes>(initialTab);
 
   const navigate = useNavigate();
   const path = useLocation();
-  const { userData, fetchUserData } = useContext(UserContext);
-  const { toast } = useToast();
+  const { userData } = useContext(UserContext);
   const changeSelectedTab = (option: TabNamesTypes) => {
     setSelectedtab(option);
     navigate(
@@ -131,36 +136,37 @@ export default function MyAccount() {
     userData.data.role === UserRoleTypes.ADMIN ? (
       <span>Let&apos; put some things in order!</span>
     ) : userData.data.role === UserRoleTypes.AUTHOR ? (
-      <div>Let&apos; add some new books! </div>
+      <span>Let&apos; add some new books! </span>
     ) : (
-      <div>Let&apos;s see some books! 🎉</div>
+      <span>Let&apos;s see some books! 🎉</span>
     );
+
+  let preparedTabs = USER_TABS;
+
+  if (userData.data.role === UserRoleTypes.AUTHOR) {
+    preparedTabs = [...preparedTabs, ...AUTHOR_TABS];
+  }
+
+  if (userData.data.role === UserRoleTypes.ADMIN) {
+    preparedTabs = [...preparedTabs, ...AUTHOR_TABS, ...ADMIN_TABS];
+  }
 
   return (
     <>
       <header className="py-8 sm:pb-9 sm:pt-12">
         <div className="gap-2 sm:flex sm:items-end sm:justify-between md:items-center">
           <div className="flex flex-col items-center gap-4 sm:items-start md:flex-row">
-            {userData.data.userInfo.profileImg.url ? (
-              <img
-                className="inline-block h-24 w-24 rounded-full object-cover ring-2 ring-white"
-                src={userData.data.userInfo.profileImg.url}
-                alt="avatar_img"
-              />
-            ) : (
-              <img
-                src="https://firebasestorage.googleapis.com/v0/b/smarthub-75eab.appspot.com/o/static_imgs%2Fnophoto.webp?alt=media&token=a974d32e-108a-4c21-be71-de358368a167"
-                className="inline-block h-24 w-24 rounded-full object-cover ring-2 ring-white"
-                alt="profile_img"
-              />
-            )}
-
+            <img
+              className="inline-block h-24 w-24 rounded-full object-cover ring-2 ring-white"
+              src={userData.data.userInfo.profileImg.url}
+              alt="avatar_img"
+            />
             <div className="pt-1 text-center sm:text-left">
               <h1 className="text-2xl font-bold text-foreground sm:text-5xl">
                 Welcome Back, {userData.data.username}!
               </h1>
 
-              <div className="mt-1.5 space-x-2 text-lg text-gray-500">
+              <div className="mt-1.5 space-x-2 text-lg flex items-center text-muted-foreground">
                 {subtitle}
                 {userData.data && userData.data.role !== 'User' && (
                   <Badge
@@ -199,24 +205,10 @@ export default function MyAccount() {
               value={selectedtab}
             >
               <SelectTrigger>
-                {TABS_ARRAY.find((tab) => tab.name === initialTab)?.text}
+                {preparedTabs.find((tab) => tab.name === initialTab)?.text}
               </SelectTrigger>
               <SelectContent>
-                {TABS_ARRAY.map((tab) => {
-                  if (
-                    tab.name === 'admin' &&
-                    userData.data &&
-                    userData.data.role !== UserRoleTypes.ADMIN
-                  )
-                    return null;
-                  if (
-                    tab.name === 'my_products' &&
-                    userData.data &&
-                    userData.data.role !== UserRoleTypes.ADMIN &&
-                    userData.data &&
-                    userData.data.role !== UserRoleTypes.AUTHOR
-                  )
-                    return null;
+                {preparedTabs.map((tab) => {
                   return (
                     <SelectItem key={tab.name} value={tab.name}>
                       {tab.text}
@@ -234,24 +226,7 @@ export default function MyAccount() {
                   Tab
                 </label>
                 <ul id="tabDesktop">
-                  {TABS_ARRAY.map((option) => {
-                    if (
-                      option.name === 'admin' &&
-                      userData.data &&
-                      userData.data.role !== UserRoleTypes.ADMIN
-                    ) {
-                      return null;
-                    }
-                    if (
-                      option.name === 'my_products' &&
-                      userData.data &&
-                      userData.data.role !== UserRoleTypes.ADMIN &&
-                      userData.data &&
-                      userData.data.role !== UserRoleTypes.AUTHOR
-                    ) {
-                      return null;
-                    }
-
+                  {preparedTabs.map((option) => {
                     return (
                       <li
                         key={option.name}
