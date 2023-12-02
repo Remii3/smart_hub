@@ -61,6 +61,7 @@ export default function CheckoutPage() {
   useEffect(() => {
     fetchData();
   }, [fetchData]);
+
   const options = {
     clientSecret: clientSecret.data,
     appearance,
