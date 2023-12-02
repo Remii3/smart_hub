@@ -93,7 +93,7 @@ const formSchema = z.object({
     .array(
       z.object({
         _id: z.string(),
-        authors_info: z.any(),
+        authorsInfo: z.any(),
       })
     )
     .min(1),
@@ -253,10 +253,8 @@ export default function ProductPage() {
   useEffect(() => {
     if (
       userData.data &&
-      ((userData.data.role == UserRoleTypes.AUTHOR &&
-        userData.data.author_info.my_products.find(
-          (product: ProductTypes) => product._id === productState.data?._id
-        )) ||
+      productState.data &&
+      (userData.data._id == productState.data.creatorData._id ||
         userData.data.role == UserRoleTypes.ADMIN)
     ) {
       setIsMyProduct(true);
@@ -328,7 +326,7 @@ export default function ProductPage() {
           await useDeleteImg({
             imgId: imgsToRemove[i],
             ownerId: productId,
-            targetLocation: 'Product_imgs',
+            targetLocation: 'ProductImgs',
           });
           filteredImgs = filteredImgs.filter((item) => {
             for (const id of imgsToRemove) {
@@ -349,7 +347,7 @@ export default function ProductPage() {
         const url = await useUploadImg({
           ownerId: productId,
           selectedFile: imgsToAdd[i].data,
-          targetLocation: 'Product_imgs',
+          targetLocation: 'ProductImgs',
           currentId: imgsToAdd[i].id,
         });
         if (url) {
@@ -786,7 +784,7 @@ export default function ProductPage() {
                                 size: 'clear',
                               })} mr-4`}
                             >
-                              {author.author_info.pseudonim}
+                              {author.authorInfo.pseudonim}
                             </Link>
                           ))}
                         </div>
@@ -1004,10 +1002,10 @@ export default function ProductPage() {
                                     }),
                                   }}
                                   getOptionValue={(author) =>
-                                    author.author_info.pseudonim
+                                    author.authorInfo.pseudonim
                                   }
                                   getOptionLabel={(author) =>
-                                    author.author_info.pseudonim
+                                    author.authorInfo.pseudonim
                                   }
                                 />
                               </FormControl>
@@ -1204,7 +1202,7 @@ export default function ProductPage() {
                           size: 'clear',
                         })} mr-4`}
                       >
-                        {author.author_info.pseudonim}
+                        {author.authorInfo.pseudonim}
                       </Link>
                     ))}
                   </td>
@@ -1266,12 +1264,7 @@ export default function ProductPage() {
             <h3 className="text-4xl border-b-2 border-border inline-block">
               Similar
             </h3>
-            <SimilarProducts
-              authorId={productState.data.authors[0]._id}
-              authorPseudonim={
-                productState.data.authors[0].author_info.pseudonim
-              }
-            />
+            <SimilarProducts authorId={productState.data.creatorData._id} />
           </div>
           <div ref={commentsRef} className="space-y-5">
             <h3 className="text-4xl border-b-2 border-border inline-block">

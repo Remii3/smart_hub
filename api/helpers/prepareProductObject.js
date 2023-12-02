@@ -10,14 +10,14 @@ const prepareProductObject = product => {
     authors,
     rating,
     quantity,
-    market_place,
+    marketplace,
     createdAt,
     sold,
     comments,
     currency,
     price,
-    auction_info,
-    seller_data,
+    auctionInfo,
+    sellerData,
     deleted,
   } = product;
 
@@ -42,23 +42,15 @@ const prepareProductObject = product => {
     authors,
     rating,
     quantity,
-    market_place,
+    marketplace,
     createdAt,
     sold,
     comments,
     currency,
-    seller_data,
+    sellerData,
     deleted,
     price,
   };
-
-  if (auction_info) {
-    preparedObject.auction_info = {
-      starting_price: parseFloat(auction_info.starting_price),
-      current_price: auction_info.current_price,
-      auction_end_date: auction_info.auction_end_date,
-    };
-  }
 
   return preparedObject;
 };

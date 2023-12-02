@@ -85,7 +85,7 @@ export default function ProductCard({
             <div className="line-clamp-1 pb-1 text-sm">
               {authors.map((author, id) => (
                 <span key={id} className="mr-2 text-sm">
-                  {author.author_info && author.author_info.pseudonim}
+                  {author.authorInfo && author.authorInfo.pseudonim}
                 </span>
               ))}
             </div>

@@ -39,7 +39,7 @@ const getBestseller = async (query, sortMethod, currentPageSize) => {
     {
       $group: {
         _id: '$product_doc._id',
-        sum: { $sum: '$products.in_cart_quantity' },
+        sum: { $sum: '$products.inCartQuantity' },
       },
     },
     { $sort: { sum: -1 } },

@@ -245,10 +245,10 @@ export default function Nav({ scrollFlag }: { scrollFlag: boolean }) {
                 >
                   <Suspense fallback={<LoadingCircle />}>
                     {userData.data ? (
-                      userData.data.user_info.profile_img.url ? (
+                      userData.data.userInfo.profileImg.url ? (
                         <div className="h-8 w-8">
                           <img
-                            src={userData.data.user_info.profile_img.url}
+                            src={userData.data.userInfo.profileImg.url}
                             className="h-8 w-8 rounded-full object-cover"
                             alt="profile_img"
                           />

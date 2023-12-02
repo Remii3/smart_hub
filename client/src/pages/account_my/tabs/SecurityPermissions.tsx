@@ -5,7 +5,7 @@ import { DATABASE_ENDPOINTS } from '@data/endpoints';
 import { Label } from '@components/UI/label';
 import { Switch } from '@components/UI/switch';
 
-type SecurityOptionNames = 'hide_private_information';
+type SecurityOptionNames = 'hidePrivateInformation';
 interface SecurityOptionType {
   name: SecurityOptionNames;
   labelName: string;
@@ -17,9 +17,9 @@ export default function SecurityPermissions() {
   if (!userData.data) return <p>Please log in</p>;
   const initialData = [
     {
-      name: 'hide_private_information',
+      name: 'hidePrivateInformation',
       labelName: 'Hide private information',
-      value: userData.data.security_settings.hide_private_information || false,
+      value: userData.data.securitySettings.hidePrivateInformation || false,
     },
   ] as SecurityOptionType[];
 

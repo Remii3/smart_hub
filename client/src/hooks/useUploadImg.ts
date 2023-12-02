@@ -1,12 +1,11 @@
 import { v4 } from 'uuid';
 import { storage } from '../firebase';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-
-type Targets = 'Profile_img' | 'Product_imgs' | 'News_img';
+import { ImgTargets } from '@customTypes/types';
 
 interface PropsTypes {
   selectedFile: File | null;
-  targetLocation: Targets;
+  targetLocation: ImgTargets;
   ownerId: string | undefined;
   currentId?: string;
 }
@@ -24,7 +23,7 @@ export default function useUploadImg({
   } else {
     prodImgId = v4();
   }
-  if (targetLocation === 'Profile_img') {
+  if (targetLocation === 'ProfileImg') {
     const imgRef = ref(storage, `${targetLocation}/${ownerId}/${prodImgId}`);
 
     return uploadBytes(imgRef, selectedFile).then((snapshot) => {
@@ -32,14 +31,14 @@ export default function useUploadImg({
         return { url, id: prodImgId };
       });
     });
-  } else if (targetLocation === 'Product_imgs') {
+  } else if (targetLocation === 'ProductImgs') {
     const imgRef = ref(storage, `${targetLocation}/${ownerId}/${prodImgId}`);
     return uploadBytes(imgRef, selectedFile).then((snapshot) => {
       return getDownloadURL(snapshot.ref).then((url) => {
         return { url, id: prodImgId };
       });
     });
-  } else if (targetLocation === 'News_img') {
+  } else if (targetLocation === 'NewsImg') {
     const imgRef = ref(storage, `${targetLocation}/${ownerId}/${prodImgId}`);
 
     return uploadBytes(imgRef, selectedFile).then((snapshot) => {

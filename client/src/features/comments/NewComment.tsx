@@ -90,7 +90,7 @@ export default function NewComment({
           _id: targetId,
           type: target,
         },
-        nickname: userData.data.author_info.pseudonim || userData.data.username,
+        nickname: userData.data.authorInfo.pseudonim || userData.data.username,
         value: dirtyData,
       },
     });
@@ -125,10 +125,10 @@ export default function NewComment({
           >
             <div className="flex flex-col gap-4">
               <section className="flex gap-2 items-center flex-wrap">
-                {userData.data.user_info.profile_img.url ? (
+                {userData.data.userInfo.profileImg.url ? (
                   <Avatar>
                     <AvatarImage
-                      src={userData.data.user_info.profile_img.url}
+                      src={userData.data.userInfo.profileImg.url}
                       alt="Profile image."
                     />
                     <AvatarFallback>Test</AvatarFallback>
@@ -144,8 +144,7 @@ export default function NewComment({
                 )}
 
                 <span className="text-lg font-semibold">
-                  {userData.data.author_info.pseudonim ||
-                    userData.data.username}
+                  {userData.data.authorInfo.pseudonim || userData.data.username}
                 </span>
 
                 {starRating && (

@@ -62,10 +62,10 @@ export default function Comment({
     <Card className="p-4 space-y-4">
       <section className="flex justify-between">
         <div className="flex gap-2 items-center">
-          {commentData.creatorData.user_info.profile_img.url ? (
+          {commentData.creatorData.userInfo.profileImg.url ? (
             <Avatar>
               <AvatarImage
-                src={commentData.creatorData.user_info.profile_img.url}
+                src={commentData.creatorData.userInfo.profileImg.url}
                 alt="Comment user picture."
               />
               <AvatarFallback>Test</AvatarFallback>

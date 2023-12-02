@@ -141,10 +141,10 @@ export default function MyAccount() {
       <header className="py-8 sm:pb-9 sm:pt-12">
         <div className="gap-2 sm:flex sm:items-end sm:justify-between md:items-center">
           <div className="flex flex-col items-center gap-4 sm:items-start md:flex-row">
-            {userData.data.user_info.profile_img.url ? (
+            {userData.data.userInfo.profileImg.url ? (
               <img
                 className="inline-block h-24 w-24 rounded-full object-cover ring-2 ring-white"
-                src={userData.data.user_info.profile_img.url}
+                src={userData.data.userInfo.profileImg.url}
                 alt="avatar_img"
               />
             ) : (

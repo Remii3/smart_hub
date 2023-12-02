@@ -60,8 +60,8 @@ export default function OrderPage() {
               className="mb-4 block space-x-3 rounded-md border-2 border-gray-200 p-3"
             >
               <span>{item.product.title}</span>
-              <span>{item.in_cart_quantity}</span>
-              <span>{item.total_price}</span>
+              <span>{item.inCartQuantity}</span>
+              <span>{item.totalPrice}</span>
             </Link>
           ))}
         </div>

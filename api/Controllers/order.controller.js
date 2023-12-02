@@ -11,7 +11,7 @@ const getAllOrders = async (req, res) => {
   }
 
   try {
-    const orders = await Order.find({ buyer_id: userId }).populate(
+    const orders = await Order.find({ buyerId: userId }).populate(
       'products.product',
     );
     return res.status(200).json({ data: orders });
@@ -36,7 +36,7 @@ const getOneOrder = async (req, res) => {
 
   try {
     const order = await Order.findOne({
-      buyer_id: userId,
+      buyerId: userId,
       _id: orderId,
     }).populate('products.product');
 
@@ -59,13 +59,13 @@ const addOneOrder = async (req, res) => {
     const mappedItems = items.map(item => {
       return {
         product: item.productData,
-        in_cart_quantity: item.inCartQuantity,
-        total_price: item.totalPrice,
+        inCartQuantity: item.inCartQuantity,
+        totalPrice: item.totalPrice,
       };
     });
     await Order.create({
       _id: orderId,
-      buyer_id: buyerId,
+      buyerId: buyerId,
       products: mappedItems,
     });
     await User.updateOne({ _id: buyerId }, { $push: { orders: orderId } });

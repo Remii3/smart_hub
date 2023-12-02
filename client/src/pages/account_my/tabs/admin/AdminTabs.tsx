@@ -25,7 +25,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@components/UI/select';
-import { USER_ROLES } from '@customTypes/types';
+import { USER_ROLES, UserRoleTypes } from '@customTypes/types';
 import { Textarea } from '@components/UI/textarea';
 import { ChangeEvent, useEffect, useState } from 'react';
 import { PlusCircleIcon } from '@heroicons/react/24/outline';
@@ -81,14 +81,14 @@ export default function AdminTabs({
           username: user.username,
           email: user.email,
           password: '',
-          firstName: user.user_info.credentials.first_name,
-          lastName: user.user_info.credentials.last_name,
-          phone: user.user_info.phone,
-          pseudonim: user.author_info.pseudonim,
-          quote: user.author_info.quote,
-          shortDescription: user.author_info.short_description,
+          firstName: user.userInfo.credentials.firstName,
+          lastName: user.userInfo.credentials.lastName,
+          phone: user.userInfo.phone,
+          pseudonim: user.authorInfo.pseudonim,
+          quote: user.authorInfo.quote,
+          shortDescription: user.authorInfo.shortDescription,
           role: user.role,
-          profileImg: user.user_info.profile_img,
+          profileImg: user.userInfo.profileImg,
         },
       ],
     },
@@ -104,16 +104,16 @@ export default function AdminTabs({
     setCurrentRole(user.role);
     setSelectedImgs({
       data: null,
-      id: user.user_info.profile_img.id || null,
-      url: user.user_info.profile_img.url || null,
+      id: user.userInfo.profileImg.id || null,
+      url: user.userInfo.profileImg.url || null,
       isDeleted: false,
     });
   };
   const { fields } = useFieldArray({ name: 'admin', control: form.control });
   const [selectedImgs, setSelectedImgs] = useState<SelectedImgsTypes>({
     data: null,
-    id: user.user_info.profile_img.id || null,
-    url: user.user_info.profile_img.url || null,
+    id: user.userInfo.profileImg.id || null,
+    url: user.userInfo.profileImg.url || null,
     isDeleted: false,
   });
 
@@ -132,16 +132,16 @@ export default function AdminTabs({
     } = form.getValues('admin')[0];
     if (
       email !== user.email ||
-      firstName !== user.user_info.credentials.first_name ||
-      lastName !== user.user_info.credentials.last_name ||
+      firstName !== user.userInfo.credentials.firstName ||
+      lastName !== user.userInfo.credentials.lastName ||
       password ||
-      phone !== user.user_info.phone ||
+      phone !== user.userInfo.phone ||
       selectedImgs.data ||
       selectedImgs.isDeleted ||
-      pseudonim !== user.author_info.pseudonim ||
-      quote !== user.author_info.quote ||
+      pseudonim !== user.authorInfo.pseudonim ||
+      quote !== user.authorInfo.quote ||
       role !== user.role ||
-      shortDescription !== user.author_info.short_description ||
+      shortDescription !== user.authorInfo.shortDescription ||
       username !== user.username
     ) {
       return true;
@@ -170,17 +170,17 @@ export default function AdminTabs({
       const uploadData = await useUploadImg({
         ownerId: user._id,
         selectedFile: selectedImgs.data,
-        targetLocation: 'Profile_img',
-        currentId: user.user_info.profile_img.id,
+        targetLocation: 'ProfileImg',
+        currentId: user.userInfo.profileImg.id,
       });
       if (uploadData) {
         response.profileImg = uploadData;
       }
     } else if (selectedImgs.isDeleted) {
       await useDeleteImg({
-        imgId: user.user_info.profile_img.id,
+        imgId: user.userInfo.profileImg.id,
         ownerId: user._id,
-        targetLocation: 'Profile_img',
+        targetLocation: 'ProfileImg',
       });
       response.profileImg = { _id: response.profileImg._id };
     }
@@ -326,7 +326,7 @@ export default function AdminTabs({
                             X
                           </span>
                         )}
-                        {!user.user_info.profile_img && !selectedImgs?.url && (
+                        {!user.userInfo.profileImg && !selectedImgs?.url && (
                           <div className="inline-block h-24 w-24 rounded-full bg-slate-200 object-cover ring-2 ring-white"></div>
                         )}
                         {selectedImgs.url ? (
@@ -388,7 +388,7 @@ export default function AdminTabs({
                               <FormLabel>Role</FormLabel>
                               <Select
                                 onValueChange={(e) => {
-                                  setCurrentRole(e);
+                                  setCurrentRole(e as UserRoleTypes);
                                   field.onChange(e);
                                 }}
                                 value={currentRole}
@@ -440,7 +440,7 @@ export default function AdminTabs({
                                 <Input
                                   type="text"
                                   placeholder={
-                                    user.user_info.credentials.first_name
+                                    user.userInfo.credentials.firstName
                                   }
                                   {...field}
                                 />
@@ -459,7 +459,7 @@ export default function AdminTabs({
                                 <Input
                                   type="text"
                                   placeholder={
-                                    user.user_info.credentials.last_name
+                                    user.userInfo.credentials.lastName
                                   }
                                   {...field}
                                 />
@@ -479,7 +479,7 @@ export default function AdminTabs({
                                   type="text"
                                   {...field}
                                   placeholder={
-                                    user.user_info.phone || 'No phone number'
+                                    user.userInfo.phone || 'No phone number'
                                   }
                                 />
                               </FormControl>
@@ -500,7 +500,7 @@ export default function AdminTabs({
                                   type="text"
                                   {...field}
                                   placeholder={
-                                    user.author_info.pseudonim || 'No pseudonim'
+                                    user.authorInfo.pseudonim || 'No pseudonim'
                                   }
                                 />
                               </FormControl>
@@ -519,7 +519,7 @@ export default function AdminTabs({
                                   type="text"
                                   {...field}
                                   placeholder={
-                                    user.author_info.quote || 'No quote'
+                                    user.authorInfo.quote || 'No quote'
                                   }
                                 />
                               </FormControl>
@@ -537,7 +537,7 @@ export default function AdminTabs({
                                 <Textarea
                                   {...field}
                                   placeholder={
-                                    user.author_info.short_description ||
+                                    user.authorInfo.shortDescription ||
                                     'No description'
                                   }
                                 />

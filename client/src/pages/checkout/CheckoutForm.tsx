@@ -194,24 +194,24 @@ export default function CheckoutForm({
           validation: { phone: { required: 'auto' } },
           display: { name: 'split' },
           defaultValues: {
-            phone: userData.data ? userData.data.user_info.phone : '',
+            phone: userData.data ? userData.data.userInfo.phone : '',
             firstName: userData.data
-              ? userData.data.user_info.credentials.first_name
+              ? userData.data.userInfo.credentials.firstName
               : '',
             lastName: userData.data
-              ? userData.data.user_info.credentials.last_name
+              ? userData.data.userInfo.credentials.lastName
               : '',
             address: {
               country: userData.data
-                ? userData.data.user_info.address.country
+                ? userData.data.userInfo.address.country
                 : '',
-              city: userData.data ? userData.data.user_info.address.city : '',
-              line1: userData.data ? userData.data.user_info.address.line1 : '',
-              line2: userData.data ? userData.data.user_info.address.line2 : '',
+              city: userData.data ? userData.data.userInfo.address.city : '',
+              line1: userData.data ? userData.data.userInfo.address.line1 : '',
+              line2: userData.data ? userData.data.userInfo.address.line2 : '',
               postal_code: userData.data
-                ? userData.data.user_info.address.postal_code
+                ? userData.data.userInfo.address.postalCode
                 : '',
-              state: userData.data ? userData.data.user_info.address.state : '',
+              state: userData.data ? userData.data.userInfo.address.state : '',
             },
           },
         }}

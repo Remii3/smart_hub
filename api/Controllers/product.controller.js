@@ -179,11 +179,7 @@ const getOneProduct = async (req, res) => {
         { path: 'categories', select: ['value', 'label'] },
         {
           path: 'authors',
-          select: [
-            'user_info.credentials.full_name',
-            '_id',
-            'author_info.pseudonim',
-          ],
+          select: ['userInfo.username', '_id', 'authorInfo.pseudonim'],
         },
       ])
       .lean();

@@ -52,6 +52,7 @@ export default function LoginPage() {
         password,
       },
     });
+    console.log(name);
     if (logInError) {
       form.setError(name, { type: 'value', message: logInError });
       return toast({

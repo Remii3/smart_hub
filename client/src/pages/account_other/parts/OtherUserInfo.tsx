@@ -94,18 +94,18 @@ export default function OtherUserInfo({
   return (
     <div className="flex flex-col items-center justify-center rounded-md ">
       <div className="mb-4">
-        {otherUserData.user_info.profile_img &&
-        otherUserData.user_info.profile_img.url ? (
+        {otherUserData.userInfo.profileImg &&
+        otherUserData.userInfo.profileImg.url ? (
           <img
-            src={otherUserData.user_info.profile_img.url}
+            src={otherUserData.userInfo.profileImg.url}
             className="aspect-auto h-36 w-36 rounded-full object-cover"
-            alt="profile_img"
+            alt="profileImg"
           />
         ) : (
           <img
             src="https://firebasestorage.googleapis.com/v0/b/smarthub-75eab.appspot.com/o/static_imgs%2Fnophoto.webp?alt=media&token=a974d32e-108a-4c21-be71-de358368a167"
             className="aspect-auto h-36 w-36 rounded-full object-cover"
-            alt="profile_img"
+            alt="profileImg"
           />
         )}
       </div>
@@ -123,37 +123,37 @@ export default function OtherUserInfo({
       </Badge>
 
       <h3 className="mb-4">
-        {otherUserData.author_info
-          ? otherUserData.author_info.pseudonim
+        {otherUserData.authorInfo
+          ? otherUserData.authorInfo.pseudonim
           : otherUserData.username}
       </h3>
-      {otherUserData.user_info && (
+      {otherUserData.userInfo && (
         <article>
-          {otherUserData.user_info.credentials.first_name && (
+          {otherUserData.userInfo.credentials.firstName && (
             <div>
               First name:{' '}
-              <span>{otherUserData.user_info.credentials.first_name}</span>
+              <span>{otherUserData.userInfo.credentials.firstName}</span>
             </div>
           )}
-          {otherUserData.user_info.credentials.last_name && (
+          {otherUserData.userInfo.credentials.lastName && (
             <div>
               Last name:{' '}
-              <span>{otherUserData.user_info.credentials.last_name}</span>
+              <span>{otherUserData.userInfo.credentials.lastName}</span>
             </div>
           )}
         </article>
       )}
-      {otherUserData.user_info && otherUserData.role !== UserRoleTypes.USER && (
+      {otherUserData.userInfo && otherUserData.role !== UserRoleTypes.USER && (
         <article>
-          {otherUserData.author_info.quote && (
+          {otherUserData.authorInfo.quote && (
             <div>
-              Favourite quote: <span>{otherUserData.author_info.quote}</span>
+              Favourite quote: <span>{otherUserData.authorInfo.quote}</span>
             </div>
           )}
-          {otherUserData.author_info.short_description && (
+          {otherUserData.authorInfo.shortDescription && (
             <div>
               Short description:{' '}
-              <span>{otherUserData.author_info.short_description}</span>
+              <span>{otherUserData.authorInfo.shortDescription}</span>
             </div>
           )}
         </article>
@@ -164,21 +164,21 @@ export default function OtherUserInfo({
             <div className="flex flex-col items-center">
               <div>Products</div>
               <span>
-                {
-                  otherUserData.author_info.my_products.filter(
+                {/* {
+                  otherUserData.authorInfo.my_products.filter(
                     (item) => item.marketplace === 'shop'
                   ).length
-                }
+                } */}
               </span>
             </div>
             <div className="flex flex-col items-center">
               <div>Collections</div>
               <span>
-                {
-                  otherUserData.author_info.my_products.filter(
+                {/* {
+                  otherUserData.authorInfo.my_products.filter(
                     (item) => item.marketplace === 'collection'
                   ).length
-                }
+                } */}
               </span>
             </div>
             <div className="flex flex-col items-center">

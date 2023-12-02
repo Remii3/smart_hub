@@ -254,9 +254,9 @@ export default function EditUserData() {
     if (selectedProfileImg.isDirty) {
       if (!selectedProfileImg.img) {
         await useDeleteImg({
-          imgId: userData.data.user_info.profile_img.id,
+          imgId: userData.data.userInfo.profileImg.id,
           ownerId: userData.data._id,
-          targetLocation: 'Profile_img',
+          targetLocation: 'ProfileImg',
         });
 
         dirtyData = { profileImg: {} };
@@ -267,8 +267,8 @@ export default function EditUserData() {
           selectedFile: selectedProfileImg.img
             ? selectedProfileImg.img.data!
             : null,
-          targetLocation: 'Profile_img',
-          currentId: userData.data.user_info.profile_img.id,
+          targetLocation: 'ProfileImg',
+          currentId: userData.data.userInfo.profileImg.id,
         });
         dirtyData = { profileImg: { ...imgResData } };
       }
@@ -298,33 +298,33 @@ export default function EditUserData() {
       username: userData.data?.username,
     });
     credentialsForm.reset({
-      firstName: userData.data?.user_info.credentials.first_name,
-      lastName: userData.data?.user_info.credentials.last_name,
+      firstName: userData.data?.userInfo.credentials.firstName,
+      lastName: userData.data?.userInfo.credentials.lastName,
     });
     passwrodForm.reset({
       password: '',
       passwordConfirmation: '',
     });
     phoneForm.reset({
-      phone: userData.data?.user_info.phone,
+      phone: userData.data?.userInfo.phone,
     });
     addressForm.reset({
-      line1: userData.data?.user_info.address.line1,
-      line2: userData.data?.user_info.address.line2,
-      city: userData.data?.user_info.address.city,
-      state: userData.data?.user_info.address.state,
-      postalCode: userData.data?.user_info.address.postal_code,
-      country: userData.data?.user_info.address.country,
+      line1: userData.data?.userInfo.address.line1,
+      line2: userData.data?.userInfo.address.line2,
+      city: userData.data?.userInfo.address.city,
+      state: userData.data?.userInfo.address.state,
+      postalCode: userData.data?.userInfo.address.postalCode,
+      country: userData.data?.userInfo.address.country,
     });
     if (userData.data && userData.data.role !== 'User') {
       quoteForm.reset({
-        quote: userData.data?.author_info.quote,
+        quote: userData.data?.authorInfo.quote,
       });
       pseudonimForm.reset({
-        pseudonim: userData.data?.author_info.pseudonim,
+        pseudonim: userData.data?.authorInfo.pseudonim,
       });
       shortDescriptionForm.reset({
-        shortDescription: userData.data?.author_info.short_description,
+        shortDescription: userData.data?.authorInfo.shortDescription,
       });
     }
   }, [openDialog]);
@@ -339,19 +339,19 @@ export default function EditUserData() {
         <div className="flex flex-col">
           <fieldset className="flex flex-col">
             <div id="showcasedProfileImg">
-              {userData.data.user_info.profile_img.url && (
+              {userData.data.userInfo.profileImg.url && (
                 <img
                   className="inline-block h-24 w-24 rounded-full object-cover ring-2 ring-white"
-                  src={userData.data.user_info.profile_img.url}
+                  src={userData.data.userInfo.profileImg.url}
                   alt="avatar_img"
                 />
               )}
-              {!userData.data.user_info.profile_img.url &&
+              {!userData.data.userInfo.profileImg.url &&
                 !selectedProfileImg.img && (
                   <img
                     src="https://firebasestorage.googleapis.com/v0/b/smarthub-75eab.appspot.com/o/static_imgs%2Fnophoto.webp?alt=media&token=a974d32e-108a-4c21-be71-de358368a167"
                     className="inline-block h-24 w-24 rounded-full object-cover ring-2 ring-white"
-                    alt="profile_img"
+                    alt="profileImg"
                   />
                 )}
             </div>
@@ -380,22 +380,22 @@ export default function EditUserData() {
                           alt="avatar_img"
                         />
                       )}
-                      {userData.data.user_info.profile_img.url &&
+                      {userData.data.userInfo.profileImg.url &&
                         !selectedProfileImg.isDirty && (
                           <img
                             className="inline-block w-40 rounded-full object-cover ring-2 ring-white"
-                            src={userData.data.user_info.profile_img.url}
+                            src={userData.data.userInfo.profileImg.url}
                             alt="avatar_img"
                           />
                         )}
-                      {((!userData.data.user_info.profile_img.url &&
+                      {((!userData.data.userInfo.profileImg.url &&
                         !selectedProfileImg.img) ||
                         (!selectedProfileImg.img &&
                           selectedProfileImg.isDirty)) && (
                         <img
                           src="https://firebasestorage.googleapis.com/v0/b/smarthub-75eab.appspot.com/o/static_imgs%2Fnophoto.webp?alt=media&token=a974d32e-108a-4c21-be71-de358368a167"
                           className="inline-block w-40 rounded-full object-cover ring-2 ring-white"
-                          alt="profile_img"
+                          alt="profileImg"
                         />
                       )}
                     </div>
@@ -543,7 +543,7 @@ export default function EditUserData() {
                       id="showcasedFirstName"
                       type="text"
                       disabled
-                      value={userData.data.user_info.credentials.first_name}
+                      value={userData.data.userInfo.credentials.firstName}
                     />
                   </fieldset>
                   <fieldset className="flex flex-col">
@@ -557,7 +557,7 @@ export default function EditUserData() {
                       id="showcasedLastName"
                       type="text"
                       disabled
-                      value={userData.data.user_info.credentials.last_name}
+                      value={userData.data.userInfo.credentials.lastName}
                     />
                   </fieldset>
                 </div>
@@ -810,7 +810,7 @@ export default function EditUserData() {
                     type="tel"
                     disabled
                     placeholder="000-000-000"
-                    value={userData.data.user_info.phone}
+                    value={userData.data.userInfo.phone}
                   />
                 </fieldset>
                 <div className="flex justify-between">
@@ -891,20 +891,20 @@ export default function EditUserData() {
                     disabled
                     placeholder="Address"
                     value={`${
-                      userData.data.user_info.address.line1 &&
-                      userData.data.user_info.address.line1 + ' / '
+                      userData.data.userInfo.address.line1 &&
+                      userData.data.userInfo.address.line1 + ' / '
                     }${
-                      userData.data.user_info.address.city &&
-                      userData.data.user_info.address.city + ' / '
+                      userData.data.userInfo.address.city &&
+                      userData.data.userInfo.address.city + ' / '
                     }${
-                      userData.data.user_info.address.state &&
-                      userData.data.user_info.address.state + ' / '
+                      userData.data.userInfo.address.state &&
+                      userData.data.userInfo.address.state + ' / '
                     }${
-                      userData.data.user_info.address.postal_code &&
-                      userData.data.user_info.address.postal_code + ' / '
+                      userData.data.userInfo.address.postalCode &&
+                      userData.data.userInfo.address.postalCode + ' / '
                     }${
-                      userData.data.user_info.address.country &&
-                      userData.data.user_info.address.country
+                      userData.data.userInfo.address.country &&
+                      userData.data.userInfo.address.country
                     }`}
                   />
                 </fieldset>
@@ -1069,9 +1069,9 @@ export default function EditUserData() {
                       type="text"
                       disabled
                       placeholder={
-                        userData.data.author_info.quote || 'No quote ...'
+                        userData.data.authorInfo.quote || 'No quote ...'
                       }
-                      value={userData.data.author_info.quote}
+                      value={userData.data.authorInfo.quote}
                     />
                   </fieldset>
                   <div>
@@ -1145,8 +1145,8 @@ export default function EditUserData() {
                       id="showcasedPseudonim"
                       type="text"
                       disabled
-                      placeholder={userData.data.author_info.pseudonim}
-                      value={userData.data.author_info.pseudonim}
+                      placeholder={userData.data.authorInfo.pseudonim}
+                      value={userData.data.authorInfo.pseudonim}
                     />
                   </fieldset>
                   <div className="flex justify-between">
@@ -1223,8 +1223,8 @@ export default function EditUserData() {
                       id="showcasedShortDescription"
                       type="text"
                       disabled
-                      placeholder={userData.data.author_info.short_description}
-                      value={userData.data.author_info.short_description}
+                      placeholder={userData.data.authorInfo.shortDescription}
+                      value={userData.data.authorInfo.shortDescription}
                     />
                   </fieldset>
                   <div className="flex justify-between">

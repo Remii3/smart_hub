@@ -1,14 +1,14 @@
 const mongoose = require('mongoose');
 
 const OrderSchema = new mongoose.Schema({
-  buyer_id: { type: mongoose.Types.ObjectId, ref: 'User' },
-  seller_id: { type: mongoose.Types.ObjectId, ref: 'User' },
+  buyerId: { type: mongoose.Types.ObjectId, ref: 'User' },
+  sellerId: { type: mongoose.Types.ObjectId, ref: 'User' },
   products: [
     {
       type: {
         product: { type: mongoose.Types.ObjectId, ref: 'Product' },
-        in_cart_quantity: Number,
-        total_price: Number,
+        inCartQuantity: Number,
+        totalPrice: Number,
       },
     },
   ],

@@ -35,7 +35,7 @@ const prodCol = async (req, res, next) => {
 
     for (let i = 0; i < filtersData.selectedAuthors.length; i++) {
       const author = await User.findOne({
-        'author_info.pseudonim': filtersData.selectedAuthors[i],
+        'authorCnfo.pseudonim': filtersData.selectedAuthors[i],
       });
       if (author) {
         authors.push(author._id);

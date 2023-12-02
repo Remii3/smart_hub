@@ -9,7 +9,6 @@ interface ProductsTypes extends FetchDataTypes {
 }
 interface PropsTypes {
   authorId: string;
-  authorPseudonim: string;
 }
 export default function SimilarProducts({ authorId }: PropsTypes) {
   const [products, setProducts] = useState<ProductsTypes>({

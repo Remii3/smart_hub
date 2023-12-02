@@ -15,12 +15,7 @@ import { UserRoleTypes } from '@customTypes/types';
 
 export type OtherUserTypes = Pick<
   AuthorTypes,
-  | '_id'
-  | 'username'
-  | 'role'
-  | 'security_settings'
-  | 'author_info'
-  | 'user_info'
+  '_id' | 'username' | 'role' | 'securitySettings' | 'authorInfo' | 'userInfo'
 >;
 export interface OtherUserDataTypes extends FetchDataTypes {
   data: OtherUserTypes | null;
@@ -59,6 +54,7 @@ export default function OtherUserPage() {
       url: DATABASE_ENDPOINTS.USER_OTHER_PROFILE,
       params: { userId: otherUserId },
     });
+    console.log(data);
 
     if (error) {
       errorToast(error);
@@ -79,7 +75,6 @@ export default function OtherUserPage() {
       url: DATABASE_ENDPOINTS.SEARCH_PRODCOL,
       params: { userId: otherUserId },
     });
-
     if (error) {
       errorToast(error);
       return setOtherUserProducts((prevState) => {
@@ -87,7 +82,7 @@ export default function OtherUserPage() {
       });
     }
     setOtherUserProducts({
-      data: data.data,
+      data: data,
       rawData: data.rawData,
       hasError: null,
       isLoading: false,
@@ -98,7 +93,7 @@ export default function OtherUserPage() {
     getOtherUserData();
     getOtherUserProducts();
   }, []);
-
+  console.log(otherUserData);
   return (
     <div className="relative">
       {otherUserData.isLoading && <LoadingCircle />}
@@ -118,7 +113,7 @@ export default function OtherUserPage() {
               <section className="mb-8">
                 <div className="">
                   <h4 className="mb-5">Products</h4>
-                  <SushiSwiper
+                  {/* <SushiSwiper
                     swiperCategory="shop"
                     loadingState={otherUserData.isLoading}
                     errorState={otherUserData.hasError}
@@ -128,11 +123,11 @@ export default function OtherUserPage() {
                         (item) => item.marketplace === 'shop'
                       )
                     }
-                  />
+                  /> */}
                 </div>
                 <div className="relative max-w-[1092px]">
                   <h4 className="mb-5">Collections</h4>
-                  <SushiSwiper
+                  {/* <SushiSwiper
                     swiperCategory="shop"
                     loadingState={otherUserData.isLoading}
                     errorState={otherUserData.hasError}
@@ -142,7 +137,7 @@ export default function OtherUserPage() {
                         (item) => item.marketplace === 'collection'
                       )
                     }
-                  />
+                  /> */}
                 </div>
               </section>
             )}

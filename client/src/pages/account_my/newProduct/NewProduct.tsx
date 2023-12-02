@@ -71,7 +71,7 @@ const formSchema = z.object({
     .array(
       z.object({
         _id: z.string(),
-        authors_info: z.any(),
+        authorsInfo: z.any(),
       })
     )
     .min(1),
@@ -133,6 +133,7 @@ export default function NewProduct() {
     const { data } = await useGetAccessDatabase({
       url: DATABASE_ENDPOINTS.USER_AUTHORS,
     });
+    console.log(data);
     setAuthorState((prevState) => {
       return { ...prevState, options: [...data] };
     });
@@ -211,8 +212,8 @@ export default function NewProduct() {
       body: {
         creatorData: {
           _id: userData.data?._id,
-          pseudonim: userData.data?.author_info.pseudonim,
-          profile_img: userData.data?.user_info.profile_img.url,
+          pseudonim: userData.data?.authorInfo.pseudonim,
+          profileImg: userData.data?.userInfo.profileImg.url,
         },
         ...dirtyData,
       },
@@ -223,7 +224,7 @@ export default function NewProduct() {
         const url = await useUploadImg({
           ownerId: data.id,
           selectedFile: selectedImgs.imgs[i].data || null,
-          targetLocation: 'Product_imgs',
+          targetLocation: 'ProductImgs',
         });
         urls.push(url);
       }
@@ -535,10 +536,10 @@ export default function NewProduct() {
                               }),
                             }}
                             getOptionValue={(author) =>
-                              author.author_info.pseudonim
+                              author.authorInfo.pseudonim
                             }
                             getOptionLabel={(author) =>
-                              author.author_info.pseudonim
+                              author.authorInfo.pseudonim
                             }
                           />
                         </FormControl>

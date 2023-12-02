@@ -1,16 +1,20 @@
 import { Badge } from '@components/UI/badge';
 import MarketplaceBadge from '@components/UI/badges/MarketplaceBadge';
 import { Button } from '@components/UI/button';
+import { Card } from '@components/UI/card';
+import DeleteDialog from '@components/UI/dialogs/DeleteDialog';
 import errorToast from '@components/UI/error/errorToast';
 import { UserContext } from '@context/UserProvider';
 import { AuthorTypes, FetchDataTypes } from '@customTypes/interfaces';
 import { UserRoleTypes } from '@customTypes/types';
 import { DATABASE_ENDPOINTS } from '@data/endpoints';
+import { TrashIcon } from '@heroicons/react/24/outline';
 import {
   useGetAccessDatabase,
   usePostAccessDatabase,
 } from '@hooks/useAaccessDatabase';
 import { useCallback, useContext, useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 
 interface FollowsTypes extends FetchDataTypes {
   data: null | AuthorTypes[];
@@ -22,6 +26,8 @@ export default function Follows() {
     hasError: null,
     isLoading: false,
   });
+  const [deleteDialog, setDeleteDialog] = useState<null | string>(null);
+
   const { userData } = useContext(UserContext);
   const fetchData = useCallback(async () => {
     setFolloweedUsers((prevState) => {
@@ -51,10 +57,14 @@ export default function Follows() {
         followReceiverId: followedUserId,
       },
     });
+    if (error) {
+      return errorToast(error);
+    }
     fetchData();
   };
+  console.log(followedUsers);
   return (
-    <div>
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
       {!followedUsers.isLoading &&
         followedUsers.data &&
         followedUsers.data.length <= 0 && (
@@ -62,43 +72,53 @@ export default function Follows() {
         )}
       {followedUsers.data &&
         followedUsers.data.map((followedUser) => (
-          <div key={followedUser._id} className="mb-4 rounded bg-slate-200">
-            <a href={`/account/${followedUser._id}`} className="block">
-              <img
-                src={followedUser.user_info.profile_img.url}
-                alt="profile_img"
-                className="aspect-square h-full w-16"
-              />
-            </a>
-            <div className="inline-block">
-              <a href={`/account/${followedUser._id}`} className="block">
-                {followedUser.role !== UserRoleTypes.USER
-                  ? followedUser.author_info.pseudonim
-                  : followedUser.username}
-              </a>
-              {followedUser.role !== 'User' && (
-                <Badge
-                  variant={'outline'}
-                  className={`${
-                    followedUser.role === UserRoleTypes.AUTHOR &&
-                    'text-purple-700 bg-purple-100'
-                  } ${
-                    followedUser.role === UserRoleTypes.ADMIN &&
-                    'text-cyan-700 bg-cyan-100'
-                  }`}
+          <div>
+            <Card
+              key={followedUser._id}
+              className="w-auto flex justify-between hover:shadow transition ease-in-out"
+            >
+              <div className="flex gap-2">
+                <Link to={`/account/${followedUser._id}`} className="block">
+                  <img
+                    src={followedUser.userInfo.profileImg.url}
+                    alt="profile_img"
+                    height={80}
+                    width={80}
+                    className="aspect-square object-cover rounded-l-md"
+                  />
+                </Link>
+                <div className="my-1">
+                  <Link
+                    to={`/account/${followedUser._id}`}
+                    className="block line-clamp-1"
+                  >
+                    {followedUser.role !== UserRoleTypes.USER
+                      ? followedUser.authorInfo.pseudonim
+                      : followedUser.username}
+                  </Link>
+                  <span className="text-muted-foreground block line-clamp-1 text-sm">
+                    {followedUser.authorInfo.quote}
+                  </span>
+                </div>
+              </div>
+
+              <div className="my-1 mr-1">
+                <DeleteDialog
+                  deleteHandler={() => removeFollowHandler(followedUser._id)}
+                  openState={deleteDialog === followedUser._id}
+                  openStateHandler={() => setDeleteDialog(null)}
                 >
-                  {followedUser.role}
-                </Badge>
-              )}
-            </div>
-            <div>
-              <Button
-                variant={'destructive'}
-                onClick={() => removeFollowHandler(followedUser._id)}
-              >
-                Remove
-              </Button>
-            </div>
+                  <Button
+                    variant={'ghost'}
+                    size={'sm'}
+                    onClick={() => setDeleteDialog(followedUser._id)}
+                    className="text-red-400 hover:text-red-400 rounded-xl"
+                  >
+                    <TrashIcon className="h-6 w-6" />
+                  </Button>
+                </DeleteDialog>
+              </div>
+            </Card>
           </div>
         ))}
     </div>

@@ -9,7 +9,7 @@ export default function OrderHistory() {
     <div className="px-3">
       <h4 className="mb-4">Order history</h4>
       <div className="px-2">
-        {userData.data.orders.map((item) => (
+        {/* {userData.data.orders.map((item) => (
           <Link
             key={item._id}
             to={`order/${item._id}`}
@@ -24,7 +24,7 @@ export default function OrderHistory() {
               </div>
             ))}
           </Link>
-        ))}
+        ))} */}
       </div>
     </div>
   );
