@@ -6,7 +6,6 @@ import { CartProductType } from '@customTypes/interfaces';
 
 export default function CheckoutProdList() {
   const { cartState } = useContext(CartContext);
-  const { userData } = useContext(UserContext);
 
   return (
     <>
@@ -15,9 +14,12 @@ export default function CheckoutProdList() {
       </div>
 
       <div>
-        <p className="text-2xl font-medium tracking-tight text-gray-900">
-          {cartState && cartState.cartPrice}
-        </p>
+        <div className="flex mb-1 justify-between items-end">
+          <strong>Price:</strong>
+          <strong className="text-2xl tracking-tight text-foreground">
+            {cartState && cartState.cartPrice}
+          </strong>
+        </div>
 
         <span className="text-sm text-muted-foreground">
           For the purchase of

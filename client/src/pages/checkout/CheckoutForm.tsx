@@ -259,7 +259,7 @@ export default function CheckoutForm({
       )}
 
       {message && (
-        <div id="payment-message" className="pt-3 text-center text-red-500">
+        <div id="payment-message" className="pt-3 text-center text-red-400">
           {message}
         </div>
       )}
