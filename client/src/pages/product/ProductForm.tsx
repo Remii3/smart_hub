@@ -88,7 +88,7 @@ export default function CollectionForm({
           <h3 className="text-[40px]">{productPrice}</h3>
           <div className="col-span-2 space-y-2">
             <Button
-              variant="default"
+              variant="secondary"
               type="button"
               onClick={addToCartHandler}
               disabled={
@@ -112,7 +112,7 @@ export default function CollectionForm({
               </span>
             </Button>
             <Button
-              variant="secondary"
+              variant="default"
               type="button"
               onClick={buyNowHandler}
               disabled={

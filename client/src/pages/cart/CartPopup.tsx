@@ -4,7 +4,7 @@ import { XMarkIcon } from '@heroicons/react/24/outline';
 import { PopoverClose } from '@radix-ui/react-popover';
 import { CartContext } from '@context/CartProvider';
 import CartPopupProdList from './CartPopupProdList';
-import { Button } from '@components/UI/button';
+import { Button, buttonVariants } from '@components/UI/button';
 
 function CartPopup() {
   const { cartState } = useContext(CartContext);
@@ -15,14 +15,16 @@ function CartPopup() {
         <XMarkIcon className="h-6 w-6" />
       </PopoverClose>
 
-      <div className="mt-4 space-y-6">
+      <div className="mt-4 space-y-4">
         <CartPopupProdList />
 
         <div className="space-y-4 text-center">
           <PopoverClose asChild>
             <Link
               to="/cart"
-              className="block rounded border border-gray-600 px-5 py-3 text-sm text-gray-600 transition hover:ring-1 hover:ring-gray-400"
+              className={`${buttonVariants({
+                variant: 'outline',
+              })} w-full py-3`}
             >
               View my cart ({cartState.products?.length || 0})
             </Link>
@@ -31,8 +33,9 @@ function CartPopup() {
             {cartState.products.length > 0 ? (
               <Link
                 to="/checkout"
-                className="block w-full rounded border border-primary bg-primary px-12 py-3 text-sm font-medium
-            text-background shadow-sm transition ease-out hover:bg-blue-700 focus:ring focus:ring-blue-300"
+                className={`${buttonVariants({
+                  variant: 'default',
+                })} w-full py-3`}
               >
                 Checkout
               </Link>
@@ -51,7 +54,10 @@ function CartPopup() {
           <PopoverClose asChild>
             <Link
               to="/shop"
-              className="inline-block text-sm text-gray-500 underline underline-offset-4 transition hover:text-gray-600"
+              className={`${buttonVariants({
+                variant: 'link',
+                size: 'clear',
+              })} `}
             >
               Continue shopping
             </Link>
