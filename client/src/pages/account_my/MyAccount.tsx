@@ -248,7 +248,7 @@ export default function MyAccount() {
             </div>
           </div>
         </div>
-        <div className="mt-8 w-full sm:px-2">
+        <div className="mt-8 w-full sm:px-3">
           {selectedtab === tabNames.MY_DATA && <EditUserData />}
           {selectedtab === tabNames.SECURITY_PERMISSIONS && (
             <SecurityPermissions />

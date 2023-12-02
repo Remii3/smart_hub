@@ -19,7 +19,7 @@ export default function AllCollectionsList({
 }: AllCollectionsListTypes) {
   return (
     <>
-      <div className="grid h-full grid-cols-1 gap-4 overflow-hidden pb-4 transition-[max-height] duration-300 ease-in-out sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <div className="px-1 grid h-full grid-cols-1 gap-4 overflow-hidden pb-4 transition-[max-height] duration-300 ease-in-out sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {collections.length <= 0 && <div>No collections.</div>}
         {collections.length > 0 &&
           collections.map((collection) => (

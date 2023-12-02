@@ -15,6 +15,8 @@ import {
   ProductTypes,
 } from '@customTypes/interfaces';
 import { MarketplaceTypes } from '@customTypes/types';
+import { Input } from '@components/UI/input';
+import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 
 interface ProductsTypes extends FetchDataTypes {
   data: null | ProductTypes[];
@@ -25,7 +27,7 @@ interface ProductsTypes extends FetchDataTypes {
 }
 
 interface ProductQuantityTypes extends FetchDataTypes {
-  quantity: null | number;
+  quantity: number;
 }
 
 interface DeleteAllTypes extends PostDataTypes {}
@@ -34,7 +36,7 @@ export default function MyCollections() {
     useState<ProductQuantityTypes>({
       hasError: null,
       isLoading: false,
-      quantity: null,
+      quantity: 0,
     });
   const [deleteDialog, setDeleteDialog] = useState(false);
   const [deleteAllStatus, setDeleteAllStatus] = useState<DeleteAllTypes>({
@@ -42,17 +44,22 @@ export default function MyCollections() {
     isLoading: false,
     isSuccess: false,
   });
-  const marketplace = 'collection' as MarketplaceTypes;
   const [collections, setCollections] = useState<ProductsTypes>({
     data: null,
     rawData: null,
     hasError: null,
     isLoading: false,
   });
-  const [page, setPage] = useState(1);
+  const marketplace = 'collection' as MarketplaceTypes;
+
   const { userData, fetchUserData } = useContext(UserContext);
-  const limit = 8;
-  const fetchAllData = useCallback(async () => {
+
+  const [searchbarValue, setSearchbarValue] = useState('');
+
+  const [page, setPage] = useState(1);
+  const allLimit = 8;
+
+  const fetchAllDataQuantity = useCallback(async () => {
     if (!userData.data) return;
     setProductsQuantity((prevState) => {
       return { ...prevState, isLoading: true };
@@ -73,24 +80,26 @@ export default function MyCollections() {
     setProductsQuantity({ hasError: null, isLoading: false, quantity: data });
   }, []);
 
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  const fetchData = useCallback(async () => {
+  const fetchAllData = async (type?: 'query') => {
     setCollections((prevState) => {
       return { ...prevState, isLoading: true };
     });
+
+    const filtersData = {
+      page,
+      marketplace,
+    } as { [index: string]: unknown };
+
+    if (type === 'query') {
+      filtersData.searchedPhrase = searchbarValue;
+    }
+
     const { data, error } = await useGetAccessDatabase({
       url: DATABASE_ENDPOINTS.SEARCH_PRODCOL,
       params: {
-        pageSize: limit,
-
-        filtersData: {
-          page,
-          marketplace: 'collection',
-        },
+        pageSize: allLimit,
         withPagination: true,
+        filtersData,
       },
     });
     if (error) {
@@ -108,17 +117,26 @@ export default function MyCollections() {
       hasError: null,
       isLoading: false,
     });
-  }, [page]);
+  };
+
+  const searchHandler = (e: React.FormEvent) => {
+    e.preventDefault();
+    fetchAllData('query');
+  };
 
   useEffect(() => {
     fetchAllData();
   }, [page]);
 
+  useEffect(() => {
+    fetchAllDataQuantity();
+  }, []);
+
   const deleteAllItemsHandler = async () => {
     setDeleteAllStatus((prevState) => {
       return { ...prevState, isLoading: true };
     });
-    console.log(marketplace);
+
     const { error } = await usePostAccessDatabase({
       url: DATABASE_ENDPOINTS.PRODUCT_DELETE_ALL,
       body: { userId: userData.data && userData.data._id, marketplace },
@@ -130,10 +148,12 @@ export default function MyCollections() {
       });
     }
     fetchUserData();
-    fetchData();
+    setPage(1);
+    fetchAllDataQuantity();
     fetchAllData();
     setDeleteDialog(false);
     setDeleteAllStatus({ hasError: null, isLoading: false, isSuccess: true });
+
     setTimeout(() => {
       setDeleteAllStatus((prevState) => {
         return { ...prevState, isSuccess: false };
@@ -142,42 +162,64 @@ export default function MyCollections() {
   };
 
   return (
-    <div className="relative px-3">
-      <section className="flex justify-between items-center">
-        <h4 className="mb-4">My collections</h4>
-        {!deleteAllStatus.isLoading &&
-          !!productsQuantity.quantity &&
-          productsQuantity.quantity > 0 && (
-            <DeleteDialog
-              openState={deleteDialog}
-              openStateHandler={() => setDeleteDialog(false)}
-              deleteHandler={deleteAllItemsHandler}
+    <div>
+      <section className="flex justify-between flex-wrap items-center mb-4 gap-4">
+        <h4 className="order-1 basis-[20%]">My collections</h4>
+        <div className="order-3 sm:order-2 w-full sm:w-auto">
+          <form
+            onSubmit={(e) => searchHandler(e)}
+            className="relative mx-auto me-4 w-full basis-full items-center justify-end text-muted-foreground flex"
+          >
+            <Input
+              className="h-full rounded-lg bg-background py-2 pl-3 pr-12 text-sm transition-[width] duration-200 ease-in-out focus-visible:w-full"
+              type="text"
+              name="search"
+              placeholder="Search"
+              value={searchbarValue}
+              onChange={(e) => setSearchbarValue(e.target.value)}
+            />
+            <button
+              type="submit"
+              className="absolute right-0 top-1/2 h-full w-auto min-w-[40px] -translate-y-1/2 transform rounded-e-xl border-0 bg-transparent px-2 text-gray-600 transition"
             >
-              <Button
-                type="button"
-                variant={'destructive'}
-                onClick={() => setDeleteDialog(true)}
-              >
-                Delete all
-              </Button>
-            </DeleteDialog>
-          )}
+              <span className="sr-only">Search</span>
+              <MagnifyingGlassIcon className="h-6 w-6 font-bold text-muted-foreground" />
+            </button>
+          </form>
+        </div>
+        <div className="order-2 sm:order-3 basis-[15%]">
+          <DeleteDialog
+            openState={deleteDialog}
+            openStateHandler={() => setDeleteDialog(false)}
+            deleteHandler={deleteAllItemsHandler}
+          >
+            <Button
+              type="button"
+              variant={'destructive'}
+              onClick={() => setDeleteDialog(true)}
+              className={`${
+                productsQuantity.quantity <= 0 && 'invisible'
+              } order-2 sm:order-3`}
+              disabled={
+                deleteAllStatus.isLoading || productsQuantity.quantity <= 0
+              }
+            >
+              Delete all
+            </Button>
+          </DeleteDialog>
+        </div>
       </section>
-      <div className="space-y-4">
-        <section className="px-2">
-          <div>
-            {collections.data && (
-              <AllCollectionsList
-                collections={collections.data}
-                limit={limit}
-                onPageChange={setPage}
-                page={page}
-                totalPages={collections.rawData?.totalProducts}
-              />
-            )}
-          </div>
-        </section>
-      </div>
+      <section>
+        {collections.data && (
+          <AllCollectionsList
+            limit={allLimit}
+            collections={collections.data}
+            onPageChange={setPage}
+            page={page}
+            totalPages={collections.rawData?.totalProducts}
+          />
+        )}
+      </section>
     </div>
   );
 }
