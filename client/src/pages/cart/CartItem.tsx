@@ -42,31 +42,33 @@ export default function CartItem({
     <li className="flex flex-wrap items-center gap-4 ">
       <Link
         to={`/${productData.marketplace}/${productData._id}`}
-        className="min-w-20 block w-20 rounded-md"
+        className="block overflow-hidden"
       >
         {productData.imgs && productData.imgs[0] ? (
           <img
             src={productData.imgs[0].url}
             alt="Cart product img."
-            width={80}
-            height={80}
-            className="aspect-square w-20 rounded-md object-cover"
+            width={95}
+            height={95}
+            className="aspect-square rounded-md object-cover"
           />
         ) : (
           <img
             src="https://firebasestorage.googleapis.com/v0/b/smarthub-75eab.appspot.com/o/static_imgs%2Fnophoto.webp?alt=media&token=a974d32e-108a-4c21-be71-de358368a167"
             alt="Cart product img placeholder."
-            width={80}
-            height={80}
-            className="aspect-square w-20 rounded-md object-cover"
+            width={95}
+            height={95}
+            className="aspect-square rounded-md object-cover scale-150"
           />
         )}
       </Link>
       <div className="flex-grow">
         <Link to={`/product/${productData._id}`} className="block">
-          <h3 className="text-base text-foreground">{productData.title}</h3>
+          <strong className="text-lg text-foreground">
+            {productData.title}
+          </strong>
         </Link>
-        <div className="text-sm text-slate-600">
+        <div className="text-sm text-muted-foreground">
           <span>{totalPrice}</span>
         </div>
       </div>
@@ -116,7 +118,7 @@ export default function CartItem({
         <Button
           variant={'ghost'}
           type="button"
-          className={`${!isBusy && ' hover:text-red-600'}`}
+          className={`${!isBusy && ' hover:text-red-400'} text-red-400`}
           disabled={isBusy}
           onClick={() => removeHandler()}
           aria-label="Remove item from your cart."
