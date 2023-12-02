@@ -133,7 +133,6 @@ export default function NewProduct() {
     const { data } = await useGetAccessDatabase({
       url: DATABASE_ENDPOINTS.USER_AUTHORS,
     });
-    console.log(data);
     setAuthorState((prevState) => {
       return { ...prevState, options: [...data] };
     });

@@ -54,7 +54,6 @@ export default function OtherUserPage() {
       url: DATABASE_ENDPOINTS.USER_OTHER_PROFILE,
       params: { userId: otherUserId },
     });
-    console.log(data);
 
     if (error) {
       errorToast(error);
@@ -93,7 +92,6 @@ export default function OtherUserPage() {
     getOtherUserData();
     getOtherUserProducts();
   }, []);
-  console.log(otherUserData);
   return (
     <div className="relative">
       {otherUserData.isLoading && <LoadingCircle />}
