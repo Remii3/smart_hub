@@ -23,6 +23,8 @@ export default function AdvancedFilter({ highestPrice }: AdvancedFilterTypes) {
   const [openCollapsible, setOpenCollapsible] = useState(false);
   const clearSelectedMarketplace = () => {
     searchParams.delete('marketplace');
+    searchParams.append('marketplace', 'shop');
+    searchParams.append('marketplace', 'collection');
     setSearchParams(searchParams, { replace: true });
   };
   const clearSelectedPriceRange = () => {
@@ -108,7 +110,7 @@ export default function AdvancedFilter({ highestPrice }: AdvancedFilterTypes) {
       <Collapsible
         className={`${
           openCollapsible && ''
-        } fixed left-0 top-[calc(64px+48px)] z-10 block w-full bg-background px-4 py-2 md:hidden`}
+        } fixed left-0 top-[calc(64px+86px)] z-10 block w-full bg-background px-4 py-2 md:hidden`}
         open={openCollapsible}
         onOpenChange={setOpenCollapsible}
       >

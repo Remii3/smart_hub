@@ -206,12 +206,14 @@ export default function SearchPage() {
 
   return (
     <MainContainer>
-      <div className="fixed left-0 right-0 top-16 z-10 flex w-full items-center justify-between bg-background px-4 pb-1 pt-2 md:static md:mb-2 md:px-0 md:pt-0">
-        <span>
-          Results:{' '}
-          {searchedProductsData.rawData &&
-            searchedProductsData.rawData.totalProducts}
-        </span>
+      <div className="fixed left-0 flex-wrap right-0 top-16 z-10 flex w-full items-center justify-between bg-background px-4 pb-1 pt-2 md:static md:mb-2 md:px-0 md:pt-0">
+        <div>
+          <span>
+            Results:{' '}
+            {searchedProductsData.rawData &&
+              searchedProductsData.rawData.totalProducts}
+          </span>
+        </div>
         <div>
           <SortProducts
             category="search"
@@ -219,17 +221,7 @@ export default function SearchPage() {
             sortOptionChangeHandler={sortOptionChangeHandler}
           />
         </div>
-      </div>
-
-      <div className="flex flex-col justify-between gap-8 md:flex-row">
-        <AdvancedFilter
-          highestPrice={
-            (searchedProductsData.rawData &&
-              searchedProductsData.rawData.highestPrice) ||
-            0
-          }
-        />
-        <section className="mt-16 h-full w-full space-y-2 md:pt-0">
+        <div className="basis-full justify-start flex flex-wrap gap-1">
           {(searchParams.get('phrase') ||
             searchParams.get('special') ||
             searchParams.get('category') ||
@@ -329,7 +321,18 @@ export default function SearchPage() {
               )}
             </>
           )}
+        </div>
+      </div>
 
+      <div className="flex flex-col justify-between gap-8 md:flex-row">
+        <AdvancedFilter
+          highestPrice={
+            (searchedProductsData.rawData &&
+              searchedProductsData.rawData.highestPrice) ||
+            0
+          }
+        />
+        <section className="h-full w-full space-y-2 md:pt-0">
           {!searchedProductsData.isLoading &&
             searchedProductsData.products &&
             searchedProductsData.products.length === 0 && (

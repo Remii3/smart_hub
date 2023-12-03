@@ -58,8 +58,7 @@ export default function CategoriesFilter() {
   });
 
   return (
-    <div>
-      <Label htmlFor="filterAuthors">Categories filter</Label>
+    <>
       <Select
         inputId="filterCategories"
         menuPlacement="top"
@@ -113,6 +112,6 @@ export default function CategoriesFilter() {
               })
         }
       />
-    </div>
+    </>
   );
 }

@@ -57,8 +57,7 @@ export default function AuthorsFilter() {
     }
   };
   return (
-    <div>
-      <Label htmlFor="filterAuthors">Authors filter</Label>
+    <>
       <Select
         menuPlacement="top"
         maxMenuHeight={250}
@@ -117,6 +116,6 @@ export default function AuthorsFilter() {
               })
         }
       />
-    </div>
+    </>
   );
 }

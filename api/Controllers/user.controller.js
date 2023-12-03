@@ -3,8 +3,36 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
 const Cart = require('../Models/cart');
+const Product = require('../Models/product');
 const getRandomString = require('../helpers/getRandomString');
+const cashFormatter = require('../helpers/cashFormatter');
 const salt = bcrypt.genSaltSync(12);
+
+const prepareData = originalData => {
+  if (Array.isArray(originalData)) {
+    const preparedData = [...originalData];
+
+    for (let i = 0; i < originalData.length; i++) {
+      preparedData[i].price = {
+        ...preparedData[i].price,
+        value: `${cashFormatter({
+          number: preparedData[i].price.value,
+        })}`,
+      };
+    }
+    return preparedData;
+  } else {
+    const preparedData = { ...originalData };
+
+    preparedData.price = {
+      ...preparedData.price,
+      value: `${cashFormatter({
+        number: preparedData.price.value,
+      })}`,
+    };
+    return preparedData;
+  }
+};
 
 const login = async (req, res) => {
   const { email, password } = req.body;
@@ -205,8 +233,19 @@ const getOtherProfile = async (req, res) => {
       _id: userId,
     });
 
+    const otherUserProductsData = await Product.find({
+      $or: [{ 'creatorData._id': userId }, { authors: userId }],
+      deleted: false,
+      sold: false,
+      quantity: { $gt: 0 },
+    })
+      .populate(['authors', 'categories'])
+      .lean();
+
+    const preparedProducts = prepareData(otherUserProductsData);
+
     return res.status(200).json({
-      data: otherUserData,
+      data: { otherUserData, otherUserProductsData: preparedProducts },
     });
   } catch (err) {
     return res

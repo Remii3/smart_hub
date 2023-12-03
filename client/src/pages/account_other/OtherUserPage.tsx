@@ -21,30 +21,19 @@ export type OtherUserTypes = Pick<
 >;
 export interface OtherUserDataTypes extends FetchDataTypes {
   data: OtherUserTypes | null;
-}
-
-interface OtherUserProductsTypes extends FetchDataTypes {
-  data: null | ProductTypes[];
-  rawData: null | {
-    [index: string]: unknown;
-  };
+  productsData: ProductTypes[] | null;
 }
 
 export default function OtherUserPage() {
   const [otherUserData, setOtherUserData] = useState<OtherUserDataTypes>({
     data: null,
+    productsData: null,
     isLoading: false,
     hasError: null,
   });
 
-  const [otherUserProducts, setOtherUserProducts] =
-    useState<OtherUserProductsTypes>({
-      data: null,
-      rawData: null,
-      hasError: null,
-      isLoading: false,
-    });
-
+  const { userData } = useContext(UserContext);
+  const navigate = useNavigate();
   const otherUserId = window.location.href.split('/').at(-1);
 
   const getOtherUserData = useCallback(async () => {
@@ -64,43 +53,24 @@ export default function OtherUserPage() {
       });
     }
 
-    setOtherUserData({ data, isLoading: false, hasError: null });
-  }, []);
-
-  const getOtherUserProducts = useCallback(async () => {
-    setOtherUserProducts((prevState) => {
-      return { ...prevState, isLoading: true };
-    });
-
-    const { data, error } = await useGetAccessDatabase({
-      url: DATABASE_ENDPOINTS.SEARCH_PRODCOL,
-      params: { userId: otherUserId },
-    });
-    if (error) {
-      errorToast(error);
-      return setOtherUserProducts((prevState) => {
-        return { ...prevState, isLoading: false, hasError: error };
-      });
-    }
-    setOtherUserProducts({
-      data: data,
-      rawData: data.rawData,
-      hasError: null,
+    setOtherUserData({
+      data: data.otherUserData,
+      productsData: data.otherUserProductsData,
       isLoading: false,
+      hasError: null,
     });
   }, []);
-  const { userData } = useContext(UserContext);
-  const navigate = useNavigate();
+
   useEffect(() => {
     if (userData.data && userData.data._id === otherUserId) {
       navigate('/account/my');
     } else {
       getOtherUserData();
-      getOtherUserProducts();
     }
   }, [userData.data]);
+
   return (
-    <div className="relative">
+    <>
       {otherUserData.isLoading && <LoadingCircle />}
       {!otherUserData.isLoading && otherUserData.hasError && (
         <ErrorMessage message={otherUserData.hasError} />
@@ -110,44 +80,54 @@ export default function OtherUserPage() {
         !otherUserData.hasError &&
         otherUserData.data && (
           <>
-            <section className="flex items-center justify-center px-8 pb-16 pt-12">
-              <OtherUserInfo otherUserData={otherUserData.data} />
-            </section>
+            <OtherUserInfo
+              otherUserData={otherUserData.data}
+              collectionsCount={
+                otherUserData.productsData
+                  ? otherUserData.productsData.filter(
+                      (item) => item.marketplace === 'collection'
+                    ).length
+                  : 0
+              }
+              productsCount={
+                otherUserData.productsData
+                  ? otherUserData.productsData.filter(
+                      (item) => item.marketplace === 'shop'
+                    ).length
+                  : 0
+              }
+            />
 
             {otherUserData.data.role !== UserRoleTypes.USER && (
-              <section className="mb-8">
-                <div className="">
-                  <h4 className="mb-5">Products</h4>
-                  {/* <SushiSwiper
-                    swiperCategory="shop"
-                    loadingState={otherUserData.isLoading}
-                    errorState={otherUserData.hasError}
-                    arrayOfItems={
-                      otherUserProducts.data &&
-                      otherUserProducts.data.filter(
-                        (item) => item.marketplace === 'shop'
-                      )
-                    }
-                  /> */}
-                </div>
-                <div className="relative max-w-[1092px]">
-                  <h4 className="mb-5">Collections</h4>
-                  {/* <SushiSwiper
-                    swiperCategory="shop"
-                    loadingState={otherUserData.isLoading}
-                    errorState={otherUserData.hasError}
-                    arrayOfItems={
-                      otherUserProducts.data &&
-                      otherUserProducts.data.filter(
-                        (item) => item.marketplace === 'collection'
-                      )
-                    }
-                  /> */}
-                </div>
+              <section>
+                <h4 className="mb-4">Products</h4>
+                <SushiSwiper
+                  swiperCategory="shop"
+                  loadingState={otherUserData.isLoading}
+                  errorState={otherUserData.hasError}
+                  arrayOfItems={
+                    otherUserData.productsData &&
+                    otherUserData.productsData.filter(
+                      (item) => item.marketplace === 'shop'
+                    )
+                  }
+                />
+                <h4 className="mb-4">Collections</h4>
+                <SushiSwiper
+                  swiperCategory="shop"
+                  loadingState={otherUserData.isLoading}
+                  errorState={otherUserData.hasError}
+                  arrayOfItems={
+                    otherUserData.productsData &&
+                    otherUserData.productsData.filter(
+                      (item) => item.marketplace === 'collection'
+                    )
+                  }
+                />
               </section>
             )}
           </>
         )}
-    </div>
+    </>
   );
 }
