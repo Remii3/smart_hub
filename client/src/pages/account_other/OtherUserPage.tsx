@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useContext } from 'react';
 import {
   AuthorTypes,
   FetchDataTypes,
@@ -12,6 +12,8 @@ import errorToast from '@components/UI/error/errorToast';
 import ErrorMessage from '@components/UI/error/ErrorMessage';
 import OtherUserInfo from './parts/OtherUserInfo';
 import { UserRoleTypes } from '@customTypes/types';
+import { UserContext } from '@context/UserProvider';
+import { useNavigate } from 'react-router-dom';
 
 export type OtherUserTypes = Pick<
   AuthorTypes,
@@ -87,11 +89,16 @@ export default function OtherUserPage() {
       isLoading: false,
     });
   }, []);
-
+  const { userData } = useContext(UserContext);
+  const navigate = useNavigate();
   useEffect(() => {
-    getOtherUserData();
-    getOtherUserProducts();
-  }, []);
+    if (userData.data && userData.data._id === otherUserId) {
+      navigate('/account/my');
+    } else {
+      getOtherUserData();
+      getOtherUserProducts();
+    }
+  }, [userData.data]);
   return (
     <div className="relative">
       {otherUserData.isLoading && <LoadingCircle />}

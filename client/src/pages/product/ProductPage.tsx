@@ -261,7 +261,7 @@ export default function ProductPage() {
       fetchAllAuthors();
       fetchAllCategories();
     }
-  }, [userData.data]);
+  }, [userData.data, productState.data]);
 
   const removeImg = (clieckedId: string) => {
     const updatedImgs = [...selectedImgs.imgs];

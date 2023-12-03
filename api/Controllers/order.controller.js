@@ -20,6 +20,15 @@ const prepareData = originalData => {
     preparedData.orderPrice = `${cashFormatter({
       number: preparedData.orderPrice,
     })}`;
+    for (let i = 0; i < originalData.products.length; i++) {
+      preparedData.products[i].totalPrice = `${cashFormatter({
+        number: preparedData.products[i].totalPrice,
+      })}`;
+      preparedData.products[i].product.price.value = `${cashFormatter({
+        number: preparedData.products[i].product.price.value,
+      })}`;
+    }
+
     return preparedData;
   }
 };
@@ -61,9 +70,13 @@ const getOneOrder = async (req, res) => {
     const order = await Order.findOne({
       buyerId: userId,
       _id: orderId,
-    }).populate('products.product');
+    })
+      .populate('products.product')
+      .lean();
 
-    return res.status(200).json({ data: order });
+    const preparedData = prepareData(order);
+
+    return res.status(200).json({ data: preparedData });
   } catch (err) {
     return res.status(500).json({
       message: 'Failed fetching orders',
