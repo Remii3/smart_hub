@@ -8,9 +8,10 @@ interface ProductsTypes extends FetchDataTypes {
   data: null | ProductTypes[];
 }
 interface PropsTypes {
-  authorId: string;
+  authorId?: string;
+  creatorId?: string;
 }
-export default function SimilarProducts({ authorId }: PropsTypes) {
+export default function SimilarProducts({ authorId, creatorId }: PropsTypes) {
   const [products, setProducts] = useState<ProductsTypes>({
     data: null,
     hasError: null,
@@ -21,9 +22,16 @@ export default function SimilarProducts({ authorId }: PropsTypes) {
     setProducts((prevState) => {
       return { ...prevState, isLoading: true };
     });
+    const filters = {} as any;
+    if (authorId) {
+      filters.authorId = authorId;
+    }
+    if (creatorId) {
+      filters.creatorId = creatorId;
+    }
     const { data, error } = await useGetAccessDatabase({
       url: DATABASE_ENDPOINTS.PRODUCT_ALL,
-      params: { authorId, limit: 10, withHighPrice: true },
+      params: { ...filters, limit: 10, withHighPrice: true },
     });
     if (error) {
       errorToast(error);
@@ -35,7 +43,7 @@ export default function SimilarProducts({ authorId }: PropsTypes) {
   useEffect(() => {
     fetchData();
   }, [authorId]);
-
+  console.log('products', products);
   return (
     <article>
       {products.data && (

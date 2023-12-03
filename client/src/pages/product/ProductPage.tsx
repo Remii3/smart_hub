@@ -1264,7 +1264,7 @@ export default function ProductPage() {
             <h3 className="text-4xl border-b-2 border-border inline-block">
               Similar
             </h3>
-            <SimilarProducts authorId={productState.data.creatorData._id} />
+            <SimilarProducts creatorId={productState.data.creatorData._id} />
           </div>
           <div ref={commentsRef} className="space-y-5">
             <h3 className="text-4xl border-b-2 border-border inline-block">
