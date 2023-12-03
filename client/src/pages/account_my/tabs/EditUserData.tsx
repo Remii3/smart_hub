@@ -330,901 +330,329 @@ export default function EditUserData() {
   }, [openDialog]);
 
   return (
-    <div className="px-3">
+    <>
       <h4 className="mb-4">My data</h4>
-      <Dialog
-        open={openDialog === 'profileImg'}
-        onOpenChange={() => setOpenDialog(null)}
-      >
-        <div className="flex flex-col">
-          <fieldset className="flex flex-col">
-            <div id="showcasedProfileImg">
-              {userData.data.userInfo.profileImg.url && (
-                <img
-                  className="inline-block h-24 w-24 rounded-full object-cover ring-2 ring-white"
-                  src={userData.data.userInfo.profileImg.url}
-                  alt="avatar_img"
-                />
-              )}
-              {!userData.data.userInfo.profileImg.url &&
-                !selectedProfileImg.img && (
+      <section className="px-1">
+        <Dialog
+          open={openDialog === 'profileImg'}
+          onOpenChange={() => setOpenDialog(null)}
+        >
+          <div className="flex flex-col">
+            <fieldset className="flex flex-col">
+              <div id="showcasedProfileImg">
+                {userData.data.userInfo.profileImg.url && (
                   <img
-                    src="https://firebasestorage.googleapis.com/v0/b/smarthub-75eab.appspot.com/o/static_imgs%2Fnophoto.webp?alt=media&token=a974d32e-108a-4c21-be71-de358368a167"
-                    className="inline-block h-24 w-24 rounded-full object-cover ring-2 ring-white"
-                    alt="profileImg"
+                    className="inline-block h-24 w-24 rounded-md object-cover ring-2 ring-white"
+                    src={userData.data.userInfo.profileImg.url}
+                    alt="avatar_img"
                   />
                 )}
-            </div>
-          </fieldset>
-          <div>
-            <Button
-              variant="link"
-              size="sm"
-              className="px-0"
-              onClick={() => setOpenDialog('profileImg')}
-            >
-              Change profile img
-            </Button>
-            <DialogContent className="w-screen max-w-md">
-              {!isUpdating ? (
-                <div className="space-y-2">
-                  <div className="text-sm font-medium text-slate-700">
-                    Profile img
-                  </div>
-                  <div className="flex flex-col items-center gap-2">
-                    <div className="flex flex-col">
-                      {selectedProfileImg.img && (
-                        <img
-                          className="inline-block w-40 rounded-full object-cover ring-2 ring-white"
-                          src={selectedProfileImg.img.url}
-                          alt="avatar_img"
-                        />
-                      )}
-                      {userData.data.userInfo.profileImg.url &&
-                        !selectedProfileImg.isDirty && (
+                {!userData.data.userInfo.profileImg.url &&
+                  !selectedProfileImg.img && (
+                    <img
+                      src="https://firebasestorage.googleapis.com/v0/b/smarthub-75eab.appspot.com/o/static_imgs%2Fnophoto.webp?alt=media&token=a974d32e-108a-4c21-be71-de358368a167"
+                      className="inline-block h-24 w-24 rounded-full object-cover ring-2 ring-white"
+                      alt="profileImg"
+                    />
+                  )}
+              </div>
+            </fieldset>
+            <div>
+              <Button
+                variant="link"
+                size="sm"
+                className="px-0"
+                onClick={() => setOpenDialog('profileImg')}
+              >
+                Change profile img
+              </Button>
+              <DialogContent className="w-screen max-w-md">
+                {!isUpdating ? (
+                  <div className="space-y-2">
+                    <div className="text-sm font-medium text-slate-700">
+                      Profile img
+                    </div>
+                    <div className="flex flex-col items-center gap-2">
+                      <div className="flex flex-col">
+                        {selectedProfileImg.img && (
                           <img
-                            className="inline-block w-40 rounded-full object-cover ring-2 ring-white"
-                            src={userData.data.userInfo.profileImg.url}
+                            className="inline-block w-40 aspect-square rounded-full object-center object-cover ring-2 ring-white"
+                            src={selectedProfileImg.img.url}
                             alt="avatar_img"
                           />
                         )}
-                      {((!userData.data.userInfo.profileImg.url &&
-                        !selectedProfileImg.img) ||
-                        (!selectedProfileImg.img &&
-                          selectedProfileImg.isDirty)) && (
-                        <img
-                          src="https://firebasestorage.googleapis.com/v0/b/smarthub-75eab.appspot.com/o/static_imgs%2Fnophoto.webp?alt=media&token=a974d32e-108a-4c21-be71-de358368a167"
-                          className="inline-block w-40 rounded-full object-cover ring-2 ring-white"
-                          alt="profileImg"
-                        />
-                      )}
+                        {userData.data.userInfo.profileImg.url &&
+                          !selectedProfileImg.isDirty && (
+                            <img
+                              className="inline-block w-40 aspect-square rounded-full object-center object-cover ring-2 ring-white"
+                              src={userData.data.userInfo.profileImg.url}
+                              alt="avatar_img"
+                            />
+                          )}
+                        {((!userData.data.userInfo.profileImg.url &&
+                          !selectedProfileImg.img) ||
+                          (!selectedProfileImg.img &&
+                            selectedProfileImg.isDirty)) && (
+                          <img
+                            src="https://firebasestorage.googleapis.com/v0/b/smarthub-75eab.appspot.com/o/static_imgs%2Fnophoto.webp?alt=media&token=a974d32e-108a-4c21-be71-de358368a167"
+                            className="inline-block w-40 rounded-full object-center aspect-square object-cover ring-2 ring-white"
+                            alt="profileImg"
+                          />
+                        )}
+                      </div>
+                      <div className="space-x-2">
+                        <Button variant={'ghost'} onClick={removeImg}>
+                          <XCircleIcon className="w-14" />
+                        </Button>
+                        <Label className="inline-block">
+                          <Input
+                            name="file"
+                            accept=".jpg, .jpeg, .png"
+                            type="file"
+                            value={''}
+                            onChange={(e) => onImageChange(e)}
+                            className="hidden"
+                          />
+                          <div
+                            className={`${buttonVariants({
+                              variant: 'ghost',
+                            })} cursor-pointer`}
+                          >
+                            <PlusCircleIcon className="w-14" />
+                          </div>
+                        </Label>
+                      </div>
                     </div>
-                    <div className="space-x-2">
-                      <Button variant={'ghost'} onClick={removeImg}>
-                        <XCircleIcon className="w-14" />
-                      </Button>
-                      <Label className="inline-block">
-                        <Input
-                          name="file"
-                          accept=".jpg, .jpeg, .png"
-                          type="file"
-                          value={''}
-                          onChange={(e) => onImageChange(e)}
-                          className="hidden"
-                        />
-                        <div
-                          className={`${buttonVariants({
-                            variant: 'ghost',
-                          })} cursor-pointer`}
-                        >
-                          <PlusCircleIcon className="w-14" />
-                        </div>
-                      </Label>
+
+                    <div className="text-[0.8rem] text-muted-foreground">
+                      Change your profile img.
                     </div>
                   </div>
-
-                  <div className="text-[0.8rem] text-muted-foreground">
-                    Change your profile img.
+                ) : (
+                  <div className="relative min-h-[72px]">
+                    <LoadingCircle />
                   </div>
-                </div>
-              ) : (
-                <div className="relative min-h-[72px]">
-                  <LoadingCircle />
-                </div>
-              )}
-              <div className="flex w-full justify-end">
-                <Button
-                  variant="default"
-                  size="default"
-                  type="button"
-                  onClick={uploadNewUserDataHandler}
-                  disabled={isUpdating}
-                >
-                  Change
-                </Button>
-              </div>
-            </DialogContent>
-          </div>
-        </div>
-      </Dialog>
-
-      <div className="flex flex-col justify-start gap-8 px-2 sm:flex-row">
-        <section className="basis-full sm:basis-3/6 lg:basis-2/6">
-          <div className="flex flex-col gap-4">
-            <Dialog
-              open={openDialog === 'username'}
-              onOpenChange={() => setOpenDialog(null)}
-            >
-              <div>
-                <fieldset className="flex flex-col">
-                  <label
-                    htmlFor="showcasedUsername"
-                    className="text-sm font-medium text-slate-700"
-                  >
-                    Username
-                  </label>
-                  <Input
-                    id="showcasedUsername"
-                    type="text"
-                    disabled
-                    value={userData.data.username}
-                  />
-                </fieldset>
-                <div className="flex justify-between gap-4">
+                )}
+                <div className="flex w-full justify-end">
                   <Button
+                    variant="default"
+                    size="default"
                     type="button"
-                    variant="link"
-                    size="sm"
-                    className="px-0"
-                    onClick={() => setOpenDialog('username')}
+                    onClick={uploadNewUserDataHandler}
+                    disabled={isUpdating}
                   >
-                    Change username
+                    Change
                   </Button>
-                  <DialogContent className="w-screen max-w-md">
-                    <Form {...usernameForm}>
-                      <form
-                        name="username"
-                        onSubmit={usernameForm.handleSubmit(
-                          uploadNewUserDataHandler
-                        )}
-                      >
-                        {!isUpdating ? (
-                          <FormField
-                            control={usernameForm.control}
-                            name="username"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Username</FormLabel>
-                                <FormControl>
-                                  <Input type="text" {...field} />
-                                </FormControl>
-                                <FormDescription>
-                                  Change your username.
-                                </FormDescription>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                        ) : (
-                          <div className="relative min-h-[72px]">
-                            <LoadingCircle />
-                          </div>
-                        )}
-                        <div className="flex w-full justify-end">
-                          <Button
-                            variant="default"
-                            size="default"
-                            disabled={isUpdating}
-                            type="submit"
-                          >
-                            Change
-                          </Button>
-                        </div>
-                      </form>
-                    </Form>
-                  </DialogContent>
                 </div>
-              </div>
-            </Dialog>
-            <Dialog
-              open={openDialog === 'credentials'}
-              onOpenChange={() => setOpenDialog(null)}
-            >
-              <div className="flex flex-col ">
-                <div className="flex gap-4">
-                  <fieldset className="flex flex-col">
-                    <label
-                      htmlFor="showcasedFirstName"
-                      className="text-sm font-medium text-slate-700"
-                    >
-                      First name
-                    </label>
-                    <Input
-                      id="showcasedFirstName"
-                      type="text"
-                      disabled
-                      value={userData.data.userInfo.credentials.firstName}
-                    />
-                  </fieldset>
-                  <fieldset className="flex flex-col">
-                    <label
-                      htmlFor="showcasedLastName"
-                      className="text-sm font-medium text-slate-700"
-                    >
-                      Last name
-                    </label>
-                    <Input
-                      id="showcasedLastName"
-                      type="text"
-                      disabled
-                      value={userData.data.userInfo.credentials.lastName}
-                    />
-                  </fieldset>
-                </div>
-                <div className="flex justify-between gap-4">
-                  <Button
-                    variant="link"
-                    size="sm"
-                    className="px-0"
-                    onClick={() => setOpenDialog('credentials')}
-                  >
-                    Change credentials
-                  </Button>
-
-                  <DialogContent className="w-screen max-w-md">
-                    <Form {...credentialsForm}>
-                      <form
-                        name="credentials"
-                        onSubmit={credentialsForm.handleSubmit(
-                          uploadNewUserDataHandler
-                        )}
-                      >
-                        {!isUpdating ? (
-                          <div className="flex flex-wrap gap-4">
-                            <FormField
-                              control={credentialsForm.control}
-                              name="firstName"
-                              render={({ field }) => (
-                                <FormItem className="basis-full">
-                                  <FormLabel>First name</FormLabel>
-                                  <FormControl>
-                                    <Input type="text" {...field} />
-                                  </FormControl>
-                                  <FormDescription>
-                                    Change your first name.
-                                  </FormDescription>
-                                  <FormMessage />
-                                </FormItem>
-                              )}
-                            />
-                            <FormField
-                              control={credentialsForm.control}
-                              name="lastName"
-                              render={({ field }) => (
-                                <FormItem className="basis-full">
-                                  <FormLabel>Last name</FormLabel>
-                                  <FormControl>
-                                    <Input type="text" {...field} />
-                                  </FormControl>
-                                  <FormDescription>
-                                    Change your last name.
-                                  </FormDescription>
-                                  <FormMessage />
-                                </FormItem>
-                              )}
-                            />
-                          </div>
-                        ) : (
-                          <div className="relative min-h-[72px]">
-                            <LoadingCircle />
-                          </div>
-                        )}
-                        <div className="flex w-full justify-end">
-                          <Button
-                            variant="default"
-                            size="default"
-                            type="submit"
-                            disabled={isUpdating}
-                          >
-                            Change
-                          </Button>
-                        </div>
-                      </form>
-                    </Form>
-                  </DialogContent>
-                </div>
-              </div>
-            </Dialog>
-            <Dialog
-              open={openDialog === 'password'}
-              onOpenChange={() => setOpenDialog(null)}
-            >
-              <div className="flex flex-col">
-                <fieldset className="flex flex-col">
-                  <label
-                    htmlFor="showcasedPassword"
-                    className="text-sm font-medium text-slate-700"
-                  >
-                    Password
-                  </label>
-                  <Input
-                    id="showcasedPassword"
-                    type="text"
-                    disabled
-                    value="*****"
-                  />
-                </fieldset>
-                <div className="flex justify-between">
-                  <Button
-                    variant="link"
-                    size="sm"
-                    className="px-0"
-                    onClick={() => setOpenDialog('password')}
-                  >
-                    Change password
-                  </Button>
-                  <DialogContent className="w-screen max-w-md">
-                    <Form {...passwrodForm}>
-                      <form
-                        name="password"
-                        onSubmit={passwrodForm.handleSubmit(
-                          uploadNewUserDataHandler
-                        )}
-                      >
-                        {!isUpdating ? (
-                          <div className="flex flex-wrap gap-4">
-                            <FormField
-                              name="password"
-                              control={passwrodForm.control}
-                              render={({ field }) => (
-                                <FormItem className="basis-full">
-                                  <FormLabel>
-                                    Password{' '}
-                                    <span className="text-red-600">*</span>
-                                  </FormLabel>
-                                  <FormControl>
-                                    <div className="relative">
-                                      <Input
-                                        autoComplete="new-password"
-                                        type={
-                                          showPasswords.password
-                                            ? 'text'
-                                            : 'password'
-                                        }
-                                        placeholder="Password..."
-                                        {...field}
-                                      />
-                                      <button
-                                        type="button"
-                                        className="absolute right-0 top-1/2 h-full -translate-y-1/2 cursor-pointer rounded-r-md px-3"
-                                        onClick={() =>
-                                          setShowPasswords((prevState) => {
-                                            return {
-                                              ...prevState,
-                                              password: !prevState.password,
-                                            };
-                                          })
-                                        }
-                                      >
-                                        {showPasswords.password ? (
-                                          <EyeIcon className="h-5 w-5 text-gray-500" />
-                                        ) : (
-                                          <EyeSlashIcon className="h-5 w-5 text-gray-400" />
-                                        )}
-                                      </button>
-                                    </div>
-                                  </FormControl>
-                                  <FormDescription>
-                                    Change your password.
-                                  </FormDescription>
-                                  <FormMessage />
-                                </FormItem>
-                              )}
-                            />
-                            <FormField
-                              name="passwordConfirmation"
-                              control={passwrodForm.control}
-                              render={({ field }) => (
-                                <FormItem className="basis-full">
-                                  <FormLabel>
-                                    Password Confirmation{' '}
-                                    <span className="text-red-600">*</span>
-                                  </FormLabel>
-                                  <FormControl>
-                                    <div className="relative">
-                                      <Input
-                                        autoComplete="new-password"
-                                        type={
-                                          showPasswords.confirmation
-                                            ? 'text'
-                                            : 'password'
-                                        }
-                                        placeholder="Password confirmation..."
-                                        {...field}
-                                      />
-                                      <button
-                                        type="button"
-                                        className="absolute right-0 top-1/2 h-full -translate-y-1/2 cursor-pointer rounded-r-md px-3"
-                                        onClick={() =>
-                                          setShowPasswords((prevState) => {
-                                            return {
-                                              ...prevState,
-                                              confirmation:
-                                                !prevState.confirmation,
-                                            };
-                                          })
-                                        }
-                                      >
-                                        {showPasswords.confirmation ? (
-                                          <EyeIcon className="h-5 w-5 text-gray-500" />
-                                        ) : (
-                                          <EyeSlashIcon className="h-5 w-5 text-gray-400" />
-                                        )}
-                                      </button>
-                                    </div>
-                                  </FormControl>
-                                  <FormDescription>
-                                    Confirm your new password.
-                                  </FormDescription>
-                                  <FormMessage />
-                                </FormItem>
-                              )}
-                            />
-                          </div>
-                        ) : (
-                          <div className="relative min-h-[72px]">
-                            <LoadingCircle />
-                          </div>
-                        )}
-
-                        <div className="flex w-full justify-end">
-                          <Button
-                            variant="default"
-                            size="default"
-                            type="submit"
-                            disabled={isUpdating}
-                          >
-                            Change
-                          </Button>
-                        </div>
-                      </form>
-                    </Form>
-                  </DialogContent>
-                </div>
-              </div>
-            </Dialog>
-            <Dialog
-              open={openDialog === 'phone'}
-              onOpenChange={() => setOpenDialog(null)}
-            >
-              <div className="flex flex-col">
-                <fieldset className="flex flex-col">
-                  <label
-                    htmlFor="showcasedPhone"
-                    className="text-sm font-medium text-slate-700"
-                  >
-                    Phone
-                  </label>
-                  <Input
-                    id="showcasedPhone"
-                    type="tel"
-                    disabled
-                    placeholder="000-000-000"
-                    value={userData.data.userInfo.phone}
-                  />
-                </fieldset>
-                <div className="flex justify-between">
-                  <Button
-                    variant="link"
-                    size="sm"
-                    className="px-0"
-                    onClick={() => setOpenDialog('phone')}
-                  >
-                    Change phone
-                  </Button>
-
-                  <DialogContent className="w-screen max-w-md">
-                    <Form {...phoneForm}>
-                      <form
-                        name="phone"
-                        onSubmit={phoneForm.handleSubmit(
-                          uploadNewUserDataHandler
-                        )}
-                      >
-                        {!isUpdating ? (
-                          <FormField
-                            control={phoneForm.control}
-                            name="phone"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Phone</FormLabel>
-                                <FormControl>
-                                  <Input
-                                    type="text"
-                                    placeholder="000-000-000"
-                                    {...field}
-                                  />
-                                </FormControl>
-                                <FormDescription>
-                                  This is your phone number.
-                                </FormDescription>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                        ) : (
-                          <div className="relative min-h-[72px]">
-                            <LoadingCircle />
-                          </div>
-                        )}
-                        <div className="flex w-full justify-end">
-                          <Button
-                            variant="default"
-                            size="default"
-                            type="submit"
-                            disabled={isUpdating}
-                          >
-                            Change
-                          </Button>
-                        </div>
-                      </form>
-                    </Form>
-                  </DialogContent>
-                </div>
-              </div>
-            </Dialog>
-            <Dialog
-              open={openDialog === 'address'}
-              onOpenChange={() => setOpenDialog(null)}
-            >
-              <div className="flex flex-col">
-                <fieldset className="flex flex-col">
-                  <label
-                    htmlFor="showcasedAddress"
-                    className="text-sm font-medium text-slate-700"
-                  >
-                    Address
-                  </label>
-                  <Input
-                    id="showcasedAddress"
-                    type="text"
-                    disabled
-                    placeholder="Address"
-                    value={`${
-                      userData.data.userInfo.address.line1 &&
-                      userData.data.userInfo.address.line1 + ' / '
-                    }${
-                      userData.data.userInfo.address.city &&
-                      userData.data.userInfo.address.city + ' / '
-                    }${
-                      userData.data.userInfo.address.state &&
-                      userData.data.userInfo.address.state + ' / '
-                    }${
-                      userData.data.userInfo.address.postalCode &&
-                      userData.data.userInfo.address.postalCode + ' / '
-                    }${
-                      userData.data.userInfo.address.country &&
-                      userData.data.userInfo.address.country
-                    }`}
-                  />
-                </fieldset>
-                <div className="flex justify-between">
-                  <Button
-                    variant="link"
-                    size="sm"
-                    className="px-0"
-                    onClick={() => setOpenDialog('address')}
-                  >
-                    Change address
-                  </Button>
-
-                  <DialogContent className="w-screen max-w-md">
-                    <Form {...addressForm}>
-                      <form
-                        name="address"
-                        onSubmit={addressForm.handleSubmit(
-                          uploadNewUserDataHandler
-                        )}
-                      >
-                        {!isUpdating ? (
-                          <div className="flex flex-wrap gap-4">
-                            <FormField
-                              control={addressForm.control}
-                              name="line1"
-                              render={({ field }) => (
-                                <FormItem className="flex-grow">
-                                  <FormLabel>Address</FormLabel>
-                                  <FormControl>
-                                    <Input type="text" {...field} />
-                                  </FormControl>
-                                  <FormDescription>
-                                    Change your address.
-                                  </FormDescription>
-                                  <FormMessage />
-                                </FormItem>
-                              )}
-                            />
-                            <FormField
-                              control={addressForm.control}
-                              name="line2"
-                              render={({ field }) => (
-                                <FormItem className="flex-grow">
-                                  <FormLabel>Address details</FormLabel>
-                                  <FormControl>
-                                    <Input type="text" {...field} />
-                                  </FormControl>
-                                  <FormDescription>
-                                    Change apartment number, storey etc.
-                                  </FormDescription>
-                                  <FormMessage />
-                                </FormItem>
-                              )}
-                            />
-                            <FormField
-                              control={addressForm.control}
-                              name="city"
-                              render={({ field }) => (
-                                <FormItem className="flex-grow">
-                                  <FormLabel>City</FormLabel>
-                                  <FormControl>
-                                    <Input type="text" {...field} />
-                                  </FormControl>
-                                  <FormDescription>
-                                    Change your city.
-                                  </FormDescription>
-                                  <FormMessage />
-                                </FormItem>
-                              )}
-                            />
-                            <FormField
-                              control={addressForm.control}
-                              name="state"
-                              render={({ field }) => (
-                                <FormItem className="flex-grow">
-                                  <FormLabel>State</FormLabel>
-                                  <FormControl>
-                                    <Input type="text" {...field} />
-                                  </FormControl>
-                                  <FormDescription>
-                                    Change your state.
-                                  </FormDescription>
-                                  <FormMessage />
-                                </FormItem>
-                              )}
-                            />
-                            <FormField
-                              control={addressForm.control}
-                              name="postalCode"
-                              render={({ field }) => (
-                                <FormItem className="flex-grow">
-                                  <FormLabel>Postal Code</FormLabel>
-                                  <FormControl>
-                                    <Input type="text" {...field} />
-                                  </FormControl>
-                                  <FormDescription>
-                                    Change your postal code.
-                                  </FormDescription>
-                                  <FormMessage />
-                                </FormItem>
-                              )}
-                            />
-                            <FormField
-                              control={addressForm.control}
-                              name="country"
-                              render={({ field }) => (
-                                <FormItem className="flex-grow">
-                                  <FormLabel>Country</FormLabel>
-                                  <FormControl>
-                                    <Input type="text" {...field} />
-                                  </FormControl>
-                                  <FormDescription>
-                                    Change your country.
-                                  </FormDescription>
-                                  <FormMessage />
-                                </FormItem>
-                              )}
-                            />
-                          </div>
-                        ) : (
-                          <div className="relative min-h-[72px]">
-                            <LoadingCircle />
-                          </div>
-                        )}
-                        <div className="flex w-full justify-end">
-                          <Button
-                            variant="default"
-                            size="default"
-                            type="submit"
-                            disabled={isUpdating}
-                          >
-                            Change
-                          </Button>
-                        </div>
-                      </form>
-                    </Form>
-                  </DialogContent>
-                </div>
-              </div>
-            </Dialog>
+              </DialogContent>
+            </div>
           </div>
-        </section>
+        </Dialog>
 
-        {userData.data.role !== 'User' && (
+        <div className="flex flex-col justify-start gap-8 px-2 sm:flex-row">
           <section className="basis-full sm:basis-3/6 lg:basis-2/6">
             <div className="flex flex-col gap-4">
               <Dialog
-                open={openDialog === 'quote'}
-                onOpenChange={() => setOpenDialog(null)}
-              >
-                <div className="flex flex-col">
-                  <fieldset className="flex flex-col">
-                    <label
-                      htmlFor="showcasedQuote"
-                      className="text-sm font-medium text-slate-700"
-                    >
-                      Quote
-                    </label>
-                    <Input
-                      id="showcasedQuote"
-                      type="text"
-                      disabled
-                      placeholder={
-                        userData.data.authorInfo.quote || 'No quote ...'
-                      }
-                      value={userData.data.authorInfo.quote}
-                    />
-                  </fieldset>
-                  <div>
-                    <Button
-                      variant="link"
-                      size="sm"
-                      className="px-0"
-                      onClick={() => setOpenDialog('quote')}
-                    >
-                      Change quote
-                    </Button>
-                    <DialogContent className="w-screen max-w-md">
-                      <Form {...quoteForm}>
-                        <form
-                          name="quote"
-                          onSubmit={quoteForm.handleSubmit(
-                            uploadNewUserDataHandler
-                          )}
-                        >
-                          {!isUpdating ? (
-                            <FormField
-                              control={quoteForm.control}
-                              name="quote"
-                              render={({ field }) => (
-                                <FormItem>
-                                  <FormLabel>Quote</FormLabel>
-                                  <FormControl>
-                                    <Input type="text" {...field} />
-                                  </FormControl>
-                                  <FormDescription>
-                                    Change your quote.
-                                  </FormDescription>
-                                  <FormMessage />
-                                </FormItem>
-                              )}
-                            />
-                          ) : (
-                            <div className="relative min-h-[72px]">
-                              <LoadingCircle />
-                            </div>
-                          )}
-                          <div className="flex w-full justify-end">
-                            <Button
-                              variant="default"
-                              size="default"
-                              type="submit"
-                              disabled={isUpdating}
-                            >
-                              Change
-                            </Button>
-                          </div>
-                        </form>
-                      </Form>
-                    </DialogContent>
-                  </div>
-                </div>
-              </Dialog>
-              <Dialog
-                open={openDialog === 'pseudonim'}
-                onOpenChange={() => setOpenDialog(null)}
-              >
-                <div className="flex flex-col">
-                  <fieldset className="flex flex-col">
-                    <label
-                      htmlFor="showcasedPseudonim"
-                      className="text-sm font-medium text-slate-700"
-                    >
-                      Pseudonim
-                    </label>
-                    <Input
-                      id="showcasedPseudonim"
-                      type="text"
-                      disabled
-                      placeholder={userData.data.authorInfo.pseudonim}
-                      value={userData.data.authorInfo.pseudonim}
-                    />
-                  </fieldset>
-                  <div className="flex justify-between">
-                    <Button
-                      variant="link"
-                      size="sm"
-                      className="px-0"
-                      onClick={() => setOpenDialog('pseudonim')}
-                    >
-                      Change pseudonim
-                    </Button>
-                    <DialogContent className="w-screen max-w-md">
-                      <Form {...pseudonimForm}>
-                        <form
-                          name="pseudonim"
-                          onSubmit={pseudonimForm.handleSubmit(
-                            uploadNewUserDataHandler
-                          )}
-                        >
-                          {!isUpdating ? (
-                            <FormField
-                              control={pseudonimForm.control}
-                              name="pseudonim"
-                              render={({ field }) => (
-                                <FormItem>
-                                  <FormLabel>
-                                    Pseudonim{' '}
-                                    <span className="text-red-600">*</span>
-                                  </FormLabel>
-                                  <FormControl>
-                                    <Input type="text" {...field} />
-                                  </FormControl>
-                                  <FormDescription>
-                                    Change your pseudonim.
-                                  </FormDescription>
-                                  <FormMessage />
-                                </FormItem>
-                              )}
-                            />
-                          ) : (
-                            <div className="relative min-h-[72px]">
-                              <LoadingCircle />
-                            </div>
-                          )}
-                          <div className="flex w-full justify-end">
-                            <Button
-                              variant="default"
-                              size="default"
-                              type="submit"
-                              disabled={isUpdating}
-                            >
-                              Change
-                            </Button>
-                          </div>
-                        </form>
-                      </Form>
-                    </DialogContent>
-                  </div>
-                </div>
-              </Dialog>
-              <Dialog
-                open={openDialog === 'shortDescription'}
+                open={openDialog === 'username'}
                 onOpenChange={() => setOpenDialog(null)}
               >
                 <div>
                   <fieldset className="flex flex-col">
                     <label
-                      htmlFor="showcasedShortDescription"
+                      htmlFor="showcasedUsername"
                       className="text-sm font-medium text-slate-700"
                     >
-                      Short Description
+                      Username
                     </label>
                     <Input
-                      id="showcasedShortDescription"
+                      id="showcasedUsername"
                       type="text"
                       disabled
-                      placeholder={userData.data.authorInfo.shortDescription}
-                      value={userData.data.authorInfo.shortDescription}
+                      value={userData.data.username}
+                    />
+                  </fieldset>
+                  <div className="flex justify-between gap-4">
+                    <Button
+                      type="button"
+                      variant="link"
+                      size="sm"
+                      className="px-0"
+                      onClick={() => setOpenDialog('username')}
+                    >
+                      Change username
+                    </Button>
+                    <DialogContent className="w-screen max-w-md">
+                      <Form {...usernameForm}>
+                        <form
+                          name="username"
+                          onSubmit={usernameForm.handleSubmit(
+                            uploadNewUserDataHandler
+                          )}
+                        >
+                          {!isUpdating ? (
+                            <FormField
+                              control={usernameForm.control}
+                              name="username"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Username</FormLabel>
+                                  <FormControl>
+                                    <Input type="text" {...field} />
+                                  </FormControl>
+                                  <FormDescription>
+                                    Change your username.
+                                  </FormDescription>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                          ) : (
+                            <div className="relative min-h-[72px]">
+                              <LoadingCircle />
+                            </div>
+                          )}
+                          <div className="flex w-full justify-end">
+                            <Button
+                              variant="default"
+                              size="default"
+                              disabled={isUpdating}
+                              type="submit"
+                            >
+                              Change
+                            </Button>
+                          </div>
+                        </form>
+                      </Form>
+                    </DialogContent>
+                  </div>
+                </div>
+              </Dialog>
+              <Dialog
+                open={openDialog === 'credentials'}
+                onOpenChange={() => setOpenDialog(null)}
+              >
+                <div className="flex flex-col ">
+                  <div className="flex gap-4">
+                    <fieldset className="flex flex-col">
+                      <label
+                        htmlFor="showcasedFirstName"
+                        className="text-sm font-medium text-slate-700"
+                      >
+                        First name
+                      </label>
+                      <Input
+                        id="showcasedFirstName"
+                        type="text"
+                        disabled
+                        value={userData.data.userInfo.credentials.firstName}
+                      />
+                    </fieldset>
+                    <fieldset className="flex flex-col">
+                      <label
+                        htmlFor="showcasedLastName"
+                        className="text-sm font-medium text-slate-700"
+                      >
+                        Last name
+                      </label>
+                      <Input
+                        id="showcasedLastName"
+                        type="text"
+                        disabled
+                        value={userData.data.userInfo.credentials.lastName}
+                      />
+                    </fieldset>
+                  </div>
+                  <div className="flex justify-between gap-4">
+                    <Button
+                      variant="link"
+                      size="sm"
+                      className="px-0"
+                      onClick={() => setOpenDialog('credentials')}
+                    >
+                      Change credentials
+                    </Button>
+
+                    <DialogContent className="w-screen max-w-md">
+                      <Form {...credentialsForm}>
+                        <form
+                          name="credentials"
+                          onSubmit={credentialsForm.handleSubmit(
+                            uploadNewUserDataHandler
+                          )}
+                        >
+                          {!isUpdating ? (
+                            <div className="flex flex-wrap gap-4">
+                              <FormField
+                                control={credentialsForm.control}
+                                name="firstName"
+                                render={({ field }) => (
+                                  <FormItem className="basis-full">
+                                    <FormLabel>First name</FormLabel>
+                                    <FormControl>
+                                      <Input type="text" {...field} />
+                                    </FormControl>
+                                    <FormDescription>
+                                      Change your first name.
+                                    </FormDescription>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                              <FormField
+                                control={credentialsForm.control}
+                                name="lastName"
+                                render={({ field }) => (
+                                  <FormItem className="basis-full">
+                                    <FormLabel>Last name</FormLabel>
+                                    <FormControl>
+                                      <Input type="text" {...field} />
+                                    </FormControl>
+                                    <FormDescription>
+                                      Change your last name.
+                                    </FormDescription>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                            </div>
+                          ) : (
+                            <div className="relative min-h-[72px]">
+                              <LoadingCircle />
+                            </div>
+                          )}
+                          <div className="flex w-full justify-end">
+                            <Button
+                              variant="default"
+                              size="default"
+                              type="submit"
+                              disabled={isUpdating}
+                            >
+                              Change
+                            </Button>
+                          </div>
+                        </form>
+                      </Form>
+                    </DialogContent>
+                  </div>
+                </div>
+              </Dialog>
+              <Dialog
+                open={openDialog === 'password'}
+                onOpenChange={() => setOpenDialog(null)}
+              >
+                <div className="flex flex-col">
+                  <fieldset className="flex flex-col">
+                    <label
+                      htmlFor="showcasedPassword"
+                      className="text-sm font-medium text-slate-700"
+                    >
+                      Password
+                    </label>
+                    <Input
+                      id="showcasedPassword"
+                      type="text"
+                      disabled
+                      value="*****"
                     />
                   </fieldset>
                   <div className="flex justify-between">
@@ -1232,36 +660,372 @@ export default function EditUserData() {
                       variant="link"
                       size="sm"
                       className="px-0"
-                      onClick={() => setOpenDialog('shortDescription')}
+                      onClick={() => setOpenDialog('password')}
                     >
-                      Change short description
+                      Change password
+                    </Button>
+                    <DialogContent className="w-screen max-w-md">
+                      <Form {...passwrodForm}>
+                        <form
+                          name="password"
+                          onSubmit={passwrodForm.handleSubmit(
+                            uploadNewUserDataHandler
+                          )}
+                        >
+                          {!isUpdating ? (
+                            <div className="flex flex-wrap gap-4">
+                              <FormField
+                                name="password"
+                                control={passwrodForm.control}
+                                render={({ field }) => (
+                                  <FormItem className="basis-full">
+                                    <FormLabel>
+                                      Password{' '}
+                                      <span className="text-red-600">*</span>
+                                    </FormLabel>
+                                    <FormControl>
+                                      <div className="relative">
+                                        <Input
+                                          autoComplete="new-password"
+                                          type={
+                                            showPasswords.password
+                                              ? 'text'
+                                              : 'password'
+                                          }
+                                          placeholder="Password..."
+                                          {...field}
+                                        />
+                                        <button
+                                          type="button"
+                                          className="absolute right-0 top-1/2 h-full -translate-y-1/2 cursor-pointer rounded-r-md px-3"
+                                          onClick={() =>
+                                            setShowPasswords((prevState) => {
+                                              return {
+                                                ...prevState,
+                                                password: !prevState.password,
+                                              };
+                                            })
+                                          }
+                                        >
+                                          {showPasswords.password ? (
+                                            <EyeIcon className="h-5 w-5 text-gray-500" />
+                                          ) : (
+                                            <EyeSlashIcon className="h-5 w-5 text-gray-400" />
+                                          )}
+                                        </button>
+                                      </div>
+                                    </FormControl>
+                                    <FormDescription>
+                                      Change your password.
+                                    </FormDescription>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                              <FormField
+                                name="passwordConfirmation"
+                                control={passwrodForm.control}
+                                render={({ field }) => (
+                                  <FormItem className="basis-full">
+                                    <FormLabel>
+                                      Password Confirmation{' '}
+                                      <span className="text-red-600">*</span>
+                                    </FormLabel>
+                                    <FormControl>
+                                      <div className="relative">
+                                        <Input
+                                          autoComplete="new-password"
+                                          type={
+                                            showPasswords.confirmation
+                                              ? 'text'
+                                              : 'password'
+                                          }
+                                          placeholder="Password confirmation..."
+                                          {...field}
+                                        />
+                                        <button
+                                          type="button"
+                                          className="absolute right-0 top-1/2 h-full -translate-y-1/2 cursor-pointer rounded-r-md px-3"
+                                          onClick={() =>
+                                            setShowPasswords((prevState) => {
+                                              return {
+                                                ...prevState,
+                                                confirmation:
+                                                  !prevState.confirmation,
+                                              };
+                                            })
+                                          }
+                                        >
+                                          {showPasswords.confirmation ? (
+                                            <EyeIcon className="h-5 w-5 text-gray-500" />
+                                          ) : (
+                                            <EyeSlashIcon className="h-5 w-5 text-gray-400" />
+                                          )}
+                                        </button>
+                                      </div>
+                                    </FormControl>
+                                    <FormDescription>
+                                      Confirm your new password.
+                                    </FormDescription>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                            </div>
+                          ) : (
+                            <div className="relative min-h-[72px]">
+                              <LoadingCircle />
+                            </div>
+                          )}
+
+                          <div className="flex w-full justify-end">
+                            <Button
+                              variant="default"
+                              size="default"
+                              type="submit"
+                              disabled={isUpdating}
+                            >
+                              Change
+                            </Button>
+                          </div>
+                        </form>
+                      </Form>
+                    </DialogContent>
+                  </div>
+                </div>
+              </Dialog>
+              <Dialog
+                open={openDialog === 'phone'}
+                onOpenChange={() => setOpenDialog(null)}
+              >
+                <div className="flex flex-col">
+                  <fieldset className="flex flex-col">
+                    <label
+                      htmlFor="showcasedPhone"
+                      className="text-sm font-medium text-slate-700"
+                    >
+                      Phone
+                    </label>
+                    <Input
+                      id="showcasedPhone"
+                      type="tel"
+                      disabled
+                      placeholder="000-000-000"
+                      value={userData.data.userInfo.phone}
+                    />
+                  </fieldset>
+                  <div className="flex justify-between">
+                    <Button
+                      variant="link"
+                      size="sm"
+                      className="px-0"
+                      onClick={() => setOpenDialog('phone')}
+                    >
+                      Change phone
                     </Button>
 
                     <DialogContent className="w-screen max-w-md">
-                      <Form {...shortDescriptionForm}>
+                      <Form {...phoneForm}>
                         <form
-                          name="shortDescription"
-                          onSubmit={shortDescriptionForm.handleSubmit(
+                          name="phone"
+                          onSubmit={phoneForm.handleSubmit(
                             uploadNewUserDataHandler
                           )}
                         >
                           {!isUpdating ? (
                             <FormField
-                              control={shortDescriptionForm.control}
-                              name="shortDescription"
+                              control={phoneForm.control}
+                              name="phone"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel>Short description</FormLabel>
+                                  <FormLabel>Phone</FormLabel>
                                   <FormControl>
-                                    <Textarea {...field} />
+                                    <Input
+                                      type="text"
+                                      placeholder="000-000-000"
+                                      {...field}
+                                    />
                                   </FormControl>
                                   <FormDescription>
-                                    Change your short description.
+                                    This is your phone number.
                                   </FormDescription>
                                   <FormMessage />
                                 </FormItem>
                               )}
                             />
+                          ) : (
+                            <div className="relative min-h-[72px]">
+                              <LoadingCircle />
+                            </div>
+                          )}
+                          <div className="flex w-full justify-end">
+                            <Button
+                              variant="default"
+                              size="default"
+                              type="submit"
+                              disabled={isUpdating}
+                            >
+                              Change
+                            </Button>
+                          </div>
+                        </form>
+                      </Form>
+                    </DialogContent>
+                  </div>
+                </div>
+              </Dialog>
+              <Dialog
+                open={openDialog === 'address'}
+                onOpenChange={() => setOpenDialog(null)}
+              >
+                <div className="flex flex-col">
+                  <fieldset className="flex flex-col">
+                    <label
+                      htmlFor="showcasedAddress"
+                      className="text-sm font-medium text-slate-700"
+                    >
+                      Address
+                    </label>
+                    <Input
+                      id="showcasedAddress"
+                      type="text"
+                      disabled
+                      placeholder="Address"
+                      value={`${
+                        userData.data.userInfo.address.line1 &&
+                        userData.data.userInfo.address.line1 + ' / '
+                      }${
+                        userData.data.userInfo.address.city &&
+                        userData.data.userInfo.address.city + ' / '
+                      }${
+                        userData.data.userInfo.address.state &&
+                        userData.data.userInfo.address.state + ' / '
+                      }${
+                        userData.data.userInfo.address.postalCode &&
+                        userData.data.userInfo.address.postalCode + ' / '
+                      }${
+                        userData.data.userInfo.address.country &&
+                        userData.data.userInfo.address.country
+                      }`}
+                    />
+                  </fieldset>
+                  <div className="flex justify-between">
+                    <Button
+                      variant="link"
+                      size="sm"
+                      className="px-0"
+                      onClick={() => setOpenDialog('address')}
+                    >
+                      Change address
+                    </Button>
+
+                    <DialogContent className="w-screen max-w-md">
+                      <Form {...addressForm}>
+                        <form
+                          name="address"
+                          onSubmit={addressForm.handleSubmit(
+                            uploadNewUserDataHandler
+                          )}
+                        >
+                          {!isUpdating ? (
+                            <div className="flex flex-wrap gap-4">
+                              <FormField
+                                control={addressForm.control}
+                                name="line1"
+                                render={({ field }) => (
+                                  <FormItem className="flex-grow">
+                                    <FormLabel>Address</FormLabel>
+                                    <FormControl>
+                                      <Input type="text" {...field} />
+                                    </FormControl>
+                                    <FormDescription>
+                                      Change your address.
+                                    </FormDescription>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                              <FormField
+                                control={addressForm.control}
+                                name="line2"
+                                render={({ field }) => (
+                                  <FormItem className="flex-grow">
+                                    <FormLabel>Address details</FormLabel>
+                                    <FormControl>
+                                      <Input type="text" {...field} />
+                                    </FormControl>
+                                    <FormDescription>
+                                      Change apartment number, storey etc.
+                                    </FormDescription>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                              <FormField
+                                control={addressForm.control}
+                                name="city"
+                                render={({ field }) => (
+                                  <FormItem className="flex-grow">
+                                    <FormLabel>City</FormLabel>
+                                    <FormControl>
+                                      <Input type="text" {...field} />
+                                    </FormControl>
+                                    <FormDescription>
+                                      Change your city.
+                                    </FormDescription>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                              <FormField
+                                control={addressForm.control}
+                                name="state"
+                                render={({ field }) => (
+                                  <FormItem className="flex-grow">
+                                    <FormLabel>State</FormLabel>
+                                    <FormControl>
+                                      <Input type="text" {...field} />
+                                    </FormControl>
+                                    <FormDescription>
+                                      Change your state.
+                                    </FormDescription>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                              <FormField
+                                control={addressForm.control}
+                                name="postalCode"
+                                render={({ field }) => (
+                                  <FormItem className="flex-grow">
+                                    <FormLabel>Postal Code</FormLabel>
+                                    <FormControl>
+                                      <Input type="text" {...field} />
+                                    </FormControl>
+                                    <FormDescription>
+                                      Change your postal code.
+                                    </FormDescription>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                              <FormField
+                                control={addressForm.control}
+                                name="country"
+                                render={({ field }) => (
+                                  <FormItem className="flex-grow">
+                                    <FormLabel>Country</FormLabel>
+                                    <FormControl>
+                                      <Input type="text" {...field} />
+                                    </FormControl>
+                                    <FormDescription>
+                                      Change your country.
+                                    </FormDescription>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                            </div>
                           ) : (
                             <div className="relative min-h-[72px]">
                               <LoadingCircle />
@@ -1285,8 +1049,246 @@ export default function EditUserData() {
               </Dialog>
             </div>
           </section>
-        )}
-      </div>
-    </div>
+
+          {userData.data.role !== 'User' && (
+            <section className="basis-full sm:basis-3/6 lg:basis-2/6">
+              <div className="flex flex-col gap-4">
+                <Dialog
+                  open={openDialog === 'quote'}
+                  onOpenChange={() => setOpenDialog(null)}
+                >
+                  <div className="flex flex-col">
+                    <fieldset className="flex flex-col">
+                      <label
+                        htmlFor="showcasedQuote"
+                        className="text-sm font-medium text-slate-700"
+                      >
+                        Quote
+                      </label>
+                      <Input
+                        id="showcasedQuote"
+                        type="text"
+                        disabled
+                        placeholder={
+                          userData.data.authorInfo.quote || 'No quote ...'
+                        }
+                        value={userData.data.authorInfo.quote}
+                      />
+                    </fieldset>
+                    <div>
+                      <Button
+                        variant="link"
+                        size="sm"
+                        className="px-0"
+                        onClick={() => setOpenDialog('quote')}
+                      >
+                        Change quote
+                      </Button>
+                      <DialogContent className="w-screen max-w-md">
+                        <Form {...quoteForm}>
+                          <form
+                            name="quote"
+                            onSubmit={quoteForm.handleSubmit(
+                              uploadNewUserDataHandler
+                            )}
+                          >
+                            {!isUpdating ? (
+                              <FormField
+                                control={quoteForm.control}
+                                name="quote"
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormLabel>Quote</FormLabel>
+                                    <FormControl>
+                                      <Input type="text" {...field} />
+                                    </FormControl>
+                                    <FormDescription>
+                                      Change your quote.
+                                    </FormDescription>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                            ) : (
+                              <div className="relative min-h-[72px]">
+                                <LoadingCircle />
+                              </div>
+                            )}
+                            <div className="flex w-full justify-end">
+                              <Button
+                                variant="default"
+                                size="default"
+                                type="submit"
+                                disabled={isUpdating}
+                              >
+                                Change
+                              </Button>
+                            </div>
+                          </form>
+                        </Form>
+                      </DialogContent>
+                    </div>
+                  </div>
+                </Dialog>
+                <Dialog
+                  open={openDialog === 'pseudonim'}
+                  onOpenChange={() => setOpenDialog(null)}
+                >
+                  <div className="flex flex-col">
+                    <fieldset className="flex flex-col">
+                      <label
+                        htmlFor="showcasedPseudonim"
+                        className="text-sm font-medium text-slate-700"
+                      >
+                        Pseudonim
+                      </label>
+                      <Input
+                        id="showcasedPseudonim"
+                        type="text"
+                        disabled
+                        placeholder={userData.data.authorInfo.pseudonim}
+                        value={userData.data.authorInfo.pseudonim}
+                      />
+                    </fieldset>
+                    <div className="flex justify-between">
+                      <Button
+                        variant="link"
+                        size="sm"
+                        className="px-0"
+                        onClick={() => setOpenDialog('pseudonim')}
+                      >
+                        Change pseudonim
+                      </Button>
+                      <DialogContent className="w-screen max-w-md">
+                        <Form {...pseudonimForm}>
+                          <form
+                            name="pseudonim"
+                            onSubmit={pseudonimForm.handleSubmit(
+                              uploadNewUserDataHandler
+                            )}
+                          >
+                            {!isUpdating ? (
+                              <FormField
+                                control={pseudonimForm.control}
+                                name="pseudonim"
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormLabel>
+                                      Pseudonim{' '}
+                                      <span className="text-red-600">*</span>
+                                    </FormLabel>
+                                    <FormControl>
+                                      <Input type="text" {...field} />
+                                    </FormControl>
+                                    <FormDescription>
+                                      Change your pseudonim.
+                                    </FormDescription>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                            ) : (
+                              <div className="relative min-h-[72px]">
+                                <LoadingCircle />
+                              </div>
+                            )}
+                            <div className="flex w-full justify-end">
+                              <Button
+                                variant="default"
+                                size="default"
+                                type="submit"
+                                disabled={isUpdating}
+                              >
+                                Change
+                              </Button>
+                            </div>
+                          </form>
+                        </Form>
+                      </DialogContent>
+                    </div>
+                  </div>
+                </Dialog>
+                <Dialog
+                  open={openDialog === 'shortDescription'}
+                  onOpenChange={() => setOpenDialog(null)}
+                >
+                  <div>
+                    <fieldset className="flex flex-col">
+                      <label
+                        htmlFor="showcasedShortDescription"
+                        className="text-sm font-medium text-slate-700"
+                      >
+                        Short Description
+                      </label>
+                      <Input
+                        id="showcasedShortDescription"
+                        type="text"
+                        disabled
+                        placeholder={userData.data.authorInfo.shortDescription}
+                        value={userData.data.authorInfo.shortDescription}
+                      />
+                    </fieldset>
+                    <div className="flex justify-between">
+                      <Button
+                        variant="link"
+                        size="sm"
+                        className="px-0"
+                        onClick={() => setOpenDialog('shortDescription')}
+                      >
+                        Change short description
+                      </Button>
+
+                      <DialogContent className="w-screen max-w-md">
+                        <Form {...shortDescriptionForm}>
+                          <form
+                            name="shortDescription"
+                            onSubmit={shortDescriptionForm.handleSubmit(
+                              uploadNewUserDataHandler
+                            )}
+                          >
+                            {!isUpdating ? (
+                              <FormField
+                                control={shortDescriptionForm.control}
+                                name="shortDescription"
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormLabel>Short description</FormLabel>
+                                    <FormControl>
+                                      <Textarea {...field} />
+                                    </FormControl>
+                                    <FormDescription>
+                                      Change your short description.
+                                    </FormDescription>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                            ) : (
+                              <div className="relative min-h-[72px]">
+                                <LoadingCircle />
+                              </div>
+                            )}
+                            <div className="flex w-full justify-end">
+                              <Button
+                                variant="default"
+                                size="default"
+                                type="submit"
+                                disabled={isUpdating}
+                              >
+                                Change
+                              </Button>
+                            </div>
+                          </form>
+                        </Form>
+                      </DialogContent>
+                    </div>
+                  </div>
+                </Dialog>
+              </div>
+            </section>
+          )}
+        </div>
+      </section>
+    </>
   );
 }
