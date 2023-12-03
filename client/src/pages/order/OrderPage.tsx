@@ -49,23 +49,21 @@ export default function OrderPage() {
   if (!orderData.data) return <div>No data</div>;
 
   return (
-    <MainContainer>
+    <div>
+      <h5>Order: #{orderData.data._id}</h5>
       <div>
-        <h5>Order: #{orderData.data._id}</h5>
-        <div>
-          {orderData.data.products.map((item) => (
-            <Link
-              to={`/product/${item.product._id}`}
-              key={item.product._id}
-              className="mb-4 block space-x-3 rounded-md border-2 border-gray-200 p-3"
-            >
-              <span>{item.product.title}</span>
-              <span>{item.inCartQuantity}</span>
-              <span>{item.totalPrice}</span>
-            </Link>
-          ))}
-        </div>
+        {orderData.data.products.map((item) => (
+          <Link
+            to={`/product/${item.product._id}`}
+            key={item.product._id}
+            className="mb-4 block space-x-3 rounded-md border-2 border-gray-200 p-3"
+          >
+            <span>{item.product.title}</span>
+            <span>{item.inCartQuantity}</span>
+            <span>{item.totalPrice}</span>
+          </Link>
+        ))}
       </div>
-    </MainContainer>
+    </div>
   );
 }

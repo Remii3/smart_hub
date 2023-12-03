@@ -21,7 +21,7 @@ const NoPage404 = lazy(() => import('@pages/static/NoPage404'));
 const ProductPage = lazy(() => import('@pages/product/ProductPage'));
 const SearchPage = lazy(() => import('@pages/search/SearchPage'));
 const OtherUserPage = lazy(() => import('@pages/account_other/OtherUserPage'));
-const OrderPage = lazy(() => import('@pages/account_my/OrderPage'));
+const OrderPage = lazy(() => import('@pages/order/OrderPage'));
 const ThankYouPage = lazy(() => import('@pages/checkout/ThankYouPage'));
 const ShopPage = lazy(() => import('@pages/shop/ShopPage'));
 const HomePage = lazy(() => import('@pages/home/HomePage'));

@@ -99,11 +99,13 @@ export interface TransactionHistoryTypes {
 export interface OrderTypes {
   _id: string;
   buyerId: string;
+  status: string;
   products: {
     product: ProductTypes;
     inCartQuantity: number;
     totalPrice: number;
   }[];
+  orderPrice: string;
   createdAt: string;
 }
 

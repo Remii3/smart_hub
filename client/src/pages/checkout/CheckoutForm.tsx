@@ -17,6 +17,7 @@ import { usePostAccessDatabase } from '../../hooks/useAaccessDatabase';
 import { DATABASE_ENDPOINTS } from '../../data/endpoints';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@components/UI/button';
+import errorToast from '@components/UI/error/errorToast';
 
 interface PropsTypes {
   readyToShow: {
@@ -134,20 +135,27 @@ export default function CheckoutForm({
       }
     } else {
       const currentUserId = userData.data?._id || getCookie('guestToken');
-      const { data } = await usePostAccessDatabase({
+      const { data, error } = await usePostAccessDatabase({
         url: DATABASE_ENDPOINTS.ORDER_ONE,
         body: {
           buyerId: currentUserId,
           items: cartState.products,
         },
       });
-      await usePostAccessDatabase({
+      if (error) {
+        return errorToast(error);
+      }
+
+      const { error: removeFromCartError } = await usePostAccessDatabase({
         url: DATABASE_ENDPOINTS.CART_REMOVE,
         body: {
           userId: currentUserId,
           productId: 'all',
         },
       });
+      if (removeFromCartError) {
+        return errorToast(removeFromCartError);
+      }
 
       fetchCartData();
       fetchUserData();

@@ -4,7 +4,7 @@ const User = require('../../Models/user');
 const prodCol = async (req, res, next) => {
   let { pageSize, filtersData } = req.query;
   if (!filtersData) {
-    filtersData = {};
+    filtersData = { page: 1 };
   }
 
   let currentPage = filtersData.page;

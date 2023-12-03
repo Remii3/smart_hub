@@ -5,14 +5,11 @@ const mongoose = require('mongoose');
 const Cart = require('../Models/cart');
 const getRandomString = require('../helpers/getRandomString');
 const salt = bcrypt.genSaltSync(12);
-const Product = require('../Models/product');
-const cashFormatter = require('../helpers/cashFormatter');
 
 const login = async (req, res) => {
   const { email, password } = req.body;
 
   const userData = await User.findOne({ email });
-  console.log(userData);
   if (!userData)
     return res.status(422).json({
       name: 'email',
@@ -26,7 +23,6 @@ const login = async (req, res) => {
       error: 'Invalid password',
       message: 'Invalid password',
     });
-  console.log(email);
   jwt.sign(
     {
       email,
@@ -205,67 +201,10 @@ const getOtherProfile = async (req, res) => {
     return res.status(422).json({ message: 'user id is required' });
   }
   try {
-    console.log(userId);
     const otherUserData = await User.findOne({
       _id: userId,
     });
-    console.log(otherUserData);
-    // const { followers, pseudonim, quote, shortDescription } = authorInfo;
 
-    // const userProducts = await Product.find({
-    //   $or: [{ authors: userId }, { 'creatorData._id': userId }],
-    //   sold: false,
-    //   deleted: false,
-    //   quantity: { $gt: 0 },
-    // }).lean();
-
-    // const userProductsCopy = userProducts.map(product => ({
-    //   ...product,
-    //   price: {
-    //     ...product.price,
-    //     value: `${cashFormatter({
-    //       number: product.price.value,
-    //     })}`,
-    //   },
-    // }));
-
-    // const preparedAuthorInfo = {
-    //   avg_products_grade,
-    //   categories,
-    //   followers,
-    //   my_products: userProductsCopy,
-    //   myCollections: [],
-    //   pseudonim,
-    //   quote,
-    //   short_description,
-    //   sold_books_quantity,
-    // };
-    // let preparedUserInfo = null;
-    // if (!security_settings.hide_private_information) {
-    //   preparedUserInfo = user_info;
-    // }
-    // if (role !== 'User') {
-    //   return res.status(200).json({
-    //     data: {
-    //       email,
-    //       _id,
-    //       username,
-    //       user_info: preparedUserInfo,
-    //       author_info: preparedAuthorInfo,
-    //       role,
-    //     },
-    //   });
-    // } else {
-    //   return res.status(200).json({
-    //     data: {
-    //       email,
-    //       _id,
-    //       username,
-    //       user_info: preparedUserInfo,
-    //       role,
-    //     },
-    //   });
-    // }
     return res.status(200).json({
       data: otherUserData,
     });
