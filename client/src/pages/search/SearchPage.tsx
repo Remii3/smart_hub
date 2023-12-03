@@ -1,9 +1,8 @@
-import { useState, useEffect, ChangeEvent, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import AdvancedFilter from '@pages/search/AdvancedFilter';
-import { ProductTypes } from '@customTypes/interfaces';
+import { CategoryTypes, ProductTypes } from '@customTypes/interfaces';
 import ProductCard from '@components/cards/ProductCard';
-import MainContainer from '@layout/MainContainer';
 import Pagination from '@components/paginations/Pagination';
 import SortProducts from '@features/sortProducts/SortProducts';
 import { useGetAccessDatabase } from '../../hooks/useAaccessDatabase';
@@ -12,7 +11,6 @@ import { sortOptions, sortOptionsArray } from '@hooks/useSortProducts';
 import { Badge } from '@components/UI/badge';
 import LoadingCircle from '@components/Loaders/LoadingCircle';
 import { toast } from '@components/UI/use-toast';
-import CollectionCard from '@components/cards/CollectionCard';
 
 interface SearchedProductsDataTypes {
   products: ProductTypes[];
@@ -39,6 +37,27 @@ type FilterParams = 'phrase' | 'category' | 'author' | 'special';
 export default function SearchPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const currentSortMethod = searchParams.get('sortMethod');
+
+  const [categoriesState, setCategoriesState] = useState<{
+    options: CategoryTypes[];
+  }>({
+    options: [],
+  });
+  const fetchCategories = useCallback(async () => {
+    const { data, error } = await useGetAccessDatabase({
+      url: DATABASE_ENDPOINTS.CATEGORY_ALL,
+    });
+    if (error) {
+      return;
+    }
+    setCategoriesState((prevState) => {
+      return { ...prevState, options: [...data] };
+    });
+  }, []);
+
+  useEffect(() => {
+    fetchCategories();
+  }, [fetchCategories]);
 
   const pageIteration = 8;
 
@@ -308,7 +327,11 @@ export default function SearchPage() {
                         >
                           <div className="absolute inset-0 h-full w-full rounded-md bg-black opacity-0 transition-opacity ease-out group-hover:opacity-10" />
                           <span className="text-sm text-green-700 group-hover:brightness-90">
-                            {query}
+                            {
+                              categoriesState.options.find(
+                                (category) => category.value === query
+                              )?.label
+                            }
                           </span>
                           <div className="absolute -left-2 -top-1 box-border h-4 w-4 rounded-full border bg-green-100 text-green-600">
                             X
@@ -331,6 +354,7 @@ export default function SearchPage() {
               searchedProductsData.rawData.highestPrice) ||
             0
           }
+          categoriesState={categoriesState.options}
         />
         <section className="h-full w-full space-y-2 md:pt-0">
           {!searchedProductsData.isLoading &&

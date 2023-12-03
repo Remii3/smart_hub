@@ -43,7 +43,7 @@ export default function SimilarProducts({ authorId, creatorId }: PropsTypes) {
   useEffect(() => {
     fetchData();
   }, [authorId]);
-  console.log('products', products);
+
   return (
     <article>
       {products.data && (

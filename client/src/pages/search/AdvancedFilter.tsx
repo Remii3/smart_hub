@@ -12,13 +12,17 @@ import {
 } from '@components/UI/collapsible';
 import { AdjustmentsHorizontalIcon } from '@heroicons/react/24/outline';
 import { useState } from 'react';
-import { Label } from '@components/UI/label';
+import { CategoryTypes } from '@customTypes/interfaces';
 
 type AdvancedFilterTypes = {
   highestPrice: number;
+  categoriesState: CategoryTypes[];
 };
 
-export default function AdvancedFilter({ highestPrice }: AdvancedFilterTypes) {
+export default function AdvancedFilter({
+  highestPrice,
+  categoriesState,
+}: AdvancedFilterTypes) {
   const [searchParams, setSearchParams] = useSearchParams();
   const [openCollapsible, setOpenCollapsible] = useState(false);
   const clearSelectedMarketplace = () => {
@@ -95,7 +99,7 @@ export default function AdvancedFilter({ highestPrice }: AdvancedFilterTypes) {
               Clear
             </Button>
           </div>
-          <CategoriesFilter />
+          <CategoriesFilter categoriesState={categoriesState} />
         </section>
         <section className="mb-1">
           <div className="flex items-center justify-between">
@@ -187,7 +191,7 @@ export default function AdvancedFilter({ highestPrice }: AdvancedFilterTypes) {
                   Clear
                 </Button>
               </div>
-              <CategoriesFilter />
+              <CategoriesFilter categoriesState={categoriesState} />
             </section>
             <section className="mb-1">
               <div className="flex items-center justify-between">
