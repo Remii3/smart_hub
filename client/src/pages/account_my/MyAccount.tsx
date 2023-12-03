@@ -185,11 +185,7 @@ export default function MyAccount() {
               </div>
             </div>
           </div>
-          {userData.data.role !== UserRoleTypes.USER && (
-            <div className="space-y-1">
-              <NewProduct />
-            </div>
-          )}
+          {userData.data.role !== UserRoleTypes.USER && <NewProduct />}
         </div>
       </header>
       <div className="pb-8 sm:pb-12">

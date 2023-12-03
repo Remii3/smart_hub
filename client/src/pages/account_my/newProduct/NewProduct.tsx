@@ -46,8 +46,10 @@ import { MarketplaceTypes } from '@customTypes/types';
 
 import { Tabs, TabsList, TabsTrigger } from '@components/UI/tabs';
 import errorToast from '@components/UI/error/errorToast';
-import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import { CKEditor } from '@ckeditor/ckeditor5-react';
+import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
+import { Switch } from '@components/UI/switch';
+import { Card } from '@components/UI/card';
 
 type SelectedImgsTypes = {
   isDirty: boolean;
@@ -244,27 +246,30 @@ export default function NewProduct() {
     }
   };
 
-  const clearForm = () => {
-    setOpenDialog(false);
-
-    setTimeout(() => {
+  const clearForm = (openState: boolean) => {
+    setOpenDialog(openState);
+    if (!openState) {
       setStatus({ hasFailed: false, isLoading: false, isSuccess: false });
-      setSelectedImgs({ imgs: [], isDirty: false });
-      reset();
-    }, 50);
+      setTimeout(() => {
+        setSelectedMarketplace('shop');
+        setNewDescription({ value: '', show: false });
+        setSelectedImgs({ imgs: [], isDirty: false });
+        reset();
+      }, 50);
+    }
   };
 
   return (
-    <Dialog open={openDialog} onOpenChange={clearForm}>
+    <Dialog
+      open={openDialog}
+      onOpenChange={(openState) => clearForm(openState)}
+    >
       <div className="mt-4 flex flex-col sm:mt-0 sm:flex-row sm:items-center">
         <Button
           variant="default"
           className="w-full"
           onClick={() => {
             setOpenDialog(true);
-            setTimeout(() => {
-              setNewDescription({ value: '', show: true });
-            }, 100);
           }}
         >
           Add new book
@@ -273,7 +278,7 @@ export default function NewProduct() {
       <DialogContent
         className={`${
           status.isLoading ? 'overflow-y-hidden' : 'overflow-y-auto'
-        } h-full w-full p-7 `}
+        } w-full p-7 `}
       >
         {status.isLoading && (
           <div className="flex items-center justify-center">
@@ -287,10 +292,12 @@ export default function NewProduct() {
           </div>
         )}
         {status.hasFailed && !status.isLoading && (
-          <div className="h-auto">
-            <DialogHeader className="mb-8 mt-4">
-              <DialogTitle>Failed adding new product</DialogTitle>
+          <>
+            <DialogHeader className="mb-10">
+              <h4>Failed</h4>
+              <p>We failed adding your book.</p>
             </DialogHeader>
+
             <DialogFooter>
               <Button
                 variant={'outline'}
@@ -302,11 +309,11 @@ export default function NewProduct() {
               >
                 Try again
               </Button>
-              <Button variant={'destructive'} onClick={clearForm}>
+              <Button variant={'destructive'} onClick={() => clearForm(false)}>
                 Close
               </Button>
             </DialogFooter>
-          </div>
+          </>
         )}
         {status.isSuccess && !status.isLoading && (
           <>
@@ -315,7 +322,7 @@ export default function NewProduct() {
               <p>Your book has been successfully added!</p>
             </DialogHeader>
             <DialogFooter>
-              <Button variant={'default'} onClick={clearForm}>
+              <Button variant={'default'} onClick={() => clearForm(false)}>
                 Close
               </Button>
             </DialogFooter>
@@ -478,7 +485,6 @@ export default function NewProduct() {
                       </FormItem>
                     )}
                   />
-
                   <FormField
                     control={control}
                     name="authors"
@@ -644,39 +650,57 @@ export default function NewProduct() {
                       </FormItem>
                     )}
                   />
-                  {newDescription.show && (
-                    <CKEditor
-                      editor={ClassicEditor}
-                      data={newDescription.value}
-                      config={{
-                        mediaEmbed: { previewsInData: true },
-                        toolbar: {
-                          shouldNotGroupWhenFull: true,
-                          items: [
-                            'heading',
-                            '|',
-                            'bold',
-                            'italic',
-                            'mediaEmbed',
-                            'bulletedList',
-                            'numberedList',
-                            '|',
-                            'outdent',
-                            'indent',
-                            '|',
-                            'blockQuote',
-                            'insertTable',
-                            'undo',
-                            'redo',
-                          ],
-                        },
-                      }}
-                      onChange={(event, editor) => {
-                        const data = editor.getData();
-                        setNewDescription({ show: true, value: data });
-                      }}
-                    />
-                  )}
+                  <div className="space-y-2">
+                    <Label>Additional data</Label>
+                    <div>
+                      <Card className="inline-block">
+                        <Label
+                          className="p-3 flex gap-1 items-center"
+                          htmlFor="descriptionNewSwitch"
+                        >
+                          Description
+                          <Switch
+                            id="descriptionNewSwitch"
+                            onCheckedChange={(checked: boolean) =>
+                              setNewDescription((prevState) => {
+                                return { ...prevState, show: checked };
+                              })
+                            }
+                          />
+                        </Label>
+                      </Card>
+                    </div>
+                    {newDescription.show && (
+                      <CKEditor
+                        editor={ClassicEditor}
+                        data={newDescription.value}
+                        config={{
+                          toolbar: {
+                            shouldNotGroupWhenFull: true,
+                            items: [
+                              'undo',
+                              'redo',
+                              '|',
+                              'bold',
+                              'italic',
+                              '|',
+                              'bulletedList',
+                              'numberedList',
+                              '|',
+                              'outdent',
+                              'indent',
+                              '|',
+                              'blockQuote',
+                            ],
+                          },
+                        }}
+                        onChange={(event, editor) => {
+                          const data = editor.getData();
+                          setNewDescription({ show: true, value: data });
+                        }}
+                      />
+                    )}
+                  </div>
                 </article>
 
                 <DialogFooter className="flex justify-end">
