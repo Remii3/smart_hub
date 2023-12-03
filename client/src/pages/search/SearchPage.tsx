@@ -205,10 +205,10 @@ export default function SearchPage() {
   }, []);
 
   return (
-    <MainContainer>
+    <>
       <div className="fixed left-0 flex-wrap right-0 top-16 z-10 flex w-full items-center justify-between bg-background px-4 pb-1 pt-2 md:static md:mb-2 md:px-0 md:pt-0">
         <div>
-          <span>
+          <span className="text-lg">
             Results:{' '}
             {searchedProductsData.rawData &&
               searchedProductsData.rawData.totalProducts}
@@ -383,6 +383,6 @@ export default function SearchPage() {
           </div>
         </section>
       </div>
-    </MainContainer>
+    </>
   );
 }
