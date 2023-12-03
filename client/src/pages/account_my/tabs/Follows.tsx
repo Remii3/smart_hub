@@ -63,15 +63,16 @@ export default function Follows() {
     fetchData();
   };
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-      {!followedUsers.isLoading &&
-        followedUsers.data &&
-        followedUsers.data.length <= 0 && (
-          <div>You're not following anybody yet!</div>
-        )}
-      {followedUsers.data &&
-        followedUsers.data.map((followedUser) => (
-          <div>
+    <>
+      <h4 className="mb-4">Following</h4>
+      <div className="px-1 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+        {!followedUsers.isLoading &&
+          followedUsers.data &&
+          followedUsers.data.length <= 0 && (
+            <div>You're not following anybody yet!</div>
+          )}
+        {followedUsers.data &&
+          followedUsers.data.map((followedUser) => (
             <Card
               key={followedUser._id}
               className="w-auto flex justify-between hover:shadow transition ease-in-out"
@@ -118,8 +119,8 @@ export default function Follows() {
                 </DeleteDialog>
               </div>
             </Card>
-          </div>
-        ))}
-    </div>
+          ))}
+      </div>
+    </>
   );
 }
