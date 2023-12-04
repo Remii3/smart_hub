@@ -55,7 +55,7 @@ export default function MyProducts() {
   const [searchbarValue, setSearchbarValue] = useState('');
 
   const [page, setPage] = useState(1);
-  const allLimit = 8;
+  const allLimit = 2;
 
   const fetchAllDataQuantity = async () => {
     if (!userData.data) return;
@@ -77,19 +77,17 @@ export default function MyProducts() {
     setProductsQuantity({ hasError: null, isLoading: false, quantity: data });
   };
 
-  const fetchAllData = async (type?: 'query') => {
+  const fetchAllData = async ({ newPage }: { newPage?: number }) => {
     setProducts((prevState) => {
       return { ...prevState, isLoading: true };
     });
 
     const filtersData = {
-      page,
+      page: newPage,
       marketplace,
     } as { [index: string]: unknown };
 
-    if (type === 'query') {
-      filtersData.searchedPhrase = searchbarValue;
-    }
+    filtersData.searchedPhrase = searchbarValue;
 
     const { data, error } = await useGetAccessDatabase({
       url: DATABASE_ENDPOINTS.SEARCH_PRODCOL,
@@ -116,16 +114,19 @@ export default function MyProducts() {
     });
   };
 
-  const searchHandler = (e: React.FormEvent) => {
+  const searchHandler = async (e: React.FormEvent) => {
     e.preventDefault();
-    fetchAllData('query');
+    await fetchAllData({ newPage: 1 });
+    setPage(1);
+  };
+
+  const changePageHandler = async (newPage: number) => {
+    fetchAllData({ newPage: newPage });
+    setPage(newPage);
   };
 
   useEffect(() => {
-    fetchAllData();
-  }, [page]);
-
-  useEffect(() => {
+    fetchAllData({ newPage: 1 });
     fetchAllDataQuantity();
   }, []);
 
@@ -148,7 +149,7 @@ export default function MyProducts() {
     fetchUserData();
     setPage(1);
     fetchAllDataQuantity();
-    fetchAllData();
+    fetchAllData({ newPage: 1 });
     setDeleteDialog(false);
     setDeleteAllStatus({ hasError: null, isLoading: false, isSuccess: true });
 
@@ -212,7 +213,7 @@ export default function MyProducts() {
           <AllProducts
             limit={allLimit}
             products={products.data}
-            onPageChange={setPage}
+            onPageChange={(newPage: number) => changePageHandler(newPage)}
             page={page}
             totalPages={products.rawData?.totalProducts}
           />

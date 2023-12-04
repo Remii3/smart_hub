@@ -7,7 +7,7 @@ interface PropsTypes {
   limit: number;
   totalPages?: number;
   page: number;
-  onPageChange: React.Dispatch<React.SetStateAction<number>>;
+  onPageChange: (newPage: number) => void;
 }
 
 export default function AllProducts({
