@@ -4,7 +4,7 @@ const User = require('../../Models/user');
 const prodCol = async (req, res, next) => {
   let { pageSize, filtersData } = req.query;
   if (!filtersData) {
-    filtersData = {};
+    filtersData = { page: 1 };
   }
 
   let currentPage = filtersData.page;
@@ -35,7 +35,7 @@ const prodCol = async (req, res, next) => {
 
     for (let i = 0; i < filtersData.selectedAuthors.length; i++) {
       const author = await User.findOne({
-        'author_info.pseudonim': filtersData.selectedAuthors[i],
+        'authorInfo.pseudonim': filtersData.selectedAuthors[i],
       });
       if (author) {
         authors.push(author._id);
@@ -109,6 +109,10 @@ const prodCol = async (req, res, next) => {
   if (!filtersData.showSold) {
     searchQuery.sold = false;
     searchQuery.quantity = { $gt: 0 };
+  }
+
+  if (!filtersData.showDeleted) {
+    searchQuery.deleted = false;
   }
 
   req.finalSearchData = {

@@ -23,6 +23,7 @@ export default function PrivacyPolicyPage() {
           </em>
           <span style={{ fontWeight: 'lighter' }}>.</span>
         </p>
+        <span>&nbsp;</span>
         <p>
           <span>
             <strong>

@@ -1,5 +1,6 @@
 // eslint-disable-next-line import/no-cycle
 import {
+  AddingToCartTypes,
   ImgTypes,
   MarketplaceTypes,
   PriceTypes,
@@ -21,7 +22,7 @@ export interface ProductTypes {
   description: string;
   shortDescription: string;
   quantity: number;
-  imgs: { id: string; url: string }[];
+  imgs: ImgTypes[];
   categories: { value: string; label: string; _id: string }[];
   authors: AuthorTypes[];
   rating: { avgRating: number; quantity: number };
@@ -32,7 +33,7 @@ export interface ProductTypes {
   comments: [
     {
       _id: string;
-      product_id: string;
+      productId: string;
       user: UserTypes;
       value: { rating: number; text: string };
       createdAt: string;
@@ -58,39 +59,31 @@ export interface UserTypes {
   _id: string;
   email: string;
   username: string;
-  user_info: {
-    profile_img: { url: string; id: string };
-    background_img: any;
-    credentials: { first_name: string; last_name: string; full_name: string };
+  userInfo: {
+    profileImg: { url: string; id: string };
+    credentials: { firstName: string; lastName: string };
     address: {
       line1: string;
       line2: string;
       city: string;
       state: string;
-      postal_code: string;
+      postalCode: string;
       country: string;
     };
     phone: string;
   };
-  cart_data: { products: ProductTypes[]; _id: string };
   following: string[];
-  orders: OrderTypes[];
-  role: UserRoleType | string;
-  security_settings: {
-    hide_private_information: boolean;
+  role: UserRoleType;
+  securitySettings: {
+    hidePrivateInformation: boolean;
   };
 }
 
 export interface AuthorTypes extends UserTypes {
-  author_info: {
-    categories: string[];
+  authorInfo: {
     pseudonim: string;
-    short_description: string;
+    shortDescription: string;
     quote: string;
-    avg_products_grade: number;
-    sold_books_quantity: number;
-    my_products: ProductTypes[];
-    myCollections: CollectionObjectTypes[];
     followers: string[];
   };
 }
@@ -106,12 +99,14 @@ export interface TransactionHistoryTypes {
 
 export interface OrderTypes {
   _id: string;
-  buyer_id: string;
+  buyerId: string;
+  status: string;
   products: {
     product: ProductTypes;
-    in_cart_quantity: number;
-    total_price: number;
+    inCartQuantity: number;
+    totalPrice: number;
   }[];
+  orderPrice: string;
   createdAt: string;
 }
 
@@ -135,6 +130,7 @@ export interface CartTypes {
   cartPrice: number | null;
   isLoading: boolean;
   isAdding: boolean | string;
+  addingToCartType: AddingToCartTypes;
   isIncrementing: boolean | string;
   isDecrementing: boolean | string;
   isDeleting: boolean | string;
@@ -170,7 +166,7 @@ export interface NewsType {
   subtitle: string;
   shortDescription: string;
   content: string;
-  creatorData: { _id: string; pseudonim: string; profile_img: ImgTypes };
+  creatorData: { _id: string; pseudonim: string; profileImg: ImgTypes };
   voting: { quantity: { likes: number; dislikes: number } };
   updatedAt: string;
   img: {
@@ -206,7 +202,7 @@ export interface CommentTypes {
   value: { rating: number; text: string; nickname: string };
   createdAt: string;
   updatedAt: string;
-  product_id: string;
+  productId: string;
 }
 
 export interface CollectionObjectTypes {
@@ -223,7 +219,7 @@ export interface CollectionObjectTypes {
   authors: AuthorTypes[];
   rating: RatingTypes;
   quantity: number;
-  market_place: MarketplaceTypes;
+  marketplace: MarketplaceTypes;
   createdAt: string;
   updatedAt: string;
   sold: boolean;

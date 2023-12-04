@@ -23,8 +23,8 @@ describe('Comment Component', () => {
     },
     creatorData: {
       _id: 'user456',
-      user_info: {
-        profile_img: {
+      userInfo: {
+        profileImg: {
           url: 'https://example.com/profile.jpg',
         },
       },

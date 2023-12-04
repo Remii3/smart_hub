@@ -95,7 +95,7 @@ export default function NewNews({
     if (selectedImg) {
       const imgResData = await useUploadImg({
         ownerId: data.id,
-        targetLocation: 'News_img',
+        targetLocation: 'NewsImg',
         selectedFile: selectedImg[0],
       });
       const { error } = await usePostAccessDatabase({

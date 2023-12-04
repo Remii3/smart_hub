@@ -1,81 +1,30 @@
-import { useCallback, useEffect, useState } from 'react';
-import { FetchDataTypes, ProductTypes } from '@customTypes/interfaces';
-import ShopCard from '@components/cards/ShopCard';
-import { useGetAccessDatabase } from '@hooks/useAaccessDatabase';
-import { DATABASE_ENDPOINTS } from '@data/endpoints';
-import errorToast from '@components/UI/error/errorToast';
+import { ProductTypes } from '@customTypes/interfaces';
 import Pagination from '@components/paginations/Pagination';
+import ProductCard from '@components/cards/ProductCard';
 
 interface PropsTypes {
+  products: ProductTypes[];
   limit: number;
+  totalPages?: number;
+  page: number;
+  onPageChange: React.Dispatch<React.SetStateAction<number>>;
 }
 
-interface ProductsTypes extends FetchDataTypes {
-  data: null | ProductTypes[];
-  rawData: null | any;
-}
-
-export default function AllProducts({ limit }: PropsTypes) {
-  const [products, setProducts] = useState<ProductsTypes>({
-    data: null,
-    rawData: null,
-    hasError: null,
-    isLoading: false,
-  });
-  const [page, setPage] = useState(1);
-  const fetchData = useCallback(async () => {
-    setProducts((prevState) => {
-      return { ...prevState, isLoading: true };
-    });
-
-    let data = null;
-    let error = null;
-
-    const productsResponse = await useGetAccessDatabase({
-      url: DATABASE_ENDPOINTS.SEARCH_PRODCOL,
-      params: {
-        pageSize: limit,
-        withPagination: true,
-        filtersData: {
-          page,
-          marketplace: 'shop',
-        },
-      },
-    });
-    data = productsResponse.data;
-    error = productsResponse.error;
-    if (error) {
-      errorToast(error);
-      return setProducts({
-        data: null,
-        rawData: null,
-        hasError: error,
-        isLoading: false,
-      });
-    }
-    setProducts({
-      data: data.data,
-      rawData: data.rawData,
-      hasError: null,
-      isLoading: false,
-    });
-  }, [page]);
-
-  useEffect(() => {
-    fetchData();
-  }, [page]);
-
-  const changeCurrentPageHandler = (newPage: number) => {
-    setPage(newPage);
-  };
-
+export default function AllProducts({
+  products,
+  limit,
+  onPageChange,
+  page,
+  totalPages,
+}: PropsTypes) {
   return (
-    <div>
-      <div className="grid h-full grid-cols-1 gap-4 overflow-hidden pb-4 transition-[max-height] duration-300 ease-in-out sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {products.data &&
-          products.data.map((product) => {
+    <>
+      <div className="px-1 grid h-full grid-cols-1 gap-4 overflow-hidden pb-4 transition-[max-height] duration-300 ease-in-out sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        {products.length <= 0 && <div>No products.</div>}
+        {products.length > 0 &&
+          products.map((product) => {
             return (
-              <ShopCard
+              <ProductCard
                 key={product._id}
                 _id={product._id}
                 categories={product.categories}
@@ -96,19 +45,19 @@ export default function AllProducts({ limit }: PropsTypes) {
             );
           })}
       </div>
-      {limit && (
+      {totalPages !== undefined && (
         <div className="flex justify-center">
           <Pagination
             currentPage={page}
             pageSize={limit}
             onPageChange={(newPageNumber: number) =>
-              changeCurrentPageHandler(newPageNumber)
+              onPageChange(newPageNumber)
             }
-            totalCount={products.rawData && products.rawData.totalProducts}
+            totalCount={totalPages}
             siblingCount={1}
           />
         </div>
       )}
-    </div>
+    </>
   );
 }

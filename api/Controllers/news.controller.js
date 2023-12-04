@@ -65,7 +65,7 @@ const getOneNews = async (req, res) => {
       .populate([
         {
           path: 'creatorData',
-          select: ['user_info.profile_img', 'author_info.pseudonim'],
+          select: ['userInfo.profileImg', 'authorInfo.pseudonim'],
         },
       ])
       .lean();
@@ -81,7 +81,7 @@ const getOneNews = async (req, res) => {
       creatorData: {
         _id: creatorData._id,
         pseudonim: creatorData.author_info.pseudonim,
-        profile_img: creatorData.user_info.profile_img,
+        profileImg: creatorData.userInfo.profileImg,
       },
     };
     return res.status(200).json({ data: preparedData });

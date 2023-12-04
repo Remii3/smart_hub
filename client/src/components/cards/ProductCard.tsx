@@ -9,7 +9,7 @@ import { ShoppingCartIcon } from '@heroicons/react/24/solid';
 import { Badge } from '@components/UI/badge';
 import MarketplaceBadge from '@components/UI/badges/MarketplaceBadge';
 
-export default function ShopCard({
+export default function ProductCard({
   _id,
   title,
   authors,
@@ -85,7 +85,7 @@ export default function ShopCard({
             <div className="line-clamp-1 pb-1 text-sm">
               {authors.map((author, id) => (
                 <span key={id} className="mr-2 text-sm">
-                  {author.author_info && author.author_info.pseudonim}
+                  {author.authorInfo && author.authorInfo.pseudonim}
                 </span>
               ))}
             </div>

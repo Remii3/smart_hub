@@ -36,7 +36,7 @@ import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import { Label } from '@radix-ui/react-label';
 import { Badge } from '@components/UI/badge';
 import { Separator } from '@components/UI/separator';
-import { PlusCircleIcon } from '@heroicons/react/24/outline';
+import { PlusCircleIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { Textarea } from '@components/UI/textarea';
 
 interface ArticleDataTypes extends FetchDataTypes {
@@ -130,7 +130,7 @@ export default function NewsArticle({
     if (selectedImg) {
       img = await useUploadImg({
         ownerId: newsId,
-        targetLocation: 'News_img',
+        targetLocation: 'NewsImg',
         selectedFile: selectedImg[0],
       });
     }
@@ -199,7 +199,16 @@ export default function NewsArticle({
                       deleteHandler={() => deleteArticleHandler(newsId)}
                       openState={openedDialog}
                       openStateHandler={(state) => setOpenedDialog(state)}
-                    />
+                    >
+                      <Button
+                        variant={'ghost'}
+                        size={'sm'}
+                        className="text-red-400 hover:text-red-400"
+                        onClick={() => setOpenedDialog(true)}
+                      >
+                        <TrashIcon className="h-6 w-6" />
+                      </Button>
+                    </DeleteDialog>
                     <Button
                       variant={'outline'}
                       type="button"
@@ -358,7 +367,7 @@ export default function NewsArticle({
                       className="flex items-center gap-1 text-sm"
                     >
                       <img
-                        src={articleData.data.creatorData.profile_img.url}
+                        src={articleData.data.creatorData.profileImg.url}
                         alt="profile_img"
                         className="h-8 w-8 rounded-full"
                       />
@@ -418,7 +427,7 @@ export default function NewsArticle({
             <Comments
               target="News"
               targetId={articleData.data._id}
-              withRating={false}
+              starRating={false}
             />
           </div>
         </div>

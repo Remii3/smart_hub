@@ -117,8 +117,8 @@ export default function Nav({ scrollFlag }: { scrollFlag: boolean }) {
   const burgerColor = openedBurger
     ? 'bg-foreground'
     : scrollFlag
-    ? 'bg-background'
-    : 'bg-foreground';
+      ? 'bg-background'
+      : 'bg-foreground';
   return (
     <nav>
       <div className="relative mx-auto flex h-[64px] max-w-[1480px] flex-row items-center justify-between px-4 py-3 sm:px-10">
@@ -232,7 +232,7 @@ export default function Nav({ scrollFlag }: { scrollFlag: boolean }) {
               <PopoverContent
                 className={`${
                   !scrollFlag && 'rounded-t-none'
-                } relative mt-3 w-screen max-w-full bg-background px-6 py-8 sm:px-6 md:max-w-md lg:px-6`}
+                } relative mt-3 w-screen max-w-full bg-background px-6 py-8 sm:px-6 md:max-w-lg lg:px-6`}
               >
                 <CartPopup />
               </PopoverContent>
@@ -245,10 +245,10 @@ export default function Nav({ scrollFlag }: { scrollFlag: boolean }) {
                 >
                   <Suspense fallback={<LoadingCircle />}>
                     {userData.data ? (
-                      userData.data.user_info.profile_img.url ? (
+                      userData.data.userInfo.profileImg.url ? (
                         <div className="h-8 w-8">
                           <img
-                            src={userData.data.user_info.profile_img.url}
+                            src={userData.data.userInfo.profileImg.url}
                             className="h-8 w-8 rounded-full object-cover"
                             alt="profile_img"
                           />

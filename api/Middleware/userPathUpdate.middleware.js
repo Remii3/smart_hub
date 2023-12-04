@@ -13,14 +13,14 @@ const userPathUpdate = (req, res, next) => {
   if (dirtyData.firstName) {
     preparedData['$set'] = {
       ...preparedData['$set'],
-      'user_info.credentials.first_name': dirtyData.firstName,
+      'userInfo.credentials.firstName': dirtyData.firstName,
     };
   }
 
   if (dirtyData.lastName) {
     preparedData['$set'] = {
       ...preparedData['$set'],
-      'user_info.credentials.last_name': dirtyData.lastName,
+      'userInfo.credentials.lastName': dirtyData.lastName,
     };
   }
 
@@ -30,66 +30,71 @@ const userPathUpdate = (req, res, next) => {
   }
 
   if (dirtyData.phone) {
-    preparedData['$set'] = { 'user_info.phone': dirtyData.phone };
+    preparedData['$set'] = { 'userInfo.phone': dirtyData.phone };
   }
 
   if (dirtyData.quote) {
-    preparedData['$set'] = { 'author_info.quote': dirtyData.quote };
+    preparedData['$set'] = { 'authorInfo.quote': dirtyData.quote };
   }
 
   if (dirtyData.pseudonim) {
-    preparedData['$set'] = { 'author_info.pseudonim': dirtyData.pseudonim };
+    preparedData['$set'] = { 'authorInfo.pseudonim': dirtyData.pseudonim };
   }
 
   if (dirtyData.shortDescription) {
     preparedData['$set'] = {
-      'author_info.short_description': dirtyData.shortDescription,
+      'authorInfo.shortDescription': dirtyData.shortDescription,
     };
   }
 
   if (dirtyData.line1) {
     preparedData['$set'] = {
       ...preparedData['$set'],
-      'user_info.address.line1': dirtyData.line1,
+      'userInfo.address.line1': dirtyData.line1,
     };
   }
   if (dirtyData.line2) {
     preparedData['$set'] = {
       ...preparedData['$set'],
-      'user_info.address.line2': dirtyData.line2,
+      'userInfo.address.line2': dirtyData.line2,
     };
   }
   if (dirtyData.city) {
     preparedData['$set'] = {
       ...preparedData['$set'],
-      'user_info.address.city': dirtyData.city,
+      'userInfo.address.city': dirtyData.city,
     };
   }
   if (dirtyData.state) {
     preparedData['$set'] = {
       ...preparedData['$set'],
-      'user_info.address.state': dirtyData.state,
+      'userInfo.address.state': dirtyData.state,
     };
   }
   if (dirtyData.postalCode) {
     preparedData['$set'] = {
       ...preparedData['$set'],
-      'user_info.address.postal_code': dirtyData.postalCode,
+      'userInfo.address.postalCode': dirtyData.postalCode,
     };
   }
   if (dirtyData.country) {
     preparedData['$set'] = {
       ...preparedData['$set'],
-      'user_info.address.country': dirtyData.country,
+      'userInfo.address.country': dirtyData.country,
     };
   }
   if (dirtyData.profileImg) {
     preparedData['$set'] = {
       ...preparedData['$set'],
-      'user_info.profile_img': dirtyData.profileImg,
+      'userInfo.profileImg': dirtyData.profileImg,
     };
   }
-
+  if (dirtyData.selectedOptionName) {
+    preparedData['$set'] = {
+      ...preparedData['$set'],
+      'securitySettings.hidePrivateInformation': dirtyData.selectedOptionName,
+    };
+  }
   req.preparedData = preparedData;
   next();
 };

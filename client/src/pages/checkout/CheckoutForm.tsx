@@ -17,6 +17,7 @@ import { usePostAccessDatabase } from '../../hooks/useAaccessDatabase';
 import { DATABASE_ENDPOINTS } from '../../data/endpoints';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@components/UI/button';
+import errorToast from '@components/UI/error/errorToast';
 
 interface PropsTypes {
   readyToShow: {
@@ -134,20 +135,27 @@ export default function CheckoutForm({
       }
     } else {
       const currentUserId = userData.data?._id || getCookie('guestToken');
-      const { data } = await usePostAccessDatabase({
+      const { data, error } = await usePostAccessDatabase({
         url: DATABASE_ENDPOINTS.ORDER_ONE,
         body: {
           buyerId: currentUserId,
           items: cartState.products,
         },
       });
-      await usePostAccessDatabase({
+      if (error) {
+        return errorToast(error);
+      }
+
+      const { error: removeFromCartError } = await usePostAccessDatabase({
         url: DATABASE_ENDPOINTS.CART_REMOVE,
         body: {
           userId: currentUserId,
           productId: 'all',
         },
       });
+      if (removeFromCartError) {
+        return errorToast(removeFromCartError);
+      }
 
       fetchCartData();
       fetchUserData();
@@ -194,24 +202,24 @@ export default function CheckoutForm({
           validation: { phone: { required: 'auto' } },
           display: { name: 'split' },
           defaultValues: {
-            phone: userData.data ? userData.data.user_info.phone : '',
+            phone: userData.data ? userData.data.userInfo.phone : '',
             firstName: userData.data
-              ? userData.data.user_info.credentials.first_name
+              ? userData.data.userInfo.credentials.firstName
               : '',
             lastName: userData.data
-              ? userData.data.user_info.credentials.last_name
+              ? userData.data.userInfo.credentials.lastName
               : '',
             address: {
               country: userData.data
-                ? userData.data.user_info.address.country
+                ? userData.data.userInfo.address.country
                 : '',
-              city: userData.data ? userData.data.user_info.address.city : '',
-              line1: userData.data ? userData.data.user_info.address.line1 : '',
-              line2: userData.data ? userData.data.user_info.address.line2 : '',
+              city: userData.data ? userData.data.userInfo.address.city : '',
+              line1: userData.data ? userData.data.userInfo.address.line1 : '',
+              line2: userData.data ? userData.data.userInfo.address.line2 : '',
               postal_code: userData.data
-                ? userData.data.user_info.address.postal_code
+                ? userData.data.userInfo.address.postalCode
                 : '',
-              state: userData.data ? userData.data.user_info.address.state : '',
+              state: userData.data ? userData.data.userInfo.address.state : '',
             },
           },
         }}
@@ -259,7 +267,7 @@ export default function CheckoutForm({
       )}
 
       {message && (
-        <div id="payment-message" className="pt-3 text-center text-red-500">
+        <div id="payment-message" className="pt-3 text-center text-red-400">
           {message}
         </div>
       )}

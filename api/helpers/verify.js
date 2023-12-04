@@ -14,12 +14,12 @@ function verifyNewUserData(fieldKey, value) {
       const emailErrors = checkEmail(value);
       errors.push(...emailErrors);
       break;
-    case 'first_name':
+    case 'firstName':
       if (value.trim() === '') {
         errors.push({ name: fieldKey, message: 'No value provided.' });
       }
       break;
-    case 'last_name':
+    case 'lastName':
       if (value.trim() === '') {
         errors.push({ name: fieldKey, message: 'No value provided.' });
       }
@@ -55,7 +55,7 @@ function verifyNewUserData(fieldKey, value) {
       break;
     case 'state':
       break;
-    case 'postal_code':
+    case 'postalCode':
       break;
     case 'country':
       break;

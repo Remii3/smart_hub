@@ -1,30 +1,13 @@
-import { Label } from '@components/UI/label';
-import { DATABASE_ENDPOINTS } from '@data/endpoints';
-import { useGetAccessDatabase } from '@hooks/useAaccessDatabase';
-import { useCallback, useEffect, useState } from 'react';
+import { CategoryTypes } from '@customTypes/interfaces';
 import { useSearchParams } from 'react-router-dom';
 import Select from 'react-select';
 
-export default function CategoriesFilter() {
+export default function CategoriesFilter({
+  categoriesState,
+}: {
+  categoriesState: CategoryTypes[];
+}) {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [categoriesState, setCategoriesState] = useState<{ options: any }>({
-    options: [],
-  });
-  const fetchCategories = useCallback(async () => {
-    const { data, error } = await useGetAccessDatabase({
-      url: DATABASE_ENDPOINTS.CATEGORY_ALL,
-    });
-    if (error) {
-      return;
-    }
-    setCategoriesState((prevState) => {
-      return { ...prevState, options: [...data] };
-    });
-  }, []);
-
-  useEffect(() => {
-    fetchCategories();
-  }, [fetchCategories]);
 
   const selectHandler = (actionMeta: any) => {
     switch (actionMeta.action) {
@@ -58,8 +41,7 @@ export default function CategoriesFilter() {
   });
 
   return (
-    <div>
-      <Label htmlFor="filterAuthors">Categories filter</Label>
+    <>
       <Select
         inputId="filterCategories"
         menuPlacement="top"
@@ -102,17 +84,24 @@ export default function CategoriesFilter() {
         }}
         maxMenuHeight={250}
         isMulti
-        options={categoriesState.options}
+        options={categoriesState}
         defaultValue={defaultValue && defaultValue}
         onChange={(newValue, actionMeta) => selectHandler(actionMeta)}
         value={
           searchParams.getAll('category').length <= 0
             ? null
             : searchParams.getAll('category').map((item) => {
-                return { label: item, value: item };
+                const selectedCategory = categoriesState.find(
+                  (category) => category.value === item
+                );
+                if (!selectedCategory) return;
+                return {
+                  label: selectedCategory.label,
+                  value: selectedCategory.value,
+                };
               })
         }
       />
-    </div>
+    </>
   );
 }

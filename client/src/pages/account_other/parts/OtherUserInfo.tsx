@@ -20,8 +20,12 @@ interface FollowersTypes extends FetchDataTypes {
 
 export default function OtherUserInfo({
   otherUserData,
+  productsCount,
+  collectionsCount,
 }: {
   otherUserData: OtherUserTypes;
+  productsCount: number;
+  collectionsCount: number;
 }) {
   const [otherUserFollowers, setOtherUserFollowers] = useState<FollowersTypes>({
     followers: null,
@@ -92,94 +96,78 @@ export default function OtherUserInfo({
   }, []);
 
   return (
-    <div className="flex flex-col items-center justify-center rounded-md ">
-      <div className="mb-4">
-        {otherUserData.user_info.profile_img &&
-        otherUserData.user_info.profile_img.url ? (
-          <img
-            src={otherUserData.user_info.profile_img.url}
-            className="aspect-auto h-36 w-36 rounded-full object-cover"
-            alt="profile_img"
-          />
-        ) : (
-          <img
-            src="https://firebasestorage.googleapis.com/v0/b/smarthub-75eab.appspot.com/o/static_imgs%2Fnophoto.webp?alt=media&token=a974d32e-108a-4c21-be71-de358368a167"
-            className="aspect-auto h-36 w-36 rounded-full object-cover"
-            alt="profile_img"
-          />
+    <div className="flex flex-col items-center justify-center space-y-4 mb-4">
+      <div className="flex flex-col items-center justify-center space-y-2">
+        <div>
+          {otherUserData.userInfo.profileImg &&
+          otherUserData.userInfo.profileImg.url ? (
+            <img
+              src={otherUserData.userInfo.profileImg.url}
+              className="aspect-auto h-36 w-36 rounded-full object-cover"
+              alt="profileImg"
+            />
+          ) : (
+            <img
+              src="https://firebasestorage.googleapis.com/v0/b/smarthub-75eab.appspot.com/o/static_imgs%2Fnophoto.webp?alt=media&token=a974d32e-108a-4c21-be71-de358368a167"
+              className="aspect-auto h-36 w-36 rounded-full object-cover"
+              alt="profileImg"
+            />
+          )}
+        </div>
+
+        <h3>
+          {otherUserData.authorInfo
+            ? otherUserData.authorInfo.pseudonim
+            : otherUserData.username}
+        </h3>
+        <Badge
+          variant={'outline'}
+          className={`${
+            otherUserData.role === UserRoleTypes.AUTHOR &&
+            'bg-purple-100 text-purple-700'
+          } ${
+            otherUserData.role === UserRoleTypes.ADMIN &&
+            'bg-cyan-100 text-cyan-700'
+          }`}
+        >
+          {otherUserData.role}
+        </Badge>
+        {!otherUserData.securitySettings.hidePrivateInformation && (
+          <article className="flex gap-3">
+            <span>Credentials:</span>
+            <div className="space-x-2">
+              {otherUserData.userInfo.credentials.firstName && (
+                <span>{otherUserData.userInfo.credentials.firstName}</span>
+              )}
+              {otherUserData.userInfo.credentials.lastName && (
+                <span>{otherUserData.userInfo.credentials.lastName}</span>
+              )}
+            </div>
+          </article>
+        )}
+        {otherUserData.authorInfo.quote && (
+          <blockquote className="text-muted-foreground">
+            {otherUserData.authorInfo.quote}
+          </blockquote>
         )}
       </div>
-      <Badge
-        variant={'outline'}
-        className={`${
-          otherUserData.role === UserRoleTypes.AUTHOR &&
-          'bg-purple-100 text-purple-700'
-        } ${
-          otherUserData.role === UserRoleTypes.ADMIN &&
-          'bg-cyan-100 text-cyan-700'
-        }`}
-      >
-        {otherUserData.role}
-      </Badge>
 
-      <h3 className="mb-4">
-        {otherUserData.author_info
-          ? otherUserData.author_info.pseudonim
-          : otherUserData.username}
-      </h3>
-      {otherUserData.user_info && (
-        <article>
-          {otherUserData.user_info.credentials.first_name && (
-            <div>
-              First name:{' '}
-              <span>{otherUserData.user_info.credentials.first_name}</span>
-            </div>
-          )}
-          {otherUserData.user_info.credentials.last_name && (
-            <div>
-              Last name:{' '}
-              <span>{otherUserData.user_info.credentials.last_name}</span>
-            </div>
-          )}
+      {otherUserData.authorInfo.shortDescription && (
+        <article className="max-w-lg">
+          <span>{otherUserData.authorInfo.shortDescription}</span>
         </article>
       )}
-      {otherUserData.user_info && otherUserData.role !== UserRoleTypes.USER && (
-        <article>
-          {otherUserData.author_info.quote && (
-            <div>
-              Favourite quote: <span>{otherUserData.author_info.quote}</span>
-            </div>
-          )}
-          {otherUserData.author_info.short_description && (
-            <div>
-              Short description:{' '}
-              <span>{otherUserData.author_info.short_description}</span>
-            </div>
-          )}
-        </article>
-      )}
+
       {otherUserData.role !== UserRoleTypes.USER && (
-        <>
-          <div className="mb-8 flex gap-8">
+        <div className="flex flex-col items-center gap-4">
+          <div className="flex gap-8">
             <div className="flex flex-col items-center">
               <div>Products</div>
-              <span>
-                {
-                  otherUserData.author_info.my_products.filter(
-                    (item) => item.marketplace === 'shop'
-                  ).length
-                }
-              </span>
+              <span>{productsCount}</span>
             </div>
             <div className="flex flex-col items-center">
               <div>Collections</div>
-              <span>
-                {
-                  otherUserData.author_info.my_products.filter(
-                    (item) => item.marketplace === 'collection'
-                  ).length
-                }
-              </span>
+              <span>{collectionsCount}</span>
             </div>
             <div className="flex flex-col items-center">
               <div>Followers</div>
@@ -191,40 +179,38 @@ export default function OtherUserInfo({
           </div>
 
           {otherUserFollowers.followers && (
-            <div>
-              <Button
-                type="button"
-                variant={
+            <Button
+              type="button"
+              variant={
+                otherUserFollowers.followers.find(
+                  (followerId) => followerId === userData.data?._id
+                )
+                  ? 'outline'
+                  : 'default'
+              }
+              disabled={!userData.data}
+              onClick={followHandler}
+              className="relative"
+            >
+              <div
+                className={`${
                   otherUserFollowers.followers.find(
                     (followerId) => followerId === userData.data?._id
                   )
-                    ? 'outline'
-                    : 'default'
-                }
-                disabled={!userData.data}
-                onClick={followHandler}
-                className="relative"
+                    ? 'hover:opacity-100'
+                    : 'opacity-0'
+                } absolute flex h-full w-full items-center justify-center bg-accent text-red-600 opacity-0 transition-opacity ease-out`}
               >
-                <div
-                  className={`${
-                    otherUserFollowers.followers.find(
-                      (followerId) => followerId === userData.data?._id
-                    )
-                      ? 'hover:opacity-100'
-                      : 'opacity-0'
-                  } absolute flex h-full w-full items-center justify-center bg-accent text-red-600 opacity-0 transition-opacity ease-out`}
-                >
-                  Unfollow
-                </div>
-                {otherUserFollowers.followers.find(
-                  (followerId) => followerId === userData.data?._id
-                )
-                  ? 'Following'
-                  : 'Follow'}
-              </Button>
-            </div>
+                Unfollow
+              </div>
+              {otherUserFollowers.followers.find(
+                (followerId) => followerId === userData.data?._id
+              )
+                ? 'Following'
+                : 'Follow'}
+            </Button>
           )}
-        </>
+        </div>
       )}
     </div>
   );

@@ -30,7 +30,7 @@ export default function AuthorsFilter() {
   const selectHandler = (actionMeta: any) => {
     switch (actionMeta.action) {
       case 'select-option': {
-        searchParams.append('author', actionMeta.option.author_info.pseudonim);
+        searchParams.append('author', actionMeta.option.authorInfo.pseudonim);
         setSearchParams(searchParams, { replace: true });
         break;
       }
@@ -38,7 +38,7 @@ export default function AuthorsFilter() {
         const authors = searchParams
           .getAll('author')
           .filter(
-            (item) => item !== actionMeta.removedValue.author_info.pseudonim
+            (item) => item !== actionMeta.removedValue.authorInfo.pseudonim
           );
         searchParams.delete('author');
         if (authors) {
@@ -57,8 +57,7 @@ export default function AuthorsFilter() {
     }
   };
   return (
-    <div>
-      <Label htmlFor="filterAuthors">Authors filter</Label>
+    <>
       <Select
         menuPlacement="top"
         maxMenuHeight={250}
@@ -103,8 +102,8 @@ export default function AuthorsFilter() {
         inputId="filterAuthors"
         options={authorsState.options}
         onChange={(newValue, actionMeta) => selectHandler(actionMeta)}
-        getOptionValue={(author) => author.author_info.pseudonim}
-        getOptionLabel={(author) => author.author_info.pseudonim}
+        getOptionValue={(author) => author.authorInfo.pseudonim}
+        getOptionLabel={(author) => author.authorInfo.pseudonim}
         value={
           searchParams.getAll('author').length <= 0
             ? null
@@ -112,11 +111,11 @@ export default function AuthorsFilter() {
                 return {
                   label: item,
                   value: item,
-                  author_info: { pseudonim: item },
+                  authorInfo: { pseudonim: item },
                 };
               })
         }
       />
-    </div>
+    </>
   );
 }

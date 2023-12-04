@@ -1,4 +1,4 @@
-import { AuthorTypes, CommentTypes } from './interfaces';
+import { CommentTypes } from './interfaces';
 
 export enum UserRoleTypes {
   USER = 'User',
@@ -35,3 +35,5 @@ export type PriceTypes = {
   value: string;
   currency: string;
 };
+export type ImgTargets = 'ProfileImg' | 'ProductImgs' | 'NewsImg';
+export type AddingToCartTypes = null | 'addToCart' | 'buyNow';

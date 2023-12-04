@@ -7,6 +7,7 @@ export default function RatingSummary({
   quantity,
   reviews,
 }: RatingTypes) {
+  if (!reviews) return <></>;
   const ratingComments = reviews.filter((comment) => comment.value.rating);
   const countVotes = (value: number) =>
     ratingComments.filter((comment) => comment.value.rating === value).length;

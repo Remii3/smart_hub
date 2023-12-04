@@ -35,7 +35,7 @@ const ShopDataSchema = new Schema({
   sold: { type: Boolean, required: true, default: false },
   price: {
     type: {
-      value: { type: Number, required: true },
+      value: { type: Number && String, required: true },
       currency: { type: String, required: true, default: 'USD' },
     },
   },

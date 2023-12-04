@@ -19,10 +19,10 @@ export default function ({ highestPrice }: PropsTypes) {
   };
 
   return (
-    <div className="flex flex-col justify-between gap-4 sm:flex-nowrap">
+    <div className="flex flex-col justify-between gap-2 sm:flex-nowrap">
       <fieldset>
         <Label className="font-normal">Min</Label>
-        <div className="flex flex-row rounded-md shadow">
+        <div className="flex flex-row rounded-md shadow-sm">
           <span className="flex items-center rounded-md rounded-r-none border border-input px-3 text-foreground">
             $
           </span>
@@ -42,7 +42,7 @@ export default function ({ highestPrice }: PropsTypes) {
       </fieldset>
       <fieldset>
         <Label className="font-normal">Max</Label>
-        <div className="flex flex-row rounded-md shadow">
+        <div className="flex flex-row rounded-md shadow-sm">
           <span className="flex items-center rounded-md rounded-r-none border border-input px-3 text-foreground">
             $
           </span>

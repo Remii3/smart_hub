@@ -1,3 +1,4 @@
+import LoadingCircle from '@components/Loaders/LoadingCircle';
 import { Button } from '../button';
 import {
   Dialog,
@@ -14,10 +15,12 @@ interface PropsTypes {
   deleteHandler: () => void;
   targetId?: string;
   children: React.ReactNode;
+  loadingCondition?: boolean;
 }
 
 export default function ({
   openState,
+  loadingCondition,
   openStateHandler,
   deleteHandler,
   targetId,
@@ -41,9 +44,10 @@ export default function ({
             type="button"
             variant={'destructive'}
             onClick={() => deleteHandler()}
-            className="rounded-xl"
+            className="rounded-xl relative"
           >
-            Delete
+            {loadingCondition && <LoadingCircle type="destructive" />}
+            <span className={`${loadingCondition && 'invisible'}`}>Delete</span>
           </Button>
           <Button
             variant={'outline'}

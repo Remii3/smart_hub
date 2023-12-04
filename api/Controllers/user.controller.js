@@ -1,41 +1,72 @@
-const User = require("../Models/user");
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
-const mongoose = require("mongoose");
-const Cart = require("../Models/cart");
-const getRandomString = require("../helpers/getRandomString");
+const User = require('../Models/user');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const mongoose = require('mongoose');
+const Cart = require('../Models/cart');
+const Product = require('../Models/product');
+const getRandomString = require('../helpers/getRandomString');
+const cashFormatter = require('../helpers/cashFormatter');
 const salt = bcrypt.genSaltSync(12);
-const Product = require("../Models/product");
-const cashFormatter = require("../helpers/cashFormatter");
+
+const prepareData = originalData => {
+  if (Array.isArray(originalData)) {
+    const preparedData = [...originalData];
+
+    for (let i = 0; i < originalData.length; i++) {
+      preparedData[i].price = {
+        ...preparedData[i].price,
+        value: `${cashFormatter({
+          number: preparedData[i].price.value,
+        })}`,
+      };
+    }
+    return preparedData;
+  } else {
+    const preparedData = { ...originalData };
+
+    preparedData.price = {
+      ...preparedData.price,
+      value: `${cashFormatter({
+        number: preparedData.price.value,
+      })}`,
+    };
+    return preparedData;
+  }
+};
 
 const login = async (req, res) => {
   const { email, password } = req.body;
 
-  const userDoc = await User.findOne({ email });
-  if (!userDoc)
+  const userData = await User.findOne({ email });
+  if (!userData)
     return res.status(422).json({
-      name: "email",
-      error: "No account found",
-      message: "No account found",
+      name: 'email',
+      error: 'No account found',
+      message: 'No account found',
     });
-  const passwordVerification = bcrypt.compareSync(password, userDoc.password);
+  const passwordVerification = bcrypt.compareSync(password, userData.password);
   if (!passwordVerification)
     return res.status(422).json({
-      name: "password",
-      error: "Invalid password",
-      message: "Invalid password",
+      name: 'password',
+      error: 'Invalid password',
+      message: 'Invalid password',
     });
   jwt.sign(
     {
       email,
-      user_id: userDoc._id,
+      userId: userData._id,
     },
     process.env.JWT_SECRET,
     {},
     (err, token) => {
-      if (err) throw "firts";
-      return res.status(200).cookie("token", token).json({ data: userDoc });
-    }
+      if (err) {
+        return res.status(500).json({
+          error: err.message,
+          message: 'We failed loggin you in.',
+        });
+      }
+      return res.status(200).cookie('token', token).json({ data: userData });
+    },
   );
 };
 
@@ -51,58 +82,61 @@ const register = async (req, res) => {
       email,
       username,
       password: bcrypt.hashSync(password, salt),
-      user_info: {
-        profile_img: {},
+      userInfo: {
+        profileImg: {
+          id: new mongoose.Types.ObjectId(),
+          url: 'https://firebasestorage.googleapis.com/v0/b/smarthub-75eab.appspot.com/o/static_imgs%2Fnophoto.webp?alt=media&token=a974d32e-108a-4c21-be71-de358368a167',
+        },
         credentials: {
-          first_name: credentials.firstName,
-          last_name: credentials.lastName,
-          full_name: `${credentials.firstName} ${credentials.lastName}`,
+          firstName: credentials.firstName,
+          lastName: credentials.lastName,
         },
         address: {
-          line1: "",
-          line2: "",
-          city: "",
-          state: "",
-          postal_code: "",
-          country: "",
+          line1: '',
+          line2: '',
+          city: '',
+          state: '',
+          postalCode: '',
+          country: '',
         },
-        phone: "",
+        phone: '',
       },
       cart: cartId,
       following: [],
       orders: [],
-      author_info: {
-        categories: [],
-        pseudonim: `${credentials.firstName} ${credentials.lastName}`,
-        short_description: "",
-        quote: "",
-        avg_products_grade: 0,
-        sold_books_quantity: 0,
-        my_products: [],
+      authorInfo: {
+        pseudonim: `${username}`,
+        shortDescription: '',
+        quote: '',
         followers: [],
       },
     });
 
     await Cart.create({
       _id: cartId,
-      user_id: userId,
+      userId,
       products: [],
     });
 
     jwt.sign(
       {
         email,
-        user_id: userId,
+        userId,
       },
       process.env.JWT_SECRET,
       {},
       (err, token) => {
-        if (err) throw "firts";
+        if (err) {
+          return res.status(500).json({
+            error: err.message,
+            message: 'We failed loggin you in.',
+          });
+        }
         return res
           .status(201)
-          .cookie("token", token)
-          .json({ message: "Succesfully created an account" });
-      }
+          .cookie('token', token)
+          .json({ message: 'Succesfully created an account' });
+      },
     );
   } catch (err) {
     if (err.code === 11000) {
@@ -110,109 +144,81 @@ const register = async (req, res) => {
       return res.status(422).json({
         message: Object.values(responseObject)[0] + ` already exists`,
         error: err.message,
-        name: "email",
+        name: 'email',
       });
     }
     return res
       .status(500)
-      .json({ message: "Failed to register", error: err.message });
+      .json({ message: 'Failed to register', error: err.message });
   }
 };
 
 const getMyProfile = async (req, res) => {
+  // let preparedData = {};
   try {
-    const {
-      _id,
-      email,
-      username,
-      user_info,
-      following,
-      orders,
-      role,
-      author_info,
-      security_settings,
-      news,
-    } = await User.findOne(
+    const userData = await User.findOne(
       {
-        _id: req.user.user_id,
+        _id: req.user.userId,
       },
-      { password: 0 }
-    ).populate([
-      {
-        path: "orders",
-      },
-      {
-        path: "orders",
-        populate: { path: "products.product" },
-      },
-    ]);
+      { password: 0 },
+    );
 
-    const cartData = await Cart.findOne({
-      user_id: _id,
-    });
-
-    const {
-      avg_products_grade,
-      categories,
-      followers,
-      pseudonim,
-      quote,
-      short_description,
-      sold_books_quantity,
-    } = author_info;
-
-    const userProducts = await Product.find({
-      $or: [{ authors: _id }, { "creatorData._id": _id }],
-      sold: false,
-      deleted: false,
-      quantity: { $gt: 0 },
-    }).lean();
-
-    const userProductsCopy = userProducts.map((product) => ({
-      ...product,
-      price: {
-        ...product.price,
-        value: `${cashFormatter({
-          number: product.price.value,
-        })}`,
-      },
-    }));
-
-    const preparedAuthorInfo = {
-      avg_products_grade,
-      categories,
-      followers,
-      my_products: userProductsCopy,
-      myCollections: [],
-      pseudonim,
-      quote,
-      short_description,
-      sold_books_quantity,
-      _id,
-    };
-
-    let preparedUserData = {
-      _id,
-      email,
-      username,
-      user_info,
-      following,
-      orders,
-      cart: cartData,
-      role,
-      security_settings,
-      news,
-    };
-
-    if (role !== "User") {
-      preparedAuthorInfo.myCollections = [];
-      preparedUserData.author_info = preparedAuthorInfo;
+    // const cartData = await Cart.findOne({
+    //   userId: userData._id,
+    // });
+    // preparedData = userData;
+    if (userData.role != 'User') {
+      // const userProducts = await Product.find({
+      //   $or: [{ authors: userData._id }, { 'creatorData._id': userData._id }],
+      //   sold: false,
+      //   deleted: false,
+      //   quantity: { $gt: 0 },
+      // }).lean();
+      // const userProductsCopy = userProducts.map(product => ({
+      //   ...product,
+      //   price: {
+      //     ...product.price,
+      //     value: `${cashFormatter({
+      //       number: product.price.value,
+      //     })}`,
+      //   },
+      // }));
+      // const preparedAuthorInfo = {
+      //   avg_products_grade,
+      //   categories,
+      //   followers,
+      //   my_products: userProductsCopy,
+      //   myCollections: [],
+      //   pseudonim,
+      //   quote,
+      //   short_description,
+      //   sold_books_quantity,
+      //   _id,
+      // };
+    } else {
+      // preparedData = {
+      //   _id: userData._id,
+      //   email: userData.email
+      // };
+      // let preparedUserData = {
+      //   _id,
+      //   email,
+      //   username,
+      //   user_info,
+      //   following,
+      //   orders,
+      //   cart: cartData,
+      //   role,
+      //   security_settings,
+      //   news,
+      // };
     }
-    res.status(200).json({ data: preparedUserData });
+
+    res.status(200).json({ data: userData });
   } catch (err) {
     res
       .status(500)
-      .json({ message: "Failed to fetch user data", error: err.message });
+      .json({ message: 'Failed to fetch user data', error: err.message });
   }
 };
 
@@ -220,90 +226,31 @@ const getOtherProfile = async (req, res) => {
   const { userId } = req.query;
 
   if (!userId) {
-    return res.status(422).json({ message: "user id is required" });
+    return res.status(422).json({ message: 'user id is required' });
   }
-
   try {
-    const {
-      role,
-      email,
-      username,
-      user_info,
-      author_info,
-      security_settings,
-      _id,
-    } = await User.findOne({
+    const otherUserData = await User.findOne({
       _id: userId,
-    }).populate("author_info");
+    });
 
-    const {
-      avg_products_grade,
-      categories,
-      followers,
-      pseudonim,
-      quote,
-      short_description,
-      sold_books_quantity,
-    } = author_info;
-
-    const userProducts = await Product.find({
-      $or: [{ authors: userId }, { "creatorData._id": userId }],
-      sold: false,
+    const otherUserProductsData = await Product.find({
+      $or: [{ 'creatorData._id': userId }, { authors: userId }],
       deleted: false,
+      sold: false,
       quantity: { $gt: 0 },
-    }).lean();
+    })
+      .populate(['authors', 'categories'])
+      .lean();
 
-    const userProductsCopy = userProducts.map((product) => ({
-      ...product,
-      price: {
-        ...product.price,
-        value: `${cashFormatter({
-          number: product.price.value,
-        })}`,
-      },
-    }));
+    const preparedProducts = prepareData(otherUserProductsData);
 
-    const preparedAuthorInfo = {
-      avg_products_grade,
-      categories,
-      followers,
-      my_products: userProductsCopy,
-      myCollections: [],
-      pseudonim,
-      quote,
-      short_description,
-      sold_books_quantity,
-    };
-    let preparedUserInfo = null;
-    if (!security_settings.hide_private_information) {
-      preparedUserInfo = user_info;
-    }
-    if (role !== "User") {
-      return res.status(200).json({
-        data: {
-          email,
-          _id,
-          username,
-          user_info: preparedUserInfo,
-          author_info: preparedAuthorInfo,
-          role,
-        },
-      });
-    } else {
-      return res.status(200).json({
-        data: {
-          email,
-          _id,
-          username,
-          user_info: preparedUserInfo,
-          role,
-        },
-      });
-    }
+    return res.status(200).json({
+      data: { otherUserData, otherUserProductsData: preparedProducts },
+    });
   } catch (err) {
     return res
       .status(500)
-      .json({ message: "Failed to fetch user data", error: err.message });
+      .json({ message: 'Failed to fetch user data', error: err.message });
   }
 };
 
@@ -311,21 +258,21 @@ const getGuestProfile = async (req, res) => {
   jwt.sign(
     {
       email: getRandomString(10),
-      user_id: getRandomString(15),
+      userId: getRandomString(15),
     },
     getRandomString(40),
     {},
     (err, token) => {
-      if (err) res.status(500).json({ message: "Failed to fetch guest Data" });
+      if (err) res.status(500).json({ message: 'Failed to fetch guest Data' });
       token = token.slice(token.length - 12, token.length);
-      res.status(200).cookie("guestToken", token).json("Success");
-    }
+      res.status(200).cookie('guestToken', token).json('Success');
+    },
   );
 };
 
 const getAllAuthors = async (req, res) => {
   try {
-    const authors = await User.find({ role: "Author" });
+    const authors = await User.find({ role: 'Author' });
     // const authorsData = [];
     // for (const author of authors) {
     //   authorsData.push({
@@ -339,18 +286,18 @@ const getAllAuthors = async (req, res) => {
   } catch (err) {
     return res
       .status(500)
-      .json({ message: "Failed to fetch authors", error: err.message });
+      .json({ message: 'Failed to fetch authors', error: err.message });
   }
 };
 
 const getAllAdmins = async (req, res) => {
   try {
-    const admins = await User.find({ role: "Admin" });
+    const admins = await User.find({ role: 'Admin' });
     const adminData = [];
     for (const admin of admins) {
       adminData.push({
-        label: admin.author_info.pseudonim,
-        value: admin.admin_info.pseudonim,
+        label: admin.authorInfo.pseudonim,
+        value: admin.authorInfo.pseudonim,
         _id: admin._id,
       });
     }
@@ -359,7 +306,7 @@ const getAllAdmins = async (req, res) => {
   } catch (err) {
     return res
       .status(500)
-      .json({ message: "Failed to fetch authors", error: err.message });
+      .json({ message: 'Failed to fetch authors', error: err.message });
   }
 };
 
@@ -367,26 +314,26 @@ const addOneFollow = async (req, res) => {
   const { followGiverId, followReceiverId } = req.body;
 
   if (!followGiverId) {
-    return res.status(422).json({ message: "Giver id is required" });
+    return res.status(422).json({ message: 'Giver id is required' });
   }
   if (!followReceiverId) {
-    return res.status(422).json({ message: "Receiver id is required" });
+    return res.status(422).json({ message: 'Receiver id is required' });
   }
 
   try {
     await User.updateOne(
       { _id: followGiverId },
-      { $addToSet: { following: followReceiverId } }
+      { $addToSet: { following: followReceiverId } },
     );
     await User.updateOne(
       { _id: followReceiverId },
-      { $addToSet: { "author_info.followers": followGiverId } }
+      { $addToSet: { 'authorInfo.followers': followGiverId } },
     );
-    return res.status(200).json({ message: "success" });
+    return res.status(200).json({ message: 'success' });
   } catch (err) {
     return res
       .status(500)
-      .json({ message: "Failed adding follow", error: err.message });
+      .json({ message: 'Failed adding follow', error: err.message });
   }
 };
 
@@ -394,25 +341,25 @@ const removeOneFollow = async (req, res) => {
   const { followGiverId, followReceiverId } = req.body;
 
   if (!followGiverId) {
-    return res.status(422).json({ message: "Giver id is required" });
+    return res.status(422).json({ message: 'Giver id is required' });
   }
   if (!followReceiverId) {
-    return res.status(422).json({ message: "Receiver id is required" });
+    return res.status(422).json({ message: 'Receiver id is required' });
   }
   try {
     await User.updateOne(
       { _id: followGiverId },
-      { $pull: { following: followReceiverId } }
+      { $pull: { following: followReceiverId } },
     );
     await User.updateOne(
       { _id: followReceiverId },
-      { $pull: { "author_info.followers": followGiverId } }
+      { $pull: { 'authorInfo.followers': followGiverId } },
     );
-    return res.status(200).json({ message: "success" });
+    return res.status(200).json({ message: 'success' });
   } catch (err) {
     return res
       .status(500)
-      .json({ message: "Failed removing follow", error: err.message });
+      .json({ message: 'Failed removing follow', error: err.message });
   }
 };
 
@@ -426,10 +373,10 @@ const updateOneUser = async (req, res) => {
         email: userEmail,
       },
       preparedData,
-      { upsert: true }
+      { upsert: true },
     );
 
-    return res.status(200).json({ message: "Successfully updated data" });
+    return res.status(200).json({ message: 'Successfully updated data' });
   } catch (err) {
     if (err.code === 11000) {
       return res.status(422).json({
@@ -439,7 +386,7 @@ const updateOneUser = async (req, res) => {
     } else {
       return res
         .status(500)
-        .json({ message: "Failed to update data", error: err.message });
+        .json({ message: 'Failed to update data', error: err.message });
     }
   }
 };
@@ -448,12 +395,12 @@ const deleteOneUser = async (req, res) => {
   const { userId } = req.body;
   try {
     await User.deleteOne({ _id: userId });
-    await Cart.deleteOne({ user_id: userId });
-    return res.status(200).json({ message: "Success" });
+    await Cart.deleteOne({ userId: userId });
+    return res.status(200).json({ message: 'Success' });
   } catch (err) {
     return res
       .status(500)
-      .json({ message: "Failed deleting user", error: err.message });
+      .json({ message: 'Failed deleting user', error: err.message });
   }
 };
 
@@ -462,7 +409,7 @@ const getFollowedUsers = async (req, res) => {
   const fetchedUserData = [];
 
   if (!userId) {
-    return res.status(402).json({ message: "UserId is required" });
+    return res.status(402).json({ message: 'UserId is required' });
   }
 
   try {
@@ -477,11 +424,12 @@ const getFollowedUsers = async (req, res) => {
           _id: authorsData._id,
           username: authorsData.username,
           role: authorsData.role,
-          user_info: { profile_img: authorsData.user_info.profile_img },
+          userInfo: { profileImg: authorsData.userInfo.profileImg },
         };
-        if (authorsData.role !== "User") {
-          preparedData.author_info = {
-            pseudonim: authorsData.author_info.pseudonim,
+        if (authorsData.role !== 'User') {
+          preparedData.authorInfo = {
+            pseudonim: authorsData.authorInfo.pseudonim,
+            quote: authorsData.authorInfo.quote,
           };
         }
         fetchedUserData.push(preparedData);
@@ -491,22 +439,22 @@ const getFollowedUsers = async (req, res) => {
   } catch (err) {
     return res
       .status(500)
-      .json({ message: "Failed loading followed users", error: err.message });
+      .json({ message: 'Failed loading followed users', error: err.message });
   }
 };
 
 const getFollowes = async (req, res) => {
   const { _id } = req.query;
   try {
-    const data = await User.findOne({ _id }, { "author_info.followers": 1 });
+    const data = await User.findOne({ _id }, { 'authorInfo.followers': 1 });
     if (data) {
-      return res.json({ data: data.author_info.followers });
+      return res.json({ data: data.authorInfo.followers });
     }
     return res.json({ data: data });
   } catch (err) {
     return res
       .status(500)
-      .json({ message: "Failed fetching followers.", error: error.message });
+      .json({ message: 'Failed fetching followers.', error: err.message });
   }
 };
 

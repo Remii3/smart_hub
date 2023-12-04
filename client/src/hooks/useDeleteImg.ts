@@ -1,10 +1,9 @@
+import { ImgTargets } from '@customTypes/types';
 import { storage } from '../firebase';
 import { ref, deleteObject } from 'firebase/storage';
 
-type Targets = 'Profile_img' | 'Product_imgs' | 'News_img';
-
 interface PropsTypes {
-  targetLocation: Targets;
+  targetLocation: ImgTargets;
   ownerId: string;
   imgId: string;
 }
