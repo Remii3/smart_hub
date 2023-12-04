@@ -47,7 +47,7 @@ export default function CollectionForm({
             <span>{totalQuantity}</span>
             <span className="text-muted-foreground">x</span>
           </div>
-          <div className="flex items-center">
+          <div className="flex items-center mt-2">
             <Button
               variant={'ghost'}
               type="button"
@@ -85,7 +85,7 @@ export default function CollectionForm({
               +
             </Button>
           </div>
-          <h3 className="text-[40px]">{productPrice}</h3>
+          <h3 className="text-[40px] mt-2">{productPrice}</h3>
           <div className="col-span-2 space-y-2">
             <Button
               variant="secondary"
@@ -99,9 +99,14 @@ export default function CollectionForm({
               }
               className="relative w-full"
             >
-              {cartState.isAdding === productId && <LoadingCircle />}
+              {cartState.isAdding === productId &&
+                cartState.addingToCartType === 'addToCart' && <LoadingCircle />}
               <span
-                className={`${cartState.isAdding === productId && 'invisible'}`}
+                className={`${
+                  cartState.isAdding === productId &&
+                  cartState.addingToCartType === 'addToCart' &&
+                  'invisible'
+                }`}
               >
                 Add to cart
                 <ShoppingBagIcon
@@ -123,9 +128,14 @@ export default function CollectionForm({
               }
               className="relative w-full"
             >
-              {cartState.isAdding === productId && <LoadingCircle />}
+              {cartState.isAdding === productId &&
+                cartState.addingToCartType === 'buyNow' && <LoadingCircle />}
               <span
-                className={`${cartState.isAdding === productId && 'invisible'}`}
+                className={`${
+                  cartState.isAdding === productId &&
+                  cartState.addingToCartType === 'buyNow' &&
+                  'invisible'
+                }`}
               >
                 Buy now
                 <ShoppingCartIcon

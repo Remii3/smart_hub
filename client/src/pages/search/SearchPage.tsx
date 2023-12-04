@@ -11,6 +11,8 @@ import { sortOptions, sortOptionsArray } from '@hooks/useSortProducts';
 import { Badge } from '@components/UI/badge';
 import LoadingCircle from '@components/Loaders/LoadingCircle';
 import { toast } from '@components/UI/use-toast';
+import { Button } from '@components/UI/button';
+import { AdjustmentsHorizontalIcon } from '@heroicons/react/24/outline';
 
 interface SearchedProductsDataTypes {
   products: ProductTypes[];
@@ -37,7 +39,7 @@ type FilterParams = 'phrase' | 'category' | 'author' | 'special';
 export default function SearchPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const currentSortMethod = searchParams.get('sortMethod');
-
+  const [openCollapsible, setOpenCollapsible] = useState(false);
   const [categoriesState, setCategoriesState] = useState<{
     options: CategoryTypes[];
   }>({
@@ -171,6 +173,7 @@ export default function SearchPage() {
   };
 
   const ref = useRef(document.getElementById('mainContainer'));
+  const searchef = useRef(document.getElementById('mainContainer'));
   useEffect(() => {
     if (searchedProductsData.products) {
       ref.current?.scrollIntoView({
@@ -225,7 +228,7 @@ export default function SearchPage() {
 
   return (
     <>
-      <div className="fixed left-0 flex-wrap right-0 top-16 z-10 flex w-full items-center justify-between bg-background px-4 pb-1 pt-2 md:static md:mb-2 md:px-0 md:pt-0">
+      <div className="fixed z-20 left-0 flex-wrap right-0 top-16  flex w-full items-center justify-between bg-background px-4 pb-1 pt-2 md:static md:mb-2 md:px-0 md:pt-0">
         <div>
           <span className="text-lg">
             Results:{' '}
@@ -233,12 +236,30 @@ export default function SearchPage() {
               searchedProductsData.rawData.totalProducts}
           </span>
         </div>
-        <div>
+        <div className="flex gap-2">
           <SortProducts
             category="search"
             sortOption={currentSortMethod}
             sortOptionChangeHandler={sortOptionChangeHandler}
           />
+          <Button
+            variant="ghost"
+            size={'clear'}
+            className="px-2 md:hidden"
+            onClick={() => {
+              ref.current?.scrollIntoView({
+                block: 'start',
+              });
+              setOpenCollapsible((prevState) => !prevState);
+            }}
+          >
+            <AdjustmentsHorizontalIcon
+              className={`h-7 w-7 transition ${
+                openCollapsible ? 'rotate-90' : 'rotate-0'
+              }`}
+            />
+            <span className="sr-only">Toggle search</span>
+          </Button>
         </div>
         <div className="basis-full justify-start flex flex-wrap gap-1">
           {(searchParams.get('phrase') ||
@@ -347,16 +368,17 @@ export default function SearchPage() {
         </div>
       </div>
 
-      <div className="flex flex-col justify-between gap-8 md:flex-row">
+      <div className="flex flex-col items-start justify-between gap-8 md:flex-row">
         <AdvancedFilter
           highestPrice={
             (searchedProductsData.rawData &&
               searchedProductsData.rawData.highestPrice) ||
             0
           }
+          openCollapsible={openCollapsible}
           categoriesState={categoriesState.options}
         />
-        <section className="h-full w-full space-y-2 md:pt-0">
+        <section className="h-full w-full space-y-2 md:pt-0 pt-12">
           {!searchedProductsData.isLoading &&
             searchedProductsData.products &&
             searchedProductsData.products.length === 0 && (
@@ -364,7 +386,11 @@ export default function SearchPage() {
                 No products
               </div>
             )}
-          <div className="relative h-full">
+          <div
+            className={`${
+              openCollapsible ? 'hidden' : 'block'
+            } md:block relative h-full`}
+          >
             <div className="relative grid min-h-[400px] grid-cols-1 justify-items-center gap-6 sm:grid-cols-2 sm:gap-3 lg:grid-cols-3 xl:grid-cols-4">
               {searchedProductsData.isLoading && <LoadingCircle />}
               {!searchedProductsData.isLoading &&

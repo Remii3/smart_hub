@@ -1,5 +1,6 @@
 // eslint-disable-next-line import/no-cycle
 import {
+  AddingToCartTypes,
   ImgTypes,
   MarketplaceTypes,
   PriceTypes,
@@ -129,6 +130,7 @@ export interface CartTypes {
   cartPrice: number | null;
   isLoading: boolean;
   isAdding: boolean | string;
+  addingToCartType: AddingToCartTypes;
   isIncrementing: boolean | string;
   isDecrementing: boolean | string;
   isDeleting: boolean | string;

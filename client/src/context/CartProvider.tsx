@@ -15,12 +15,14 @@ import {
   usePostAccessDatabase,
 } from '@hooks/useAaccessDatabase';
 import { DATABASE_ENDPOINTS } from '@data/endpoints';
+import { AddingToCartTypes } from '@customTypes/types';
 
 const initialState = {
   products: [],
   cartPrice: null,
   isLoading: false,
   isAdding: false,
+  addingToCartType: null,
   isIncrementing: false,
   isDecrementing: false,
   isDeleting: false,
@@ -35,9 +37,11 @@ export const CartContext = createContext<{
   addProductToCart: ({
     productId,
     productQuantity,
+    addingToCartType,
   }: {
     productId: string;
     productQuantity: number;
+    addingToCartType: AddingToCartTypes;
   }) => void;
   incrementCartItem: (productId: string) => void;
   decrementCartItem: (productId: string) => void;
@@ -68,6 +72,7 @@ export default function CartProvider({ children }: { children: ReactNode }) {
           ...prevState,
           isIncrementing: false,
           isAdding: false,
+          addingToCartType: null,
           isDecrementing: false,
           isDeleting: false,
           isLoading: false,
@@ -81,12 +86,18 @@ export default function CartProvider({ children }: { children: ReactNode }) {
     async ({
       productId,
       productQuantity,
+      addingToCartType,
     }: {
       productId: string;
       productQuantity: number;
+      addingToCartType: AddingToCartTypes;
     }) => {
       setCart((prevState) => {
-        return { ...prevState, isAdding: productId };
+        return {
+          ...prevState,
+          isAdding: productId,
+          addingToCartType: addingToCartType,
+        };
       });
       await usePostAccessDatabase({
         url: DATABASE_ENDPOINTS.CART_ADD,

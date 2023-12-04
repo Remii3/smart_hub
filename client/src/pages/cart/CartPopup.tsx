@@ -17,7 +17,20 @@ function CartPopup() {
 
       <div className="mt-4 space-y-4">
         <CartPopupProdList />
-
+        {cartState.cartPrice && (
+          <div className="mt-8 flex justify-end border-t border-gray-100 pt-8">
+            <div className="w-screen max-w-lg space-y-4">
+              <dl className="space-y-0.5 text-sm text-foreground">
+                <div className="flex justify-between !text-base font-medium">
+                  <dt className="text-xl">Total:</dt>
+                  <dd className="text-xl">
+                    {cartState && cartState.cartPrice}
+                  </dd>
+                </div>
+              </dl>
+            </div>
+          </div>
+        )}
         <div className="space-y-4 text-center">
           <PopoverClose asChild>
             <Link

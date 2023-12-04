@@ -422,6 +422,7 @@ export default function ProductPage() {
       addProductToCart({
         productId: productId,
         productQuantity: selectedQuantity,
+        addingToCartType: 'addToCart',
       });
       setSelectedQuantity(1);
     }
@@ -461,6 +462,7 @@ export default function ProductPage() {
       await addProductToCart({
         productId: productId,
         productQuantity: selectedQuantity,
+        addingToCartType: 'buyNow',
       });
       setSelectedQuantity(1);
       navigate('/checkout');
@@ -738,7 +740,9 @@ export default function ProductPage() {
                 <div className="md:max-w-[400px] flex-grow">
                   {!isEditing.isEditing && (
                     <div>
-                      <h2 className="text-4xl">{productState.data.title}</h2>
+                      <h2 className="text-4xl mb-4">
+                        {productState.data.title}
+                      </h2>
                       <section className="grid grid-cols-2 gap-2 mb-2">
                         <span>Seller:</span>
                         <div>
@@ -812,8 +816,9 @@ export default function ProductPage() {
                           totalQuantity={productState.data.quantity}
                           buyNowHandler={buyNowHandler}
                         />
-                        <span>Detailed information:</span>
-                        <div>
+
+                        <span className="mt-2">Detailed information:</span>
+                        <div className="mt-2">
                           <Button
                             variant={'link'}
                             size={'clear'}

@@ -36,3 +36,4 @@ export type PriceTypes = {
   currency: string;
 };
 export type ImgTargets = 'ProfileImg' | 'ProductImgs' | 'NewsImg';
+export type AddingToCartTypes = null | 'addToCart' | 'buyNow';
