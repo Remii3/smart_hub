@@ -1,5 +1,5 @@
 const { Schema, model } = require('mongoose');
-const ShopDataSchema = new Schema({
+const ProductSchema = new Schema({
   creatorData: {
     type: {
       _id: { type: Schema.Types.ObjectId, required: true },
@@ -43,6 +43,5 @@ const ShopDataSchema = new Schema({
   expireAt: { type: Date, expires: 0 },
 });
 
-const ShopDataModel = model('Product', ShopDataSchema);
-
-module.exports = ShopDataModel;
+const Product = model('Product', ProductSchema);
+module.exports = { ProductSchema, Product };

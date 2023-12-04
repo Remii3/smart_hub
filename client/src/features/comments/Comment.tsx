@@ -33,7 +33,7 @@ export default function Comment({
 
   const deleteCommentHandler = async (
     commentId: string,
-    value: { text: string; rating: number }
+    value: { text?: string; rating: number }
   ) => {
     const { error } = await usePostAccessDatabase({
       url: DATABASE_ENDPOINTS.COMMENT_DELETE,
@@ -109,7 +109,8 @@ export default function Comment({
         )}
       </section>
       <section className="text-foreground">
-        {parse(commentData.value.text.replaceAll('\n', '<br/>'))}
+        {commentData.value.text &&
+          parse(commentData.value.text.replaceAll('\n', '<br/>'))}
       </section>
       <Separator />
       <div>

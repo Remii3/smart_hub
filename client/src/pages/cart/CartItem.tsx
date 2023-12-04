@@ -64,10 +64,7 @@ export default function CartItem({
           )}
         </Link>
         <div className="basis-[70%]">
-          <Link
-            to={`/${productData.marketplace}/${productData._id}`}
-            className="inline-block "
-          >
+          <Link to={`/product/${productData._id}`} className="inline-block ">
             <strong className="line-clamp-1 text-lg sm:text-xl text-foreground">
               {productData.title}
             </strong>

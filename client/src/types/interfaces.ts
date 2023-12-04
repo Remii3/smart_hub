@@ -199,7 +199,7 @@ export interface CommentTypes {
   targetData: {
     _id: string;
   };
-  value: { rating: number; text: string; nickname: string };
+  value: { rating: number; text?: string; nickname: string };
   createdAt: string;
   updatedAt: string;
   productId: string;

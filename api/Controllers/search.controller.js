@@ -1,5 +1,5 @@
 const Order = require('../Models/order');
-const Product = require('../Models/product');
+const { Product } = require('../Models/product');
 const cashFormatter = require('../helpers/cashFormatter');
 
 const getHighestPrice = async pipeline => {

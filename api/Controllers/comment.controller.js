@@ -1,6 +1,6 @@
 const { default: mongoose } = require('mongoose');
 const Comment = require('../Models/comment');
-const Product = require('../Models/product');
+const { Product } = require('../Models/product');
 const News = require('../Models/news');
 const calculateAvgRating = require('../helpers/calculate/calculateAvgRating');
 

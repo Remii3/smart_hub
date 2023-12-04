@@ -1,6 +1,6 @@
 const { default: mongoose } = require('mongoose');
 const Order = require('../Models/order');
-const Product = require('../Models/product');
+const { Product } = require('../Models/product');
 const reverseCashFormatter = require('../helpers/reverseCashFormatter');
 const cashFormatter = require('../helpers/cashFormatter');
 
@@ -41,9 +41,7 @@ const getAllOrders = async (req, res) => {
   }
 
   try {
-    const orders = await Order.find({ buyerId: userId }).populate(
-      'products.product',
-    );
+    const orders = await Order.find({ buyerId: userId });
 
     const preparedData = prepareData(orders);
     return res.status(200).json({ data: preparedData });
@@ -70,9 +68,7 @@ const getOneOrder = async (req, res) => {
     const order = await Order.findOne({
       buyerId: userId,
       _id: orderId,
-    })
-      .populate('products.product')
-      .lean();
+    }).lean();
 
     const preparedData = prepareData(order);
 
@@ -94,15 +90,21 @@ const addOneOrder = async (req, res) => {
   try {
     const orderId = new mongoose.Types.ObjectId();
     let orderPrice = 0;
-    const mappedItems = items.map(item => {
-      orderPrice += Number(reverseCashFormatter({ number: item.totalPrice }));
-      return {
-        product: item.productData._id,
-        inCartQuantity: item.inCartQuantity,
-        totalPrice: reverseCashFormatter({ number: item.totalPrice }),
-      };
-    });
 
+    const mappedItems = await Promise.all(
+      items.map(async item => {
+        const fetchedItem = await Product.findOne({
+          _id: item.productData._id,
+        });
+
+        orderPrice += Number(reverseCashFormatter({ number: item.totalPrice }));
+        return {
+          product: fetchedItem,
+          inCartQuantity: item.inCartQuantity,
+          totalPrice: reverseCashFormatter({ number: item.totalPrice }),
+        };
+      }),
+    );
     await Order.create({
       _id: orderId,
       buyerId: buyerId,

@@ -63,10 +63,7 @@ export default function CartPopupItem({
           )}
         </Link>
         <div className="basis-[70%]">
-          <Link
-            to={`/${productData.marketplace}/${productData._id}`}
-            className="inline-block "
-          >
+          <Link to={`/product/${productData._id}`} className="inline-block ">
             <strong className="line-clamp-1 text-lg text-foreground">
               {productData.title}
             </strong>

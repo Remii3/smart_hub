@@ -249,13 +249,13 @@ export default function NewProduct() {
   const clearForm = (openState: boolean) => {
     setOpenDialog(openState);
     if (!openState) {
-      setStatus({ hasFailed: false, isLoading: false, isSuccess: false });
       setTimeout(() => {
+        setStatus({ hasFailed: false, isLoading: false, isSuccess: false });
         setSelectedMarketplace('shop');
         setNewDescription({ value: '', show: false });
         setSelectedImgs({ imgs: [], isDirty: false });
         reset();
-      }, 50);
+      }, 100);
     }
   };
 
