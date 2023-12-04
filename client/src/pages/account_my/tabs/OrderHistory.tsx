@@ -61,10 +61,11 @@ export default function OrderHistory() {
     if (type === 'query') {
       filtersData.query = searchbarValue;
     }
+    if (!userData.data) return;
     const { data, error } = await useGetAccessDatabase({
       url: DATABASE_ENDPOINTS.ORDER_SEARCH,
       params: {
-        userId: userData.data?._id,
+        userId: userData.data._id,
         pageSize: limit,
         filtersData,
         withPagination: true,
@@ -204,6 +205,11 @@ export default function OrderHistory() {
               ))}
           </TableBody>
         </Table>
+        {orderState.data && orderState.data.length <= 0 && (
+          <span className="text-sm text-muted-foreground px-1 inline-block pt-1">
+            Nothing to show.
+          </span>
+        )}
       </section>
       {orderState.rawData && (
         <div className="flex justify-center mt-4">

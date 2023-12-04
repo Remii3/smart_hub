@@ -143,10 +143,12 @@ const addOneOrder = async (req, res) => {
   }
 };
 const getSearchOrder = async (req, res) => {
-  let { pageSize, filtersData, withPagination } = req.query;
+  let { pageSize, filtersData, withPagination, userId } = req.query;
   const rawData = {};
   try {
-    const searchQuery = {};
+    const searchQuery = {
+      buyerId: userId,
+    };
     if (!filtersData) {
       filtersData = { page: 1 };
     }
