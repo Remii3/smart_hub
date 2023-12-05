@@ -2,9 +2,7 @@ import { Link } from 'react-router-dom';
 import { useContext } from 'react';
 import { CartContext } from '@context/CartProvider';
 import CartProdList from './CartProdList';
-import MainContainer from '@layout/MainContainer';
 import { Button, buttonVariants } from '@components/UI/button';
-import DeleteDialog from '@components/UI/dialogs/DeleteDialog';
 
 export default function CartPage() {
   const { cartState, removeProductFromCart } = useContext(CartContext);
@@ -26,6 +24,7 @@ export default function CartPage() {
               onClick={removeAllCartItemsHandler}
               variant={'outline'}
               className="text-red-400 hover:text-red-400"
+              disabled={cartState.products.length <= 0}
             >
               Remove all
             </Button>
