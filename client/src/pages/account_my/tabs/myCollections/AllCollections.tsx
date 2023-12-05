@@ -7,7 +7,7 @@ interface AllCollectionsListTypes {
   collections: ProductTypes[];
   page: number;
   totalPages?: number;
-  onPageChange: React.Dispatch<React.SetStateAction<number>>;
+  onPageChange: (newPage: number) => void;
 }
 
 export default function AllCollectionsList({

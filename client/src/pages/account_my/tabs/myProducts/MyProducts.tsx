@@ -1,4 +1,4 @@
-import { useCallback, useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { UserContext } from '@context/UserProvider';
 import { Button } from '@components/UI/button';
 import {
@@ -55,7 +55,7 @@ export default function MyProducts() {
   const [searchbarValue, setSearchbarValue] = useState('');
 
   const [page, setPage] = useState(1);
-  const allLimit = 2;
+  const allLimit = 8;
 
   const fetchAllDataQuantity = async () => {
     if (!userData.data) return;
