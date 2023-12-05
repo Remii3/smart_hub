@@ -172,7 +172,10 @@ const getSearchOrder = async (req, res) => {
       searchQuery._id = filtersData.query;
     }
 
-    const data = await Order.find(searchQuery).limit(pageSize).skip(skipPages);
+    const data = await Order.find(searchQuery)
+      .sort({ createdAt: -1 })
+      .limit(pageSize)
+      .skip(skipPages);
 
     if (withPagination) {
       const totalDocuments = await Order.find(searchQuery).countDocuments();

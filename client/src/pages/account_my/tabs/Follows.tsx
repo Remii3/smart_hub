@@ -65,7 +65,7 @@ export default function Follows() {
   return (
     <>
       <h4 className="mb-4">Following</h4>
-      <div className="px-1 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+      <div className="px-1 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {!followedUsers.isLoading &&
           followedUsers.data &&
           followedUsers.data.length <= 0 && (
@@ -82,12 +82,12 @@ export default function Follows() {
                   <img
                     src={followedUser.userInfo.profileImg.url}
                     alt="profile_img"
-                    height={80}
-                    width={80}
-                    className="aspect-square object-cover rounded-l-md"
+                    height={100}
+                    width={100}
+                    className="object-cover h-full aspect-[4/3] rounded-l-md"
                   />
                 </Link>
-                <div className="my-1">
+                <div className="my-1 flex-grow">
                   <Link
                     to={`/account/${followedUser._id}`}
                     className="block line-clamp-1"
@@ -96,9 +96,9 @@ export default function Follows() {
                       ? followedUser.authorInfo.pseudonim
                       : followedUser.username}
                   </Link>
-                  <span className="text-muted-foreground block line-clamp-1 text-sm">
+                  <div className="text-muted-foreground line-clamp-1 text-sm">
                     {followedUser.authorInfo.quote}
-                  </span>
+                  </div>
                 </div>
               </div>
 
