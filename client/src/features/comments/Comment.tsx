@@ -12,8 +12,9 @@ import parse from 'html-react-parser';
 import { UserRoleTypes } from '@customTypes/types';
 import DeleteDialog from '@components/UI/dialogs/DeleteDialog';
 import { Separator } from '@components/UI/separator';
-import { Button } from '@components/UI/button';
+import { Button, buttonVariants } from '@components/UI/button';
 import { TrashIcon } from '@radix-ui/react-icons';
+import { Link } from 'react-router-dom';
 
 export interface CommentPropsTypes extends CommentsPropsTypes {
   commentData: CommentTypes;
@@ -79,9 +80,14 @@ export default function Comment({
               <AvatarFallback>Test2</AvatarFallback>
             </Avatar>
           )}
-          <span className="text-lg font-semibold">
+          <Link
+            to={`/account/${commentData.creatorData._id}`}
+            className={`${buttonVariants({
+              variant: 'link',
+            })} text-lg font-semibold`}
+          >
             {commentData.value.nickname}
-          </span>
+          </Link>
           {starRating && commentData.value.rating > 0 && (
             <StarRating rating={commentData.value.rating} showOnly />
           )}

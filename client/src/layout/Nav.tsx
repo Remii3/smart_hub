@@ -246,13 +246,13 @@ export default function Nav({ scrollFlag }: { scrollFlag: boolean }) {
                   <Suspense fallback={<LoadingCircle />}>
                     {userData.data ? (
                       userData.data.userInfo.profileImg.url ? (
-                        <div className="h-8 w-8">
-                          <img
-                            src={userData.data.userInfo.profileImg.url}
-                            className="h-8 w-8 rounded-full object-cover"
-                            alt="profile_img"
-                          />
-                        </div>
+                        <img
+                          src={userData.data.userInfo.profileImg.url}
+                          height={32}
+                          width={32}
+                          className="h-8 w-8 rounded-full aspect-square object-cover"
+                          alt="profile_img"
+                        />
                       ) : (
                         <SolidUserIcon className={`h-8 w-8`} />
                       )
