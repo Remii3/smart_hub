@@ -61,7 +61,7 @@ export default function Comment({
   };
   return (
     <Card className="p-4 space-y-4">
-      <section className="flex justify-between">
+      <section className="flex justify-between flex-wrap">
         <div className="flex gap-2 items-center">
           {commentData.creatorData.userInfo.profileImg.url ? (
             <Avatar>

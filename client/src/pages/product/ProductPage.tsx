@@ -540,17 +540,19 @@ export default function ProductPage() {
                   </Button>
                 </div>
               )}
-              <Breadcrumb
-                pathStops={[
-                  {
-                    name: productState.data.marketplace,
-                    path: `/${productState.data.marketplace}`,
-                  },
-                  { name: productState.data.title },
-                ]}
-              />
+              <div className="mb-4">
+                <Breadcrumb
+                  pathStops={[
+                    {
+                      name: productState.data.marketplace,
+                      path: `/${productState.data.marketplace}`,
+                    },
+                    { name: productState.data.title },
+                  ]}
+                />
+              </div>
 
-              <div className="flex gap-2 mb-2 justify-between flex-col md:flex-row">
+              <div className="flex gap-2 mb-2 justify-between items-start flex-col md:flex-row">
                 <div>
                   <div className="max-w-screen md:max-w-sm lg:max-w-xl xl:max-w-3xl 2xl:max-w-4xl w-full">
                     {isEditing.isEditing && (
@@ -566,7 +568,7 @@ export default function ProductPage() {
                               key={item.id}
                               id={item.id}
                               alt="Product preview remove img."
-                              className="aspect-[4/3] w-full rounded-md object-cover brightness-[40%] transition group-hover:brightness-[20%]"
+                              className="aspect-[4/3] w-full rounded-md object-cover object-center brightness-[40%] transition group-hover:brightness-[20%]"
                               src={item.url}
                             />
                           </div>
@@ -596,7 +598,7 @@ export default function ProductPage() {
                               <SwiperSlide key={el.id} className="relative">
                                 <Dialog>
                                   {isEditing.isEditing && (
-                                    <Label className="group absolute left-0 top-0 z-20 block h-full w-full cursor-pointer ">
+                                    <label className="group absolute left-0 top-0 z-20 block h-full w-full cursor-pointer ">
                                       <Input
                                         name="file"
                                         accept=".jpg, .jpeg, .png"
@@ -615,19 +617,19 @@ export default function ProductPage() {
                                           isEditing.isEditing
                                             ? 'w-full brightness-50 transition-[filter] group-hover:brightness-[25%]'
                                             : ''
-                                        } aspect-[4/3] rounded-md object-cover`}
+                                        } aspect-4/3 w-full h-full rounded-md object-cover object-center`}
                                       />
 
                                       <PlusCircleIcon className="absolute left-1/2 top-1/2 z-10 h-24 w-24 -translate-x-1/2 -translate-y-1/2 transform text-slate-300 opacity-95 brightness-95 transition-[opacity,filter] group-hover:opacity-100 group-hover:brightness-100" />
-                                    </Label>
+                                    </label>
                                   )}
 
-                                  <DialogTrigger className="block">
+                                  <DialogTrigger className="block w-full">
                                     <img
                                       src={el.url}
                                       key={el.id}
                                       alt="product_img"
-                                      className={`aspect-[4/3] rounded-md object-cover`}
+                                      className={`aspect-[4/3] w-full rounded-md object-cover object-center`}
                                     />
                                   </DialogTrigger>
                                   <DialogContent className="w-screen max-w-[100vw] p-0 sm:w-auto sm:max-w-3xl">
@@ -657,7 +659,7 @@ export default function ProductPage() {
                                                 alt={
                                                   'Preview: ' + nestedImgs.id
                                                 }
-                                                className="aspect-[16/10] h-full w-full object-cover"
+                                                className="aspect-[4/3] h-full w-full object-cover object-center"
                                               />
                                             </div>
                                           </SwiperSlide>
@@ -691,13 +693,13 @@ export default function ProductPage() {
                               <img
                                 src={image.url}
                                 alt={`Thumb ${image.id}`}
-                                className="aspect-square cursor-pointer rounded-md object-cover"
+                                className="aspect-[4/3] cursor-pointer rounded-md object-cover object-center"
                               />
                             </SwiperSlide>
                           ))}
                           {isEditing.isEditing && (
                             <SwiperSlide>
-                              <div className="relative aspect-square rounded-md object-cover">
+                              <div className="relative aspect-[4/3] rounded-md object-cover">
                                 <Label className="absolute left-0 top-0 block h-full w-full">
                                   <Input
                                     name="file"
@@ -741,14 +743,14 @@ export default function ProductPage() {
                             'https://firebasestorage.googleapis.com/v0/b/smarthub-75eab.appspot.com/o/static_imgs%2Fnophoto.webp?alt=media&token=a974d32e-108a-4c21-be71-de358368a167'
                           }
                           alt="product_img"
-                          className="aspect-[4/3] rounded-md object-cover"
+                          className="aspect-[4/3] rounded-md object-cover object-center"
                         />
                       </div>
                     )}
                   </div>
                 </div>
 
-                <div className="md:max-w-[400px] flex-grow">
+                <div className="md:max-w-[400px] flex-grow sticky top-[68px]">
                   {!isEditing.isEditing && (
                     <div>
                       <h2 className="text-4xl mb-4">

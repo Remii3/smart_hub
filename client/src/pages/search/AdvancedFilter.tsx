@@ -38,7 +38,7 @@ export default function AdvancedFilter({
     setSearchParams(searchParams, { replace: true });
   };
   const clearSelectedRating = () => {
-    searchParams.set('rating', '5');
+    searchParams.set('rating', '0');
     setSearchParams(searchParams, { replace: true });
   };
   const clearSelectedCategories = () => {
@@ -49,12 +49,17 @@ export default function AdvancedFilter({
     searchParams.delete('author');
     setSearchParams(searchParams, { replace: true });
   };
+  const clearPhrase = () => {
+    searchParams.delete('phrase');
+    setSearchParams(searchParams, { replace: true });
+  };
   const clearAll = () => {
     clearSelectedMarketplace();
     clearSelectedPriceRange();
     clearSelectedRating();
     clearSelectedCategories();
     clearSelectedAuthors();
+    clearPhrase();
   };
   return (
     <>

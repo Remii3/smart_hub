@@ -72,7 +72,6 @@ const getOneNews = async (req, res) => {
     const comments = await Comment.find({ 'targetData._id': newsData._id })
       .populate('creatorData')
       .lean();
-
     const creatorData = newsData.creatorData;
 
     const preparedData = {
@@ -80,7 +79,7 @@ const getOneNews = async (req, res) => {
       comments,
       creatorData: {
         _id: creatorData._id,
-        pseudonim: creatorData.author_info.pseudonim,
+        pseudonim: creatorData.authorInfo.pseudonim,
         profileImg: creatorData.userInfo.profileImg,
       },
     };

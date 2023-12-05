@@ -214,7 +214,7 @@ export default function SearchPage() {
       }
 
       if (!searchRating) {
-        searchParams.set('rating', '5');
+        searchParams.set('rating', '0');
       }
       if (!searchPage) {
         searchParams.set('page', '1');

@@ -366,7 +366,6 @@ const removeOneFollow = async (req, res) => {
 const updateOneUser = async (req, res) => {
   const { userEmail } = req.body;
   const preparedData = req.preparedData;
-
   try {
     await User.updateOne(
       {

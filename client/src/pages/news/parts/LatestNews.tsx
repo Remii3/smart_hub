@@ -78,6 +78,9 @@ export default function LatestNews({
                       <div className="line-clamp-2 text-gray-200 lg:text-foreground/25">
                         {item.subtitle}
                       </div>
+                      <div className="line-clamp-2 text-white lg:text-foreground">
+                        {item.shortDescription}
+                      </div>
                     </div>
                   </section>
                   <section className="h-[40vh] basis-[100%] lg:basis-1/2">

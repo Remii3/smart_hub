@@ -232,7 +232,7 @@ export default function Nav({ scrollFlag }: { scrollFlag: boolean }) {
               <PopoverContent
                 className={`${
                   !scrollFlag && 'rounded-t-none'
-                } relative mt-3 w-screen max-w-full bg-background px-6 py-8 sm:px-6 md:max-w-lg lg:px-6`}
+                } relative mt-3 w-screen max-w-full bg-background px-6 py-8 sm:px-6 md:max-w-lg lg:px-6 `}
               >
                 <CartPopup />
               </PopoverContent>

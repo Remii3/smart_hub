@@ -33,6 +33,8 @@ import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import { Textarea } from '@components/UI/textarea';
 import { PlusCircleIcon } from '@heroicons/react/24/outline';
 import { Label } from '@components/UI/label';
+import { Card } from '@components/UI/card';
+import { Switch } from '@components/UI/switch';
 
 interface PropsTypes {
   updateAllNews: () => void;
@@ -52,7 +54,10 @@ export default function NewNews({
   const [selectedImg, setSelectedImg] = useState<null | FileList>(null);
   const [openedDialog, setOpenedDialog] = useState(false);
   const [readyToShow, setReadyToShow] = useState(false);
-  const [contentData, setContentData] = useState('');
+  const [newDescription, setNewDescription] = useState({
+    value: '',
+    show: false,
+  });
   const { userData } = useContext(UserContext);
   const [pushStatus, setPushStatus] = useState<FetchDataTypes>({
     hasError: null,
@@ -84,7 +89,7 @@ export default function NewNews({
       url: DATABASE_ENDPOINTS.NEWS_ONE,
       body: {
         creatorData: userData.data._id,
-        content: contentData,
+        content: newDescription.value,
         ...dirtyData,
       },
     });
@@ -113,7 +118,7 @@ export default function NewNews({
     setTimeout(() => {
       setPushStatus({ hasError: null, isLoading: false });
       setSelectedImg(null);
-      setContentData('');
+      setNewDescription({ value: '', show: false });
       form.reset();
     }, 100);
   };
@@ -123,7 +128,7 @@ export default function NewNews({
       setReadyToShow(false);
       setPushStatus({ hasError: null, isLoading: false });
       setSelectedImg(null);
-      setContentData('');
+      setNewDescription({ value: '', show: false });
       form.reset();
     }, 100);
   };
@@ -233,21 +238,40 @@ export default function NewNews({
 
                   <FormMessage />
                 </FormItem>
-                {readyToShow && (
-                  <div className="">
+                <div className="space-y-2">
+                  <Label>Additional data</Label>
+                  <div>
+                    <Card className="inline-block">
+                      <Label
+                        className="p-3 flex gap-1 items-center"
+                        htmlFor="descriptionNewSwitch"
+                      >
+                        Description
+                        <Switch
+                          id="descriptionNewSwitch"
+                          onCheckedChange={(checked: boolean) =>
+                            setNewDescription((prevState) => {
+                              return { ...prevState, show: checked };
+                            })
+                          }
+                        />
+                      </Label>
+                    </Card>
+                  </div>
+                  {newDescription.show && (
                     <CKEditor
                       editor={ClassicEditor}
-                      data={contentData}
+                      data={newDescription.value}
                       config={{
-                        mediaEmbed: { previewsInData: true },
                         toolbar: {
                           shouldNotGroupWhenFull: true,
                           items: [
-                            'heading',
+                            'undo',
+                            'redo',
                             '|',
                             'bold',
                             'italic',
-                            'mediaEmbed',
+                            '|',
                             'bulletedList',
                             'numberedList',
                             '|',
@@ -255,19 +279,16 @@ export default function NewNews({
                             'indent',
                             '|',
                             'blockQuote',
-                            'insertTable',
-                            'undo',
-                            'redo',
                           ],
                         },
                       }}
                       onChange={(event, editor) => {
                         const data = editor.getData();
-                        setContentData(data);
+                        setNewDescription({ show: true, value: data });
                       }}
                     />
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
 
               <DialogFooter>

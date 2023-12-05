@@ -187,14 +187,14 @@ export default function NewsArticle({
         <div
           className={`${
             articleData.isLoading ? 'invisible' : 'visible'
-          } relative`}
+          } relative space-y-4`}
         >
           <Form {...form}>
             <form onSubmit={form.handleSubmit(uploadNewDataHandler)}>
               {userData.data &&
                 (userData.data._id === articleData.data.creatorData._id ||
                   userData.data.role === UserRoleTypes.ADMIN) && (
-                  <div className="mb-4 space-x-2 bg-white">
+                  <div className="mb-4 flex gap-2 bg-white">
                     <DeleteDialog
                       deleteHandler={() => deleteArticleHandler(newsId)}
                       openState={openedDialog}

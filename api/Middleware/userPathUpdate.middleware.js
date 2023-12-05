@@ -89,7 +89,7 @@ const userPathUpdate = (req, res, next) => {
       'userInfo.profileImg': dirtyData.profileImg,
     };
   }
-  if (dirtyData.selectedOptionName) {
+  if (dirtyData.selectedOptionName !== undefined) {
     preparedData['$set'] = {
       ...preparedData['$set'],
       'securitySettings.hidePrivateInformation': dirtyData.selectedOptionName,
