@@ -1,4 +1,10 @@
-import { useContext, useState, useEffect, ChangeEvent } from 'react';
+import {
+  useContext,
+  useState,
+  useEffect,
+  ChangeEvent,
+  useCallback,
+} from 'react';
 import { UserContext } from '@context/UserProvider';
 import { Button, buttonVariants } from '@components/UI/button';
 import { Input } from '@components/UI/input';
@@ -21,12 +27,20 @@ import errorToast from '@components/UI/error/errorToast';
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
 import { Textarea } from '@components/UI/textarea';
 import LoadingCircle from '@components/Loaders/LoadingCircle';
-import { FetchDataTypes } from '@customTypes/interfaces';
 import useUploadImg from '@hooks/useUploadImg';
 import { PlusCircleIcon, XCircleIcon } from '@heroicons/react/24/outline';
 import { Label } from '@components/UI/label';
 import { v4 } from 'uuid';
 import useDeleteImg from '@hooks/useDeleteImg';
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@components/UI/select';
+import { availableCountries } from '@data/countries';
 
 type SelectedProfileImgTypes = {
   isDirty: boolean;
@@ -77,7 +91,6 @@ const phoneFormSchema = z.object({
     })
     .optional(),
 });
-
 const addressFormSchema = z.object({
   line1: z.string().optional(),
   line2: z.string().optional(),
@@ -100,6 +113,10 @@ const shortDescriptionFormSchema = z.object({
 });
 
 export default function EditUserData() {
+  const [countries, setCountries] = useState<{ code: string; name?: string }[]>(
+    []
+  );
+
   const [openDialog, setOpenDialog] = useState<null | NewDataNameTypes>(null);
   const [isUpdating, setIsUpdating] = useState(false);
   const [selectedProfileImg, setSelectedProfileImg] =
@@ -328,7 +345,18 @@ export default function EditUserData() {
       });
     }
   }, [openDialog]);
+  const prepareCountry = new Intl.DisplayNames(['en'], { type: 'region' });
 
+  const fetchCountries = useCallback(async () => {
+    const preparedCountries = availableCountries.map((country: string) => ({
+      code: country,
+      name: prepareCountry.of(country),
+    }));
+    setCountries(preparedCountries);
+  }, []);
+  useEffect(() => {
+    fetchCountries();
+  }, []);
   return (
     <>
       <h4 className="mb-4">My data</h4>
@@ -905,7 +933,9 @@ export default function EditUserData() {
                         userData.data.userInfo.address.postalCode + ' / '
                       }${
                         userData.data.userInfo.address.country &&
-                        userData.data.userInfo.address.country
+                        prepareCountry.of(
+                          userData.data.userInfo.address.country
+                        )
                       }`}
                     />
                   </fieldset>
@@ -1013,11 +1043,42 @@ export default function EditUserData() {
                                 control={addressForm.control}
                                 name="country"
                                 render={({ field }) => (
-                                  <FormItem className="flex-grow">
+                                  <FormItem className="flex-grow w-full">
                                     <FormLabel>Country</FormLabel>
-                                    <FormControl>
-                                      <Input type="text" {...field} />
-                                    </FormControl>
+                                    <Select
+                                      onValueChange={(newValue) =>
+                                        field.onChange(newValue)
+                                      }
+                                      defaultValue={field.value}
+                                    >
+                                      <FormControl>
+                                        <SelectTrigger>
+                                          <SelectValue
+                                            placeholder={
+                                              userData.data?.userInfo.address
+                                                .country
+                                                ? prepareCountry.of(
+                                                    userData.data?.userInfo
+                                                      .address.country
+                                                  )
+                                                : 'Select a country'
+                                            }
+                                          />
+                                        </SelectTrigger>
+                                      </FormControl>
+                                      <SelectContent className="max-h-[25vh]">
+                                        <SelectGroup>
+                                          {countries.map((country) => (
+                                            <SelectItem
+                                              key={country.code}
+                                              value={country.code}
+                                            >
+                                              {country.name}
+                                            </SelectItem>
+                                          ))}
+                                        </SelectGroup>
+                                      </SelectContent>
+                                    </Select>
                                     <FormDescription>
                                       Change your country.
                                     </FormDescription>
