@@ -71,6 +71,7 @@ import MarketplaceBadge from '@components/UI/badges/MarketplaceBadge';
 import { TrashIcon } from '@radix-ui/react-icons';
 import RatingSummary from '@features/comments/RatingSummary';
 import { Separator } from '@components/UI/separator';
+import Breadcrumb from '@components/breadcrumbs/Breadcrumb';
 
 interface ProductTypesLocal extends FetchDataTypes {
   data: null | ProductTypes;
@@ -539,6 +540,16 @@ export default function ProductPage() {
                   </Button>
                 </div>
               )}
+              <Breadcrumb
+                pathStops={[
+                  {
+                    name: productState.data.marketplace,
+                    path: `/${productState.data.marketplace}`,
+                  },
+                  { name: productState.data.title },
+                ]}
+              />
+
               <div className="flex gap-2 mb-2 justify-between flex-col md:flex-row">
                 <div>
                   <div className="max-w-screen md:max-w-sm lg:max-w-xl xl:max-w-3xl 2xl:max-w-4xl w-full">
