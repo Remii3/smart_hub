@@ -80,7 +80,7 @@ export default function CartItem({
                 type="button"
                 className={`${
                   (!(inCartQuantity > 1) || isBusy) && 'text-slate-800'
-                } max-h-9 text-base rounded-xl`}
+                } max-h-9 text-base rounded-md`}
                 disabled={!(inCartQuantity > 1) || isBusy}
                 onClick={() => decrementHandler()}
                 aria-label="Decrement item in your cart."
@@ -98,7 +98,7 @@ export default function CartItem({
                 readOnly
                 disabled
                 id="popupCartProductQuantity"
-                className="w-[60px] rounded-xl text-center text-sm text-foreground [-moz-appearance:_textfield] focus:outline-none [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none"
+                className="w-[60px] rounded-md text-center text-sm text-foreground [-moz-appearance:_textfield] focus:outline-none [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none"
               />
               <Button
                 variant={'ghost'}
@@ -106,7 +106,7 @@ export default function CartItem({
                 className={`${
                   (inCartQuantity >= productData.quantity || isBusy) &&
                   'text-gray-800'
-                } max-h-9 text-base rounded-xl`}
+                } max-h-9 text-base rounded-md`}
                 disabled={inCartQuantity >= productData.quantity || isBusy}
                 onClick={() => incrementHandler()}
                 aria-label="Increment item in your cart."
@@ -124,7 +124,7 @@ export default function CartItem({
         size={'sm'}
         className={`${
           !isBusy && ' hover:text-red-400'
-        } text-red-400 rounded-xl`}
+        } text-red-400 rounded-md`}
         disabled={isBusy}
         onClick={() => removeHandler()}
         aria-label="Remove item from your cart."

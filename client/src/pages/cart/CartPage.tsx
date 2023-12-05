@@ -4,9 +4,15 @@ import { CartContext } from '@context/CartProvider';
 import CartProdList from './CartProdList';
 import MainContainer from '@layout/MainContainer';
 import { Button, buttonVariants } from '@components/UI/button';
+import DeleteDialog from '@components/UI/dialogs/DeleteDialog';
 
 export default function CartPage() {
-  const { cartState } = useContext(CartContext);
+  const { cartState, removeProductFromCart } = useContext(CartContext);
+
+  const removeAllCartItemsHandler = () => {
+    removeProductFromCart('all');
+  };
+
   return (
     <div className="mx-auto max-w-screen-xl">
       <div className="mx-auto max-w-3xl">
@@ -15,6 +21,15 @@ export default function CartPage() {
         </header>
 
         <div className="mt-8">
+          <div className="flex justify-end mb-2">
+            <Button
+              onClick={removeAllCartItemsHandler}
+              variant={'outline'}
+              className="text-red-400 hover:text-red-400"
+            >
+              Remove all
+            </Button>
+          </div>
           <CartProdList />
           <div className="mt-8 flex justify-end border-t border-gray-100 pt-8">
             <div className="w-screen max-w-lg space-y-4">
