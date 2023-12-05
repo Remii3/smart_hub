@@ -29,7 +29,7 @@ export default function Admin() {
   const { userData } = useContext(UserContext);
   const limit = 10;
 
-  const fetchData = useCallback(async () => {
+  const fetchData = async ({ newPage }: { newPage?: number }) => {
     setAllUsers((prevState) => {
       return { ...prevState, isLoading: true };
     });
@@ -37,7 +37,7 @@ export default function Admin() {
     const { data, error } = await useGetAccessDatabase({
       url: DATABASE_ENDPOINTS.ADMIN_SEARCH_USERS,
       params: {
-        page,
+        page: newPage || page,
         pageSize: limit,
       },
     });
@@ -54,13 +54,15 @@ export default function Admin() {
       hasError: null,
       isLoading: false,
     });
-  }, [page]);
+  };
 
   useEffect(() => {
-    fetchData();
-  }, [page]);
-
-  if (!userData.data) return <div>Please log in</div>;
+    fetchData({ newPage: 1 });
+  }, []);
+  const pageChangeHandler = (newPage: number) => {
+    fetchData({ newPage });
+    setPage(newPage);
+  };
   return (
     <div className="sm:px-3">
       <h4 className="mb-4">Users</h4>
@@ -85,7 +87,9 @@ export default function Admin() {
             <Pagination
               totalCount={allUsers.rawData.quantity}
               currentPage={page}
-              onPageChange={(newPageNumber: number) => setPage(newPageNumber)}
+              onPageChange={(newPageNumber: number) =>
+                pageChangeHandler(newPageNumber)
+              }
               pageSize={limit}
               siblingCount={1}
             />

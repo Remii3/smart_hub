@@ -12,7 +12,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '../../../../components/UI/accordion';
-import { AuthorTypes } from '../../../../types/interfaces';
+import { AuthorTypes, PostDataTypes } from '../../../../types/interfaces';
 import { Link } from 'react-router-dom';
 import { Button } from '../../../../components/UI/button';
 import { Input } from '../../../../components/UI/input';
@@ -27,7 +27,7 @@ import {
 } from '@components/UI/select';
 import { USER_ROLES, UserRoleTypes } from '@customTypes/types';
 import { Textarea } from '@components/UI/textarea';
-import { ChangeEvent, useEffect, useState } from 'react';
+import { ChangeEvent, useCallback, useEffect, useState } from 'react';
 import { PlusCircleIcon } from '@heroicons/react/24/outline';
 import useUploadImg from '@hooks/useUploadImg';
 import { usePostAccessDatabase } from '@hooks/useAaccessDatabase';
@@ -43,6 +43,7 @@ import {
 } from '@components/UI/dialog';
 import { DialogClose } from '@radix-ui/react-dialog';
 import useDeleteImg from '@hooks/useDeleteImg';
+import LoadingCircle from '@components/Loaders/LoadingCircle';
 
 export default function AdminTabs({
   user,
@@ -51,10 +52,15 @@ export default function AdminTabs({
 }: {
   user: AuthorTypes;
   userData: AuthorTypes | null;
-  fetchData: () => void;
+  fetchData: ({}) => void;
 }) {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const { toast } = useToast();
+  const [updateUserStatus, setUpdateUserStatus] = useState<PostDataTypes>({
+    hasError: null,
+    isLoading: false,
+    isSuccess: false,
+  });
   const [currentRole, setCurrentRole] = useState(user.role);
   const adminSchema = z.object({
     admin: z.array(
@@ -75,7 +81,9 @@ export default function AdminTabs({
   });
   const form = useForm({
     resolver: zodResolver<typeof adminSchema>(adminSchema),
-    defaultValues: {
+  });
+  const resetUserData = useCallback(() => {
+    form.reset({
       admin: [
         {
           username: user.username,
@@ -91,8 +99,13 @@ export default function AdminTabs({
           profileImg: user.userInfo.profileImg,
         },
       ],
-    },
-  });
+    });
+  }, [user]);
+
+  useEffect(() => {
+    resetUserData();
+  }, [user]);
+
   type SelectedImgsTypes = {
     id: string | null;
     data: File | null;
@@ -110,45 +123,13 @@ export default function AdminTabs({
     });
   };
   const { fields } = useFieldArray({ name: 'admin', control: form.control });
+
   const [selectedImgs, setSelectedImgs] = useState<SelectedImgsTypes>({
     data: null,
     id: user.userInfo.profileImg.id || null,
     url: user.userInfo.profileImg.url || null,
     isDeleted: false,
   });
-
-  const editedCheck = () => {
-    const {
-      email,
-      firstName,
-      lastName,
-      password,
-      phone,
-      pseudonim,
-      quote,
-      role,
-      shortDescription,
-      username,
-    } = form.getValues('admin')[0];
-    if (
-      email !== user.email ||
-      firstName !== user.userInfo.credentials.firstName ||
-      lastName !== user.userInfo.credentials.lastName ||
-      password ||
-      phone !== user.userInfo.phone ||
-      selectedImgs.data ||
-      selectedImgs.isDeleted ||
-      pseudonim !== user.authorInfo.pseudonim ||
-      quote !== user.authorInfo.quote ||
-      role !== user.role ||
-      shortDescription !== user.authorInfo.shortDescription ||
-      username !== user.username
-    ) {
-      return true;
-    } else {
-      return false;
-    }
-  };
 
   const onImageChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -161,11 +142,22 @@ export default function AdminTabs({
       });
     }
   };
-  const updateDataHandler = async (
-    formResponse: z.infer<typeof adminSchema>
-  ) => {
-    const response = formResponse.admin[0];
 
+  const updateDataHandler = async () => {
+    let dirtyData = {};
+    if (form.formState.dirtyFields.admin) {
+      dirtyData = Object.fromEntries(
+        Object.keys(form.formState.dirtyFields.admin[0]).map((x: string) => {
+          return [
+            x,
+            form.getValues(`admin[0].${x}` as keyof z.infer<typeof formSchema>),
+          ];
+        })
+      );
+    }
+    setUpdateUserStatus((prevState) => {
+      return { ...prevState, isLoading: true };
+    });
     if (selectedImgs.data) {
       const uploadData = await useUploadImg({
         ownerId: user._id,
@@ -174,7 +166,7 @@ export default function AdminTabs({
         currentId: user.userInfo.profileImg.id,
       });
       if (uploadData) {
-        response.profileImg = uploadData;
+        dirtyData.profileImg = uploadData;
       }
     } else if (selectedImgs.isDeleted) {
       await useDeleteImg({
@@ -182,12 +174,12 @@ export default function AdminTabs({
         ownerId: user._id,
         targetLocation: 'ProfileImg',
       });
-      response.profileImg = { _id: response.profileImg._id };
+      dirtyData.profileImg = { _id: user.userInfo.profileImg.id };
     }
 
     const { error } = await usePostAccessDatabase({
       url: DATABASE_ENDPOINTS.USER_UPDATE,
-      body: { userEmail: user.email, fieldKey: null, fieldValue: response },
+      body: { _id: user._id, dirtyData },
     });
     if (error) {
       return toast({
@@ -196,7 +188,10 @@ export default function AdminTabs({
         description: 'Failed adding profile img',
       });
     }
-    fetchData();
+    setUpdateUserStatus((prevState) => {
+      return { ...prevState, isLoading: false };
+    });
+    fetchData({});
     setSelectedImgs((prevState) => {
       return {
         data: null,
@@ -218,7 +213,7 @@ export default function AdminTabs({
         description: 'Failed deleting user',
       });
     }
-    fetchData();
+    fetchData({});
   };
 
   return (
@@ -244,10 +239,23 @@ export default function AdminTabs({
                 <div
                   className={`absolute right-0 top-0 flex flex-col-reverse gap-3 py-2 sm:flex-row`}
                 >
-                  {editedCheck() && (
+                  {(form.formState.isDirty ||
+                    selectedImgs.data ||
+                    selectedImgs.isDeleted) && (
                     <>
-                      <Button variant={'default'} type="submit">
-                        Submit
+                      <Button
+                        variant={'default'}
+                        type="submit"
+                        className="relative"
+                      >
+                        {updateUserStatus.isLoading && <LoadingCircle />}
+                        <span
+                          className={`${
+                            updateUserStatus.isLoading && 'invisible'
+                          }`}
+                        >
+                          Update
+                        </span>
                       </Button>
                       <Button
                         variant={'ghost'}
@@ -370,11 +378,7 @@ export default function AdminTabs({
                             <FormItem className="col-span-1">
                               <FormLabel>Email</FormLabel>
                               <FormControl>
-                                <Input
-                                  type="text"
-                                  placeholder={user.email}
-                                  {...field}
-                                />
+                                <Input type="text" {...field} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -488,65 +492,55 @@ export default function AdminTabs({
                           )}
                         />
                       </div>
-                      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
-                        <FormField
-                          name={`admin.${index}.pseudonim`}
-                          control={form.control}
-                          render={({ field }) => (
-                            <FormItem className="col-span-1">
-                              <FormLabel>Pseudonim</FormLabel>
-                              <FormControl>
-                                <Input
-                                  type="text"
-                                  {...field}
-                                  placeholder={
-                                    user.authorInfo.pseudonim || 'No pseudonim'
-                                  }
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          name={`admin.${index}.quote`}
-                          control={form.control}
-                          render={({ field }) => (
-                            <FormItem className="col-span-1">
-                              <FormLabel>Quote</FormLabel>
-                              <FormControl>
-                                <Input
-                                  type="text"
-                                  {...field}
-                                  placeholder={
-                                    user.authorInfo.quote || 'No quote'
-                                  }
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          name={`admin.${index}.shortDescription`}
-                          control={form.control}
-                          render={({ field }) => (
-                            <FormItem className="col-span-1">
-                              <FormLabel>Short description</FormLabel>
-                              <FormControl>
-                                <Textarea
-                                  {...field}
-                                  placeholder={
-                                    user.authorInfo.shortDescription ||
-                                    'No description'
-                                  }
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </div>
+                      {user.role !== UserRoleTypes.USER && (
+                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
+                          <FormField
+                            name={`admin.${index}.pseudonim`}
+                            control={form.control}
+                            render={({ field }) => (
+                              <FormItem className="col-span-1">
+                                <FormLabel>Pseudonim</FormLabel>
+                                <FormControl>
+                                  <Input type="text" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            name={`admin.${index}.quote`}
+                            control={form.control}
+                            render={({ field }) => (
+                              <FormItem className="col-span-1">
+                                <FormLabel>Quote</FormLabel>
+                                <FormControl>
+                                  <Input type="text" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            name={`admin.${index}.shortDescription`}
+                            control={form.control}
+                            render={({ field }) => (
+                              <FormItem className="col-span-1">
+                                <FormLabel>Short description</FormLabel>
+                                <FormControl>
+                                  <Textarea
+                                    {...field}
+                                    placeholder={
+                                      user.authorInfo.shortDescription ||
+                                      'No description'
+                                    }
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+                      )}
                     </div>
                   </section>
                 );

@@ -39,7 +39,7 @@ export default function SecurityPermissions() {
     await usePostAccessDatabase({
       url: DATABASE_ENDPOINTS.USER_UPDATE,
       body: {
-        userEmail: userData.data && userData.data.email,
+        _id: userData.data?._id,
         dirtyData: {
           selectedOptionName: check,
         },

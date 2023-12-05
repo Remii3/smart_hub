@@ -289,7 +289,7 @@ export default function EditUserData() {
     const { error } = await usePostAccessDatabase({
       url: DATABASE_ENDPOINTS.USER_UPDATE,
       body: {
-        userEmail: userData.data.email,
+        _id: userData.data._id,
         dirtyData,
       },
     });

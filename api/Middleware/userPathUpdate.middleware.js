@@ -10,6 +10,14 @@ const userPathUpdate = (req, res, next) => {
     preparedData['$set'] = { username: dirtyData.username };
   }
 
+  if (dirtyData.email) {
+    preparedData['$set'] = { email: dirtyData.email };
+  }
+
+  if (dirtyData.role) {
+    preparedData['$set'] = { role: dirtyData.role };
+  }
+
   if (dirtyData.firstName) {
     preparedData['$set'] = {
       ...preparedData['$set'],
