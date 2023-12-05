@@ -63,7 +63,7 @@ export default function OtherUserPage() {
 
   useEffect(() => {
     if (userData.data && userData.data._id === otherUserId) {
-      navigate('/account/my');
+      navigate('/account/my', { replace: true });
     } else {
       getOtherUserData();
     }

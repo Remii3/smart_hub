@@ -84,12 +84,7 @@ const passwordFormSchema = z
   });
 
 const phoneFormSchema = z.object({
-  phone: z
-    .string()
-    .refine((value) => /^\d{10}$/.test(value), {
-      message: 'Invalid phone number. Must be 10 digits.',
-    })
-    .optional(),
+  phone: z.string().optional(),
 });
 const addressFormSchema = z.object({
   line1: z.string().optional(),
