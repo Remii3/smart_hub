@@ -25,7 +25,6 @@ import { MagnifyingGlassIcon } from '@radix-ui/react-icons';
 import DeleteDialog from '@components/UI/dialogs/DeleteDialog';
 import { Button } from '@components/UI/button';
 import Pagination from '@components/paginations/Pagination';
-import LoadingCircle from '@components/Loaders/LoadingCircle';
 
 interface UserOrdersTypes extends FetchDataTypes {
   data: null | OrderTypes[];
@@ -54,13 +53,13 @@ export default function OrderHistory() {
   });
   const { userData } = useContext(UserContext);
 
-  const fetchOrders = async (type?: 'query') => {
+  const fetchOrders = async ({ newPage }: { newPage: number }) => {
     const filtersData = {
-      page,
-    } as any;
-    if (type === 'query') {
-      filtersData.query = searchbarValue;
-    }
+      page: newPage,
+    } as { [index: string]: unknown };
+
+    filtersData.query = searchbarValue;
+
     if (!userData.data) return;
     const { data, error } = await useGetAccessDatabase({
       url: DATABASE_ENDPOINTS.ORDER_SEARCH,
@@ -88,7 +87,8 @@ export default function OrderHistory() {
 
   const searchHandler = async (e: React.FormEvent) => {
     e.preventDefault();
-    fetchOrders('query');
+    await fetchOrders({ newPage: 1 });
+    setPage(1);
   };
 
   const deleteAllItemsHandler = async () => {
@@ -106,8 +106,8 @@ export default function OrderHistory() {
       });
     }
 
-    await fetchOrders();
-
+    await fetchOrders({ newPage: 1 });
+    setPage(1);
     setDeleteDialog(false);
     setDeleteAllStatus({ isLoading: false, hasError: null, isSuccess: true });
 
@@ -119,12 +119,15 @@ export default function OrderHistory() {
       });
     }, 500);
   };
-  const pageChangeHandler = (newPage: number) => {
+  const pageChangeHandler = async (newPage: number) => {
+    fetchOrders({ newPage });
     setPage(newPage);
   };
+
   useEffect(() => {
-    fetchOrders();
-  }, [page]);
+    fetchOrders({ newPage: 1 });
+  }, []);
+
   return (
     <>
       <section className="flex justify-between flex-wrap items-center mb-4 gap-4">

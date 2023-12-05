@@ -121,7 +121,7 @@ export default function MyProducts() {
   };
 
   const changePageHandler = async (newPage: number) => {
-    fetchAllData({ newPage: newPage });
+    fetchAllData({ newPage });
     setPage(newPage);
   };
 
