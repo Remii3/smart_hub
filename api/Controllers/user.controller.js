@@ -68,7 +68,6 @@ const login = async (req, res) => {
       return res
         .status(200)
         .cookie('token', token, {
-          httpOnly: true,
           secure: true,
           sameSite: 'None',
           path: '/',
@@ -143,7 +142,6 @@ const register = async (req, res) => {
         return res
           .status(201)
           .cookie('token', token, {
-            httpOnly: true,
             secure: true,
             sameSite: 'None',
             path: '/',
@@ -281,7 +279,6 @@ const getGuestProfile = async (req, res) => {
       res
         .status(200)
         .cookie('guestToken', token, {
-          httpOnly: true,
           secure: true,
           sameSite: 'None',
           path: '/',
