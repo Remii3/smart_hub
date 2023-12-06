@@ -1,287 +1,413 @@
-import { useContext, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
-import gsap from 'gsap';
-import { OverlayContext } from '../context/OverlayProvider';
-import { UserContext } from '../context/UserProvider';
+import React, { Suspense, lazy, useContext, useRef, useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { PopoverClose } from '@radix-ui/react-popover';
+import { UserContext } from '@context/UserProvider';
+import CartPopup from '@pages/cart/CartPopup';
+import { CartContext } from '@context/CartProvider';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@components/UI/popover';
+import { useGetAccessDatabase } from '../hooks/useAaccessDatabase';
+import { DATABASE_ENDPOINTS } from '../data/endpoints';
+import { Separator } from '@components/UI/separator';
+import { Button } from '@components/UI/button';
+import LoadingCircle from '@components/Loaders/LoadingCircle';
+import { Input } from '@components/UI/input';
 
-function Nav({ profileOverlayHandler }: { profileOverlayHandler: () => void }) {
+const ShoppingBagIcon = lazy(
+  () => import('@heroicons/react/24/outline/ShoppingBagIcon')
+);
+const OutlinedUserIcon = lazy(
+  () => import('@heroicons/react/24/outline/UserCircleIcon')
+);
+const MagnifyingGlassIcon = lazy(
+  () => import('@heroicons/react/24/solid/MagnifyingGlassIcon')
+);
+const SolidUserIcon = lazy(
+  () => import('@heroicons/react/24/solid/UserCircleIcon')
+);
+const HomeLogoIcon = lazy(() =>
+  import('@assets/icons/Icons').then((module) => ({
+    default: module.HomeLogoIcon,
+  }))
+);
+
+export default function Nav({ scrollFlag }: { scrollFlag: boolean }) {
   const [openedBurger, setOpenedBurger] = useState(false);
+  const [searchbarValue, setSearchbarValue] = useState('');
+  const location = useLocation();
+
   const navMobile = useRef(null);
 
-  const { userData, setUserData } = useContext(UserContext);
-  const { shownOverlay } = useContext(OverlayContext);
-
-  gsap.registerPlugin();
+  const navigate = useNavigate();
+  const navLinkList = [
+    { to: '/news', text: 'news' },
+    { to: '/shop', text: 'shop' },
+    { to: '/collection', text: 'collections' },
+  ];
+  const { userData, changeUserData } = useContext(UserContext);
+  const { cartState } = useContext(CartContext);
 
   const showMobileOverlay = () => {
-    if (openedBurger) {
-      gsap.to(navMobile.current, {
-        left: '100vw',
-        ease: 'sine.inOut',
-      });
-      setOpenedBurger(false);
-    } else {
-      gsap.to(navMobile.current, {
-        left: '0',
-        ease: 'sine.inOut',
-      });
-      setOpenedBurger(true);
+    if (
+      !/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+        navigator.userAgent
+      )
+    ) {
+      document.querySelector('body')?.classList.toggle('mr-[17px]');
     }
+    document.querySelector('body')?.classList.toggle('overflow-hidden');
+    setOpenedBurger((prevState) => !prevState);
   };
 
-  const dropdownHandler = () => {
-    profileOverlayHandler();
+  const hideMobileOverlay = () => {
+    document.querySelector('body')?.classList.remove('overflow-hidden');
+    document.querySelector('body')?.classList.remove('mr-[17px]');
+    setOpenedBurger(false);
   };
 
   const logoutHandler = () => {
-    document.cookie = 'token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-    setUserData(() => null);
-    dropdownHandler();
+    let timeoutTimer = 0;
+    if (openedBurger) {
+      timeoutTimer = 500;
+      showMobileOverlay();
+      navigate('/');
+    }
+    setTimeout(async () => {
+      document.cookie =
+        'token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+      await useGetAccessDatabase({ url: DATABASE_ENDPOINTS.USER_GUEST });
+      changeUserData(null);
+      navigate('/');
+    }, timeoutTimer);
   };
 
+  const searchHandler = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchbarValue === '') {
+      navigate({
+        pathname: '/search',
+      });
+    } else {
+      const existingSearch = new URLSearchParams(location.search);
+      let finalQuery = `phrase=${searchbarValue}`;
+      for (const [key, value] of existingSearch.entries()) {
+        if (key !== 'phrase') {
+          finalQuery += `&${key}=${value}`;
+        }
+      }
+      navigate({
+        pathname: '/search',
+        search: finalQuery,
+      });
+      setSearchbarValue('');
+    }
+  };
+  const searchbarValueChangeHandler = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setSearchbarValue(e.target.value);
+  };
+  const totalProductQuantity =
+    cartState.products &&
+    cartState.products.reduce((acc, item) => acc + item.inCartQuantity, 0);
+
+  const burgerColor = openedBurger
+    ? 'bg-foreground'
+    : scrollFlag
+      ? 'bg-background'
+      : 'bg-foreground';
   return (
     <nav>
-      <div className="mx-auto flex h-[64px] max-w-[1480px] flex-row items-center justify-between px-10 py-3">
-        <div className="text-white">
-          <Link to="/">SmartHub</Link>
-        </div>
-        <div className="hidden md:flex">
-          <ul className="flex flex-row items-center px-8 text-white">
-            <li className="text-base transition-[color] duration-200 ease-out hover:text-primary">
-              <Link className="px-4 py-2" to="/news">
-                News
-              </Link>
-            </li>
-
-            <li className="text-base transition-[color] duration-200 ease-out hover:text-primary">
-              <Link className="px-4 py-2" to="/shop">
-                Shop
-              </Link>
-            </li>
-
-            <li className="text-base transition-[color] duration-200 ease-out hover:text-primary">
-              <Link className="px-4 py-2" to="/specials">
-                Specials
-              </Link>
-            </li>
-
-            <li className="text-base transition-[color] duration-200 ease-out hover:text-primary">
-              <Link className="px-4 py-2" to="/auctions">
-                Auctions
-              </Link>
-            </li>
+      <div className="relative mx-auto flex h-[64px] max-w-[1480px] flex-row items-center justify-between px-4 py-3 sm:px-10">
+        <div className="z-30 flex items-center">
+          <Link
+            to="/"
+            className="relative block h-8 w-8 text-blue-600"
+            onClick={() => hideMobileOverlay()}
+          >
+            <span className="sr-only">Home</span>
+            <Suspense fallback={<LoadingCircle />}>
+              <HomeLogoIcon className="h-8 w-8" />
+            </Suspense>
+          </Link>
+          <ul className={`hidden flex-row items-center px-8 lg:flex`}>
+            {navLinkList.map((navLink, id) => (
+              <li key={id}>
+                <Link
+                  to={navLink.to}
+                  className="px-4 py-2 text-base transition-[color] duration-200 ease-out hover:text-primary"
+                >
+                  {navLink.text[0].toLocaleUpperCase()}
+                  {navLink.text.slice(1)}
+                </Link>
+              </li>
+            ))}
           </ul>
-          <div className="relative z-40 mt-[2px] flex items-center justify-center ">
-            <button
-              type="button"
+        </div>
+        <form
+          onSubmit={(e) => searchHandler(e)}
+          className="relative mx-auto me-4 hidden w-full basis-full items-center justify-end text-gray-600 lg:flex"
+        >
+          <Input
+            className="h-full max-w-[24rem] rounded-lg bg-background py-2 pl-3 pr-12 text-sm transition-[width] duration-200 ease-in-out focus-visible:w-full sm:w-56"
+            type="text"
+            name="search"
+            placeholder="Search"
+            value={searchbarValue}
+            onChange={(e) => searchbarValueChangeHandler(e)}
+          />
+          <button
+            type="submit"
+            className="absolute right-0 top-1/2 h-full w-auto min-w-[40px] -translate-y-1/2 transform rounded-e-xl border-0 bg-transparent px-2 text-gray-600 transition"
+          >
+            <span className="sr-only">Search</span>
+            <Suspense fallback={<LoadingCircle />}>
+              <MagnifyingGlassIcon className="h-6 w-6 fill-current font-bold text-gray-600" />
+            </Suspense>
+          </button>
+        </form>
+        <div className="flex max-h-[32px] gap-4">
+          <div className="block lg:hidden">
+            <Popover>
+              <PopoverTrigger
+                aria-label="Search trigger"
+                className="relative h-8 w-8"
+              >
+                <Suspense fallback={<LoadingCircle />}>
+                  <MagnifyingGlassIcon className={`h-8 w-8`} />
+                </Suspense>
+              </PopoverTrigger>
+              <PopoverContent className="mt-3 block w-screen rounded-t-none bg-background lg:hidden">
+                <form
+                  onSubmit={(e) => searchHandler(e)}
+                  className="relative mx-auto w-full max-w-xl text-gray-600"
+                >
+                  <Input
+                    className="h-full w-full rounded-lg border-2 border-gray-300 bg-background px-3 py-2 pr-16 text-sm focus:outline-none"
+                    type="text"
+                    name="search"
+                    placeholder="Search"
+                    value={searchbarValue}
+                    onChange={(e) => searchbarValueChangeHandler(e)}
+                  />
+                  <PopoverClose
+                    type="submit"
+                    className="absolute right-0 top-1/2 -translate-y-1/2 rounded-e-lg border-b-2 border-r-2 border-t-2 border-transparent bg-transparent px-2 text-gray-600 transition"
+                  >
+                    <span className="sr-only">Search</span>
+                    <Suspense fallback={<LoadingCircle />}>
+                      <MagnifyingGlassIcon className="h-4 w-4 fill-current font-bold text-gray-600" />
+                    </Suspense>
+                  </PopoverClose>
+                </form>
+              </PopoverContent>
+            </Popover>
+          </div>
+
+          <div className="flex gap-4">
+            <Popover>
+              <PopoverTrigger
+                className="relative h-8 w-8"
+                aria-label="Shopping cart"
+              >
+                <Suspense fallback={<LoadingCircle />}>
+                  <ShoppingBagIcon className={`h-8 w-8`} />
+                  {cartState && cartState.products.length > 0 && (
+                    <span
+                      aria-hidden="true"
+                      className={`${
+                        scrollFlag
+                          ? 'bg-foreground/90 text-background'
+                          : 'bg-background/90 text-foreground'
+                      } absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full`}
+                    >
+                      {totalProductQuantity}
+                    </span>
+                  )}
+                </Suspense>
+              </PopoverTrigger>
+              <PopoverContent
+                className={`${
+                  !scrollFlag && 'rounded-t-none'
+                } relative mt-3 w-screen max-w-full bg-background px-6 py-8 sm:px-6 md:max-w-lg lg:px-6 `}
+              >
+                <CartPopup />
+              </PopoverContent>
+            </Popover>
+            <div className="hidden items-center lg:flex">
+              <Popover>
+                <PopoverTrigger
+                  aria-label="Profile dropdown"
+                  className="relative h-8 w-8"
+                >
+                  <Suspense fallback={<LoadingCircle />}>
+                    {userData.data ? (
+                      userData.data.userInfo.profileImg.url ? (
+                        <img
+                          src={userData.data.userInfo.profileImg.url}
+                          height={32}
+                          width={32}
+                          className="h-8 w-8 rounded-full aspect-square object-cover"
+                          alt="profile_img"
+                        />
+                      ) : (
+                        <SolidUserIcon className={`h-8 w-8`} />
+                      )
+                    ) : (
+                      <OutlinedUserIcon className={`h-8 w-8`} />
+                    )}
+                  </Suspense>
+                </PopoverTrigger>
+                <PopoverContent
+                  className={`${
+                    !scrollFlag && 'rounded-t-none'
+                  } mt-3 w-auto bg-background p-0`}
+                >
+                  <ul>
+                    {!userData.data && (
+                      <>
+                        <li>
+                          <PopoverClose asChild>
+                            <Link
+                              to={{ pathname: '/account/login' }}
+                              className={`${
+                                !scrollFlag && 'rounded-t-none'
+                              } flex w-full items-center justify-center px-5 pb-2 pt-3 text-sm transition-colors duration-200 ease-out hover:bg-slate-400/25 hover:text-primary`}
+                            >
+                              Sign in
+                            </Link>
+                          </PopoverClose>
+                        </li>
+                        <li>
+                          <PopoverClose asChild>
+                            <Link
+                              to={{
+                                pathname: '/account/register',
+                              }}
+                              className="flex w-full items-center justify-center rounded-b-md px-5 pb-3 pt-2 text-sm transition-colors duration-200 ease-out hover:bg-slate-400/25 hover:text-primary"
+                            >
+                              Sign up
+                            </Link>
+                          </PopoverClose>
+                        </li>
+                      </>
+                    )}
+                    {userData.data && (
+                      <>
+                        <li>
+                          <PopoverClose asChild>
+                            <Link
+                              to="/account/my"
+                              className={`${
+                                !scrollFlag && 'rounded-t-none'
+                              } flex w-full items-center justify-center px-5 pb-2 pt-3 text-sm transition-colors duration-200 ease-out hover:bg-slate-400/25 hover:text-primary`}
+                            >
+                              Account
+                            </Link>
+                          </PopoverClose>
+                        </li>
+                        <li>
+                          <PopoverClose asChild>
+                            <button
+                              type="button"
+                              onClick={logoutHandler}
+                              className="flex w-full items-center justify-center rounded-b-md px-5 pb-3 pt-2 text-sm text-red-500 transition-colors duration-200 ease-out hover:bg-red-400/25 "
+                            >
+                              Logout
+                            </button>
+                          </PopoverClose>
+                        </li>
+                      </>
+                    )}
+                  </ul>
+                </PopoverContent>
+              </Popover>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-center lg:hidden">
+            <div
               className={`${
-                shownOverlay ? 'bg-transparentGray shadow-lg' : ''
-              } rounded-lg p-1 transition-[background-color,box-shadow] duration-200 ease-out hover:bg-transparentGray hover:shadow-lg `}
-              onClick={dropdownHandler}
+                openedBurger && 'tham-active'
+              } tham-e-squeeze tham tham-w-8 relative z-30 duration-300 ease-in-out hover:bg-opacity-30 `}
+              onClick={showMobileOverlay}
             >
-              {userData ? (
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                  className="h-7 w-7 text-white"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M18.685 19.097A9.723 9.723 0 0021.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 003.065 7.097A9.716 9.716 0 0012 21.75a9.716 9.716 0 006.685-2.653zm-12.54-1.285A7.486 7.486 0 0112 15a7.486 7.486 0 015.855 2.812A8.224 8.224 0 0112 20.25a8.224 8.224 0 01-5.855-2.438zM15.75 9a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              ) : (
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={1.5}
-                  stroke="currentColor"
-                  className="h-7 w-7 text-white"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z"
-                  />
-                </svg>
-              )}
-            </button>
-            {!userData && (
-              <div
-                className={`${
-                  shownOverlay ? 'flex' : 'hidden'
-                } absolute top-7 w-24 flex-col rounded-lg bg-pageBackground`}
-              >
-                <Link
-                  to={{ pathname: '/account', search: 'auth=login' }}
-                  className="px-3 pb-2 pt-4 text-white transition-[color] duration-200 ease-out hover:text-primary"
-                >
-                  <button
-                    type="button"
-                    className="w-full text-center text-base"
-                    onClick={dropdownHandler}
-                  >
-                    Sign in
-                  </button>
-                </Link>
-                <Link
-                  to={{ pathname: '/account', search: 'auth=register' }}
-                  className="px-3 pb-4 pt-2 text-white transition-[color] duration-200 ease-out hover:text-primary"
-                >
-                  <button
-                    type="button"
-                    className="w-full text-center text-base"
-                    onClick={dropdownHandler}
-                  >
-                    Sign up
-                  </button>
-                </Link>
+              <div className="tham-box">
+                <div
+                  className={`${burgerColor} tham-inner transition-colors duration-200 ease-in-out`}
+                />
               </div>
-            )}
-            {userData && (
-              <div
-                className={`${
-                  shownOverlay ? 'flex' : 'hidden'
-                }  absolute top-7 w-24 flex-col rounded-lg bg-pageBackground`}
-              >
-                <Link
-                  to="/account/my"
-                  className="px-3 pb-2 pt-4 text-white transition-[color] duration-200 ease-out hover:text-primary"
-                >
-                  <button
-                    type="button"
-                    className="w-full text-center text-base"
-                    onClick={dropdownHandler}
-                  >
-                    Account
-                  </button>
-                </Link>
-                <button
-                  type="button"
-                  onClick={logoutHandler}
-                  className="px-3 pb-4 pt-2 text-base text-white transition-[color] duration-200 ease-out hover:text-primary"
-                >
-                  Logout
-                </button>
-              </div>
-            )}
+            </div>
           </div>
         </div>
-        <button
-          type="button"
-          className={`${
-            openedBurger ? 'open' : ''
-          } relative z-30 block h-10 w-10 cursor-pointer pl-2 md:hidden`}
-          onClick={showMobileOverlay}
-        >
-          <span
-            className={`${
-              openedBurger
-                ? 'left-1/2 top-[18px] w-0'
-                : 'left-0 top-[5px] w-full'
-            } absolute block h-1 rotate-0 rounded-lg bg-white opacity-100 transition-[top,left,width] duration-200 ease-in-out`}
-          />
-          <span
-            className={`${
-              openedBurger ? 'rotate-45' : 'rotate-0'
-            } absolute left-0 top-[18px] block h-1 w-full rounded-lg bg-white opacity-100 transition-transform`}
-          />
-          <span
-            className={`${
-              openedBurger ? '-rotate-45' : 'rotate-0'
-            } absolute left-0 top-[18px] block h-1 w-full rounded-lg bg-white opacity-100 transition-transform`}
-          />
-          <span
-            className={`${
-              openedBurger
-                ? 'left-1/2 top-[18px] w-0'
-                : 'left-0 top-[31px] w-full'
-            } absolute block h-1 rotate-0 rounded-lg bg-white opacity-100 transition-[top,left,width] duration-200 ease-in-out`}
-          />
-        </button>
       </div>
+
       <div
         ref={navMobile}
-        className="mobile-overlay absolute left-[100vw] top-[0] z-10 h-screen w-full bg-pageBackground pt-16"
+        className={`${
+          openedBurger ? 'left-0 opacity-100' : 'left-[100vw] opacity-0'
+        } absolute top-[0] z-10 h-screen w-full transform overflow-auto bg-background pt-16 transition-[left,opacity] duration-500 ease-in-out lg:hidden`}
       >
-        <ul className="flex flex-col text-white">
-          <li className="w-full">
-            <Link
-              to="/news"
-              className="block w-full py-3 text-center text-lg transition-[color] duration-200 ease-out hover:text-primaryText"
-            >
-              News
-            </Link>
-          </li>
-          <li className="w-full">
-            <Link
-              to="/shop"
-              className="block w-full py-3 text-center text-lg transition-[color] duration-200 ease-out hover:text-primaryText"
-            >
-              Shop
-            </Link>
+        <ul className="flex flex-col text-foreground">
+          {navLinkList.map((navLink, id) => (
+            <li key={id}>
+              <Link
+                to={navLink.to}
+                className="hover:text-primaryText mx-auto block w-1/3 py-3 text-center text-lg transition-[color] duration-200 ease-out"
+                onClick={showMobileOverlay}
+              >
+                {navLink.text[0].toLocaleUpperCase()}
+                {navLink.text.slice(1)}
+              </Link>
+            </li>
+          ))}
+          <li>
+            <Separator className="mx-auto my-4 w-3/4 bg-slate-300" />
           </li>
           <li>
-            <Link
-              to="/collections"
-              className="block w-full py-3 text-center text-lg transition-[color] duration-200 ease-out hover:text-primaryText"
-            >
-              Collections
-            </Link>
-          </li>
-          <li>
-            <Link
-              to="/auctions"
-              className="block w-full py-3 text-center text-lg transition-[color] duration-200 ease-out hover:text-primaryText"
-            >
-              Auctions
-            </Link>
-          </li>
-          <div className="mx-auto my-4 h-[1px] w-3/4 rounded-lg bg-white" />
-
-          {!userData && (
-            <div className="w-full flex-col bg-pageBackground">
-              <button type="button" className="w-full">
+            {!userData.data ? (
+              <div className="flex-col">
                 <Link
-                  to={{ pathname: '/account', search: 'auth=login' }}
-                  className="block w-full py-3 text-center text-lg transition-[color] duration-200 ease-out hover:text-primaryText"
+                  to={{ pathname: '/account/login' }}
+                  className="hover:text-primaryText mx-auto block w-1/3 py-3 text-center text-lg transition-[color] duration-200 ease-out"
+                  onClick={showMobileOverlay}
                 >
                   Sign in
                 </Link>
-              </button>
-              <button type="button" className="w-full">
                 <Link
-                  to={{ pathname: '/account', search: 'auth=register' }}
-                  className="block w-full py-3 text-center text-lg transition-[color] duration-200 ease-out hover:text-primaryText"
+                  to={{ pathname: '/account/register' }}
+                  className="hover:text-primaryText mx-auto block w-1/3 py-3 text-center text-lg transition-[color] duration-200 ease-out"
+                  onClick={showMobileOverlay}
                 >
                   Sign up
                 </Link>
-              </button>
-            </div>
-          )}
-          {userData && (
-            <div className="w-full flex-col bg-pageBackground">
-              <Link
-                to="/account/my"
-                className="block w-full py-3 text-center text-lg transition-[color] duration-200 ease-out hover:text-primaryText"
-              >
-                Account
-              </Link>
-              <button
-                type="button"
-                className="block w-full py-3 text-center text-lg transition-[color] duration-200 ease-out hover:text-primaryText"
-              >
-                Logout
-              </button>
-            </div>
-          )}
+              </div>
+            ) : (
+              <div className="flex-col">
+                <Link
+                  to="/account/my"
+                  className="hover:text-primaryText mx-auto block w-1/3 py-3 text-center text-lg transition-[color] duration-200 ease-out"
+                  onClick={showMobileOverlay}
+                >
+                  Profile
+                </Link>
+
+                <Button
+                  type="submit"
+                  variant={'link'}
+                  className="mx-auto block w-1/3 py-3 text-center text-lg text-red-600 transition-[filter] duration-200 ease-out hover:brightness-90"
+                  onClick={logoutHandler}
+                >
+                  Logout
+                </Button>
+              </div>
+            )}
+          </li>
         </ul>
       </div>
     </nav>
   );
 }
-
-export default Nav;

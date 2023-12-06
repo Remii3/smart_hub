@@ -32,6 +32,14 @@
         "depth": 1
       }
     ],
-    "no-underscore-dangle": "off"
+    "no-underscore-dangle": "off",
+    "react/no-array-index-key": "off",
+    "no-restricted-syntax": "off",
+    "no-return-assign": "off",
+    "no-param-reassign": "off",
+    "@typescript-eslint/no-non-null-assertion": "off",
+    "import/prefer-default-export": "off",
+    "react/jsx-props-no-spreading": "off",
+    "react/prop-types": [2, { "ignore": "className" }]
   }
 }

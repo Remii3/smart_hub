@@ -1,62 +1,42 @@
-import { gsap } from 'gsap';
-import { useContext, useEffect, useRef } from 'react';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { OverlayContext } from '../context/OverlayProvider';
+import { useCallback, useEffect, useState } from 'react';
 import Nav from './Nav';
 
-function Header() {
-  const { shownOverlay, setShownOverlay } = useContext(OverlayContext);
-  const navOverlay = useRef(null);
-  const headerBgBreakPoint = useRef(null);
-  gsap.registerPlugin(ScrollTrigger);
+type HeaderTypes = {
+  currentPathname: string;
+};
 
-  useEffect(() => {
-    const mainContainer = document.getElementById('mainContainer');
-
-    ScrollTrigger.create({
-      trigger: mainContainer,
-      start: 'top 70px',
-      end: 'bottom 70px',
-      markers: false,
-      animation: gsap.to(headerBgBreakPoint.current, {
-        backgroundColor: '#14222F',
-        ease: 'sine.out',
-      }),
-      toggleActions: 'restart none none reverse',
-    });
+function Header({ currentPathname }: HeaderTypes) {
+  const [isTransparent, setIsTransparent] = useState(false);
+  const isHomepage = currentPathname === '/';
+  const changeHeaderBgHandler = useCallback(() => {
+    const mainPageTitle = document.getElementById('mainPageTitle');
+    if (mainPageTitle && mainPageTitle?.getBoundingClientRect().top < 0) {
+      setIsTransparent(false);
+    } else {
+      setIsTransparent(true);
+    }
   }, []);
 
-  const profileOverlayHandler = () => {
-    const tm = gsap.timeline();
-
-    if (shownOverlay) {
-      tm.to(navOverlay.current, {
-        opacity: 0,
-        duration: 0.1,
-      }).to(navOverlay.current, { maxHeight: 0, duration: 0.01 });
-    } else {
-      tm.to(navOverlay.current, { maxHeight: '100vh', duration: 0.01 }).to(
-        navOverlay.current,
-        {
-          opacity: 0.3,
-          duration: 0.1,
-        }
-      );
+  useEffect(() => {
+    if (isHomepage) {
+      setIsTransparent(true);
+      window.addEventListener('scroll', changeHeaderBgHandler);
     }
-    setShownOverlay((prevState) => !prevState);
-  };
+    return () => {
+      window.removeEventListener('scroll', changeHeaderBgHandler);
+    };
+  }, [changeHeaderBgHandler, currentPathname]);
+
+  const scrollFlag = isHomepage ? isTransparent : false;
   return (
-    <header
-      ref={headerBgBreakPoint}
-      className="fixed left-0 top-0 z-20 w-full bg-transparent"
-    >
+    <header className={`${isHomepage ? 'fixed' : 'sticky'} top-0 z-30 w-full`}>
       <div
-        ref={navOverlay}
-        className="absolute inset-0 h-screen max-h-0 w-screen bg-black opacity-0"
-        onClick={profileOverlayHandler}
-        aria-hidden="true"
+        className={`${scrollFlag ? 'opacity-0' : 'opacity-100'}
+        transiiton-opacity absolute left-0 top-0 h-full w-full bg-background shadow-sm duration-150 ease-out`}
       />
-      <Nav profileOverlayHandler={profileOverlayHandler} />
+      <div className={`${scrollFlag ? 'text-background' : 'text-foreground'}`}>
+        <Nav scrollFlag={scrollFlag} />
+      </div>
     </header>
   );
 }

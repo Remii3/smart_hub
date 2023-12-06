@@ -1,22 +1,20 @@
 import axios from 'axios';
-import { lazy, useContext } from 'react';
-import { Routes, Route } from 'react-router-dom';
-import SuspenseComponent from './components/suspense/SuspenseComponent';
-import LoadingComponent from './components/UI/LoadingComponent';
-import { UserContext } from './context/UserProvider';
-
-const MainPage = lazy(() => import('./pages/MainPage'));
-const AuthPage = lazy(() => import('./pages/AuthPage'));
-const NoPage404 = lazy(() => import('./pages/NoPage404'));
-const MyAccount = lazy(() => import('./pages/MyAccount'));
+import UserProvider from './context/UserProvider';
+import CartProvider from './context/CartProvider';
+import MainLayout from './layout/MainLayout';
+import { Toaster } from '@components/UI/toaster';
+import { ParallaxProvider } from 'react-scroll-parallax';
 
 let properUrl = 'http://localhost:4000';
 
-switch (document.URL) {
-  case 'http://localhost:5173/':
+switch (window.location.origin) {
+  case 'http://localhost:5173':
     properUrl = 'http://localhost:4000';
     break;
-  case 'https://smarthub-jb8g.onrender.com/':
+  case 'http://localhost:4173':
+    properUrl = 'http://localhost:4000';
+    break;
+  case 'https://smarthub-jb8g.onrender.com':
     properUrl = 'https://smarthub-backend.onrender.com';
     break;
   default:
@@ -26,17 +24,17 @@ switch (document.URL) {
 axios.defaults.baseURL = properUrl;
 axios.defaults.withCredentials = true;
 
-function App() {
-  const { userData } = useContext(UserContext);
+export default function App() {
   return (
-    <SuspenseComponent fallback={<LoadingComponent />}>
-      <Routes>
-        <Route path="/" element={<MainPage />} />
-        <Route path="/account" element={<AuthPage />} />
-        {userData && <Route path="/account/my" element={<MyAccount />} />}
-        <Route path="/*" element={<NoPage404 />} />
-      </Routes>
-    </SuspenseComponent>
+    <>
+      <UserProvider>
+        <CartProvider>
+          <ParallaxProvider>
+            <MainLayout />
+            <Toaster />
+          </ParallaxProvider>
+        </CartProvider>
+      </UserProvider>
+    </>
   );
 }
-export default App;

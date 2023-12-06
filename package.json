@@ -4,11 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "install-server": "cd api && npm install",
-    "start-server": "cd api && node index.js",
-    "install-client": "cd client && npm install",
-    "build-client": "cd client && npm run build",
-    "start-client": "cd client && npm run dev"
+    "start": "concurrently \"cd client && npm run dev\" \"cd api && nodemon index.js\"",
+    "update-all": "npm install && cd api && npm install && cd ../client && npm install"
   },
   "repository": {
     "type": "git",
@@ -20,5 +17,8 @@
   "bugs": {
     "url": "https://github.com/Remii3/smart_hub/issues"
   },
-  "homepage": "https://github.com/Remii3/smart_hub#readme"
+  "homepage": "https://github.com/Remii3/smart_hub#readme",
+  "devDependencies": {
+    "concurrently": "^8.2.0"
+  }
 }

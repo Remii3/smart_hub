@@ -2,6 +2,68 @@
 @tailwind base;
 
 @layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 214 10% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 214 10% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 214 10% 3.9%;
+
+    --primary: 223 100% 62%;
+    --primary-foreground: 214 40% 98%;
+    --secondary: 221 66% 86%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+
+    --muted: 214 4.8% 95.9%;
+    --muted-foreground: 214 3.8% 46.1%;
+    --accent: 214 30% 95%;
+    --accent-foreground: 214 32% 10%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 215 20.2% 65.1%;
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 240 10% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 240 10% 3.9%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 223 100% 62%;
+    --primary-foreground: 222.2 47.4% 1.2%;
+    --secondary: 222.2 47.4% 11.2%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+    --accent: 240 3.7% 15.9%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 85.7% 97.3%;
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 215 20.2% 65.1%;
+  }
+  * {
+    @apply border-border;
+  }
+
+  a:-webkit-any-link:focus-visible,
+  button:focus-visible {
+    @apply ring-ring;
+    @apply ring-2;
+    @apply outline-none;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings:
+      'rlig' 1,
+      'calt' 1;
+  }
   h1,
   h2,
   h3,
@@ -9,38 +71,66 @@
   h5,
   h6 {
     @apply font-poppins;
-    @apply font-semibold;
-  }
-
-  h1 {
-    @apply text-[calc(3rem+0.390625vw)] leading-none sm:text-[calc(3.75rem+0.390625vw)]  lg:text-[calc(4.5rem+0.390625vw)];
-  }
-
-  h2 {
-    @apply text-[calc(1.875rem+0.390625vw)] leading-9 sm:text-[calc(3rem+0.390625vw)] sm:leading-none lg:text-[calc(3.75rem+0.390625vw)];
-  }
-
-  h3 {
-    @apply text-[calc(1.5rem+0.390625vw)] leading-8 sm:text-[calc(1.875rem+0.390625vw)] sm:leading-9 lg:text-[calc(3rem+0.390625vw)] lg:leading-none;
-  }
-
-  h4 {
-    @apply text-[calc(1.25rem+0.390625vw)] leading-7 sm:text-[calc(1.5rem+0.390625vw)] sm:leading-8 lg:text-[calc(1.875rem+0.390625vw)];
-  }
-
-  h5 {
-    @apply text-[calc(1.125rem+0.390625vw)] leading-7 sm:text-[calc(1.25rem+0.390625vw)] lg:text-[calc(1.5rem+0.390625vw)] lg:leading-8;
+    @apply font-bold;
+    @apply dark:text-white;
   }
 
   h6 {
-    @apply text-[calc(1rem+0.390625vw)] leading-6 sm:text-[calc(1.125rem+0.390625vw)] sm:leading-7 lg:text-[calc(1.25rem+0.390625vw)];
+    @apply text-xl;
+  }
+
+  h5 {
+    @apply text-2xl;
+  }
+
+  h4 {
+    @apply text-3xl;
+  }
+
+  h3 {
+    @apply text-4xl;
+  }
+
+  h2 {
+    @apply text-3xl sm:text-4xl lg:text-5xl;
+  }
+
+  h1 {
+    @apply text-4xl sm:text-5xl lg:text-6xl;
   }
 
   body {
     @apply font-rubik;
-    @apply text-[calc(1rem+0.390625vw)] leading-6 sm:text-[calc(1.125rem+0.390625vw)] sm:leading-7 lg:text-xl;
+  }
+  .star:hover,
+  .star.clicked {
+    @apply text-yellow-400; /* Change this to your desired star color on hover or click */
+  }
+}
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+  .step {
+    counter-increment: step;
+  }
+
+  .step:before {
+    @apply absolute inline-flex h-9 w-9 items-center justify-center rounded-full border-4 border-background bg-muted text-center -indent-px font-mono text-base font-medium;
+    @apply ml-[-50px] mt-[-4px];
+    content: counter(step);
   }
 }
 
-@tailwind components;
-@tailwind utilities;
+.swiper-button-disabled {
+  display: none !important;
+}
+
+.StripeElement--focus {
+  background-color: red;
+}
+
+.swiper-latest-news-button-next::after,
+.swiper-latest-news-button-prev::after {
+  font-size: 2.5rem !important;
+}

@@ -5,8 +5,9 @@ type SuspensePropsType = {
   children: React.ReactNode;
 };
 
-function SuspenseComponent({ fallback, children }: SuspensePropsType) {
+export default function SuspenseComponent({
+  fallback,
+  children,
+}: SuspensePropsType) {
   return <Suspense fallback={fallback}>{children}</Suspense>;
 }
-
-export default SuspenseComponent;

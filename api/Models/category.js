@@ -1,9 +1,9 @@
 const mongoose = require('mongoose');
 
-const CategorySchema = mongoose.Schema({
-  _id: { type: mongoose.Schema.Types.ObjectId },
-  name: String,
-  description: String,
+const CategorySchema = new mongoose.Schema({
+  value: { type: String, required: true },
+  label: { type: String, required: true },
+  description: { type: String },
 });
 
 const CategoryModel = mongoose.model('Category', CategorySchema);
