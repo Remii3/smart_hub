@@ -27,7 +27,7 @@ app.use(
     origin: [
       'http://localhost:5173',
       'http://localhost:4173',
-      'https://smarthub-6l9t.onrender.com/',
+      'https://smarthub.studio/',
     ],
   }),
 );
