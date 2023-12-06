@@ -231,6 +231,8 @@ const initiatePayment = async (req, res) => {
       automatic_payment_methods: {
         enabled: true,
       },
+      description: 'Thanks for your purchase!',
+      receipt_email: 'remek778790@gmail.com',
     });
 
     return res.status(200).send({

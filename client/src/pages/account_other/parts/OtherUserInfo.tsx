@@ -153,7 +153,7 @@ export default function OtherUserInfo({
       </div>
 
       {otherUserData.authorInfo.shortDescription && (
-        <article className="max-w-lg">
+        <article className="max-w-lg text-justify">
           <span>{otherUserData.authorInfo.shortDescription}</span>
         </article>
       )}
