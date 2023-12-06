@@ -17,6 +17,7 @@ import { usePostAccessDatabase } from '../../hooks/useAaccessDatabase';
 import { DATABASE_ENDPOINTS } from '../../data/endpoints';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@components/UI/button';
+import errorToast from '@components/UI/error/errorToast';
 
 interface PropsTypes {
   readyToShow: {
@@ -104,10 +105,25 @@ export default function CheckoutForm({
     }
 
     setIsLoading(true);
+    let currentUrl = '';
+    switch (window.location.origin) {
+      case 'http://localhost:5173':
+        currentUrl = 'http://localhost:4000';
+        break;
+      case 'http://localhost:4173':
+        currentUrl = 'http://localhost:4173';
+        break;
+      case 'https://smarthub-jb8g.onrender.com':
+        currentUrl = 'https://smarthub-backend.onrender.com';
+        break;
+      default:
+        currentUrl = 'https://smarthub-backend.onrender.com';
+        break;
+    }
     const { error } = await stripe.confirmPayment({
       elements,
       confirmParams: {
-        return_url: 'http://localhost:5173',
+        return_url: currentUrl,
       },
       redirect: 'if_required',
     });
@@ -119,24 +135,31 @@ export default function CheckoutForm({
       }
     } else {
       const currentUserId = userData.data?._id || getCookie('guestToken');
-      await usePostAccessDatabase({
+      const { data, error } = await usePostAccessDatabase({
         url: DATABASE_ENDPOINTS.ORDER_ONE,
         body: {
           buyerId: currentUserId,
           items: cartState.products,
         },
       });
-      await usePostAccessDatabase({
+      if (error) {
+        return errorToast(error);
+      }
+
+      const { error: removeFromCartError } = await usePostAccessDatabase({
         url: DATABASE_ENDPOINTS.CART_REMOVE,
         body: {
           userId: currentUserId,
           productId: 'all',
         },
       });
+      if (removeFromCartError) {
+        return errorToast(removeFromCartError);
+      }
 
       fetchCartData();
       fetchUserData();
-      navigate('/thankyou');
+      navigate(`${data.data._id}/thankyou`);
     }
     setIsLoading(false);
   };
@@ -144,6 +167,7 @@ export default function CheckoutForm({
   const paymentElementOptions = {
     layout: 'tabs',
   } as { layout: Layout };
+  if (userData.isLoading) return;
   return (
     <form id="payment-form" onSubmit={handleSubmit}>
       <LinkAuthenticationElement
@@ -151,7 +175,9 @@ export default function CheckoutForm({
         onChange={(e: StripeLinkAuthenticationElementChangeEvent) =>
           setEmail(e.value.email)
         }
-        options={{ defaultValues: { email: userData.data?.email || email } }}
+        options={{
+          defaultValues: { email: userData.data ? userData.data.email : email },
+        }}
         onReady={() =>
           readyToShowHandler((prevState) => {
             return { ...prevState, linkAuth: true };
@@ -174,7 +200,28 @@ export default function CheckoutForm({
           fields: { phone: 'always' },
           blockPoBox: true,
           validation: { phone: { required: 'auto' } },
-          display: { name: 'full' },
+          display: { name: 'split' },
+          defaultValues: {
+            phone: userData.data ? userData.data.userInfo.phone : '',
+            firstName: userData.data
+              ? userData.data.userInfo.credentials.firstName
+              : '',
+            lastName: userData.data
+              ? userData.data.userInfo.credentials.lastName
+              : '',
+            address: {
+              country: userData.data
+                ? userData.data.userInfo.address.country
+                : '',
+              city: userData.data ? userData.data.userInfo.address.city : '',
+              line1: userData.data ? userData.data.userInfo.address.line1 : '',
+              line2: userData.data ? userData.data.userInfo.address.line2 : '',
+              postal_code: userData.data
+                ? userData.data.userInfo.address.postalCode
+                : '',
+              state: userData.data ? userData.data.userInfo.address.state : '',
+            },
+          },
         }}
         onChange={(event) => {
           if (event.complete) {
@@ -220,7 +267,7 @@ export default function CheckoutForm({
       )}
 
       {message && (
-        <div id="payment-message" className="pt-3 text-center text-red-500">
+        <div id="payment-message" className="pt-3 text-center text-red-400">
           {message}
         </div>
       )}

@@ -5,7 +5,7 @@ import { DATABASE_ENDPOINTS } from '@data/endpoints';
 import { Label } from '@components/UI/label';
 import { Switch } from '@components/UI/switch';
 
-type SecurityOptionNames = 'hide_private_information';
+type SecurityOptionNames = 'hidePrivateInformation';
 interface SecurityOptionType {
   name: SecurityOptionNames;
   labelName: string;
@@ -14,12 +14,11 @@ interface SecurityOptionType {
 
 export default function SecurityPermissions() {
   const { userData } = useContext(UserContext);
-  if (!userData.data) return <p>Please log in</p>;
   const initialData = [
     {
-      name: 'hide_private_information',
+      name: 'hidePrivateInformation',
       labelName: 'Hide private information',
-      value: userData.data.security_settings.hide_private_information || false,
+      value: userData.data!.securitySettings.hidePrivateInformation || false,
     },
   ] as SecurityOptionType[];
 
@@ -40,16 +39,17 @@ export default function SecurityPermissions() {
     await usePostAccessDatabase({
       url: DATABASE_ENDPOINTS.USER_UPDATE,
       body: {
-        userEmail: userData.email,
-        fieldKey: selectedOptionName,
-        fieldValue: check,
+        _id: userData.data?._id,
+        dirtyData: {
+          selectedOptionName: check,
+        },
       },
     });
   };
   return (
-    <div className="px-3">
+    <div>
       <h4 className="mb-4">Security options</h4>
-      <div className="px-2">
+      <div className="px-1">
         {availableSettings.map((item) => {
           return (
             <div key={item.name} className="flex items-center space-x-2">

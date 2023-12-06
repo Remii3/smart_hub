@@ -1,18 +1,21 @@
 const mongoose = require('mongoose');
+const { ProductSchema } = require('./product');
 
-const OrderSchema = mongoose.Schema({
-  buyer_id: { type: mongoose.Types.ObjectId, ref: 'User' },
-  seller_id: { type: mongoose.Types.ObjectId, ref: 'User' },
+const OrderSchema = new mongoose.Schema({
+  buyerId: { type: mongoose.Types.ObjectId, ref: 'User' },
+  sellerId: { type: mongoose.Types.ObjectId, ref: 'User' },
   products: [
     {
       type: {
-        product: { type: mongoose.Types.ObjectId, ref: 'Product' },
-        in_cart_quantity: Number,
-        total_price: Number,
+        product: ProductSchema,
+        inCartQuantity: Number,
+        totalPrice: Number,
       },
     },
   ],
-  created_at: { type: Date, default: Date.now },
+  orderPrice: { type: Number && String },
+  status: { type: String },
+  createdAt: { type: Date, default: Date.now },
 });
 
 const OrderModel = mongoose.model('Order', OrderSchema);

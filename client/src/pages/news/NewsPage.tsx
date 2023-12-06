@@ -1,207 +1,253 @@
-import {
-  ChangeEvent,
-  FormEvent,
-  useCallback,
-  useContext,
-  useEffect,
-  useState,
-} from 'react';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTrigger,
-  DialogTitle,
-} from '@components/UI/dialog';
-import MainContainer from '@layout/MainContainer';
-import { Button } from '@components/UI/button';
-import { NewsTypes } from '@customTypes/interfaces';
-import {
-  useGetAccessDatabase,
-  usePostAccessDatabase,
-} from '../../hooks/useAaccessDatabase';
-import { DATABASE_ENDPOINTS } from '../../data/endpoints';
-import { Label } from '@components/UI/label';
-import { Input } from '@components/UI/input';
+import { useCallback, useContext, useEffect, useRef, useState } from 'react';
+import AllNews from './parts/AllNews';
+import LatestNews from './parts/LatestNews';
+import TopRated from './parts/TopRated';
+import { useGetAccessDatabase } from '@hooks/useAaccessDatabase';
+import { DATABASE_ENDPOINTS } from '@data/endpoints';
+import errorToast from '@components/UI/error/errorToast';
+import { Skeleton } from '@components/UI/skeleton';
+import SearchNews from './parts/SearchNews';
+import ErrorMessage from '@components/UI/error/ErrorMessage';
+import { FetchDataTypes, NewsType } from '@customTypes/interfaces';
 import { UserContext } from '@context/UserProvider';
-import NewsArticle from './NewsArticle';
-import useUploadImg from '@hooks/useUploadImg';
+import NewNews from './popup/NewNews';
+import { UserRoleTypes } from '@customTypes/types';
+import Pagination from '@components/paginations/Pagination';
+import { useSearchParams } from 'react-router-dom';
 
-interface NewArticleType {
-  title: string;
-  subtitle: string;
-  content: string;
+interface NewsTypes extends FetchDataTypes {
+  data: null | NewsType[];
 }
-
+interface AllNewsTypes extends FetchDataTypes {
+  data: null | NewsType[];
+  rawData: { totalPages: number | null };
+}
 export default function NewsPage() {
-  const [newsList, setNewsList] = useState<null | NewsTypes[]>(null);
-  const [newArticleData, setNewArticleData] = useState<NewArticleType>({
-    title: '',
-    subtitle: '',
-    content: '',
-  });
-  const [selectedImgs, setSelectedImgs] = useState<null | FileList>(null);
+  const [isSticky, setIsSticky] = useState(false);
+  const elementRef = useRef(null);
 
   const { userData } = useContext(UserContext);
-  const fetchData = useCallback(async () => {
-    const { data } = await useGetAccessDatabase({
-      url: DATABASE_ENDPOINTS.NEWS_ALL,
-    });
-    setNewsList(data);
-  }, []);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [page, setPage] = useState(Number(searchParams.get('page')) || 1);
+  const [searchQuery, setSearchQuery] = useState(
+    searchParams.get('search') || 'all'
+  );
+  const currentPageSize = 10;
 
-  const addNewNewsHandler = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const { data } = await usePostAccessDatabase({
-      url: DATABASE_ENDPOINTS.NEWS_ONE,
-      body: { userId: userData.data?._id, ...newArticleData },
+  const [topRatedNews, setTopRatedNews] = useState<NewsTypes>({
+    data: null,
+    hasError: null,
+    isLoading: false,
+  });
+  const [latestNews, setLatestNews] = useState<NewsTypes>({
+    data: null,
+    hasError: null,
+    isLoading: false,
+  });
+  const [allNews, setAllNews] = useState<AllNewsTypes>({
+    data: null,
+    rawData: { totalPages: null },
+    hasError: null,
+    isLoading: false,
+  });
+
+  const fetchTopRated = useCallback(async () => {
+    setTopRatedNews((prevState) => {
+      return { ...prevState, isLoading: true };
     });
-    if (selectedImgs) {
-      const imgResData = await useUploadImg({
-        ownerId: data.id,
-        targetLocation: 'News_img',
-        selectedFile: selectedImgs[0],
-      });
-      await usePostAccessDatabase({
-        url: DATABASE_ENDPOINTS.NEWS_UPDATE,
-        body: { img: imgResData, _id: data.id },
+    const { data, error } = await useGetAccessDatabase({
+      url: DATABASE_ENDPOINTS.NEWS_ALL,
+      params: { sortOption: 'top_rated', limit: 5 },
+    });
+
+    if (error) {
+      errorToast(error);
+      return setTopRatedNews((prevState) => {
+        return { ...prevState, isLoading: false, hasError: error };
       });
     }
-    await fetchData();
-  };
+    setTopRatedNews({ data, hasError: null, isLoading: false });
+  }, []);
 
-  const changeNewArticleHandler = (e: ChangeEvent<HTMLInputElement>) => {
-    setNewArticleData((prevState) => {
-      return { ...prevState, [e.target.name]: e.target.value };
+  const fetchLatestNews = useCallback(async () => {
+    setLatestNews((prevState) => {
+      return { ...prevState, isLoading: true };
     });
-  };
 
-  const deleteArticleHandler = async (newsId: string) => {
-    await usePostAccessDatabase({
-      url: DATABASE_ENDPOINTS.NEWS_DELETE,
-      body: { userId: userData.data?._id, newsId },
+    const { data, error } = await useGetAccessDatabase({
+      url: DATABASE_ENDPOINTS.NEWS_ALL,
+      params: {
+        sortOption: 'latest',
+        limit: 6,
+      },
     });
-    await fetchData();
-  };
+    if (error) {
+      errorToast(error);
+      return setLatestNews({ data: null, hasError: error, isLoading: false });
+    }
+    setLatestNews({ data, hasError: null, isLoading: false });
+  }, []);
+  const fetchAllNews = useCallback(async () => {
+    setAllNews((prevState) => {
+      return { ...prevState, isLoading: true };
+    });
+    const { data, error } = await useGetAccessDatabase({
+      url: DATABASE_ENDPOINTS.NEWS_SEARCH,
+      params: {
+        limit: currentPageSize,
+        currentPage: searchParams.get('page'),
+        searchQuery: searchParams.get('search'),
+      },
+    });
+    if (error) {
+      errorToast(error);
+      return setAllNews((prevState) => {
+        return { ...prevState, isLoading: false, hasError: error };
+      });
+    }
+    setAllNews({
+      data: data.data,
+      rawData: data.rawData,
+      hasError: null,
+      isLoading: false,
+    });
+  }, [searchQuery, page]);
 
   useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+    searchParams.set('search', searchQuery);
+    searchParams.set('page', page.toString());
+    setSearchParams(searchParams);
+    fetchAllNews();
+  }, [searchQuery, page]);
+
+  useEffect(() => {
+    fetchLatestNews();
+    fetchTopRated();
+  }, []);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          // Update the state based on whether the bottom of the element is visible
+          setIsSticky(entry.isIntersecting);
+        });
+      },
+      { threshold: 0 } // Fire the callback when any part of the element is visible
+    );
+
+    if (elementRef.current) {
+      observer.observe(elementRef.current);
+    }
+
+    // Cleanup the observer when the component unmounts
+    return () => {
+      observer.disconnect();
+    };
+  }, [elementRef]);
 
   return (
-    <MainContainer>
-      <div>
-        <span>News</span>
-        <Dialog>
-          {userData.data && userData.data.role !== 'User' && (
-            <DialogTrigger asChild>
-              <Button variant="default">+Add new</Button>
-            </DialogTrigger>
-          )}
-          <DialogContent>
-            <form className="space-y-4" onSubmit={addNewNewsHandler}>
-              <DialogHeader>
-                <DialogTitle>News</DialogTitle>
-                <DialogDescription>Add new news</DialogDescription>
-              </DialogHeader>
-              <div className="flex flex-col gap-4">
-                <fieldset>
-                  <Label>
-                    Title
-                    <Input
-                      className="block"
-                      name="title"
-                      onChange={(e) => changeNewArticleHandler(e)}
-                      type="text"
-                    />
-                  </Label>
-                </fieldset>
-                <fieldset>
-                  <Label>
-                    Subtitle
-                    <Input
-                      className="block"
-                      name="subtitle"
-                      onChange={(e) => changeNewArticleHandler(e)}
-                      type="text"
-                    />
-                  </Label>
-                </fieldset>
-                <fieldset>
-                  <Label>
-                    Image
-                    <Input
-                      className="block"
-                      type="file"
-                      name="img"
-                      onChange={(e) => setSelectedImgs(e.target.files)}
-                      accept="image/png, image/jpg"
-                    />
-                  </Label>
-                </fieldset>
-                <fieldset>
-                  <Label>
-                    Content
-                    <Input
-                      className="block"
-                      type="text"
-                      name="content"
-                      onChange={(e) => changeNewArticleHandler(e)}
-                    />
-                  </Label>
-                </fieldset>
-              </div>
-              <DialogFooter>
-                <DialogTrigger asChild>
-                  <Button variant="default" type="submit">
-                    Submit
-                  </Button>
-                </DialogTrigger>
-              </DialogFooter>
-            </form>
-          </DialogContent>
-        </Dialog>
-      </div>
-      <div className="flex flex-col gap-4">
-        {newsList ? (
-          newsList.map((item) => (
-            <div key={item._id} className="block p-3">
-              <Dialog>
-                <DialogTrigger asChild>
-                  <button
-                    type="button"
-                    className="rounded-md border border-slate-400 p-3 text-start shadow-sm"
-                  >
-                    {item.img && (
-                      <div className="flex max-h-[200px]">
-                        <img
-                          src={item.img.url}
-                          className="aspect-auto w-full object-cover object-center"
-                          alt="news_img"
-                        />
-                      </div>
-                    )}
-                    <h6>{item.title}</h6>
-                    {item.subtitle && (
-                      <section className="pt-3">{item.subtitle}</section>
-                    )}
-                  </button>
-                </DialogTrigger>
-                <DialogContent className="h-full max-h-full w-screen overflow-y-auto sm:max-h-[80%]">
-                  <NewsArticle
-                    newsId={item._id}
-                    deleteArticleHandler={deleteArticleHandler}
-                  />
-                </DialogContent>
-              </Dialog>
-            </div>
-          ))
-        ) : (
-          <h4>No news</h4>
+    <section>
+      <section className="-mx-4 -mt-6 mb-14 h-[40vh]">
+        {latestNews.isLoading && !latestNews.data && (
+          <Skeleton className="h-[40vh] w-full" />
         )}
-      </div>
-    </MainContainer>
+        {latestNews.hasError && <ErrorMessage message={latestNews.hasError} />}
+        {latestNews.data && (
+          <LatestNews
+            updateLatestNews={fetchLatestNews}
+            latestNewsData={latestNews.data}
+          />
+        )}
+      </section>
+      <section className="relative flex flex-col-reverse justify-between gap-4 lg:flex-row lg:items-baseline">
+        <main className="flex flex-col gap-4 lg:basis-3/5">
+          <div>
+            <h3 className="mb-2">Latest</h3>
+            <div className="flex items-stretch gap-4">
+              <div className="w-full">
+                <SearchNews
+                  changePage={setPage}
+                  changeSearchQUery={setSearchQuery}
+                />
+              </div>
+              {userData.data && userData.data.role !== UserRoleTypes.USER && (
+                <div className="inline-block">
+                  <NewNews
+                    updateAllNews={fetchAllNews}
+                    updateLatestNews={fetchLatestNews}
+                  />
+                </div>
+              )}
+            </div>
+          </div>
+          <div>
+            {allNews.isLoading && !allNews.data && (
+              <div className="space-y-4">
+                {[...Array(3)].map((el, index) => (
+                  <Skeleton
+                    key={index}
+                    className="flex w-full flex-col justify-between p-3"
+                  >
+                    <Skeleton className="mb-4 h-5 w-32" />
+                    <div className="space-y-2">
+                      <Skeleton className="h-4 w-40" />
+                      <Skeleton className="h-4 w-44" />
+                    </div>
+                  </Skeleton>
+                ))}
+              </div>
+            )}
+            {allNews.hasError && <ErrorMessage message={allNews.hasError} />}
+            {allNews.data && (
+              <AllNews allNews={allNews.data} updateAllNews={fetchAllNews} />
+            )}
+            {allNews.data &&
+              allNews.data.length > 0 &&
+              allNews.rawData.totalPages && (
+                <div className="mt-4 flex w-full items-center justify-center">
+                  <Pagination
+                    currentPage={page}
+                    onPageChange={(newPageNumber: number) => {
+                      setPage(newPageNumber);
+                    }}
+                    pageSize={currentPageSize}
+                    siblingCount={1}
+                    totalCount={allNews.rawData.totalPages}
+                  />
+                </div>
+              )}
+          </div>
+        </main>
+        <aside ref={elementRef} className="basis-full lg:basis-1/3 ">
+          <h3 className="mb-2">Trending</h3>
+          {topRatedNews.isLoading && !topRatedNews.data && (
+            <div className="space-y-4">
+              {[...Array(3)].map((el, index) => (
+                <Skeleton
+                  key={index}
+                  className="flex w-full flex-col justify-between p-3"
+                >
+                  <Skeleton className="mb-4 h-5 w-32" />
+                  <div className="space-y-2">
+                    <Skeleton className="h-4 w-40" />
+                    <Skeleton className="h-4 w-44" />
+                  </div>
+                </Skeleton>
+              ))}
+            </div>
+          )}
+          {topRatedNews.hasError && (
+            <ErrorMessage message={topRatedNews.hasError} />
+          )}
+          {topRatedNews.data && (
+            <TopRated
+              fetchTopRatedData={fetchTopRated}
+              newsTopRatedList={topRatedNews.data}
+            />
+          )}
+        </aside>
+      </section>
+    </section>
   );
 }

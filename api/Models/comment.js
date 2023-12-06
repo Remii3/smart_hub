@@ -1,11 +1,28 @@
 const mongoose = require('mongoose');
 
-const CommentSchema = mongoose.Schema({
-  user: { type: mongoose.Types.ObjectId, required: true, ref: 'User' },
-  target_id: { type: String, required: true },
-  value: { type: { rating: Number, text: String } },
-  target: { type: String },
-  created_at: { type: Date, required: true },
+const CommentSchema = new mongoose.Schema({
+  creatorData: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true,
+    ref: 'User',
+  },
+  targetData: {
+    _id: { type: mongoose.Schema.Types.ObjectId, required: true },
+    type: {
+      type: String,
+      required: true,
+      enum: ['Product', 'News'],
+    },
+  },
+  value: {
+    type: {
+      rating: { type: Number },
+      text: { type: String },
+      nickname: { type: String },
+    },
+  },
+  createdAt: { type: Date, required: true },
+  updatedAt: { type: Date, required: true },
 });
 
 const CommentModel = mongoose.model('Comment', CommentSchema);

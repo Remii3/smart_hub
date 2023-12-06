@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { ProductTypes } from '@customTypes/interfaces';
 import MainPageHeading from '@pages/home/MainPageHeading';
-import CollectionCard from '@components/cards/CollectionCard';
 import { useGetAccessDatabase } from '../../hooks/useAaccessDatabase';
 import { DATABASE_ENDPOINTS } from '../../data/endpoints';
 import { Link } from 'react-router-dom';
@@ -34,7 +33,10 @@ export default function CollectionSection() {
         />
       </div>
       <div className="grid w-full grid-cols-1 gap-6 sm:grid-cols-2">
-        <Link to="/shop" className="block cursor-pointer sm:col-span-2">
+        <Link
+          to="/shop"
+          className="block cursor-pointer rounded-xl sm:col-span-2"
+        >
           <Card className="space-y-10 p-10 transition-[box-shadow,transform] duration-300 ease-in-out hover:scale-[1.02] hover:shadow-md active:scale-100 ">
             <div className="space-y-1">
               <h3 className="pb-2 uppercase">Variety</h3>
@@ -55,7 +57,7 @@ export default function CollectionSection() {
         </Link>
         <Link
           to={{ pathname: '/search', search: 'special=bestseller' }}
-          className="block cursor-pointer"
+          className="block cursor-pointer rounded-xl"
         >
           <Card className="space-y-10 p-10 transition-[box-shadow,transform] duration-300 ease-in-out hover:scale-[1.02] hover:shadow-md active:scale-100">
             <div className="space-y-1">
@@ -80,7 +82,7 @@ export default function CollectionSection() {
             pathname: '/search',
             search: `sort=${sortOptions.PRICE_ASC}`,
           }}
-          className="block cursor-pointer"
+          className="block cursor-pointer rounded-xl"
         >
           <Card className="space-y-10 p-10 transition-[box-shadow,transform] duration-300 ease-in-out hover:scale-[1.02] hover:shadow-md active:scale-100">
             <div className="space-y-1">

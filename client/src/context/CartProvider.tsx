@@ -15,11 +15,20 @@ import {
   usePostAccessDatabase,
 } from '@hooks/useAaccessDatabase';
 import { DATABASE_ENDPOINTS } from '@data/endpoints';
+import { AddingToCartTypes } from '@customTypes/types';
 
 const initialState = {
   products: [],
-  cartPrice: 0,
+  cartPrice: null,
   isLoading: false,
+  isAdding: false,
+  addingToCartType: null,
+  isIncrementing: false,
+  isDecrementing: false,
+  isDeleting: false,
+  additionalData: {
+    discount: 0,
+  },
 };
 
 export const CartContext = createContext<{
@@ -28,20 +37,22 @@ export const CartContext = createContext<{
   addProductToCart: ({
     productId,
     productQuantity,
+    addingToCartType,
   }: {
     productId: string;
     productQuantity: number;
+    addingToCartType: AddingToCartTypes;
   }) => void;
   incrementCartItem: (productId: string) => void;
   decrementCartItem: (productId: string) => void;
   removeProductFromCart: (productId: string) => void;
 }>({
   cartState: initialState,
-  fetchCartData: () => null,
-  addProductToCart: () => null,
-  incrementCartItem: () => null,
-  decrementCartItem: () => null,
-  removeProductFromCart: () => null,
+  fetchCartData: () => undefined,
+  addProductToCart: () => undefined,
+  incrementCartItem: () => undefined,
+  decrementCartItem: () => undefined,
+  removeProductFromCart: () => undefined,
 });
 
 export default function CartProvider({ children }: { children: ReactNode }) {
@@ -59,8 +70,13 @@ export default function CartProvider({ children }: { children: ReactNode }) {
       setCart((prevState) => {
         return {
           ...prevState,
-          products: data.products,
-          cartPrice: data.cartPrice,
+          isIncrementing: false,
+          isAdding: false,
+          addingToCartType: null,
+          isDecrementing: false,
+          isDeleting: false,
+          isLoading: false,
+          ...data,
         };
       });
     }
@@ -70,24 +86,25 @@ export default function CartProvider({ children }: { children: ReactNode }) {
     async ({
       productId,
       productQuantity,
+      addingToCartType,
     }: {
       productId: string;
       productQuantity: number;
+      addingToCartType: AddingToCartTypes;
     }) => {
       setCart((prevState) => {
-        return { ...prevState, isLoading: true };
+        return {
+          ...prevState,
+          isAdding: productId,
+          addingToCartType: addingToCartType,
+        };
       });
-
       await usePostAccessDatabase({
         url: DATABASE_ENDPOINTS.CART_ADD,
         body: { userId, productId, productQuantity },
       });
 
       await fetchCartData();
-
-      setCart((prevState) => {
-        return { ...prevState, isLoading: false };
-      });
     },
     [userId, fetchCartData]
   );
@@ -96,34 +113,16 @@ export default function CartProvider({ children }: { children: ReactNode }) {
     async (productId: string) => {
       if (!cartState) return;
 
-      const newProducts = cartState.products;
-
-      const productIndex = cartState.products.findIndex(
-        (product) => product.productData._id === productId
-      );
-
-      newProducts[productIndex].inCartQuantity += 1;
-
       setCart((prevState) => {
-        return { ...prevState, isLoading: true };
+        return { ...prevState, isIncrementing: productId };
       });
 
       await usePostAccessDatabase({
         url: DATABASE_ENDPOINTS.CART_INCREMENT,
         body: { userId, productId },
       });
-      await fetchCartData();
-      setCart((prevState) => {
-        return { ...prevState, isLoading: false };
-      });
 
-      setCart((prevState) => {
-        return {
-          ...prevState,
-          cartPrice: prevState.cartPrice || 0,
-          products: newProducts,
-        };
-      });
+      await fetchCartData();
     },
     [cartState, fetchCartData, userId]
   );
@@ -132,16 +131,8 @@ export default function CartProvider({ children }: { children: ReactNode }) {
     async (productId: string) => {
       if (!cartState) return;
 
-      const newProducts = cartState.products;
-
-      const productIndex = cartState.products.findIndex(
-        (product) => product.productData._id === productId
-      );
-
-      newProducts[productIndex].inCartQuantity -= 1;
-
       setCart((prevState) => {
-        return { ...prevState, isLoading: true };
+        return { ...prevState, isDecrementing: productId };
       });
 
       await usePostAccessDatabase({
@@ -149,17 +140,6 @@ export default function CartProvider({ children }: { children: ReactNode }) {
         body: { userId, productId },
       });
       await fetchCartData();
-      setCart((prevState) => {
-        return { ...prevState, isLoading: false };
-      });
-
-      setCart((prevState) => {
-        return {
-          ...prevState,
-          cartPrice: prevState.cartPrice || 0,
-          products: newProducts,
-        };
-      });
     },
     [cartState, fetchCartData, userId]
   );
@@ -168,24 +148,15 @@ export default function CartProvider({ children }: { children: ReactNode }) {
     async (productId: string) => {
       if (!cartState) return;
 
-      const newProducts = cartState.products.filter(
-        (product) => product.productData._id !== productId
-      );
-
+      setCart((prevState) => {
+        return { ...prevState, isDeleting: productId };
+      });
       await usePostAccessDatabase({
         url: DATABASE_ENDPOINTS.CART_REMOVE,
         body: { userId, productId },
       });
 
       await fetchCartData();
-
-      setCart((prevState) => {
-        return {
-          ...prevState,
-          cartPrice: prevState.cartPrice || 0,
-          products: newProducts,
-        };
-      });
     },
     [cartState, fetchCartData, userId]
   );

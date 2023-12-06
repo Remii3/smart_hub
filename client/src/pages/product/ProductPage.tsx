@@ -4,44 +4,30 @@ import {
   useState,
   useContext,
   useCallback,
-  useMemo,
+  useRef,
 } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {
-  AuthorTypes,
-  ProductCategories,
-  UnknownProductTypes,
+  FetchDataTypes,
+  PostDataTypes,
+  ProductTypes,
 } from '@customTypes/interfaces';
 import { UserContext } from '@context/UserProvider';
-import ProductPill from './ProductPill';
-import StarRating from '@features/starRating/StarRating';
+import StarRating from '@features/rating/StarRating';
 import ProductForm from '@pages/product/ProductForm';
-import { Button } from '@components/UI/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@components/UI/dialog';
+import { Button, buttonVariants } from '@components/UI/button';
+import { Dialog, DialogContent, DialogTrigger } from '@components/UI/dialog';
 import {
   useGetAccessDatabase,
   usePostAccessDatabase,
 } from '../../hooks/useAaccessDatabase';
 import { DATABASE_ENDPOINTS } from '../../data/endpoints';
 import Comments from '@features/comments/Comments';
-import { Skeleton } from '@components/UI/skeleton';
 import { Textarea } from '@components/UI/textarea';
 import { Input } from '@components/UI/input';
 import { UserRoleTypes } from '@customTypes/types';
-import { useToast } from '@components/UI/use-toast';
-import { ToastAction } from '@components/UI/toast';
-import MainContainer from '@layout/MainContainer';
-import SuspenseComponent from '@components/suspense/SuspenseComponent';
 import LoadingCircle from '@components/Loaders/LoadingCircle';
-import { Navigation, Pagination } from 'swiper';
+import { Navigation, Pagination, Thumbs } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import 'swiper/css/pagination';
@@ -64,71 +50,93 @@ import {
   FormMessage,
 } from '@components/UI/form';
 import Select from 'react-select';
+import errorToast from '@components/UI/error/errorToast';
+import SimilarProducts from '@features/product/SimilarProducts';
+import type { Swiper as SwiperType } from 'swiper';
+import { CartContext } from '@context/CartProvider';
+import ErrorMessage from '@components/UI/error/ErrorMessage';
+import ProductDescription from '@features/product/ProductDescription';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@components/UI/accordion';
+import DeleteDialog from '@components/UI/dialogs/DeleteDialog';
+import CreatableSelect from 'react-select/creatable';
+import SwiperArrowRight from '@components/swiper/navigation/SwiperArrowRight';
+import SwiperArrowLeft from '@components/swiper/navigation/SwiperArrowLeft';
+import SwiperDots from '@components/swiper/pagination/SwiperDots';
+import MarketplaceBadge from '@components/UI/badges/MarketplaceBadge';
+import { TrashIcon } from '@radix-ui/react-icons';
+import RatingSummary from '@features/comments/RatingSummary';
+import { Separator } from '@components/UI/separator';
+import Breadcrumb from '@components/breadcrumbs/Breadcrumb';
 
-interface ProductTypes {
-  isLoading: boolean;
-  data: null | UnknownProductTypes;
+interface ProductTypesLocal extends FetchDataTypes {
+  data: null | ProductTypes;
 }
-interface ProductRating {
-  quantity: number;
-  value: number;
-}
-interface ProductEditTypes {
-  isEditing: boolean;
-  isLoading: boolean;
-  data: {
-    title: null | string;
-    price: null | number;
-    categories: null | { value: string; label: string; _id: string }[];
-    authors: null | AuthorTypes[];
-    quantity: null | number;
-    description: null | string;
-  };
-  imgsArray: { id: string; url: string; data?: File }[];
-}
+
 type SelectedImgsTypes = {
-  id: string;
-  data?: File;
-  url: string;
-}[];
+  isDirty: boolean;
+  imgs: {
+    id: string;
+    data?: File;
+    url: string;
+  }[];
+};
 
 const formSchema = z.object({
-  title: z
-    .string()
-    .min(2, {
-      message: 'Title must be at least 2 characters.',
-    })
-    .optional(),
+  title: z.string().min(2, {
+    message: 'Title must be at least 2 characters.',
+  }),
   authors: z
     .array(
       z.object({
         _id: z.string(),
-        label: z.string(),
-        value: z.string(),
+        authorsInfo: z.any(),
       })
     )
-    .optional(),
-  categories: z.array(
-    z.object({
-      _id: z.string(),
-      label: z.string(),
-      value: z.string(),
-    })
-  ),
-  description: z.string().optional(),
-  quantity: z.number().min(1).optional(),
-  price: z.string().or(z.number()).optional(),
+    .min(1),
+  categories: z.any(),
+  shortDescription: z.string(),
+  marketplace: z.string(),
+  quantity: z.number().min(1),
+  price: z.number(),
 });
-
+interface ProductRating {
+  quantity: number;
+  value: number;
+  reviews: [];
+}
+interface EditingTypes extends PostDataTypes {
+  isEditing: boolean;
+}
 export default function ProductPage() {
-  const [productState, setProductState] = useState<ProductTypes>({
+  const [activeThumb, setActiveThumb] = useState<SwiperType | null>(null);
+  const [deleteDialogState, setDeleteDialogState] = useState(false);
+
+  const [productState, setProductState] = useState<ProductTypesLocal>({
     isLoading: false,
+    hasError: null,
     data: null,
   });
-  const [selectedImgs, setSelectedImgs] = useState<SelectedImgsTypes>([]);
+  const [newDescription, setNewDescription] = useState('');
+  const [isMyProduct, setIsMyProduct] = useState(false);
+  const { userData, fetchUserData } = useContext(UserContext);
+  const [isEditing, setIsEditing] = useState<EditingTypes>({
+    hasError: null,
+    isLoading: false,
+    isSuccess: false,
+    isEditing: false,
+  });
+  const [selectedImgs, setSelectedImgs] = useState<SelectedImgsTypes>({
+    imgs: [],
+    isDirty: false,
+  });
   const [imgsToRemove, setImgsToRemove] = useState<string[]>([]);
   const [imgsToAdd, setImgsToAdd] = useState<{ id: string; data: File }[]>([]);
-  const [isMyProduct, setIsMyProduct] = useState(false);
+
   const [authorState, setAuthorState] = useState<{
     isLoading: boolean;
     options: any;
@@ -143,33 +151,20 @@ export default function ProductPage() {
     isLoading: false,
     options: [],
   });
-  const [productEditState, setProductEditState] = useState<ProductEditTypes>({
-    isEditing: false,
-    isLoading: false,
-    data: {
-      title: null,
-      price: null,
-      categories: null,
-      authors: null,
-      quantity: null,
-      description: null,
-    },
-    imgsArray: [],
-  });
-
-  const { userData, fetchUserData } = useContext(UserContext);
-  const { toast } = useToast();
-  const navigate = useNavigate();
-  const path = useLocation();
   const [productRating, setProductRating] = useState<ProductRating>();
-  let unPreparedProdId: string | any[] | null = null;
-  unPreparedProdId = path.pathname.split('/');
-  const prodId: string = unPreparedProdId[unPreparedProdId.length - 1];
 
-  const form = useForm<any>({
+  const headerHeight = 124;
+  const shortDescriptionRef = useRef<null | HTMLDivElement>(null);
+  const detailsRef = useRef<null | HTMLDivElement>(null);
+  const similarRef = useRef<null | HTMLDivElement>(null);
+  const commentsRef = useRef<null | HTMLDivElement>(null);
+
+  const productId = window.location.href.split('/').at(-1);
+  const navigate = useNavigate();
+
+  const form = useForm({
     resolver: zodResolver(formSchema),
   });
-  const { handleSubmit, control, reset } = form;
 
   const fetchAllCategories = useCallback(async () => {
     const { data } = await useGetAccessDatabase({
@@ -180,6 +175,18 @@ export default function ProductPage() {
     });
   }, []);
 
+  const fetchComments = useCallback(async () => {
+    const { data } = await useGetAccessDatabase({
+      url: DATABASE_ENDPOINTS.RATING_RATING,
+      params: { targetId: productId },
+    });
+    setProductRating({
+      quantity: data.quantity,
+      value: data.avgRating,
+      reviews: data.reviews,
+    });
+  }, [productId]);
+
   const fetchAllAuthors = useCallback(async () => {
     const { data } = await useGetAccessDatabase({
       url: DATABASE_ENDPOINTS.USER_AUTHORS,
@@ -189,106 +196,76 @@ export default function ProductPage() {
     });
   }, []);
 
-  const fetchComments = useCallback(async () => {
-    const { data } = await useGetAccessDatabase({
-      url: DATABASE_ENDPOINTS.PRODUCT_RATING,
-      params: { _id: prodId },
-    });
-    setProductRating({ quantity: data.rating.length, value: data.avgRating });
-  }, []);
-
   const fetchData = useCallback(async () => {
     setProductState((prevState) => {
       return { ...prevState, isLoading: true };
     });
     const { data, error } = await useGetAccessDatabase({
       url: DATABASE_ENDPOINTS.PRODUCT_ONE,
-      params: { productId: prodId },
+      params: { _id: productId },
     });
     if (error) {
-      return toast({
-        variant: 'destructive',
-        title: 'Uh oh! Something went wrong.',
-        description: 'There was a problem with your request.',
-        action: (
-          <ToastAction onClick={() => location.reload()} altText="Try again">
-            Try again
-          </ToastAction>
-        ),
+      errorToast(error);
+      return setProductState((prevState) => {
+        return { ...prevState, isLoading: false, hasError: error };
       });
     }
+    setProductState({ data, isLoading: false, hasError: null });
 
-    setSelectedImgs(data.imgs);
-    setProductEditState((prevState) => {
-      return {
-        ...prevState,
-        data: {
-          title: data.title,
-          authors: data.authors,
-          categories: data.categories,
-          price: data.shop_info.price,
-          quantity: data.quantity,
-          description: data.description,
-        },
-        imgsArray: data.imgs,
-      };
+    setSelectedImgs({ imgs: data.imgs, isDirty: false });
+    setNewDescription(data.description);
+    form.reset({
+      title: data.title,
+      authors: data.authors,
+      categories: data.categories,
+      price: data.price.value && Number(data.price.value.slice(1)),
+      quantity: data.quantity,
+      shortDescription: data.shortDescription,
+      marketplace: data.marketplace,
     });
-    setProductRating({
-      quantity: data.rating.count,
-      value: data.rating.rating,
+  }, [productId]);
+
+  const clearForm = () => {
+    setNewDescription(productState.data ? productState.data.description : '');
+    setSelectedImgs({
+      imgs: productState.data ? productState.data.imgs : [],
+      isDirty: false,
     });
-    setProductState({ data, isLoading: false });
-  }, [prodId]);
+    form.reset({
+      title: productState.data ? productState.data.title : '',
+      shortDescription: productState.data
+        ? productState.data.shortDescription
+        : '',
+      quantity: productState.data ? productState.data.quantity : 0,
+      price: productState.data
+        ? Number(productState.data.price.value.slice(1))
+        : 0,
+      marketplace: productState.data ? productState.data.marketplace : '',
+      authors: productState.data ? productState.data.authors : [],
+      categories: productState.data ? productState.data.categories : [],
+    });
+  };
 
   useEffect(() => {
     fetchData();
-    fetchAllAuthors();
-    fetchAllCategories();
-  }, [fetchData]);
+    fetchComments();
+  }, [productId]);
 
   useEffect(() => {
     if (
       userData.data &&
-      ((userData.data.role == UserRoleTypes.AUTHOR &&
-        userData.data.author_info.my_products.find(
-          (product: UnknownProductTypes) =>
-            product._id === productState.data?._id
-        )) ||
+      productState.data &&
+      (userData.data._id == productState.data.creatorData._id ||
         userData.data.role == UserRoleTypes.ADMIN)
     ) {
       setIsMyProduct(true);
-      if (!productState.data) return;
-      let preparedAuthors = [];
-      for (let i = 0; i < productState.data.authors.length; i++) {
-        if (!productState.data.authors[i].author_info) break;
-        preparedAuthors.push({
-          label: productState.data.authors[i].author_info.pseudonim,
-          value: productState.data.authors[i].author_info.pseudonim,
-          _id: productState.data.authors[i]._id,
-        });
-      }
-      let preparedCategories = [];
-      if (productState.data.categories) {
-        for (let i = 0; i < productState.data.categories.length; i++) {
-          preparedCategories.push({
-            label: productState.data.categories[i].label,
-            value: productState.data.categories[i].value,
-            _id: productState.data.categories[i]._id,
-          });
-        }
-      }
-      reset({
-        title: productState.data.title,
-        price: productState.data.shop_info.price,
-        authors: preparedAuthors,
-        categories: preparedCategories,
-        quantity: productState.data.quantity,
-        description: productState.data.description,
-      });
+      fetchAllAuthors();
+      fetchAllCategories();
     }
-  }, [userData.data, productState]);
+  }, [userData.data, productState.data]);
+
   const removeImg = (clieckedId: string) => {
-    const updatedImgs = [...selectedImgs];
+    const updatedImgs = [...selectedImgs.imgs];
     const indexToRemove = updatedImgs.findIndex(
       (item) => item.id === clieckedId
     );
@@ -297,7 +274,7 @@ export default function ProductPage() {
     });
     if (indexToRemove !== -1) {
       const newArray = updatedImgs.filter((item) => item.id !== clieckedId);
-      setSelectedImgs(newArray);
+      setSelectedImgs({ imgs: newArray, isDirty: true });
     }
   };
 
@@ -305,9 +282,11 @@ export default function ProductPage() {
     e: ChangeEvent<HTMLInputElement>,
     clickedId: string
   ) => {
-    const newArray = [...selectedImgs];
+    const newArray = [...selectedImgs.imgs];
     if (e.target.files && e.target.files[0]) {
-      const index = selectedImgs.findIndex((item) => item.id === clickedId);
+      const index = selectedImgs.imgs.findIndex(
+        (item) => item.id === clickedId
+      );
       const eventFiles = e.target.files;
       if (index != -1) {
         newArray[index] = {
@@ -325,534 +304,638 @@ export default function ProductPage() {
       setImgsToAdd((prevState) => {
         return [...prevState, { id: clickedId, data: eventFiles[0] }];
       });
-      setSelectedImgs(newArray);
+      setSelectedImgs({ imgs: newArray, isDirty: true });
     }
   };
 
-  const toggleEditting = () => {
-    if (productEditState.isEditing) {
-      setImgsToAdd([]);
-      setImgsToRemove([]);
-      setSelectedImgs(productEditState.imgsArray);
-      reset();
+  const updateProductData = async () => {
+    if (!userData.data) return;
+    setIsEditing((prevState) => {
+      return { ...prevState, isLoading: true };
+    });
+
+    let filteredImgs = selectedImgs.imgs;
+
+    if (imgsToRemove.length > 0) {
       if (!productState.data) return;
-      setProductEditState((prevState) => {
-        return {
-          ...prevState,
-          isEditing: false,
-          data: {
-            authors: productState.data!.authors,
-            categories: productState.data!.categories ?? [],
-            description: productState.data!.description ?? '',
-            price: productState.data!.shop_info.price,
-            quantity: productState.data!.quantity,
-            title: productState.data!.title,
-          },
-        };
-      });
-    } else {
-      setProductEditState((prevState) => {
-        return { ...prevState, isEditing: true };
-      });
-    }
-  };
-
-  const updateProductData = async (
-    formResponse: z.infer<typeof formSchema>
-  ) => {
-    if (productState.data) {
-      setProductState((prevState) => {
-        return { ...prevState, isLoading: true };
-      });
-      setProductEditState((prevState) => {
-        return { ...prevState, isLoading: true };
-      });
-
-      let filteredImgs = selectedImgs;
-
-      if (imgsToRemove.length > 0) {
-        for (let i = 0; i < imgsToRemove.length; i++) {
-          const checkIndex = productState.data.imgs.findIndex(
-            (img) => img.id === imgsToRemove[i]
-          );
-          if (checkIndex != -1) {
-            await useDeleteImg({
-              imgId: imgsToRemove[i],
-              ownerId: prodId,
-              targetLocation: 'Product_imgs',
-            });
-            filteredImgs = filteredImgs.filter((item) => {
-              for (const id of imgsToRemove) {
-                if (item.id.includes(id)) {
-                  return false;
-                }
+      for (let i = 0; i < imgsToRemove.length; i++) {
+        const checkIndex = productState.data.imgs.findIndex(
+          (img) => img.id === imgsToRemove[i]
+        );
+        if (checkIndex != -1) {
+          if (!productId) return;
+          await useDeleteImg({
+            imgId: imgsToRemove[i],
+            ownerId: productId,
+            targetLocation: 'ProductImgs',
+          });
+          filteredImgs = filteredImgs.filter((item) => {
+            for (const id of imgsToRemove) {
+              if (item.id.includes(id)) {
+                return false;
               }
-              return true;
-            });
-          }
-        }
-      }
-
-      if (imgsToAdd.length > 0) {
-        for (let i = 0; i < imgsToAdd.length; i++) {
-          const index = selectedImgs.findIndex(
-            (img) => img.id === imgsToAdd[i].id
-          );
-          const url = await useUploadImg({
-            ownerId: prodId,
-            selectedFile: imgsToAdd[i].data,
-            targetLocation: 'Product_imgs',
-            currentId: imgsToAdd[i].id,
-          });
-          if (url) {
-            filteredImgs[index] = url;
-          }
-        }
-      }
-      function differentAuthors(array1, array2) {
-        if (array1.length === array2.length) {
-          return array1.every((element, index) => {
-            if (element.label === array2[index].author_info.pseudonim) {
-              return false;
             }
             return true;
           });
         }
-        return true;
       }
-      function differentCategories(array1, array2) {
-        if (array1.length === array2.length) {
-          return array1.every((element, index) => {
-            if (element.value === array2[index].value) {
-              return false;
-            }
-            return true;
-          });
-        }
-        return true;
-      }
-      function validImgsArray(array1: SelectedImgsTypes) {
-        array1.forEach((item) => {
-          if (item.data) {
-            return true;
-          }
+    }
+    if (imgsToAdd.length > 0) {
+      for (let i = 0; i < imgsToAdd.length; i++) {
+        const index = selectedImgs.imgs.findIndex(
+          (img) => img.id === imgsToAdd[i].id
+        );
+        const url = await useUploadImg({
+          ownerId: productId,
+          selectedFile: imgsToAdd[i].data,
+          targetLocation: 'ProductImgs',
+          currentId: imgsToAdd[i].id,
         });
-
-        return false;
+        if (url) {
+          filteredImgs[index] = url;
+        }
       }
-      const productData = {
-        _id: productState.data._id,
-        market_place: productState.data.market_place,
-      } as {
-        _id: string;
-        market_place: string;
-        title?: string;
-        price?: string | number;
-        quantity?: string | number;
-        description?: string;
-        authors?: any[];
-        categories?: any[];
-        imgs?: any[];
-      };
-      if (formResponse.title !== productState.data.title)
-        productData.title = formResponse.title;
-      if (formResponse.price !== productState.data.shop_info.price)
-        productData.price = formResponse.price;
-      if (formResponse.description! == productState.data.description)
-        productData.description = formResponse.description;
-      if (formResponse.quantity !== formResponse.quantity)
-        productData.quantity = formResponse.quantity;
-      if (differentAuthors(formResponse.authors, productState.data.authors))
-        productData.authors = formResponse.authors;
-      if (
-        differentCategories(
-          formResponse.categories,
-          productState.data.categories
-        )
-      )
-        productData.categories = formResponse.categories;
-      if (validImgsArray(filteredImgs)) productData.imgs = filteredImgs;
-      await usePostAccessDatabase({
-        url: DATABASE_ENDPOINTS.PRODUCT_UPDATE,
-        body: productData,
+    }
+
+    const dirtyData = Object.fromEntries(
+      Object.keys(form.formState.dirtyFields).map((x: string) => [
+        x,
+        form.getValues(x as keyof z.infer<typeof formSchema>),
+      ])
+    );
+
+    if (newDescription !== productState.data?.description) {
+      dirtyData.description = newDescription;
+    }
+    if (selectedImgs.isDirty) {
+      dirtyData.imgs = selectedImgs.imgs;
+    }
+
+    const { error } = await usePostAccessDatabase({
+      url: DATABASE_ENDPOINTS.PRODUCT_UPDATE,
+      body: { _id: productId, ...dirtyData },
+    });
+
+    if (error) {
+      errorToast(error);
+      return setIsEditing((prevState) => {
+        return { ...prevState, hasError: error, isLoading: false };
       });
-      setImgsToAdd([]);
-      setImgsToRemove([]);
-      await fetchData();
-      setProductEditState((prevState) => {
-        return { ...prevState, isEditing: false, isLoading: false };
+    }
+
+    fetchData();
+    setIsEditing({
+      hasError: null,
+      isEditing: false,
+      isLoading: false,
+      isSuccess: true,
+    });
+    setImgsToAdd([]);
+    setImgsToRemove([]);
+    setTimeout(() => {
+      setIsEditing((prevState) => {
+        return { ...prevState, isSuccess: false };
       });
+    }, 2000);
+  };
+
+  const deleteHandler = async () => {
+    const { error } = await usePostAccessDatabase({
+      url: DATABASE_ENDPOINTS.PRODUCT_DELETE,
+      body: { _id: productId },
+    });
+    if (error) {
+      return errorToast(error);
+    }
+
+    fetchUserData();
+    navigate(-1);
+  };
+
+  const [selectedQuantity, setSelectedQuantity] = useState(1);
+  const { addProductToCart, cartState } = useContext(CartContext);
+
+  let itemCapacity = false;
+  let itemBtnCapacity = false;
+
+  const addToCartHandler = async () => {
+    if (productId) {
+      addProductToCart({
+        productId: productId,
+        productQuantity: selectedQuantity,
+        addingToCartType: 'addToCart',
+      });
+      setSelectedQuantity(1);
+    }
+  };
+  const incrementQuantityHandler = () => {
+    if (productState.data && productState.data.quantity! <= selectedQuantity)
+      return;
+    setSelectedQuantity((prevState) => (prevState += 1));
+  };
+  const decrementQuantityHandler = () => {
+    if (selectedQuantity <= 1) return;
+    setSelectedQuantity((prevState) => (prevState -= 1));
+  };
+
+  const currentItem = cartState.products.find((product) => {
+    return product.productData._id === productId;
+  });
+  if (!productState.data) return;
+  if (currentItem) {
+    itemCapacity =
+      productState.data.quantity! <= selectedQuantity ||
+      currentItem.inCartQuantity + selectedQuantity >=
+        productState.data.quantity! ||
+      false;
+    itemBtnCapacity =
+      productState.data.quantity! < selectedQuantity ||
+      currentItem.inCartQuantity + selectedQuantity >
+        productState.data.quantity! ||
+      false;
+  } else {
+    itemCapacity = productState.data.quantity! <= selectedQuantity || false;
+    itemBtnCapacity = productState.data.quantity! < selectedQuantity || false;
+  }
+
+  const buyNowHandler = async () => {
+    if (productId) {
+      await addProductToCart({
+        productId: productId,
+        productQuantity: selectedQuantity,
+        addingToCartType: 'buyNow',
+      });
+      setSelectedQuantity(1);
+      navigate('/checkout');
     }
   };
 
-  const deleteItemHandler = async () => {
-    if (productState.data) {
-      await usePostAccessDatabase({
-        url: DATABASE_ENDPOINTS.PRODUCT_DELETE,
-        body: { _id: productState.data._id, userId: userData.data?._id },
-      });
-      fetchUserData();
-      navigate(-1);
-    }
-  };
-  if (!productState.data || userData.isLoading) return <></>;
   return (
-    <MainContainer className="relative py-8">
-      <div className="grid grid-cols-1 items-start gap-8 md:grid-cols-2">
-        <div className="grid grid-cols-1 items-center space-y-4">
-          {productState.isLoading && (
-            <div className="max-w-[500px]">
-              <Skeleton className="aspect-square h-full w-full rounded-xl object-cover" />
-              <div className="flex gap-4 lg:mt-4">
-                <Skeleton className="aspect-square w-full rounded-xl object-cover" />
-                <Skeleton className="aspect-square w-full rounded-xl object-cover" />
-                <Skeleton className="aspect-square w-full rounded-xl object-cover" />
-                <Skeleton className="aspect-square w-full rounded-xl object-cover" />
-              </div>
-            </div>
-          )}
-          {!productState.isLoading && productState.data.imgs && (
-            <div className="space-y-2">
-              {productEditState.isEditing &&
-                selectedImgs.map((item) => (
-                  <div
-                    key={item.id}
-                    className="group relative me-2 inline-block cursor-pointer"
-                    onClick={() => removeImg(item.id)}
+    <section
+      ref={shortDescriptionRef}
+      className="relative min-h-[calc(100vh-64px)]"
+    >
+      {productState.isLoading && <LoadingCircle />}
+      {productState.hasError && (
+        <ErrorMessage message={productState.hasError} />
+      )}
+      {!productState.isLoading && productState.data && (
+        <div className="flex flex-col gap-10">
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(updateProductData)}>
+              {isMyProduct && (
+                <div className="mb-3 flex w-full justify-end gap-3">
+                  <DeleteDialog
+                    deleteHandler={deleteHandler}
+                    openState={deleteDialogState}
+                    openStateHandler={setDeleteDialogState}
                   >
-                    <img
-                      key={item.id}
-                      id={item.id}
-                      alt="preview_image"
-                      className="aspect-auto h-24 w-24"
-                      src={item.url}
-                    />
-                    <div className="absolute inset-0 flex items-center justify-center bg-slate-100/80 opacity-0 transition duration-150 ease-out group-hover:opacity-90">
-                      <XCircleIcon className="h-12 w-12" />
-                    </div>
-                  </div>
-                ))}
-              <div className="relative">
-                <Dialog>
-                  {productEditState.isEditing && selectedImgs.length >= 1 && (
-                    <Label className="absolute left-0 top-0 block h-full w-full">
-                      <Input
-                        name="file"
-                        accept=".jpg, .jpeg, .png"
-                        type="file"
-                        value={''}
-                        onChange={(e) => onImageChange(e, selectedImgs[0].id)}
-                        className="hidden"
-                      />
-                      <div className="flex h-full w-full cursor-pointer items-center justify-center bg-black/20 p-1 transition-colors duration-150 ease-out hover:bg-black/30">
-                        <PlusCircleIcon className="h-12 w-12" />
-                      </div>
-                    </Label>
+                    <Button
+                      type="button"
+                      variant={'destructive'}
+                      size={'default'}
+                      disabled={isEditing.isLoading}
+                      onClick={() => setDeleteDialogState(true)}
+                    >
+                      <TrashIcon className="w-5 h-5" />
+                    </Button>
+                  </DeleteDialog>
+                  {isEditing.isEditing && (
+                    <Button
+                      type="submit"
+                      variant={'outline'}
+                      disabled={isEditing.isLoading}
+                      className="relative text-green-600 hover:text-green-600"
+                    >
+                      {isEditing.isLoading && <LoadingCircle />}
+                      <span className={`${isEditing.isLoading && 'invisible'}`}>
+                        Accept
+                      </span>
+                    </Button>
                   )}
-
-                  <DialogTrigger className="mx-auto block">
-                    {productEditState.isEditing && selectedImgs.length > 0 && (
-                      <img
-                        src={selectedImgs[0].url}
-                        className="mx-auto aspect-auto h-full w-full max-w-[500px] rounded-xl object-cover lg:xl:w-[90%] xl:w-[80%]"
-                      />
-                    )}
-                    {!productEditState.isEditing &&
-                      productState.data.imgs.length > 0 && (
-                        <img
-                          src={productState.data.imgs[0].url}
-                          className="mx-auto aspect-auto h-full w-full max-w-[500px] rounded-xl object-cover lg:xl:w-[90%] xl:w-[80%]"
-                        />
-                      )}
-                  </DialogTrigger>
-                  <DialogContent>
-                    {productState.data.imgs.length > 0 && (
-                      <img
-                        src={productState.data.imgs[0].url}
-                        className="mx-auto aspect-square h-full w-full max-w-[500px] rounded-xl object-cover lg:xl:w-[90%] xl:w-[80%]"
-                      />
-                    )}
-                  </DialogContent>
-                </Dialog>
+                  <Button
+                    type="button"
+                    variant={'outline'}
+                    disabled={isEditing.isLoading}
+                    onClick={() => {
+                      clearForm();
+                      setIsEditing((prevState) => {
+                        return {
+                          ...prevState,
+                          isEditing: !prevState.isEditing,
+                        };
+                      });
+                    }}
+                  >
+                    <span className={`${!isEditing.isEditing && 'invisible'}`}>
+                      Cancel
+                    </span>
+                    <span
+                      className={`${
+                        isEditing.isEditing && 'invisible'
+                      } absolute`}
+                    >
+                      Edit
+                    </span>
+                  </Button>
+                </div>
+              )}
+              <div className="mb-4">
+                <Breadcrumb
+                  pathStops={[
+                    {
+                      name: productState.data.marketplace,
+                      path: `/${productState.data.marketplace}`,
+                    },
+                    { name: productState.data.title },
+                  ]}
+                />
               </div>
-              <div>
-                <Swiper
-                  navigation={{
-                    nextEl: `.swiper-productImage-button-next`,
-                    prevEl: `.swiper-productImage-button-prev`,
-                    enabled: false,
-                  }}
-                  slidesPerView={2.2}
-                  modules={[Navigation]}
-                  breakpoints={{
-                    640: {
-                      slidesPerView: 2.2,
-                      navigation: {
-                        enabled: true,
-                      },
-                    },
-                    1024: {
-                      slidesPerView: 3.2,
-                      navigation: {
-                        enabled: true,
-                      },
-                    },
-                    1280: {
-                      slidesPerView: 4.2,
-                      navigation: {
-                        enabled: true,
-                      },
-                    },
-                  }}
-                  className="-mr-4"
-                >
-                  <SuspenseComponent fallback={<LoadingCircle />}>
-                    {productEditState.isEditing ? (
-                      <div>
-                        {selectedImgs.map((el, index) => {
-                          if (index !== 0) {
-                            return (
-                              <SwiperSlide key={el.id} className="pr-6">
-                                <div className="relative">
-                                  <Label className="absolute left-0 top-0 block h-full w-full">
-                                    <Input
-                                      name="file"
-                                      accept=".jpg, .jpeg, .png"
-                                      type="file"
-                                      value={''}
-                                      onChange={(e) => onImageChange(e, el.id)}
-                                      className="hidden"
-                                    />
-                                    <div className="flex h-full w-full cursor-pointer items-center justify-center bg-black/20 p-1 transition-colors duration-150 ease-out hover:bg-black/30">
-                                      <PlusCircleIcon className="h-12 w-12" />
-                                    </div>
-                                  </Label>
-                                  <img
-                                    src={el.url}
-                                    key={index}
-                                    alt="product_img"
-                                    className="aspect-square rounded-xl object-cover"
-                                  />
-                                </div>
-                              </SwiperSlide>
-                            );
-                          }
-                        })}
-                        <SwiperSlide className="pr-6">
-                          <div className="relative">
-                            <Label className="absolute left-0 top-0 block h-full w-full">
-                              <Input
-                                name="file"
-                                accept=".jpg, .jpeg, .png"
-                                type="file"
-                                value={''}
-                                onChange={(e) => onImageChange(e, v4())}
-                                className="hidden"
-                              />
-                              <div className="flex h-full w-full cursor-pointer items-center justify-center bg-black/20 p-1 transition-colors duration-150 ease-out hover:bg-black/30">
-                                <PlusCircleIcon className="h-12 w-12" />
-                              </div>
-                            </Label>
-                            <div className="aspect-square h-full w-full rounded-xl bg-primary/20 object-cover" />
+
+              <div className="flex gap-2 mb-2 justify-between items-start flex-col md:flex-row">
+                <div>
+                  <div className="max-w-screen md:max-w-sm lg:max-w-xl xl:max-w-3xl 2xl:max-w-4xl w-full">
+                    {isEditing.isEditing && (
+                      <div className="mb-4 flex flex-wrap gap-4">
+                        {selectedImgs.imgs.map((item) => (
+                          <div
+                            key={item.id}
+                            className="group relative basis-1/4 cursor-pointer"
+                            onClick={() => removeImg(item.id)}
+                          >
+                            <XCircleIcon className="absolute left-1/2 top-1/2 z-10 h-12 w-12 -translate-x-1/2 -translate-y-1/2 transform text-slate-200 opacity-75 transition-[opacity,filter] group-hover:opacity-100" />
+                            <img
+                              key={item.id}
+                              id={item.id}
+                              alt="Product preview remove img."
+                              className="aspect-[4/3] w-full rounded-md object-cover object-center brightness-[40%] transition group-hover:brightness-[20%]"
+                              src={item.url}
+                            />
                           </div>
-                        </SwiperSlide>
+                        ))}
                       </div>
-                    ) : (
-                      productState.data.imgs.map((el, index) => {
-                        if (index !== 0) {
-                          return (
-                            <SwiperSlide key={el.id} className=" pr-6">
-                              <div className="relative">
+                    )}
+                    {selectedImgs.imgs.length > 0 ? (
+                      <div className="space-y-3 w-full">
+                        <Swiper
+                          navigation={{
+                            nextEl: `.swiper-thumbPreview-button-next`,
+                            prevEl: `.swiper-thumbPreview-button-prev`,
+                          }}
+                          spaceBetween={12}
+                          modules={[Navigation, Thumbs]}
+                          grabCursor
+                          thumbs={{
+                            swiper:
+                              activeThumb && !activeThumb.destroyed
+                                ? activeThumb
+                                : null,
+                          }}
+                          className="relative"
+                        >
+                          {selectedImgs.imgs.map((el, index) => {
+                            return (
+                              <SwiperSlide key={el.id} className="relative">
                                 <Dialog>
-                                  <DialogTrigger className="block">
+                                  {isEditing.isEditing && (
+                                    <label className="group absolute left-0 top-0 z-20 block h-full w-full cursor-pointer ">
+                                      <Input
+                                        name="file"
+                                        accept=".jpg, .jpeg, .png"
+                                        type="file"
+                                        value={''}
+                                        onChange={(e) =>
+                                          onImageChange(e, el.id)
+                                        }
+                                        className="hidden"
+                                      />
+                                      <img
+                                        src={el.url}
+                                        key={el.id}
+                                        alt="product_img"
+                                        className={`${
+                                          isEditing.isEditing
+                                            ? 'w-full brightness-50 transition-[filter] group-hover:brightness-[25%]'
+                                            : ''
+                                        } aspect-4/3 w-full h-full rounded-md object-cover object-center`}
+                                      />
+
+                                      <PlusCircleIcon className="absolute left-1/2 top-1/2 z-10 h-24 w-24 -translate-x-1/2 -translate-y-1/2 transform text-slate-300 opacity-95 brightness-95 transition-[opacity,filter] group-hover:opacity-100 group-hover:brightness-100" />
+                                    </label>
+                                  )}
+
+                                  <DialogTrigger className="block w-full">
                                     <img
                                       src={el.url}
-                                      key={index}
+                                      key={el.id}
                                       alt="product_img"
-                                      className="aspect-square rounded-xl object-cover"
+                                      className={`aspect-[4/3] w-full rounded-md object-cover object-center`}
                                     />
                                   </DialogTrigger>
-                                  <DialogContent>
+                                  <DialogContent className="w-screen max-w-[100vw] p-0 sm:w-auto sm:max-w-3xl">
                                     <Swiper
                                       navigation={{
-                                        nextEl: `.swiper-bigProductImg-button-next`,
-                                        prevEl: `.swiper-bigProductImg-button-prev`,
+                                        nextEl: `.swiper-preview-button-next`,
+                                        prevEl: `.swiper-preview-button-prev`,
                                       }}
-                                      grabCursor
-                                      initialSlide={index - 1}
-                                      nested={true}
-                                      slidesPerView={'auto'}
                                       pagination={{
                                         clickable: true,
+                                        el: '.swiper-latest-news-pagination',
                                       }}
+                                      grabCursor
+                                      spaceBetween={4}
+                                      initialSlide={index}
+                                      nested={true}
+                                      slidesPerView={'auto'}
                                       direction="horizontal"
                                       modules={[Pagination, Navigation]}
                                     >
-                                      <SuspenseComponent
-                                        fallback={<LoadingCircle />}
-                                      >
-                                        {!productState.data && 'No items'}
-                                        {productState.data &&
-                                        productState.data.imgs
-                                          ? productState.data.imgs.map(
-                                              (nestedImgs, nestedIndex) => {
-                                                if (nestedIndex === 0) return;
-                                                return (
-                                                  <SwiperSlide
-                                                    key={nestedImgs.id}
-                                                  >
-                                                    <div className="relative">
-                                                      <img
-                                                        src={nestedImgs.url}
-                                                        alt="product_img"
-                                                        className="aspect-square rounded-xl object-cover"
-                                                      />
-                                                    </div>
-                                                  </SwiperSlide>
-                                                );
-                                              }
-                                            )
-                                          : 'Hello'}
-                                      </SuspenseComponent>
-                                      <div
-                                        className={`swiper-button-next swiper-bigProductImg-button-next color-primary right-0 flex items-center justify-center rounded-full bg-white p-8 opacity-90 backdrop-blur-sm`}
-                                      ></div>
-                                      <div
-                                        className={`swiper-button-prev swiper-bigProductImg-button-prev color-primary left-0 flex items-center justify-center rounded-full bg-white p-8 opacity-90 backdrop-blur-sm`}
-                                      ></div>
+                                      {selectedImgs.imgs.map((nestedImgs) => {
+                                        return (
+                                          <SwiperSlide key={nestedImgs.id}>
+                                            <div className="relative">
+                                              <img
+                                                src={nestedImgs.url}
+                                                alt={
+                                                  'Preview: ' + nestedImgs.id
+                                                }
+                                                className="aspect-[4/3] h-full w-full object-cover object-center"
+                                              />
+                                            </div>
+                                          </SwiperSlide>
+                                        );
+                                      })}
+                                      <SwiperArrowRight elId="swiper-preview-button-next" />
+                                      <SwiperArrowLeft elId="swiper-preview-button-prev" />
+                                      <SwiperDots elId="swiper-latest-news-pagination" />
                                     </Swiper>
                                   </DialogContent>
                                 </Dialog>
+                              </SwiperSlide>
+                            );
+                          })}
+                          <SwiperArrowRight elId="swiper-thumbPreview-button-next" />
+                          <SwiperArrowLeft elId="swiper-thumbPreview-button-prev" />
+                        </Swiper>
+                        <Swiper
+                          onSwiper={setActiveThumb}
+                          navigation={{
+                            nextEl: '.swiper-thumbs-button-next',
+                            prevEl: '.swiper-thumbs-button-prev',
+                          }}
+                          spaceBetween={12}
+                          slidesPerView={5}
+                          watchSlidesProgress={true}
+                          modules={[Navigation, Thumbs]}
+                        >
+                          {selectedImgs.imgs.map((image) => (
+                            <SwiperSlide key={image.id}>
+                              <img
+                                src={image.url}
+                                alt={`Thumb ${image.id}`}
+                                className="aspect-[4/3] cursor-pointer rounded-md object-cover object-center"
+                              />
+                            </SwiperSlide>
+                          ))}
+                          {isEditing.isEditing && (
+                            <SwiperSlide>
+                              <div className="relative aspect-[4/3] rounded-md object-cover">
+                                <Label className="absolute left-0 top-0 block h-full w-full">
+                                  <Input
+                                    name="file"
+                                    accept=".jpg, .jpeg, .png"
+                                    type="file"
+                                    value={''}
+                                    onChange={(e) => onImageChange(e, v4())}
+                                    className="hidden"
+                                  />
+                                  <div className="flex h-full w-full cursor-pointer items-center justify-center rounded-md bg-black/20 p-1 transition-colors duration-150 ease-out hover:bg-black/30">
+                                    <PlusCircleIcon className="h-12 w-12" />
+                                  </div>
+                                </Label>
                               </div>
                             </SwiperSlide>
-                          );
-                        }
-                      })
-                    )}
-                  </SuspenseComponent>
+                          )}
+                          <SwiperArrowRight elId="swiper-thumbs-button-next" />
+                          <SwiperArrowLeft elId="swiper-thumbs-button-prev" />
+                        </Swiper>
+                      </div>
+                    ) : (
+                      <div className="relative">
+                        {isEditing.isEditing && (
+                          <Label className="absolute left-0 top-0 block h-full w-full">
+                            <Input
+                              name="file"
+                              accept=".jpg, .jpeg, .png"
+                              type="file"
+                              value={''}
+                              onChange={(e) => onImageChange(e, v4())}
+                              className="hidden"
+                            />
 
-                  <div
-                    className={`swiper-button-next swiper-productImage-button-next color-primary right-0 flex items-center justify-center rounded-full bg-white p-8 opacity-90 backdrop-blur-sm`}
-                  ></div>
-                  <div
-                    className={`swiper-button-prev swiper-productImage-button-prev color-primary left-0 flex items-center justify-center rounded-full bg-white p-8 opacity-90 backdrop-blur-sm`}
-                  ></div>
-                </Swiper>
-              </div>
-            </div>
-          )}
-        </div>
+                            <div className="flex h-full w-full cursor-pointer items-center justify-center rounded-md bg-black/30 p-1 transition-colors duration-150 ease-out hover:bg-black/40"></div>
 
-        <div className="sticky top-24">
-          <Form {...form}>
-            <form onSubmit={handleSubmit(updateProductData)}>
-              <div className="relative mb-3 w-full">
-                <ProductPill
-                  text={productState.data && productState.data.market_place}
-                />
-
-                {(isMyProduct ||
-                  (userData.data &&
-                    userData.data.role === UserRoleTypes.ADMIN)) && (
-                  <div className="absolute right-0 top-0 flex gap-3">
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <Button
-                          variant={'ghost'}
-                          className="hover:text-400 text-red-400"
-                        >
-                          Delete
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent>
-                        <DialogHeader>
-                          <DialogTitle>Are you sure?</DialogTitle>
-                          <DialogDescription>
-                            Deleting this will permamently remove the item from
-                            the database.
-                          </DialogDescription>
-                        </DialogHeader>
-                        <DialogFooter>
-                          <Button
-                            type="button"
-                            onClick={() => deleteItemHandler()}
-                            variant={'destructive'}
-                          >
-                            Delete
-                          </Button>
-                          <DialogTrigger asChild>
-                            <Button variant={'outline'} type="button">
-                              Cancel
-                            </Button>
-                          </DialogTrigger>
-                        </DialogFooter>
-                      </DialogContent>
-                    </Dialog>
-                    <Button
-                      type="button"
-                      variant={'outline'}
-                      onClick={toggleEditting}
-                    >
-                      {productEditState.isEditing ? 'Cancel' : 'Edit'}
-                    </Button>
-                    {productEditState.isEditing && (
-                      <Button
-                        type="submit"
-                        variant={'outline'}
-                        className="text-green-600 hover:text-green-600"
-                      >
-                        Accept
-                      </Button>
+                            <PlusCircleIcon className="absolute left-1/2 top-1/2 z-10 h-24 w-24 -translate-x-1/2 -translate-y-1/2 transform text-slate-300 opacity-95 brightness-95 transition-[opacity,filter] group-hover:opacity-100 group-hover:brightness-100" />
+                          </Label>
+                        )}
+                        <img
+                          src={
+                            'https://firebasestorage.googleapis.com/v0/b/smarthub-75eab.appspot.com/o/static_imgs%2Fnophoto.webp?alt=media&token=a974d32e-108a-4c21-be71-de358368a167'
+                          }
+                          alt="product_img"
+                          className="aspect-[4/3] rounded-md object-cover object-center"
+                        />
+                      </div>
                     )}
                   </div>
-                )}
-              </div>
+                </div>
 
-              <div className="mt-8 flex justify-between">
-                <div className="max-w-[35ch] space-y-2">
-                  {productEditState.isEditing ? (
-                    <FormField
-                      control={control}
-                      name="title"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Title</FormLabel>
-                          <FormControl>
-                            <Input
-                              type="text"
-                              placeholder="Title..."
-                              {...field}
+                <div className="md:max-w-[400px] flex-grow sticky top-[68px]">
+                  {!isEditing.isEditing && (
+                    <div>
+                      <h2 className="text-4xl mb-4">
+                        {productState.data.title}
+                      </h2>
+                      <section className="grid grid-cols-2 gap-2 mb-2">
+                        <span>Seller:</span>
+                        <div>
+                          <Link
+                            to={`/account/${productState.data.creatorData._id}`}
+                            className={`${buttonVariants({
+                              variant: 'link',
+                              size: 'clear',
+                            })}`}
+                          >
+                            {productState.data.creatorData.pseudonim}
+                          </Link>
+                        </div>
+                        <span>Rating:</span>
+                        <div className="flex items-center flex-wrap gap-2">
+                          <StarRating
+                            rating={
+                              productRating && productRating.value
+                                ? productRating.value
+                                : productState.data.rating.avgRating || 0
+                            }
+                            showOnly
+                          />
+                          <span className="pt-[3px] text-sm text-slate-400">
+                            ({' '}
+                            {productRating && productRating.value
+                              ? productRating.quantity
+                              : productState.data.rating.quantity || 0}{' '}
+                            )
+                          </span>
+                        </div>
+
+                        <span>Publish date: </span>
+                        <span>{productState.data.createdAt.slice(0, 10)}</span>
+                        <span>Authors: </span>
+                        <div>
+                          {productState.data.authors.map((author) => (
+                            <Link
+                              key={author._id}
+                              to={`/account/${author._id}`}
+                              className={`${buttonVariants({
+                                variant: 'link',
+                                size: 'clear',
+                              })} mr-4`}
+                            >
+                              {author.authorInfo.pseudonim}
+                            </Link>
+                          ))}
+                        </div>
+                        <span>Tags: </span>
+                        <div>
+                          <Link to={`/${productState.data.marketplace}`}>
+                            <MarketplaceBadge
+                              type={productState.data.marketplace}
                             />
-                          </FormControl>
-                          <FormDescription>
-                            This is your book title.
-                          </FormDescription>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  ) : (
-                    !productState.isLoading && (
-                      <h1 className="text-xl font-bold sm:text-3xl">
-                        {productState.data && productState.data.title}
-                      </h1>
-                    )
+                          </Link>
+                        </div>
+
+                        <ProductForm
+                          addToCartHandler={addToCartHandler}
+                          decrementQuantityHandler={decrementQuantityHandler}
+                          incrementQuantityHandler={incrementQuantityHandler}
+                          isEditing={isEditing.isEditing}
+                          itemBtnCapacity={itemBtnCapacity}
+                          itemCapacity={itemCapacity}
+                          productId={productId || ''}
+                          productQuantity={productState.data.quantity}
+                          selectedQuantity={selectedQuantity}
+                          sold={productState.data.sold}
+                          productPrice={productState.data.price.value}
+                          totalQuantity={productState.data.quantity}
+                          buyNowHandler={buyNowHandler}
+                        />
+
+                        <span className="mt-2">Detailed information:</span>
+                        <div className="mt-2">
+                          <Button
+                            variant={'link'}
+                            size={'clear'}
+                            type="button"
+                            onClick={() =>
+                              window.scrollTo({
+                                top:
+                                  window.scrollY +
+                                  detailsRef.current!.getBoundingClientRect()
+                                    .top -
+                                  headerHeight,
+                                behavior: 'smooth',
+                              })
+                            }
+                          >
+                            Show
+                          </Button>
+                        </div>
+                      </section>
+
+                      <section className="flex flex-col gap-2">
+                        <strong>Short description: </strong>
+                        <span>{productState.data.shortDescription}</span>
+                      </section>
+                    </div>
                   )}
-                  {productState.isLoading && <Skeleton className="h-9" />}
-                  <div>
-                    {productEditState.isEditing ? (
+                  {isEditing.isEditing && (
+                    <div>
                       <FormField
-                        control={control}
+                        name="title"
+                        control={form.control}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Title</FormLabel>
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
+                            <FormDescription>
+                              This is the book's title that will be shown in the
+                              offer.
+                            </FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
                         name="categories"
                         render={({ field }) => {
                           return (
                             <FormItem>
                               <FormLabel>Categories</FormLabel>
                               <FormControl>
-                                <Select
+                                <CreatableSelect
                                   {...field}
                                   isMulti
                                   options={categoryState.options}
+                                  filterOption={(option, rawInput) => {
+                                    const label = option.label.toLowerCase();
+                                    const input = rawInput.toLowerCase();
+                                    return label.includes(input);
+                                  }}
+                                  className="shadow-sm"
+                                  styles={{
+                                    control: (base, state) => ({
+                                      ...base,
+                                      outline: state.isFocused
+                                        ? '2px solid transparent'
+                                        : '',
+                                      outlineColor: state.isFocused
+                                        ? 'hsl(215, 20.2%, 65.1%)'
+                                        : 'transparent',
+                                      outlineOffset: state.isFocused ? '0' : '',
+                                      border: state.isFocused
+                                        ? '1px hsl(214, 32%, 91%) solid'
+                                        : '1px hsl(214, 32%, 91%) solid',
+                                      '&:hover': {
+                                        border:
+                                          '1px var hsl(214, 30%, 95%) solid',
+                                      },
+                                      borderRadius: 'calc(var(--radius) - 2px)',
+                                      padding: '',
+                                      transition: 'none',
+                                    }),
+                                    option: (base, state) => ({
+                                      ...base,
+                                      backgroundColor: state.isFocused
+                                        ? 'hsl(214, 30%, 95%)'
+                                        : undefined,
+                                      ':active': {
+                                        backgroundColor: 'hsl(214, 30%, 95%)',
+                                      },
+                                    }),
+                                    multiValue: (base) => ({
+                                      ...base,
+                                      backgroundColor: 'hsl(214, 30%, 95%)',
+                                      borderRadius: '0.75rem',
+                                      paddingLeft: '2px',
+                                    }),
+                                    multiValueRemove: (base) => ({
+                                      ...base,
+                                      borderRadius: '0 0.75rem 0.75rem 0',
+                                    }),
+                                  }}
                                   onChange={field.onChange}
                                 />
                               </FormControl>
@@ -864,52 +947,25 @@ export default function ProductPage() {
                           );
                         }}
                       />
-                    ) : (
-                      <>
-                        <h6>Categories</h6>
-                        {productState.data.categories &&
-                          productState.data.categories.map((category) => {
-                            return (
-                              <Link
-                                key={category._id}
-                                to={{
-                                  pathname: '/search',
-                                  search: `category=${category.value}`,
-                                }}
-                                className="pr-2"
-                              >
-                                {category.label}
-                              </Link>
-                            );
-                          })}
-                      </>
-                    )}
-                    {productState.isLoading && (
-                      <Skeleton className="h-4"></Skeleton>
-                    )}
-                  </div>
-                  <div>
-                    Added:{' '}
-                    {productState.data &&
-                      productState.data.created_at.slice(0, 10)}
-                  </div>
-                  <div>
-                    <p>Seller:</p>
-                    {productState.data && !productState.isLoading && (
-                      <Link
-                        key={productState.data.seller_data._id}
-                        className="pr-4"
-                        to={`/account/${productState.data.seller_data._id}`}
-                      >
-                        {productState.data.seller_data.pseudonim}
-                      </Link>
-                    )}
-                    {productState.isLoading && <Skeleton className="h-4" />}
-                  </div>
-                  <div>
-                    {productEditState.isEditing ? (
                       <FormField
-                        control={control}
+                        name="shortDescription"
+                        control={form.control}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Short description</FormLabel>
+                            <FormControl>
+                              <Textarea {...field} />
+                            </FormControl>
+                            <FormDescription>
+                              This is the book's short description that will be
+                              shown in the offer.
+                            </FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
                         name="authors"
                         render={({ field }) => {
                           return (
@@ -921,10 +977,54 @@ export default function ProductPage() {
                                   isMulti
                                   options={authorState.options}
                                   onChange={field.onChange}
-                                  // defaultInputValue={
-                                  //   field.value.author_info.pseudonim
-                                  // }
-                                  // defaultValue={field.value}
+                                  className="shadow-sm"
+                                  styles={{
+                                    control: (base, state) => ({
+                                      ...base,
+                                      outline: state.isFocused
+                                        ? '2px solid transparent'
+                                        : '',
+                                      outlineColor: state.isFocused
+                                        ? 'hsl(215, 20.2%, 65.1%)'
+                                        : 'transparent',
+                                      outlineOffset: state.isFocused ? '0' : '',
+                                      border: state.isFocused
+                                        ? '1px hsl(214, 32%, 91%) solid'
+                                        : '1px hsl(214, 32%, 91%) solid',
+                                      '&:hover': {
+                                        border:
+                                          '1px var hsl(214, 30%, 95%) solid',
+                                      },
+                                      borderRadius: 'calc(var(--radius) - 2px)',
+                                      padding: '',
+                                      transition: 'none',
+                                    }),
+                                    option: (base, state) => ({
+                                      ...base,
+                                      backgroundColor: state.isFocused
+                                        ? 'hsl(214, 30%, 95%)'
+                                        : undefined,
+                                      ':active': {
+                                        backgroundColor: 'hsl(214, 30%, 95%)',
+                                      },
+                                    }),
+                                    multiValue: (base) => ({
+                                      ...base,
+                                      backgroundColor: 'hsl(214, 30%, 95%)',
+                                      borderRadius: '0.75rem',
+                                      paddingLeft: '2px',
+                                    }),
+                                    multiValueRemove: (base) => ({
+                                      ...base,
+                                      borderRadius: '0 0.75rem 0.75rem 0',
+                                    }),
+                                  }}
+                                  getOptionValue={(author) =>
+                                    author.authorInfo.pseudonim
+                                  }
+                                  getOptionLabel={(author) =>
+                                    author.authorInfo.pseudonim
+                                  }
                                 />
                               </FormControl>
                               <FormDescription>
@@ -935,210 +1035,275 @@ export default function ProductPage() {
                           );
                         }}
                       />
-                    ) : (
-                      !productState.isLoading &&
-                      productState.data.authors && (
-                        <>
-                          <p>Authors:</p>
-                          {productState.data.authors.map((author) => (
-                            <Link
-                              key={author._id}
-                              className="pr-4"
-                              to={`/account/${author._id}`}
-                            >
-                              {author.author_info
-                                ? author.author_info.pseudonim
-                                : ''}
-                            </Link>
-                          ))}
-                        </>
-                      )
-                    )}
-                    {productState.isLoading && <Skeleton className="h-4" />}
-                  </div>
-                  <p className="text-sm">Highest Rated Product</p>
-                  <div className="">
-                    <StarRating showOnly rating={productRating?.value} />
-                  </div>
-                  <span className="text-sm">
-                    votes: {productRating?.quantity}
-                  </span>
-                </div>
-                <div>
-                  {productEditState.isEditing ? (
-                    <FormField
-                      name="price"
-                      control={control}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Price</FormLabel>
-                          <FormControl>
-                            <div className="flex flex-row rounded-md shadow">
-                              <span className="flex items-center rounded-md rounded-r-none border border-input px-3 font-semibold text-foreground">
-                                $
-                              </span>
+                      <FormField
+                        name="quantity"
+                        control={form.control}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Quantity</FormLabel>
+                            <FormControl>
                               <Input
-                                className="rounded-l-none shadow-none"
-                                placeholder="0.00"
                                 {...field}
-                                step="0.01"
                                 type="number"
-                                value={field.value}
-                                onBlur={(e) => {
-                                  if (e.target.value.trim().length > 0) {
-                                    return field.onChange(
-                                      e.target.value
-                                        ? parseFloat(e.target.value).toFixed(2)
-                                        : 0
-                                    );
-                                  }
-                                }}
-                                onKeyDown={(e) => {
-                                  if (['.'].includes(e.key)) {
-                                    e.preventDefault();
-                                  }
-                                }}
-                                onChange={(e) => {
-                                  return field.onChange(
-                                    e.target.value
-                                      ? parseFloat(e.target.value)
-                                      : 0
-                                  );
-                                }}
+                                onChange={(e) =>
+                                  field.onChange(Number(e.target.value))
+                                }
                               />
-                            </div>
-                          </FormControl>
-                          <FormDescription>
-                            This is the price of your book.
-                          </FormDescription>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  ) : (
-                    !productState.isLoading && (
-                      <p className="text-xl font-bold">
-                        $
-                        {productState.data &&
-                          productState.data.shop_info &&
-                          productState.data.shop_info.price}
-                      </p>
-                    )
+                            </FormControl>
+                            <FormDescription>
+                              This is the book's quantity that will be shown in
+                              the offer.
+                            </FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        name="price"
+                        control={form.control}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Price</FormLabel>
+                            <FormControl>
+                              <Input
+                                {...field}
+                                type="number"
+                                onChange={(e) =>
+                                  field.onChange(Number(e.target.value))
+                                }
+                              />
+                            </FormControl>
+                            <FormDescription>
+                              This is the book's price that will be shown in the
+                              offer.
+                            </FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
                   )}
                 </div>
-
-                {productState.isLoading && <Skeleton className="h-6" />}
-              </div>
-
-              <div className="mt-4">
-                <div className="block max-w-none">
-                  <span className="inline-block">Available: </span>
-                  {productEditState.isEditing ? (
-                    <FormField
-                      control={control}
-                      name="quantity"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Quantity</FormLabel>
-                          <FormControl>
-                            <Input
-                              step={1}
-                              placeholder="1,2,3"
-                              {...field}
-                              type="number"
-                              value={Number(field.value).toString()}
-                              onChange={(e) =>
-                                field.onChange(
-                                  Number(Number(e.target.value).toString())
-                                )
-                              }
-                            />
-                          </FormControl>
-                          <FormDescription>
-                            This is the quantity of your book.
-                          </FormDescription>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  ) : (
-                    !productState.isLoading && (
-                      <span className="inline-block">
-                        {productState.data && productState.data.quantity}
-                      </span>
-                    )
-                  )}
-                  {productState.isLoading && <Skeleton className="h-4" />}
-                </div>
-                <div className="prose  max-w-none pt-4">
-                  {productEditState.isEditing ? (
-                    <FormField
-                      control={control}
-                      name="description"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Desciption</FormLabel>
-                          <FormControl>
-                            <Textarea placeholder="Description..." {...field} />
-                          </FormControl>
-                          <FormDescription>
-                            This is your book's description.
-                          </FormDescription>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  ) : (
-                    !productState.isLoading &&
-                    productState.data &&
-                    productState.data.description && (
-                      <>
-                        <h6 className="mb-1">Description: </h6>
-                        <p>
-                          {productState.data && productState.data.description}
-                        </p>
-                      </>
-                    )
-                  )}
-                  {productState.isLoading && (
-                    <>
-                      <Skeleton className="mb-2 h-4 w-10" />
-                      <Skeleton className="mb-1 h-4 w-20" />
-                      <Skeleton className="h-4 w-20" />
-                    </>
-                  )}
-                </div>
-
-                {productState.data &&
-                  productState.data.description &&
-                  productState.data.description.length > 600 && (
-                    <Button
-                      type="button"
-                      variant={'default'}
-                      className="mt-2 text-sm font-medium underline"
-                    >
-                      Read More
-                    </Button>
-                  )}
               </div>
             </form>
           </Form>
-          <ProductForm
-            productId={productState.data?._id}
-            productQuantity={productState.data?.quantity}
-            sold={(productState.data && productState.data.sold) || false}
-            isLoading={productEditState.isEditing}
-          />
+          <article className="sticky top-[63px] z-10 -mx-4 bg-background border-b border-border sm:top-16 items-center justify-around flex">
+            <div className="py-2 flex flex-wrap gap-1">
+              <Button
+                variant={'link'}
+                onClick={() =>
+                  window.scrollTo({
+                    top:
+                      window.scrollY +
+                      shortDescriptionRef.current!.getBoundingClientRect().top -
+                      headerHeight,
+                    behavior: 'smooth',
+                  })
+                }
+              >
+                Overview
+              </Button>
+
+              <Button
+                variant={'link'}
+                onClick={() =>
+                  window.scrollTo({
+                    top:
+                      window.scrollY +
+                      detailsRef.current!.getBoundingClientRect().top -
+                      headerHeight,
+                    behavior: 'smooth',
+                  })
+                }
+              >
+                Details
+              </Button>
+              <Button
+                variant={'link'}
+                onClick={() =>
+                  window.scrollTo({
+                    top:
+                      window.scrollY +
+                      similarRef.current!.getBoundingClientRect().top -
+                      headerHeight,
+                    behavior: 'smooth',
+                  })
+                }
+              >
+                Similar
+              </Button>
+              <Button
+                variant={'link'}
+                onClick={() =>
+                  window.scrollTo({
+                    top:
+                      window.scrollY +
+                      commentsRef.current!.getBoundingClientRect().top -
+                      headerHeight,
+                    behavior: 'smooth',
+                  })
+                }
+              >
+                Reviews
+              </Button>
+            </div>
+          </article>
+
+          <article ref={detailsRef} className="space-y-5">
+            <h3 className="text-4xl border-b-2 border-border inline-block">
+              Details
+            </h3>
+            <table className="border-collapse w-full max-w-xl">
+              <tbody>
+                <tr className="group border-border border-b sm:border-none">
+                  <th className="text-start font-normal w-1/2 px-1 py-2 group-hover:bg-accent transition-colors ease-in-out rounded-l-md">
+                    Title:
+                  </th>
+                  <td className="sm:text-left text-right w-1/2 px-1 py-2 group-hover:bg-accent transition-colors ease-in-out rounded-r-md">
+                    {productState.data.title}
+                  </td>
+                </tr>
+                <tr className="group border-border border-b sm:border-none">
+                  <th className="text-start font-normal w-1/2 px-1 py-2 group-hover:bg-accent transition-colors ease-in-out rounded-l-md">
+                    Publish date:{' '}
+                  </th>
+                  <td className="sm:text-left text-right w-1/2 px-1 py-2 group-hover:bg-accent transition-colors ease-in-out rounded-r-md">
+                    {productState.data.createdAt.slice(0, 10)}
+                  </td>
+                </tr>
+                <tr className="group border-border border-b sm:border-none">
+                  <th className="text-start font-normal w-1/2 px-1 py-2 group-hover:bg-accent transition-colors ease-in-out rounded-l-md">
+                    Last updated:{' '}
+                  </th>
+                  <td className="sm:text-left text-right w-1/2 px-1 py-2 group-hover:bg-accent transition-colors ease-in-out rounded-r-md">
+                    {productState.data.updatedAt.slice(0, 10)}
+                  </td>
+                </tr>
+                <tr className="group border-border border-b sm:border-none">
+                  <th className="text-start font-normal w-1/2 px-1 py-2 group-hover:bg-accent transition-colors ease-in-out rounded-l-md">
+                    Seller:{' '}
+                  </th>
+                  <td className="sm:text-left text-right w-1/2 px-1 py-2 group-hover:bg-accent transition-colors ease-in-out rounded-r-md">
+                    <Link
+                      to={`/account/${productState.data.creatorData._id}`}
+                      className={`${buttonVariants({
+                        variant: 'link',
+                        size: 'clear',
+                      })} mr-4`}
+                    >
+                      {productState.data.creatorData.pseudonim}
+                    </Link>
+                  </td>
+                </tr>
+
+                <tr className="group border-border border-b sm:border-none">
+                  <th className="text-start font-normal w-1/2 px-1 py-2 group-hover:bg-accent transition-colors ease-in-out rounded-l-md">
+                    In stock:{' '}
+                  </th>
+                  <td className="sm:text-left text-right w-1/2 px-1 py-2 group-hover:bg-accent transition-colors ease-in-out rounded-r-md">
+                    {productState.data.quantity}
+                    <span className="text-muted-foreground">x</span>
+                  </td>
+                </tr>
+
+                <tr className="group border-border border-b sm:border-none">
+                  <th className="text-start font-normal w-1/2 px-1 py-2 group-hover:bg-accent transition-colors ease-in-out rounded-l-md">
+                    Authors:{' '}
+                  </th>
+                  <td className="sm:text-left text-right w-1/2 px-1 py-2 group-hover:bg-accent transition-colors ease-in-out rounded-r-md">
+                    {productState.data.authors.map((author) => (
+                      <Link
+                        key={author._id}
+                        to={`/account/${author._id}`}
+                        className={`${buttonVariants({
+                          variant: 'link',
+                          size: 'clear',
+                        })} mr-4`}
+                      >
+                        {author.authorInfo.pseudonim}
+                      </Link>
+                    ))}
+                  </td>
+                </tr>
+                {productState.data.categories.length > 0 && (
+                  <tr className="group border-border border-b sm:border-none">
+                    <th className="text-start font-normal w-1/2 px-1 py-2 group-hover:bg-accent transition-colors ease-in-out rounded-l-md">
+                      Categories:{' '}
+                    </th>
+                    <td className="sm:text-left text-right w-1/2 px-1 py-2 group-hover:bg-accent transition-colors ease-in-out rounded-r-md">
+                      {productState.data.categories.map((category) => (
+                        <Link
+                          key={category._id}
+                          to={{
+                            pathname: '/search',
+                            search: `category=${category.value}`,
+                          }}
+                          className={`${buttonVariants({
+                            variant: 'link',
+                            size: 'clear',
+                          })} mr-4`}
+                        >
+                          {category.label}
+                        </Link>
+                      ))}
+                    </td>
+                  </tr>
+                )}
+                <tr className="group border-border border-b sm:border-none">
+                  <th className="text-start font-normal w-1/2 px-1 py-2 group-hover:bg-accent transition-colors ease-in-out rounded-l-md">
+                    Tags:{' '}
+                  </th>
+                  <td className="sm:text-left text-right w-1/2 px-1 py-2 group-hover:bg-accent transition-colors ease-in-out rounded-r-md">
+                    <Link to={`/${productState.data.marketplace}`}>
+                      <MarketplaceBadge type={productState.data.marketplace} />
+                    </Link>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            {(productState.data.description || isEditing.isEditing) && (
+              <>
+                <Separator className="my-4" />
+                <section className="space-y-5">
+                  <h4 className="border-b-2 border-border inline-block">
+                    Description
+                  </h4>
+                  <ProductDescription
+                    show={isEditing.isEditing}
+                    descriptionToShow={productState.data.description}
+                    newDescription={newDescription}
+                    setNewDescription={setNewDescription}
+                  />
+                </section>
+              </>
+            )}
+          </article>
+          <div ref={similarRef} className="space-y-5">
+            <h3 className="text-4xl border-b-2 border-border inline-block">
+              Similar
+            </h3>
+            <SimilarProducts creatorId={productState.data.creatorData._id} />
+          </div>
+          <div ref={commentsRef} className="space-y-5">
+            <h3 className="text-4xl border-b-2 border-border inline-block">
+              Reviews
+            </h3>
+            {productRating && (
+              <RatingSummary
+                avgRating={productRating.value}
+                quantity={productRating.quantity}
+                reviews={productRating.reviews}
+              />
+            )}
+            <Comments
+              starRating
+              target="Product"
+              targetId={productState.data._id}
+              updateTargetData={fetchComments}
+            />
+          </div>
         </div>
-      </div>
-      {prodId && (
-        <Comments
-          withRating={true}
-          target={'Product'}
-          targetId={prodId}
-          updateProductStatus={fetchComments}
-        />
       )}
-    </MainContainer>
+    </section>
   );
 }

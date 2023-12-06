@@ -12,17 +12,24 @@ import {
 } from '@components/UI/collapsible';
 import { AdjustmentsHorizontalIcon } from '@heroicons/react/24/outline';
 import { useState } from 'react';
-import { Label } from '@components/UI/label';
+import { CategoryTypes } from '@customTypes/interfaces';
 
 type AdvancedFilterTypes = {
   highestPrice: number;
+  categoriesState: CategoryTypes[];
+  openCollapsible: boolean;
 };
 
-export default function AdvancedFilter({ highestPrice }: AdvancedFilterTypes) {
+export default function AdvancedFilter({
+  highestPrice,
+  categoriesState,
+  openCollapsible,
+}: AdvancedFilterTypes) {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [openCollapsible, setOpenCollapsible] = useState(false);
   const clearSelectedMarketplace = () => {
-    searchParams.set('marketplace', 'shop');
+    searchParams.delete('marketplace');
+    searchParams.append('marketplace', 'shop');
+    searchParams.append('marketplace', 'collection');
     setSearchParams(searchParams, { replace: true });
   };
   const clearSelectedPriceRange = () => {
@@ -31,7 +38,7 @@ export default function AdvancedFilter({ highestPrice }: AdvancedFilterTypes) {
     setSearchParams(searchParams, { replace: true });
   };
   const clearSelectedRating = () => {
-    searchParams.set('rating', '5');
+    searchParams.set('rating', '0');
     setSearchParams(searchParams, { replace: true });
   };
   const clearSelectedCategories = () => {
@@ -42,147 +49,95 @@ export default function AdvancedFilter({ highestPrice }: AdvancedFilterTypes) {
     searchParams.delete('author');
     setSearchParams(searchParams, { replace: true });
   };
+  const clearPhrase = () => {
+    searchParams.delete('phrase');
+    setSearchParams(searchParams, { replace: true });
+  };
   const clearAll = () => {
     clearSelectedMarketplace();
     clearSelectedPriceRange();
     clearSelectedRating();
     clearSelectedCategories();
     clearSelectedAuthors();
+    clearPhrase();
   };
   return (
     <>
-      <aside className="sticky top-20 hidden w-full md:block md:max-w-[250px]">
-        <section className="mb-2 flex items-center justify-between">
-          <p className="inline-block font-semibold">Advanced filter</p>
-          <Button variant="link" onClick={clearAll}>
+      <aside
+        className={`md:block bg-background z-10 sticky top-[112px] w-full ${
+          openCollapsible ? 'block' : 'hidden'
+        } md:max-w-[250px]`}
+      >
+        <section className="mb-4 flex items-center justify-between">
+          <strong className="font-semibold">Advanced filter</strong>
+          <Button variant="link" onClick={clearAll} size={'clear'}>
             Clear all
           </Button>
         </section>
-        <section className="mb-1">
-          <div className="flex items-center justify-between">
-            <p className="inline-block font-medium">Type of offer</p>
-            <Button variant="link" onClick={clearSelectedMarketplace}>
+        <section className="mb-4">
+          <div className="mb-2 flex items-center justify-between">
+            <strong className="font-medium">Type of offer</strong>
+            <Button
+              variant="link"
+              size={'clear'}
+              onClick={clearSelectedMarketplace}
+            >
               Clear
             </Button>
           </div>
           <MarketplaceSelector />
         </section>
-        <section className="mb-1">
-          <div className="flex items-center justify-between">
-            <p className="inline-block font-medium">Price range</p>
-            <Button variant="link" onClick={clearSelectedPriceRange}>
+
+        <section className="mb-4">
+          <div className="mb-2 flex items-center justify-between">
+            <strong className="font-medium">Price range</strong>
+            <Button
+              variant="link"
+              size={'clear'}
+              onClick={clearSelectedPriceRange}
+            >
               Clear
             </Button>
           </div>
 
           <PriceRangeFilter highestPrice={highestPrice.toString()} />
         </section>
-        <section className="mb-1">
-          <div className="flex items-center justify-between">
-            <p className="inline-block font-medium">Rating</p>
-            <Button variant="link" onClick={clearSelectedRating}>
+        <section className="mb-4">
+          <div className="mb-2 flex items-center justify-between">
+            <strong className="font-medium">Rating</strong>
+            <Button variant="link" size={'clear'} onClick={clearSelectedRating}>
               Clear
             </Button>
           </div>
           <RatingFilter />
         </section>
-        <section className="mb-1">
-          <div className="flex items-center justify-between">
-            <p className="inline-block font-medium">Categories</p>
-            <Button variant="link" onClick={clearSelectedCategories}>
+        <section className="mb-4">
+          <div className="mb-2 flex items-center justify-between">
+            <strong className="font-medium">Categories</strong>
+            <Button
+              variant="link"
+              size={'clear'}
+              onClick={clearSelectedCategories}
+            >
               Clear
             </Button>
           </div>
-          <CategoriesFilter />
+          <CategoriesFilter categoriesState={categoriesState} />
         </section>
-        <section className="mb-1">
-          <div className="flex items-center justify-between">
-            <p className="inline-block font-medium">Authors</p>
-            <Button variant="link" onClick={clearSelectedAuthors}>
+        <section className="mb-4">
+          <div className="mb-2 flex items-center justify-between">
+            <strong className="font-medium">Authors</strong>
+            <Button
+              variant="link"
+              size={'clear'}
+              onClick={clearSelectedAuthors}
+            >
               Clear
             </Button>
           </div>
           <AuthorsFilter />
         </section>
       </aside>
-      <Collapsible
-        className={`${
-          openCollapsible && ''
-        } fixed left-0 top-[calc(64px+48px)] z-10 block w-full bg-background px-4 py-2 md:hidden`}
-        open={openCollapsible}
-        onOpenChange={setOpenCollapsible}
-      >
-        <CollapsibleTrigger asChild>
-          <Button variant="outline" className="flex w-full justify-between">
-            <p className="inline-block font-semibold">Advanced filter</p>
-            <AdjustmentsHorizontalIcon
-              className={`h-6 w-6 transition ${
-                openCollapsible ? 'rotate-90' : 'rotate-0'
-              }`}
-            />
-            <span className="sr-only">Toggle</span>
-          </Button>
-        </CollapsibleTrigger>
-        <CollapsibleContent>
-          <form
-            className={`${
-              openCollapsible && 'h-[calc(100vh-64px-48px-8px-42px)]'
-            } overflow-y-scroll pb-4`}
-          >
-            <section className="mb-2 flex items-center justify-end">
-              <Button variant="link" onClick={clearAll}>
-                Clear all
-              </Button>
-            </section>
-            <section className="mb-1">
-              <div className="flex items-center justify-between">
-                <p className="inline-block font-medium">Type of offer</p>
-                <Button variant="link" onClick={clearSelectedMarketplace}>
-                  Clear
-                </Button>
-              </div>
-              <MarketplaceSelector />
-            </section>
-            <section className="mb-1">
-              <div className="flex items-center justify-between">
-                <p className="inline-block font-medium">Price range</p>
-                <Button variant="link" onClick={clearSelectedPriceRange}>
-                  Clear
-                </Button>
-              </div>
-
-              <PriceRangeFilter highestPrice={highestPrice.toString()} />
-            </section>
-            <section className="mb-1">
-              <div className="flex items-center justify-between">
-                <p className="inline-block font-medium">Rating</p>
-                <Button variant="link" onClick={clearSelectedRating}>
-                  Clear
-                </Button>
-              </div>
-              <RatingFilter />
-            </section>
-            <section className="mb-1">
-              <div className="flex items-center justify-between">
-                <p className="inline-block font-medium">Categories</p>
-                <Button variant="link" onClick={clearSelectedCategories}>
-                  Clear
-                </Button>
-              </div>
-              <CategoriesFilter />
-            </section>
-            <section className="mb-1">
-              <div className="flex items-center justify-between">
-                <p className="inline-block font-medium">Authors</p>
-                <Button variant="link" onClick={clearSelectedAuthors}>
-                  Clear
-                </Button>
-              </div>
-              <AuthorsFilter />
-            </section>
-          </form>
-        </CollapsibleContent>
-      </Collapsible>
     </>
   );
 }

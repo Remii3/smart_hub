@@ -2,30 +2,28 @@ import { useContext } from 'react';
 import { CartContext } from '@context/CartProvider';
 import { UserContext } from '@context/UserProvider';
 import CheckoutItem from './CheckoutItem';
-import { CartProductTypes } from '@customTypes/interfaces';
+import { CartProductType } from '@customTypes/interfaces';
 
 export default function CheckoutProdList() {
   const { cartState } = useContext(CartContext);
-  const { userData } = useContext(UserContext);
 
   return (
     <>
       <div className="flex items-center gap-4">
-        <span className="h-10 w-10 rounded-full bg-blue-700" />
-
-        <h2 className="font-medium text-gray-900">
-          {userData.data
-            ? userData.data.user_info.credentials.first_name
-            : 'Guest'}
-        </h2>
+        <h3>Shop list</h3>
       </div>
 
       <div>
-        <p className="text-2xl font-medium tracking-tight text-gray-900">
-          {cartState && cartState.cartPrice}
-        </p>
+        <div className="flex mb-1 justify-between items-end">
+          <strong>Price:</strong>
+          <strong className="text-2xl tracking-tight text-foreground">
+            {cartState && cartState.cartPrice}
+          </strong>
+        </div>
 
-        <p className="mt-1 text-sm text-gray-600">For the purchase of</p>
+        <span className="text-sm text-muted-foreground">
+          For the purchase of
+        </span>
       </div>
 
       <div>
@@ -34,12 +32,12 @@ export default function CheckoutProdList() {
         ) : (
           <div className="flow-root">
             <ul className="-my-4 divide-y divide-gray-100">
-              {cartState.products.map((cartProduct: CartProductTypes) => (
+              {cartState.products.map((cartProduct: CartProductType) => (
                 <CheckoutItem
                   key={cartProduct.productData._id}
                   productData={cartProduct.productData}
                   inCartQuantity={cartProduct.inCartQuantity}
-                  productsTotalPrice={cartProduct.productsTotalPrice}
+                  totalPrice={cartProduct.totalPrice}
                 />
               ))}
             </ul>

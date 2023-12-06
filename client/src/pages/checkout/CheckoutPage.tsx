@@ -8,7 +8,7 @@ import { FetchDataTypes } from '@customTypes/interfaces';
 import { usePostAccessDatabase } from '../../hooks/useAaccessDatabase';
 import { DATABASE_ENDPOINTS } from '../../data/endpoints';
 import MainContainer from '@layout/MainContainer';
-import errorToast from '@components/UI/toasts/errorToast';
+import errorToast from '@components/UI/error/errorToast';
 import { Skeleton } from '@components/UI/skeleton';
 
 interface ClientSecretTypes extends FetchDataTypes {
@@ -67,43 +67,45 @@ export default function CheckoutPage() {
     appearance,
   };
   return (
-    <MainContainer>
-      <div className="mx-auto grid max-w-screen-2xl grid-cols-1 md:grid-cols-2">
-        <div className="bg-gray-50 py-12 md:min-h-[632px] md:py-24">
-          <div className="mx-auto max-w-lg space-y-4 px-4 lg:px-8">
-            {(!readyToShow.address &&
-              !readyToShow.linkAuth &&
-              !readyToShow.payment) ||
-            clientSecret.isLoading ? (
-              <>
-                <Skeleton className="h-12 w-full" />
-                <Skeleton className="h-12 w-full" />
-                <Skeleton className="h-12 w-full" />
-              </>
-            ) : (
-              <CheckoutProdList />
-            )}
-          </div>
-        </div>
-
-        <div className="bg-background py-12 md:py-24">
-          <div className="mx-auto h-full max-w-lg px-4 lg:px-8">
-            {!clientSecret.isLoading && clientSecret.hasError && (
-              <p className="text-red-500">{clientSecret.hasError}</p>
-            )}
-            {!clientSecret.isLoading &&
-              clientSecret.data &&
-              !clientSecret.hasError && (
-                <Elements options={options} stripe={stripePromise}>
-                  <CheckoutForm
-                    readyToShow={readyToShow}
-                    readyToShowHandler={setReadyToShow}
-                  />
-                </Elements>
-              )}
-          </div>
+    <div className="mx-auto grid max-w-screen-2xl grid-cols-1 md:grid-cols-2 -my-4">
+      <div className="bg-gray-50 py-12 md:min-h-[632px] md:py-24">
+        <div className="mx-auto max-w-lg space-y-4 px-4 lg:px-8">
+          {(!readyToShow.address &&
+            !readyToShow.linkAuth &&
+            !readyToShow.payment) ||
+          clientSecret.isLoading ? (
+            <>
+              <Skeleton className="h-12 w-full" />
+              <Skeleton className="h-12 w-full" />
+              <Skeleton className="h-12 w-full" />
+            </>
+          ) : (
+            <CheckoutProdList />
+          )}
         </div>
       </div>
-    </MainContainer>
+
+      <div className="bg-background py-12 md:py-24">
+        <div className="mx-auto h-full max-w-lg px-4 lg:px-8">
+          {!clientSecret.isLoading && clientSecret.hasError && (
+            <p className="text-red-500">{clientSecret.hasError}</p>
+          )}
+          {!clientSecret.isLoading &&
+            options.clientSecret &&
+            !clientSecret.hasError && (
+              <Elements
+                key={options.clientSecret}
+                options={options}
+                stripe={stripePromise}
+              >
+                <CheckoutForm
+                  readyToShow={readyToShow}
+                  readyToShowHandler={setReadyToShow}
+                />
+              </Elements>
+            )}
+        </div>
+      </div>
+    </div>
   );
 }

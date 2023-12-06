@@ -118,8 +118,8 @@ module.exports = {
     },
   },
   plugins: [
-    require('@tailwindcss/forms'),
     require('tailwindcss-animate'),
     require('tailwind-hamburgers'),
+    require('@tailwindcss/typography'),
   ],
 };

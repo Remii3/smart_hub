@@ -9,13 +9,13 @@ export default function CartPopupProdList() {
 
   if (cartState && cartState.products) {
     ProductsList = (
-      <ul className="max-h-[396px] space-y-4 overflow-y-auto pr-2">
+      <ul className="md:max-h-[25vh] max-h-[35vh] space-y-4 overflow-y-auto pr-2 pb-4">
         {cartState.products.map((cartProduct) => (
           <CartPopupItem
             key={cartProduct.productData._id}
             productData={cartProduct.productData}
             inCartQuantity={cartProduct.inCartQuantity}
-            productsTotalPrice={cartProduct.productsTotalPrice}
+            totalPrice={cartProduct.totalPrice}
           />
         ))}
       </ul>

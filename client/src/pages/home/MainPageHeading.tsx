@@ -15,12 +15,16 @@ export default function MainPageHeading({
     <div
       className={`${
         usecase === 'main' ? 'py-11' : 'py-10'
-      } px-4 text-center md:py-32`}
+      } text-center md:py-32`}
     >
       {usecase === 'main' ? (
-        <h2 className={`mb-5 uppercase text-${color}`}>{mainTitle}</h2>
+        <h2
+          className={`mb-5 text-4xl uppercase sm:text-5xl md:text-6xl text-${color}`}
+        >
+          {mainTitle}
+        </h2>
       ) : (
-        <h3 className={`mb-5   text-${color}`}>{mainTitle}</h3>
+        <h3 className={`mb-5  text-5xl text-${color}`}>{mainTitle}</h3>
       )}
       <p
         className={`${

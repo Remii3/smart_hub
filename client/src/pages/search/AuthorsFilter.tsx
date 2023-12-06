@@ -30,17 +30,19 @@ export default function AuthorsFilter() {
   const selectHandler = (actionMeta: any) => {
     switch (actionMeta.action) {
       case 'select-option': {
-        searchParams.append('author', actionMeta.option.value);
+        searchParams.append('author', actionMeta.option.authorInfo.pseudonim);
         setSearchParams(searchParams, { replace: true });
         break;
       }
       case 'remove-value': {
-        const categories = searchParams
+        const authors = searchParams
           .getAll('author')
-          .filter((item) => item !== actionMeta.removedValue.value);
+          .filter(
+            (item) => item !== actionMeta.removedValue.authorInfo.pseudonim
+          );
         searchParams.delete('author');
-        if (categories) {
-          categories.forEach((item) => searchParams.append('author', item));
+        if (authors) {
+          authors.forEach((item) => searchParams.append('author', item));
         }
         setSearchParams(searchParams, { replace: true });
         break;
@@ -54,29 +56,66 @@ export default function AuthorsFilter() {
         break;
     }
   };
-  const defaultValue = searchParams.getAll('author').map((item) => {
-    return { label: item, value: item };
-  });
-
   return (
-    <div>
-      <Label htmlFor="filterAuthors">Authors filter</Label>
+    <>
       <Select
         menuPlacement="top"
         maxMenuHeight={250}
+        className="shadow-sm"
+        styles={{
+          control: (base, state) => ({
+            ...base,
+            outline: state.isFocused ? '2px solid transparent' : '',
+            outlineColor: state.isFocused
+              ? 'hsl(215, 20.2%, 65.1%)'
+              : 'transparent',
+            outlineOffset: state.isFocused ? '0' : '',
+            border: state.isFocused
+              ? '1px hsl(214, 32%, 91%) solid'
+              : '1px hsl(214, 32%, 91%) solid',
+            '&:hover': {
+              border: '1px var hsl(214, 30%, 95%) solid',
+            },
+            borderRadius: 'calc(var(--radius) - 2px)',
+            padding: '',
+            transition: 'none',
+          }),
+          option: (base, state) => ({
+            ...base,
+            backgroundColor: state.isFocused ? 'hsl(214, 30%, 95%)' : undefined,
+            ':active': {
+              backgroundColor: 'hsl(214, 30%, 95%)',
+            },
+          }),
+          multiValue: (base) => ({
+            ...base,
+            backgroundColor: 'hsl(214, 30%, 95%)',
+            borderRadius: '0.75rem',
+            paddingLeft: '2px',
+          }),
+          multiValueRemove: (base) => ({
+            ...base,
+            borderRadius: '0 0.75rem 0.75rem 0',
+          }),
+        }}
         isMulti
         inputId="filterAuthors"
         options={authorsState.options}
-        defaultValue={defaultValue && defaultValue}
         onChange={(newValue, actionMeta) => selectHandler(actionMeta)}
+        getOptionValue={(author) => author.authorInfo.pseudonim}
+        getOptionLabel={(author) => author.authorInfo.pseudonim}
         value={
           searchParams.getAll('author').length <= 0
             ? null
             : searchParams.getAll('author').map((item) => {
-                return { label: item, value: item };
+                return {
+                  label: item,
+                  value: item,
+                  authorInfo: { pseudonim: item },
+                };
               })
         }
       />
-    </div>
+    </>
   );
 }

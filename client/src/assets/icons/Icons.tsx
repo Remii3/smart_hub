@@ -1,17 +1,11 @@
-type CheckiconTypes = {
-  height?: number | string;
-  width?: number | string;
-};
+interface PropsTypes {
+  className?: string;
+}
 
-const defaultProps = {
-  height: 6,
-  width: 6,
-};
-
-export function SunRiseIcon({ height, width }: CheckiconTypes) {
+export function SunRiseIcon({ className }: PropsTypes) {
   return (
     <svg
-      className={`h-${height} sm:h-10 w-${width}`}
+      className={className}
       viewBox="0 0 28 24"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
@@ -24,10 +18,10 @@ export function SunRiseIcon({ height, width }: CheckiconTypes) {
   );
 }
 
-export function HomeLogoIcon() {
+export function HomeLogoIcon({ className }: PropsTypes) {
   return (
     <svg
-      className="h-8 w-8"
+      className={className}
       viewBox="0 0 28 24"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
@@ -39,5 +33,3 @@ export function HomeLogoIcon() {
     </svg>
   );
 }
-
-SunRiseIcon.defaultProps = defaultProps;

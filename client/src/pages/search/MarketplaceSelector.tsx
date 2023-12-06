@@ -23,15 +23,9 @@ export default function MarketplaceSelector() {
   };
 
   return (
-    <>
+    <div className="space-y-2">
       {marketplaces.map((option) => (
-        <div key={option} className="mb-2 flex items-center gap-1">
-          <Label
-            htmlFor={`filter-${option}`}
-            className="font-normal first-letter:uppercase"
-          >
-            {option}
-          </Label>
+        <div key={option} className="flex items-center gap-1">
           <Checkbox
             id={`filter-${option}`}
             aria-label={`Show marketplace ${option}`}
@@ -41,8 +35,14 @@ export default function MarketplaceSelector() {
               searchParams.getAll('marketplace').includes(option) || false
             }
           />
+          <Label
+            htmlFor={`filter-${option}`}
+            className="font-normal first-letter:uppercase"
+          >
+            {option}
+          </Label>
         </div>
       ))}
-    </>
+    </div>
   );
 }

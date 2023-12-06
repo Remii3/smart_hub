@@ -1,108 +1,137 @@
 import { Link } from 'react-router-dom';
-import { useContext, useState } from 'react';
+import { useContext } from 'react';
 import { TrashIcon } from '@heroicons/react/24/outline';
-import { CartProductTypes } from '@customTypes/interfaces';
 import { CartContext } from '@context/CartProvider';
+import { CartProductType } from '@customTypes/interfaces';
+import { Button } from '@components/UI/button';
+import { Input } from '@components/UI/input';
 
 export default function CartPopupItem({
   productData,
   inCartQuantity,
-  productsTotalPrice,
-}: CartProductTypes) {
-  const [localQuantity, setLocalQuantity] = useState(inCartQuantity);
-  const { incrementCartItem, decrementCartItem, removeProductFromCart } =
-    useContext(CartContext);
+  totalPrice,
+}: CartProductType) {
+  const {
+    cartState,
+    incrementCartItem,
+    decrementCartItem,
+    removeProductFromCart,
+  } = useContext(CartContext);
   if (!productData) return <div />;
 
   const decrementHandler = () => {
-    setLocalQuantity((prevState) => prevState - 1);
     decrementCartItem(productData._id);
   };
 
   const incrementHandler = () => {
-    setLocalQuantity((prevState) => prevState + 1);
     incrementCartItem(productData._id);
   };
   const removeHandler = () => {
     removeProductFromCart(productData._id);
   };
+
+  const isBusy =
+    cartState.isAdding === productData._id ||
+    cartState.isIncrementing === productData._id ||
+    cartState.isDecrementing === productData._id ||
+    cartState.isDeleting === productData._id ||
+    cartState.isLoading;
+
   return (
-    <li className="flex items-center gap-4">
-      <Link to={`/product/${productData._id}`}>
-        {productData.imgs && productData.imgs[0] ? (
-          <img
-            src={productData.imgs[0].url}
-            alt="product_img"
-            className="h-16 w-16 rounded object-cover"
-          />
-        ) : (
-          <img
-            src="https://images.unsplash.com/photo-1618354691373-d851c5c3a990?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=830&q=80"
-            alt="product_img"
-            className="h-16 w-16 rounded object-cover"
-          />
-        )}
-      </Link>
-      <div>
-        <Link to={`/product/${productData._id}`}>
-          <h3 className="m-0 text-sm text-gray-900">{productData.title}</h3>
-        </Link>
-
-        <dl className="mt-0.5 space-y-px text-[10px] text-gray-600">
-          <div>
-            <dt className="inline">Price:</dt>
-            <dd className="inline">{productData.shop_info.price}€</dd>
-          </div>
-        </dl>
-      </div>
-
-      <div className="flex flex-1 items-center justify-end gap-3 sm:gap-6">
-        <form>
-          <div className="flex items-center">
-            <button
-              type="button"
-              className={`${!(localQuantity > 1) && 'text-gray-300'} px-2`}
-              disabled={!(localQuantity > 1)}
-              onClick={() => decrementHandler()}
-            >
-              -
-            </button>
-            <label htmlFor="Line1Qty" className="sr-only">
-              Quantity
-            </label>
-            <input
-              type="number"
-              min="1"
-              value={localQuantity}
-              max={productData.quantity}
-              readOnly
-              disabled
-              id="Line1Qty"
-              className="h-8 w-12 rounded border-gray-200 bg-gray-50 p-0 text-center text-xs text-gray-600 [-moz-appearance:_textfield] focus:outline-none [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none"
-            />
-            <button
-              type="button"
-              className={`${
-                localQuantity >= productData.quantity && 'text-gray-300'
-              } px-2`}
-              disabled={localQuantity >= productData.quantity}
-              onClick={() => incrementHandler()}
-            >
-              +
-            </button>
-          </div>
-        </form>
-
-        <button
-          type="button"
-          className="text-gray-600 transition hover:text-red-600"
-          onClick={() => removeHandler()}
+    <li className="flex items-start justify-between">
+      <div className="flex w-full gap-4">
+        <Link
+          to={`/product/${productData._id}`}
+          className="block overflow-hidden"
         >
-          <span className="sr-only">Remove item</span>
+          {productData.imgs && productData.imgs[0] ? (
+            <img
+              src={productData.imgs[0].url}
+              alt="Cart product img."
+              width={95}
+              height={95}
+              className="aspect-square rounded-xl object-cover"
+            />
+          ) : (
+            <img
+              src="https://firebasestorage.googleapis.com/v0/b/smarthub-75eab.appspot.com/o/static_imgs%2Fnophoto.webp?alt=media&token=a974d32e-108a-4c21-be71-de358368a167"
+              alt="Cart product img placeholder."
+              width={95}
+              height={95}
+              className="aspect-square scale-150 rounded-xl object-cover"
+            />
+          )}
+        </Link>
+        <div className="basis-[70%]">
+          <Link to={`/product/${productData._id}`} className="inline-block ">
+            <strong className="line-clamp-1 text-lg text-foreground">
+              {productData.title}
+            </strong>
+          </Link>
 
-          <TrashIcon className="h-4 w-4" />
-        </button>
+          <div className="text-sm text-muted-foreground mb-1">
+            <span>{totalPrice}</span>
+          </div>
+          <form>
+            <div className="flex items-center">
+              <Button
+                variant={'ghost'}
+                type="button"
+                className={`${
+                  (!(inCartQuantity > 1) || isBusy) && 'text-slate-800'
+                } max-h-9 text-base rounded-xl`}
+                disabled={!(inCartQuantity > 1) || isBusy}
+                onClick={() => decrementHandler()}
+                aria-label="Decrement item in your cart."
+              >
+                -
+              </Button>
+              <label htmlFor="popupCartProductQuantity" className="sr-only">
+                Quantity
+              </label>
+              <Input
+                type="number"
+                min="1"
+                value={inCartQuantity}
+                max={productData.quantity}
+                readOnly
+                disabled
+                id="popupCartProductQuantity"
+                className="w-[60px] rounded-xl text-center text-sm text-foreground [-moz-appearance:_textfield] focus:outline-none [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none"
+              />
+              <Button
+                variant={'ghost'}
+                type="button"
+                className={`${
+                  (inCartQuantity >= productData.quantity || isBusy) &&
+                  'text-gray-800'
+                } max-h-9 text-base rounded-xl`}
+                disabled={inCartQuantity >= productData.quantity || isBusy}
+                onClick={() => incrementHandler()}
+                aria-label="Increment item in your cart."
+              >
+                +
+              </Button>
+            </div>
+          </form>
+        </div>
       </div>
+
+      <Button
+        variant={'ghost'}
+        type="button"
+        size={'sm'}
+        className={`${
+          !isBusy && ' hover:text-red-400'
+        } text-red-400 rounded-xl`}
+        disabled={isBusy}
+        onClick={() => removeHandler()}
+        aria-label="Remove item from your cart."
+      >
+        <span className="sr-only">Remove item</span>
+
+        <TrashIcon className="h-5 w-5" />
+      </Button>
     </li>
   );
 }

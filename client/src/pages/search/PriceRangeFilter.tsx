@@ -1,5 +1,6 @@
 import { Input } from '@components/UI/input';
 import { Label } from '@components/UI/label';
+import useCashFormatter from '@hooks/useCashFormatter';
 import { useSearchParams } from 'react-router-dom';
 
 interface PropsTypes {
@@ -16,11 +17,12 @@ export default function ({ highestPrice }: PropsTypes) {
     }
     setSearchParams(searchParams, { replace: true });
   };
+
   return (
-    <div className="flex flex-col justify-between gap-4 sm:flex-nowrap">
+    <div className="flex flex-col justify-between gap-2 sm:flex-nowrap">
       <fieldset>
         <Label className="font-normal">Min</Label>
-        <div className="flex flex-row rounded-md shadow">
+        <div className="flex flex-row rounded-md shadow-sm">
           <span className="flex items-center rounded-md rounded-r-none border border-input px-3 text-foreground">
             $
           </span>
@@ -28,15 +30,10 @@ export default function ({ highestPrice }: PropsTypes) {
             id="search-Min-PriceSelector"
             name="minPrice"
             className="rounded-l-none shadow-none"
-            placeholder="0.00"
+            placeholder={useCashFormatter({ number: 0 })}
             step="0.01"
             type="number"
             value={searchParams.get('minPrice') || ''}
-            onKeyDown={(e) => {
-              if (['.'].includes(e.key)) {
-                e.preventDefault();
-              }
-            }}
             onChange={(e) =>
               changePriceRangeHandler(e.target.name, e.target.value)
             }
@@ -45,7 +42,7 @@ export default function ({ highestPrice }: PropsTypes) {
       </fieldset>
       <fieldset>
         <Label className="font-normal">Max</Label>
-        <div className="flex flex-row rounded-md shadow">
+        <div className="flex flex-row rounded-md shadow-sm">
           <span className="flex items-center rounded-md rounded-r-none border border-input px-3 text-foreground">
             $
           </span>
@@ -53,16 +50,11 @@ export default function ({ highestPrice }: PropsTypes) {
             id="search-Max-PriceSelector"
             name="maxPrice"
             className="rounded-l-none shadow-none"
-            placeholder={`${parseFloat(highestPrice).toFixed(2)}`}
+            placeholder={`${highestPrice}`}
             max={highestPrice}
             step="0.01"
             type="number"
             value={searchParams.get('maxPrice') || ''}
-            onKeyDown={(e) => {
-              if (['.'].includes(e.key)) {
-                e.preventDefault();
-              }
-            }}
             onChange={(e) =>
               changePriceRangeHandler(e.target.name, e.target.value)
             }

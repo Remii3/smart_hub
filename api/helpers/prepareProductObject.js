@@ -1,3 +1,5 @@
+const cashFormatter = require('./cashFormatter');
+
 const prepareProductObject = product => {
   let {
     _id,
@@ -8,14 +10,14 @@ const prepareProductObject = product => {
     authors,
     rating,
     quantity,
-    market_place,
-    created_at,
+    marketplace,
+    createdAt,
     sold,
     comments,
     currency,
-    shop_info,
-    auction_info,
-    seller_data,
+    price,
+    auctionInfo,
+    sellerData,
     deleted,
   } = product;
 
@@ -40,26 +42,15 @@ const prepareProductObject = product => {
     authors,
     rating,
     quantity,
-    market_place,
-    created_at,
+    marketplace,
+    createdAt,
     sold,
     comments,
     currency,
-    seller_data,
+    sellerData,
     deleted,
+    price,
   };
-
-  if (shop_info) {
-    preparedObject.shop_info = { price: parseFloat(shop_info.price) };
-  }
-
-  if (auction_info) {
-    preparedObject.auction_info = {
-      starting_price: parseFloat(auction_info.starting_price),
-      current_price: auction_info.current_price,
-      auction_end_date: auction_info.auction_end_date,
-    };
-  }
 
   return preparedObject;
 };

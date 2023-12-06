@@ -1,119 +1,113 @@
 import { FormEvent, useContext, useState } from 'react';
-import { ShoppingBagIcon } from '@heroicons/react/24/solid';
+import { ShoppingBagIcon, ShoppingCartIcon } from '@heroicons/react/24/solid';
 import { CartContext } from '@context/CartProvider';
 import { Button } from '@components/UI/button';
 import LoadingCircle from '@components/Loaders/LoadingCircle';
+import { Input } from '@components/UI/input';
 
 type ProductFormType = {
-  productId?: string;
-  productQuantity?: number;
+  addToCartHandler: () => void;
   sold: boolean;
-  isLoading: boolean;
+  selectedQuantity: number;
+  decrementQuantityHandler: () => void;
+  productQuantity: number;
+  itemCapacity: boolean;
+  incrementQuantityHandler: () => void;
+  productId: string;
+  isEditing: boolean;
+  itemBtnCapacity: boolean;
+  productPrice: string;
+  totalQuantity: number;
+  buyNowHandler: () => void;
 };
 
-const defaultProps = {
-  productId: '',
-  productQuantity: 0,
-};
-
-export default function ProductForm({
-  productId,
-  productQuantity,
+export default function CollectionForm({
+  addToCartHandler,
+  buyNowHandler,
   sold,
-  isLoading,
+  selectedQuantity,
+  decrementQuantityHandler,
+  productQuantity,
+  incrementQuantityHandler,
+  itemCapacity,
+  productId,
+  isEditing,
+  itemBtnCapacity,
+  productPrice,
+  totalQuantity,
 }: ProductFormType) {
-  const [selectedQuantity, setSelectedQuantity] = useState(1);
-  const [isAddingToCart, setIsAddingToCart] = useState(false);
-  const { addProductToCart, cartState } = useContext(CartContext);
-
-  let itemCapacity = false;
-  let itemBtnCapacity = false;
-
-  const addToCartHandler = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (productId) {
-      setIsAddingToCart(true);
-
-      addProductToCart({
-        productId,
-        productQuantity: selectedQuantity,
-      });
-      setSelectedQuantity(1);
-      setIsAddingToCart(false);
-    }
-  };
-  const incrementQuantityHandler = () => {
-    if (productQuantity! <= selectedQuantity) return;
-    setSelectedQuantity((prevState) => (prevState += 1));
-  };
-  const decrementQuantityHandler = () => {
-    if (selectedQuantity <= 1) return;
-    setSelectedQuantity((prevState) => (prevState -= 1));
-  };
-
-  const currentItem = cartState.products.find((product) => {
-    return product.productData._id === productId;
-  });
-
-  if (currentItem) {
-    itemCapacity =
-      productQuantity! <= selectedQuantity ||
-      currentItem.inCartQuantity + selectedQuantity >= productQuantity! ||
-      false;
-    itemBtnCapacity =
-      productQuantity! < selectedQuantity ||
-      currentItem.inCartQuantity + selectedQuantity > productQuantity! ||
-      false;
-  } else {
-    itemCapacity = productQuantity! <= selectedQuantity || false;
-    itemBtnCapacity = productQuantity! < selectedQuantity || false;
-  }
-
+  const { cartState } = useContext(CartContext);
   return (
-    <form className="mt-8" onSubmit={(e) => addToCartHandler(e)}>
+    <>
       {sold && <h4 className="font-bold uppercase text-red-700">Sold out</h4>}
       {!sold && (
-        <div className="mt-8 flex gap-4">
+        <>
+          <span>In stock</span>
           <div>
-            <button
+            <span>{totalQuantity}</span>
+            <span className="text-muted-foreground">x</span>
+          </div>
+          <div className="flex items-center mt-2">
+            <Button
+              variant={'ghost'}
               type="button"
-              className={`${selectedQuantity <= 1 && 'text-gray-300'} px-2`}
+              className={`${
+                selectedQuantity <= 1 && 'text-slate-800'
+              } max-h-9 text-base`}
               disabled={selectedQuantity <= 1}
               onClick={decrementQuantityHandler}
+              aria-label="Decrement item in your cart."
             >
               -
-            </button>
-            <label htmlFor="quantity" className="sr-only">
-              Qty
+            </Button>
+            <label htmlFor="selectedItemQuantity" className="sr-only">
+              Selected item quantity
             </label>
-            <input
+            <Input
               type="number"
-              id="quantity"
               min="1"
               step="1"
               max={productQuantity}
               value={selectedQuantity}
+              readOnly
               disabled
-              className="w-12 rounded border-gray-200 py-3 text-center text-xs [-moz-appearance:_textfield] [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none"
+              id="selectedItemQuantity"
+              className="w-[60px] text-center text-foreground [-moz-appearance:_textfield] focus:outline-none [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none"
             />
-            <button
+            <Button
+              variant={'ghost'}
               type="button"
-              className={`${itemCapacity && 'text-gray-300'} px-2`}
+              className={`${itemCapacity && 'text-gray-800'} max-h-9 text-base`}
               disabled={itemCapacity}
               onClick={incrementQuantityHandler}
+              aria-label="Increment item in your cart."
             >
               +
-            </button>
+            </Button>
           </div>
-          <Button
-            variant="default"
-            type="submit"
-            disabled={isAddingToCart || itemBtnCapacity || isLoading}
-          >
-            {isAddingToCart ? (
-              <LoadingCircle />
-            ) : (
-              <span>
+          <h3 className="text-[40px] mt-2">{productPrice}</h3>
+          <div className="col-span-2 space-y-2">
+            <Button
+              variant="secondary"
+              type="button"
+              onClick={addToCartHandler}
+              disabled={
+                itemBtnCapacity ||
+                isEditing ||
+                cartState.isAdding === productId ||
+                cartState.isDeleting === productId
+              }
+              className="relative w-full"
+            >
+              {cartState.isAdding === productId &&
+                cartState.addingToCartType === 'addToCart' && <LoadingCircle />}
+              <span
+                className={`${
+                  cartState.isAdding === productId &&
+                  cartState.addingToCartType === 'addToCart' &&
+                  'invisible'
+                }`}
+              >
                 Add to cart
                 <ShoppingBagIcon
                   className="ml-2 inline-block"
@@ -121,11 +115,39 @@ export default function ProductForm({
                   width={24}
                 />
               </span>
-            )}
-          </Button>
-        </div>
+            </Button>
+            <Button
+              variant="default"
+              type="button"
+              onClick={buyNowHandler}
+              disabled={
+                itemBtnCapacity ||
+                isEditing ||
+                cartState.isAdding === productId ||
+                cartState.isDeleting === productId
+              }
+              className="relative w-full"
+            >
+              {cartState.isAdding === productId &&
+                cartState.addingToCartType === 'buyNow' && <LoadingCircle />}
+              <span
+                className={`${
+                  cartState.isAdding === productId &&
+                  cartState.addingToCartType === 'buyNow' &&
+                  'invisible'
+                }`}
+              >
+                Buy now
+                <ShoppingCartIcon
+                  className="ml-2 inline-block"
+                  height={24}
+                  width={24}
+                />
+              </span>
+            </Button>
+          </div>
+        </>
       )}
-    </form>
+    </>
   );
 }
-ProductForm.defaultProps = defaultProps;

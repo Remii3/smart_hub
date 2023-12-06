@@ -1,17 +1,15 @@
-export default function MarketplaceBadge({
-  message,
-  color,
-  bgColor,
-}: {
-  message: string;
-  color: string;
-  bgColor: string;
-}) {
+import { MarketplaceTypes } from '@customTypes/types';
+import { Badge } from '../badge';
+
+export default function MarketplaceBadge({ type }: { type: MarketplaceTypes }) {
   return (
-    <span
-      className={`whitespace-nowrap rounded-full ${color} px-2.5 py-0.5 text-sm ${bgColor}`}
+    <Badge
+      variant={'outline'}
+      className={`${type === 'shop' && 'text-blue-600'} ${
+        type === 'collection' && 'text-fuchsia-600'
+      } bg-white`}
     >
-      {message}
-    </span>
+      {type}
+    </Badge>
   );
 }

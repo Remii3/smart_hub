@@ -1,23 +1,26 @@
 const mongoose = require('mongoose');
 
-const NewsSchema = mongoose.Schema({
-  user: { type: mongoose.Types.ObjectId, required: true, ref: 'User' },
-  created_at: { type: Date, default: Date.now },
+const NewsSchema = new mongoose.Schema({
+  creatorData: {
+    type: mongoose.Types.ObjectId,
+    required: true,
+    ref: 'User',
+  },
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now },
   title: { type: String, required: true },
   subtitle: { type: String },
+  shortDescription: { type: String },
   img: { type: { id: String, url: String } },
-  comments: [{ type: mongoose.Types.ObjectId, ref: 'Comment' }],
   content: { type: String },
   voting: {
     type: {
-      votes: [
-        { user: { type: mongoose.Types.ObjectId, ref: 'User' }, vote: Number },
-      ],
-      quantity: { like: Number, dislike: Number },
+      votes: [{ userId: { type: mongoose.Types.ObjectId }, vote: String }],
+      quantity: { likes: Number, dislikes: Number },
     },
     default: {
       votes: [],
-      quantity: { like: 0, dislike: 0 },
+      quantity: { likes: 0, dislikes: 0 },
     },
   },
 });

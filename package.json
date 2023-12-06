@@ -4,10 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "concurrently \"cd client && npm run dev\" \"cd api && pm2 reload index.js\"",
-    "start-new": "concurrently \"cd client && npm run dev\" \"cd api && pm2 start index.js --watch --ignore-watch=\"node_modules\"\"",
-    "update-all": "npm install && cd api && npm install && cd ../client && npm install",
-    "status": "pm2 status"
+    "start": "concurrently \"cd client && npm run dev\" \"cd api && nodemon index.js\"",
+    "update-all": "npm install && cd api && npm install && cd ../client && npm install"
   },
   "repository": {
     "type": "git",
@@ -22,9 +20,5 @@
   "homepage": "https://github.com/Remii3/smart_hub#readme",
   "devDependencies": {
     "concurrently": "^8.2.0"
-  },
-  "dependencies": {
-    "firebase": "^10.4.0",
-    "uuid": "^9.0.1"
   }
 }

@@ -14,6 +14,7 @@ import { DATABASE_ENDPOINTS } from '../data/endpoints';
 import { Separator } from '@components/UI/separator';
 import { Button } from '@components/UI/button';
 import LoadingCircle from '@components/Loaders/LoadingCircle';
+import { Input } from '@components/UI/input';
 
 const ShoppingBagIcon = lazy(
   () => import('@heroicons/react/24/outline/ShoppingBagIcon')
@@ -44,7 +45,7 @@ export default function Nav({ scrollFlag }: { scrollFlag: boolean }) {
   const navLinkList = [
     { to: '/news', text: 'news' },
     { to: '/shop', text: 'shop' },
-    { to: '/collections', text: 'collections' },
+    { to: '/collection', text: 'collections' },
   ];
   const { userData, changeUserData } = useContext(UserContext);
   const { cartState } = useContext(CartContext);
@@ -109,23 +110,27 @@ export default function Nav({ scrollFlag }: { scrollFlag: boolean }) {
   ) => {
     setSearchbarValue(e.target.value);
   };
+  const totalProductQuantity =
+    cartState.products &&
+    cartState.products.reduce((acc, item) => acc + item.inCartQuantity, 0);
+
   const burgerColor = openedBurger
     ? 'bg-foreground'
     : scrollFlag
-    ? 'bg-background'
-    : 'bg-foreground';
+      ? 'bg-background'
+      : 'bg-foreground';
   return (
     <nav>
       <div className="relative mx-auto flex h-[64px] max-w-[1480px] flex-row items-center justify-between px-4 py-3 sm:px-10">
         <div className="z-30 flex items-center">
           <Link
             to="/"
-            className=" block text-blue-600"
+            className="relative block h-8 w-8 text-blue-600"
             onClick={() => hideMobileOverlay()}
           >
             <span className="sr-only">Home</span>
             <Suspense fallback={<LoadingCircle />}>
-              <HomeLogoIcon />
+              <HomeLogoIcon className="h-8 w-8" />
             </Suspense>
           </Link>
           <ul className={`hidden flex-row items-center px-8 lg:flex`}>
@@ -146,8 +151,8 @@ export default function Nav({ scrollFlag }: { scrollFlag: boolean }) {
           onSubmit={(e) => searchHandler(e)}
           className="relative mx-auto me-4 hidden w-full basis-full items-center justify-end text-gray-600 lg:flex"
         >
-          <input
-            className="border-1 h-full max-w-[24rem] rounded-lg border-gray-300 bg-background pl-3 pr-12 text-sm transition-[width] duration-200 ease-in-out focus:w-full focus:outline-none sm:w-56"
+          <Input
+            className="h-full max-w-[24rem] rounded-lg bg-background py-2 pl-3 pr-12 text-sm transition-[width] duration-200 ease-in-out focus-visible:w-full sm:w-56"
             type="text"
             name="search"
             placeholder="Search"
@@ -156,7 +161,7 @@ export default function Nav({ scrollFlag }: { scrollFlag: boolean }) {
           />
           <button
             type="submit"
-            className="absolute right-0 top-1/2 h-[98%] -translate-y-1/2 transform rounded-e-xl border-0 bg-transparent px-2 text-gray-600 transition"
+            className="absolute right-0 top-1/2 h-full w-auto min-w-[40px] -translate-y-1/2 transform rounded-e-xl border-0 bg-transparent px-2 text-gray-600 transition"
           >
             <span className="sr-only">Search</span>
             <Suspense fallback={<LoadingCircle />}>
@@ -167,9 +172,12 @@ export default function Nav({ scrollFlag }: { scrollFlag: boolean }) {
         <div className="flex max-h-[32px] gap-4">
           <div className="block lg:hidden">
             <Popover>
-              <PopoverTrigger aria-label="Search trigger">
+              <PopoverTrigger
+                aria-label="Search trigger"
+                className="relative h-8 w-8"
+              >
                 <Suspense fallback={<LoadingCircle />}>
-                  <MagnifyingGlassIcon className={` h-8 w-8`} />
+                  <MagnifyingGlassIcon className={`h-8 w-8`} />
                 </Suspense>
               </PopoverTrigger>
               <PopoverContent className="mt-3 block w-screen rounded-t-none bg-background lg:hidden">
@@ -177,8 +185,8 @@ export default function Nav({ scrollFlag }: { scrollFlag: boolean }) {
                   onSubmit={(e) => searchHandler(e)}
                   className="relative mx-auto w-full max-w-xl text-gray-600"
                 >
-                  <input
-                    className="h-full w-full rounded-lg border-2 border-gray-300 bg-background px-3 pr-16 text-sm focus:outline-none"
+                  <Input
+                    className="h-full w-full rounded-lg border-2 border-gray-300 bg-background px-3 py-2 pr-16 text-sm focus:outline-none"
                     type="text"
                     name="search"
                     placeholder="Search"
@@ -187,7 +195,7 @@ export default function Nav({ scrollFlag }: { scrollFlag: boolean }) {
                   />
                   <PopoverClose
                     type="submit"
-                    className="absolute right-0 top-1/2 h-full -translate-y-1/2 rounded-e-lg border-b-2 border-r-2 border-t-2 border-transparent bg-transparent px-2 text-gray-600 transition"
+                    className="absolute right-0 top-1/2 -translate-y-1/2 rounded-e-lg border-b-2 border-r-2 border-t-2 border-transparent bg-transparent px-2 text-gray-600 transition"
                   >
                     <span className="sr-only">Search</span>
                     <Suspense fallback={<LoadingCircle />}>
@@ -201,9 +209,12 @@ export default function Nav({ scrollFlag }: { scrollFlag: boolean }) {
 
           <div className="flex gap-4">
             <Popover>
-              <PopoverTrigger className="relative" aria-label="Shopping cart">
+              <PopoverTrigger
+                className="relative h-8 w-8"
+                aria-label="Shopping cart"
+              >
                 <Suspense fallback={<LoadingCircle />}>
-                  <ShoppingBagIcon className={`h-7 w-7`} />
+                  <ShoppingBagIcon className={`h-8 w-8`} />
                   {cartState && cartState.products.length > 0 && (
                     <span
                       aria-hidden="true"
@@ -213,7 +224,7 @@ export default function Nav({ scrollFlag }: { scrollFlag: boolean }) {
                           : 'bg-background/90 text-foreground'
                       } absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full`}
                     >
-                      {cartState.products.length}
+                      {totalProductQuantity}
                     </span>
                   )}
                 </Suspense>
@@ -221,24 +232,27 @@ export default function Nav({ scrollFlag }: { scrollFlag: boolean }) {
               <PopoverContent
                 className={`${
                   !scrollFlag && 'rounded-t-none'
-                } relative mt-3 w-screen max-w-full bg-background px-6 py-8 sm:px-6 md:max-w-sm lg:px-6`}
+                } relative mt-3 w-screen max-w-full bg-background px-6 py-8 sm:px-6 md:max-w-lg lg:px-6 `}
               >
                 <CartPopup />
               </PopoverContent>
             </Popover>
             <div className="hidden items-center lg:flex">
               <Popover>
-                <PopoverTrigger aria-label="Profile dropdown">
+                <PopoverTrigger
+                  aria-label="Profile dropdown"
+                  className="relative h-8 w-8"
+                >
                   <Suspense fallback={<LoadingCircle />}>
                     {userData.data ? (
-                      userData.data.user_info.profile_img.url ? (
-                        <div className="h-8 w-8">
-                          <img
-                            src={userData.data.user_info.profile_img.url}
-                            className="h-8 w-8 rounded-full object-cover"
-                            alt="profile_img"
-                          />
-                        </div>
+                      userData.data.userInfo.profileImg.url ? (
+                        <img
+                          src={userData.data.userInfo.profileImg.url}
+                          height={32}
+                          width={32}
+                          className="h-8 w-8 rounded-full aspect-square object-cover"
+                          alt="profile_img"
+                        />
                       ) : (
                         <SolidUserIcon className={`h-8 w-8`} />
                       )

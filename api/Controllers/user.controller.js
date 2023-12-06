@@ -3,21 +3,48 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
 const Cart = require('../Models/cart');
+const { Product } = require('../Models/product');
 const getRandomString = require('../helpers/getRandomString');
-const prepareProductObject = require('../helpers/prepareProductObject');
+const cashFormatter = require('../helpers/cashFormatter');
 const salt = bcrypt.genSaltSync(12);
+
+const prepareData = originalData => {
+  if (Array.isArray(originalData)) {
+    const preparedData = [...originalData];
+
+    for (let i = 0; i < originalData.length; i++) {
+      preparedData[i].price = {
+        ...preparedData[i].price,
+        value: `${cashFormatter({
+          number: preparedData[i].price.value,
+        })}`,
+      };
+    }
+    return preparedData;
+  } else {
+    const preparedData = { ...originalData };
+
+    preparedData.price = {
+      ...preparedData.price,
+      value: `${cashFormatter({
+        number: preparedData.price.value,
+      })}`,
+    };
+    return preparedData;
+  }
+};
 
 const login = async (req, res) => {
   const { email, password } = req.body;
 
-  const userDoc = await User.findOne({ email });
-  if (!userDoc)
+  const userData = await User.findOne({ email });
+  if (!userData)
     return res.status(422).json({
       name: 'email',
       error: 'No account found',
       message: 'No account found',
     });
-  const passwordVerification = bcrypt.compareSync(password, userDoc.password);
+  const passwordVerification = bcrypt.compareSync(password, userData.password);
   if (!passwordVerification)
     return res.status(422).json({
       name: 'password',
@@ -27,13 +54,18 @@ const login = async (req, res) => {
   jwt.sign(
     {
       email,
-      user_id: userDoc._id,
+      userId: userData._id,
     },
     process.env.JWT_SECRET,
     {},
     (err, token) => {
-      if (err) throw 'firts';
-      return res.status(200).cookie('token', token).json({ data: userDoc });
+      if (err) {
+        return res.status(500).json({
+          error: err.message,
+          message: 'We failed loggin you in.',
+        });
+      }
+      return res.status(200).cookie('token', token).json({ data: userData });
     },
   );
 };
@@ -50,19 +82,21 @@ const register = async (req, res) => {
       email,
       username,
       password: bcrypt.hashSync(password, salt),
-      user_info: {
-        profile_img: {},
+      userInfo: {
+        profileImg: {
+          id: new mongoose.Types.ObjectId(),
+          url: 'https://firebasestorage.googleapis.com/v0/b/smarthub-75eab.appspot.com/o/static_imgs%2Fnophoto.webp?alt=media&token=a974d32e-108a-4c21-be71-de358368a167',
+        },
         credentials: {
-          first_name: credentials.firstName,
-          last_name: credentials.lastName,
-          full_name: `${credentials.firstName} ${credentials.lastName}`,
+          firstName: credentials.firstName,
+          lastName: credentials.lastName,
         },
         address: {
           line1: '',
           line2: '',
           city: '',
           state: '',
-          postal_code: '',
+          postalCode: '',
           country: '',
         },
         phone: '',
@@ -70,33 +104,34 @@ const register = async (req, res) => {
       cart: cartId,
       following: [],
       orders: [],
-      author_info: {
-        categories: [],
-        pseudonim: `${credentials.firstName} ${credentials.lastName}`,
-        short_description: '',
+      authorInfo: {
+        pseudonim: `${username}`,
+        shortDescription: '',
         quote: '',
-        avg_products_grade: 0,
-        sold_books_quantity: 0,
-        my_products: [],
         followers: [],
       },
     });
 
     await Cart.create({
       _id: cartId,
-      user_id: userId,
+      userId,
       products: [],
     });
 
     jwt.sign(
       {
         email,
-        user_id: userId,
+        userId,
       },
       process.env.JWT_SECRET,
       {},
       (err, token) => {
-        if (err) throw 'firts';
+        if (err) {
+          return res.status(500).json({
+            error: err.message,
+            message: 'We failed loggin you in.',
+          });
+        }
         return res
           .status(201)
           .cookie('token', token)
@@ -119,86 +154,71 @@ const register = async (req, res) => {
 };
 
 const getMyProfile = async (req, res) => {
+  // let preparedData = {};
   try {
-    const {
-      _id,
-      email,
-      username,
-      user_info,
-      following,
-      orders,
-      role,
-      author_info,
-      security_settings,
-      news,
-    } = await User.findOne(
+    const userData = await User.findOne(
       {
-        _id: req.user.user_id,
+        _id: req.user.userId,
       },
       { password: 0 },
-    ).populate([
-      {
-        path: 'author_info',
-        populate: { path: 'my_products' },
-      },
-      {
-        path: 'orders',
-      },
-      {
-        path: 'orders',
-        populate: { path: 'products.product' },
-      },
-    ]);
+    );
 
-    const cartData = await Cart.findOne({
-      user_id: _id,
-    });
-
-    const {
-      avg_products_grade,
-      categories,
-      followers,
-      pseudonim,
-      quote,
-      short_description,
-      sold_books_quantity,
-    } = author_info;
-
-    const preparedMyProducts = author_info.my_products.map(item => {
-      return prepareProductObject(item);
-    });
-
-    const preparedAuthorInfo = {
-      avg_products_grade,
-      categories,
-      followers,
-      my_products: preparedMyProducts,
-      pseudonim,
-      quote,
-      short_description,
-      sold_books_quantity,
-      _id,
-    };
-
-    let preparedUserData = {
-      _id,
-      email,
-      username,
-      user_info,
-      following,
-      orders,
-      cart: cartData,
-      role,
-      security_settings,
-      news,
-    };
-
-    if (role !== 'User') {
-      preparedUserData.author_info = preparedAuthorInfo;
+    // const cartData = await Cart.findOne({
+    //   userId: userData._id,
+    // });
+    // preparedData = userData;
+    if (userData.role != 'User') {
+      // const userProducts = await Product.find({
+      //   $or: [{ authors: userData._id }, { 'creatorData._id': userData._id }],
+      //   sold: false,
+      //   deleted: false,
+      //   quantity: { $gt: 0 },
+      // }).lean();
+      // const userProductsCopy = userProducts.map(product => ({
+      //   ...product,
+      //   price: {
+      //     ...product.price,
+      //     value: `${cashFormatter({
+      //       number: product.price.value,
+      //     })}`,
+      //   },
+      // }));
+      // const preparedAuthorInfo = {
+      //   avg_products_grade,
+      //   categories,
+      //   followers,
+      //   my_products: userProductsCopy,
+      //   myCollections: [],
+      //   pseudonim,
+      //   quote,
+      //   short_description,
+      //   sold_books_quantity,
+      //   _id,
+      // };
+    } else {
+      // preparedData = {
+      //   _id: userData._id,
+      //   email: userData.email
+      // };
+      // let preparedUserData = {
+      //   _id,
+      //   email,
+      //   username,
+      //   user_info,
+      //   following,
+      //   orders,
+      //   cart: cartData,
+      //   role,
+      //   security_settings,
+      //   news,
+      // };
     }
-    res.status(200).json({ data: preparedUserData });
+
+    res.status(200).json({ data: userData });
   } catch (err) {
-    res.status(500).json({ message: 'Failed to fetch user data' });
+    res
+      .status(500)
+      .json({ message: 'Failed to fetch user data', error: err.message });
   }
 };
 
@@ -208,57 +228,25 @@ const getOtherProfile = async (req, res) => {
   if (!userId) {
     return res.status(422).json({ message: 'user id is required' });
   }
-
   try {
-    const { role, email, username, user_info, author_info } =
-      await User.findOne({
-        _id: userId,
-      }).populate('author_info.my_products');
-    const {
-      avg_products_grade,
-      categories,
-      followers,
-      pseudonim,
-      quote,
-      short_description,
-      sold_books_quantity,
-      _id,
-    } = author_info;
-
-    const preparedMyProducts = author_info.my_products.map(item => {
-      return prepareProductObject(item);
+    const otherUserData = await User.findOne({
+      _id: userId,
     });
 
-    const preparedAuthorInfo = {
-      avg_products_grade,
-      categories,
-      followers,
-      my_products: preparedMyProducts,
-      pseudonim,
-      quote,
-      short_description,
-      sold_books_quantity,
-      _id,
-    };
-    if (role !== 'User') {
-      return res.status(200).json({
-        data: {
-          email,
-          username,
-          user_info,
-          author_info: preparedAuthorInfo,
-        },
-      });
-    } else {
-      return res.status(200).json({
-        data: {
-          email,
-          username,
-          user_info,
-          role,
-        },
-      });
-    }
+    const otherUserProductsData = await Product.find({
+      $or: [{ 'creatorData._id': userId }, { authors: userId }],
+      deleted: false,
+      sold: false,
+      quantity: { $gt: 0 },
+    })
+      .populate(['authors', 'categories'])
+      .lean();
+
+    const preparedProducts = prepareData(otherUserProductsData);
+
+    return res.status(200).json({
+      data: { otherUserData, otherUserProductsData: preparedProducts },
+    });
   } catch (err) {
     return res
       .status(500)
@@ -270,7 +258,7 @@ const getGuestProfile = async (req, res) => {
   jwt.sign(
     {
       email: getRandomString(10),
-      user_id: getRandomString(15),
+      userId: getRandomString(15),
     },
     getRandomString(40),
     {},
@@ -285,16 +273,16 @@ const getGuestProfile = async (req, res) => {
 const getAllAuthors = async (req, res) => {
   try {
     const authors = await User.find({ role: 'Author' });
-    const authorsData = [];
-    for (const author of authors) {
-      authorsData.push({
-        label: author.author_info.pseudonim,
-        value: author.author_info.pseudonim,
-        _id: author._id,
-      });
-    }
+    // const authorsData = [];
+    // for (const author of authors) {
+    //   authorsData.push({
+    //     label: author.author_info.pseudonim,
+    //     value: author.author_info.pseudonim,
+    //     _id: author._id,
+    //   });
+    // }
 
-    return res.status(200).json({ data: authorsData });
+    return res.status(200).json({ data: authors });
   } catch (err) {
     return res
       .status(500)
@@ -308,8 +296,8 @@ const getAllAdmins = async (req, res) => {
     const adminData = [];
     for (const admin of admins) {
       adminData.push({
-        label: admin.author_info.pseudonim,
-        value: admin.admin_info.pseudonim,
+        label: admin.authorInfo.pseudonim,
+        value: admin.authorInfo.pseudonim,
         _id: admin._id,
       });
     }
@@ -339,7 +327,7 @@ const addOneFollow = async (req, res) => {
     );
     await User.updateOne(
       { _id: followReceiverId },
-      { $addToSet: { 'author_info.followers': followGiverId } },
+      { $addToSet: { 'authorInfo.followers': followGiverId } },
     );
     return res.status(200).json({ message: 'success' });
   } catch (err) {
@@ -358,7 +346,6 @@ const removeOneFollow = async (req, res) => {
   if (!followReceiverId) {
     return res.status(422).json({ message: 'Receiver id is required' });
   }
-
   try {
     await User.updateOne(
       { _id: followGiverId },
@@ -366,7 +353,7 @@ const removeOneFollow = async (req, res) => {
     );
     await User.updateOne(
       { _id: followReceiverId },
-      { $pull: { 'author_info.followers': followGiverId } },
+      { $pull: { 'authorInfo.followers': followGiverId } },
     );
     return res.status(200).json({ message: 'success' });
   } catch (err) {
@@ -377,48 +364,16 @@ const removeOneFollow = async (req, res) => {
 };
 
 const updateOneUser = async (req, res) => {
-  const { userEmail, fieldValue } = req.body;
-  const { fieldPath } = req;
+  const { _id } = req.body;
+  const preparedData = req.preparedData;
   try {
-    if (fieldPath === null) {
-      const mainData = {
-        username: fieldValue.username,
-        email: fieldValue.email,
-        role: fieldValue.role,
-      };
-      if (fieldValue.password.trim().length > 0) {
-        mainData.password = bcrypt.hashSync(fieldValue.password, salt);
-      }
-      await User.updateOne(
-        {
-          email: userEmail,
-        },
-        {
-          $set: {
-            ...mainData,
-            'user_info.phone': fieldValue.phone,
-            'user_info.profile_img': fieldValue.profileImg,
-            'user_info.credentials.first_name': fieldValue.firstName,
-            'user_info.credentials.last_name': fieldValue.lastName,
-            'author_info.quote': fieldValue.quote,
-            'author_info.short_description': fieldValue.shortDescription,
-            'author_info.pseudonim': fieldValue.pseudonim,
-          },
-        },
-        { upsert: true },
-      );
-    }
-    if (typeof fieldValue == 'object') {
-      await User.updateOne(
-        { email: userEmail },
-        { $set: { [fieldPath]: { ...fieldValue } } },
-      );
-    } else {
-      await User.updateOne(
-        { email: userEmail },
-        { $set: { [fieldPath]: fieldValue } },
-      );
-    }
+    await User.updateOne(
+      {
+        _id,
+      },
+      preparedData,
+      { upsert: true },
+    );
 
     return res.status(200).json({ message: 'Successfully updated data' });
   } catch (err) {
@@ -439,12 +394,97 @@ const deleteOneUser = async (req, res) => {
   const { userId } = req.body;
   try {
     await User.deleteOne({ _id: userId });
-    await Cart.deleteOne({ user_id: userId });
-    res.status(200).json({ message: 'Success' });
+    await Cart.deleteOne({ userId: userId });
+    return res.status(200).json({ message: 'Success' });
   } catch (err) {
-    res
+    return res
       .status(500)
       .json({ message: 'Failed deleting user', error: err.message });
+  }
+};
+
+const getFollowedUsers = async (req, res) => {
+  const { userId, pageSize, filtersData } = req.query;
+  const fetchedUserData = [];
+
+  if (!userId) {
+    return res.status(402).json({ message: 'UserId is required' });
+  }
+
+  try {
+    const userData = await User.findOne({ _id: userId });
+    if (!userData.following || userData.following.length <= 0) {
+      return res.status(200).json({ data: fetchedUserData });
+    }
+
+    const searchQuery = {
+      _id: { $in: userData.following },
+    };
+
+    if (!filtersData) {
+      filtersData = { page: 1 };
+    }
+
+    let currentPage = filtersData.page;
+
+    if (!currentPage) {
+      currentPage = 1;
+    }
+
+    let currentPageSize = pageSize;
+    if (!currentPageSize) {
+      currentPageSize = 10;
+    }
+
+    const skipPages = (currentPage - 1) * currentPageSize;
+
+    if (filtersData.searchedPhrase) {
+      searchQuery['$or'] = [
+        { username: { $regex: new RegExp(filtersData.searchedPhrase, 'i') } },
+        { email: { $regex: new RegExp(filtersData.searchedPhrase, 'i') } },
+      ];
+    }
+
+    const authorsData = await User.find(searchQuery)
+      .sort({ email: -1 })
+      .skip(skipPages)
+      .limit(currentPageSize);
+
+    const copyData = [...authorsData];
+    const preparedData = copyData.map(author => ({
+      _id: author._id,
+      username: author.username,
+      role: author.role,
+      userInfo: { profileImg: author.userInfo.profileImg },
+      authorInfo:
+        author.role !== 'User'
+          ? {
+              pseudonim: author.authorInfo.pseudonim,
+              quote: author.authorInfo.quote,
+            }
+          : {},
+    }));
+
+    return res.status(200).json({ data: { data: preparedData } });
+  } catch (err) {
+    return res
+      .status(500)
+      .json({ message: 'Failed loading followed users', error: err.message });
+  }
+};
+
+const getFollowes = async (req, res) => {
+  const { _id } = req.query;
+  try {
+    const data = await User.findOne({ _id }, { 'authorInfo.followers': 1 });
+    if (data) {
+      return res.json({ data: data.authorInfo.followers });
+    }
+    return res.json({ data: data });
+  } catch (err) {
+    return res
+      .status(500)
+      .json({ message: 'Failed fetching followers.', error: err.message });
   }
 };
 
@@ -459,5 +499,7 @@ module.exports = {
   addOneFollow,
   removeOneFollow,
   updateOneUser,
+  getFollowedUsers,
   deleteOneUser,
+  getFollowes,
 };
