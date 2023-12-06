@@ -124,7 +124,7 @@ export default function Follows() {
           </button>
         </form>
       </div>
-      <div className="px-1 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      <div className="px-1 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-4">
         {!followedUsers.isLoading &&
           followedUsers.data &&
           followedUsers.data.length <= 0 && (
