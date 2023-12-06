@@ -14,7 +14,7 @@ import {
 } from '../../../../components/UI/accordion';
 import { AuthorTypes, PostDataTypes } from '../../../../types/interfaces';
 import { Link } from 'react-router-dom';
-import { Button } from '../../../../components/UI/button';
+import { Button, buttonVariants } from '../../../../components/UI/button';
 import { Input } from '../../../../components/UI/input';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -202,6 +202,7 @@ export default function AdminTabs({
       };
     });
   };
+
   const deleteUserHandler = async () => {
     const { error } = await usePostAccessDatabase({
       url: DATABASE_ENDPOINTS.USER_DELETE_ONE,
@@ -216,7 +217,7 @@ export default function AdminTabs({
     }
     fetchData({});
   };
-
+  console.log(fields);
   return (
     <AccordionItem value={`${user._id}`}>
       <AccordionTrigger className="mt-3 flex w-full justify-between px-3 py-4 first:mt-0 hover:bg-transparent hover:no-underline">
@@ -231,11 +232,12 @@ export default function AdminTabs({
                   to={`/account/${
                     userData?._id === user._id ? 'my' : user._id
                   }`}
-                  className="inline-block h-full space-x-2"
+                  className={`inline-block h-full space-x-2 ${buttonVariants({
+                    variant: 'link',
+                    size: 'clear',
+                  })}`}
                 >
-                  <Button className="px-0" variant={'link'}>
-                    <h5 className="inline-block">{user.username}</h5>
-                  </Button>
+                  <h5 className="inline-block">{user.username}</h5>
                 </Link>
                 <div
                   className={`absolute right-0 top-0 flex flex-col-reverse gap-3 py-2 sm:flex-row`}
