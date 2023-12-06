@@ -65,7 +65,16 @@ const login = async (req, res) => {
           message: 'We failed loggin you in.',
         });
       }
-      return res.status(200).cookie('token', token).json({ data: userData });
+      return res
+        .status(200)
+        .cookie('token', token, {
+          httpOnly: true,
+          secure: true,
+          sameSite: 'None',
+          path: '/',
+          domain: 'smarthub.studio',
+        })
+        .json({ data: userData });
     },
   );
 };
@@ -134,7 +143,13 @@ const register = async (req, res) => {
         }
         return res
           .status(201)
-          .cookie('token', token)
+          .cookie('token', token, {
+            httpOnly: true,
+            secure: true,
+            sameSite: 'None',
+            path: '/',
+            domain: 'smarthub.studio',
+          })
           .json({ message: 'Succesfully created an account' });
       },
     );
@@ -265,7 +280,16 @@ const getGuestProfile = async (req, res) => {
     (err, token) => {
       if (err) res.status(500).json({ message: 'Failed to fetch guest Data' });
       token = token.slice(token.length - 12, token.length);
-      res.status(200).cookie('guestToken', token).json('Success');
+      res
+        .status(200)
+        .cookie('guestToken', token, {
+          httpOnly: true,
+          secure: true,
+          sameSite: 'None',
+          path: '/',
+          domain: 'smarthub.studio',
+        })
+        .json('Success');
     },
   );
 };
