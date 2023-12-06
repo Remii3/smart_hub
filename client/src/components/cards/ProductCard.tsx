@@ -29,6 +29,7 @@ export default function ProductCard({
     addProductToCart({
       productId: _id,
       productQuantity: 1,
+      addingToCartType: 'addToCart',
     });
   };
 
