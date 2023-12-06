@@ -11,5 +11,6 @@ export function getCookie(name: string) {
     const [k, v] = el.split('=');
     cookie[k.trim()] = v;
   });
+  console.log(cookie);
   return cookie[name];
 }
