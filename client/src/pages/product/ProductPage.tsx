@@ -554,7 +554,7 @@ export default function ProductPage() {
 
               <div className="flex gap-2 mb-2 justify-between items-start flex-col md:flex-row">
                 <div>
-                  <div className="max-w-screen md:max-w-sm lg:max-w-xl xl:max-w-3xl 2xl:max-w-4xl w-full">
+                  <div className="max-w-[calc(100vw-48px)] md:max-w-sm lg:max-w-xl xl:max-w-3xl 2xl:max-w-4xl w-full">
                     {isEditing.isEditing && (
                       <div className="mb-4 flex flex-wrap gap-4">
                         {selectedImgs.imgs.map((item) => (
