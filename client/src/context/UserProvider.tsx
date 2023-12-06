@@ -47,7 +47,7 @@ export default function UserProvider({ children }: { children: ReactNode }) {
 
     if (document.cookie.match('token') && document.cookie.match('guestToken')) {
       document.cookie =
-        'guestToken=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+        'guestToken=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT; Secure; SameSite=None;';
     }
     if (!userData.data && token) {
       fetchUserData();
