@@ -13,7 +13,7 @@ interface SecurityOptionType {
 }
 
 export default function SecurityPermissions() {
-  const { userData } = useContext(UserContext);
+  const { userData, fetchUserData } = useContext(UserContext);
   const initialData = [
     {
       name: 'hidePrivateInformation',
@@ -45,6 +45,7 @@ export default function SecurityPermissions() {
         },
       },
     });
+    fetchUserData();
   };
   return (
     <div>
