@@ -10,9 +10,10 @@ const stripe = require('stripe')(
 
 const getAllCartItems = async (req, res) => {
   const { userId } = req.query;
-
+  console.log('userId get', userId);
   const cookie = req.cookies.token || req.cookies.guestToken;
   let id = userId || cookie;
+  console.log('id get', id);
 
   const preparedData = {
     products: [],
@@ -24,7 +25,7 @@ const getAllCartItems = async (req, res) => {
     const cartData = await Cart.findOne({
       userId: id,
     }).lean();
-
+    console.log('cartData', cartData);
     if (!cartData) {
       await Cart.create({
         userId: id,
@@ -87,6 +88,7 @@ const getAllCartItems = async (req, res) => {
         number: preparedData.additionalData.discount,
       })}`,
     };
+    console.log('preparedData', preparedData);
     return res
       .status(200)
       .json({ data: preparedData, message: 'Successfully fetched cart.' });
