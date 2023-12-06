@@ -72,7 +72,7 @@ const login = async (req, res) => {
           secure: true,
           sameSite: 'None',
           path: '/',
-          domain: 'smarthub.studio',
+          domain: 'www.smarthub.studio',
         })
         .json({ data: userData });
     },
@@ -148,7 +148,7 @@ const register = async (req, res) => {
             secure: true,
             sameSite: 'None',
             path: '/',
-            domain: 'smarthub.studio',
+            domain: 'www.smarthub.studio',
           })
           .json({ message: 'Succesfully created an account' });
       },
@@ -287,7 +287,7 @@ const getGuestProfile = async (req, res) => {
           secure: true,
           sameSite: 'None',
           path: '/',
-          domain: 'smarthub.studio',
+          domain: 'www.smarthub.studio',
         })
         .json('Success');
     },
