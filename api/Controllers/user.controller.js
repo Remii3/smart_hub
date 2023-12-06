@@ -404,7 +404,7 @@ const deleteOneUser = async (req, res) => {
 };
 
 const getFollowedUsers = async (req, res) => {
-  const { userId } = req.query;
+  const { userId, pageSize, filtersData } = req.query;
   const fetchedUserData = [];
 
   if (!userId) {
@@ -416,25 +416,56 @@ const getFollowedUsers = async (req, res) => {
     if (!userData.following || userData.following.length <= 0) {
       return res.status(200).json({ data: fetchedUserData });
     }
-    for (let i = 0; i < userData.following.length; i++) {
-      const authorsData = await User.findOne({ _id: userData.following[i] });
-      if (authorsData) {
-        const preparedData = {
-          _id: authorsData._id,
-          username: authorsData.username,
-          role: authorsData.role,
-          userInfo: { profileImg: authorsData.userInfo.profileImg },
-        };
-        if (authorsData.role !== 'User') {
-          preparedData.authorInfo = {
-            pseudonim: authorsData.authorInfo.pseudonim,
-            quote: authorsData.authorInfo.quote,
-          };
-        }
-        fetchedUserData.push(preparedData);
-      }
+
+    const searchQuery = {
+      _id: { $in: userData.following },
+    };
+
+    if (!filtersData) {
+      filtersData = { page: 1 };
     }
-    return res.status(200).json({ data: fetchedUserData });
+
+    let currentPage = filtersData.page;
+
+    if (!currentPage) {
+      currentPage = 1;
+    }
+
+    let currentPageSize = pageSize;
+    if (!currentPageSize) {
+      currentPageSize = 10;
+    }
+
+    const skipPages = (currentPage - 1) * currentPageSize;
+
+    if (filtersData.searchedPhrase) {
+      searchQuery['$or'] = [
+        { username: { $regex: new RegExp(filtersData.searchedPhrase, 'i') } },
+        { email: { $regex: new RegExp(filtersData.searchedPhrase, 'i') } },
+      ];
+    }
+
+    const authorsData = await User.find(searchQuery)
+      .sort({ email: -1 })
+      .skip(skipPages)
+      .limit(currentPageSize);
+
+    const copyData = [...authorsData];
+    const preparedData = copyData.map(author => ({
+      _id: author._id,
+      username: author.username,
+      role: author.role,
+      userInfo: { profileImg: author.userInfo.profileImg },
+      authorInfo:
+        author.role !== 'User'
+          ? {
+              pseudonim: author.authorInfo.pseudonim,
+              quote: author.authorInfo.quote,
+            }
+          : {},
+    }));
+
+    return res.status(200).json({ data: { data: preparedData } });
   } catch (err) {
     return res
       .status(500)
