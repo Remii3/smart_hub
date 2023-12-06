@@ -6,7 +6,6 @@ const preparePostCartItem = (req, res, next) => {
   if (!productId) {
     return res.status(422).json({ message: 'Product id is required!' });
   }
-  console.log('cookie id', id);
   const preparedData = {
     userId: id,
     productId,

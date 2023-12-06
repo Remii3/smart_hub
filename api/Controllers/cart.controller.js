@@ -10,10 +10,8 @@ const stripe = require('stripe')(
 
 const getAllCartItems = async (req, res) => {
   const { userId } = req.query;
-  console.log('userId get', userId);
   const cookie = req.cookies.token || req.cookies.guestToken;
   let id = userId || cookie;
-  console.log('id get', id);
 
   const preparedData = {
     products: [],
@@ -25,7 +23,6 @@ const getAllCartItems = async (req, res) => {
     const cartData = await Cart.findOne({
       userId: id,
     }).lean();
-    console.log('cartData', cartData);
     if (!cartData) {
       await Cart.create({
         userId: id,
@@ -88,7 +85,6 @@ const getAllCartItems = async (req, res) => {
         number: preparedData.additionalData.discount,
       })}`,
     };
-    console.log('preparedData', preparedData);
     return res
       .status(200)
       .json({ data: preparedData, message: 'Successfully fetched cart.' });
@@ -110,7 +106,6 @@ const addItemToCart = async (req, res) => {
 
   try {
     const cart = await Cart.findOne({ userId });
-    console.log('cart', cart);
 
     if (!cart) {
       await Cart.create({
@@ -126,7 +121,6 @@ const addItemToCart = async (req, res) => {
       'products._id': productId,
     });
 
-    console.log('existingItem', existingItem);
     if (existingItem) {
       await Cart.updateOne(
         { userId, 'products._id': productId },
@@ -148,7 +142,6 @@ const addItemToCart = async (req, res) => {
         },
       },
     );
-    console.log('cart end', cart);
     return res
       .status(201)
       .json({ message: `Successfully added product to the cart.` });
