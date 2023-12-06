@@ -109,6 +109,7 @@ const addItemToCart = async (req, res) => {
 
   try {
     const cart = await Cart.findOne({ userId });
+    console.log('cart', cart);
 
     if (!cart) {
       await Cart.create({
@@ -119,12 +120,12 @@ const addItemToCart = async (req, res) => {
         .status(201)
         .json({ message: 'Successfully added product to the cart.' });
     }
-
     const existingItem = await Cart.findOne({
       userId,
       'products._id': productId,
     });
 
+    console.log('existingItem', existingItem);
     if (existingItem) {
       await Cart.updateOne(
         { userId, 'products._id': productId },
@@ -146,6 +147,7 @@ const addItemToCart = async (req, res) => {
         },
       },
     );
+    console.log('cart end', cart);
     return res
       .status(201)
       .json({ message: `Successfully added product to the cart.` });
