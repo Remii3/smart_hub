@@ -144,12 +144,13 @@ export default function AdminTabs({
   };
 
   const updateDataHandler = async () => {
-    let dirtyData = {};
+    let dirtyData = {} as { [index: string]: unknown };
     if (form.formState.dirtyFields.admin) {
       dirtyData = Object.fromEntries(
         Object.keys(form.formState.dirtyFields.admin[0]).map((x: string) => {
           return [
             x,
+            // @ts-ignore
             form.getValues(`admin[0].${x}` as keyof z.infer<typeof formSchema>),
           ];
         })
