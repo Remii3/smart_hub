@@ -83,7 +83,7 @@ export default function MyProducts() {
     });
 
     const filtersData = {
-      page: newPage,
+      page: newPage || page,
       marketplace,
     } as { [index: string]: unknown };
 

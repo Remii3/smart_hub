@@ -1,7 +1,10 @@
 const prepareSearchedUsers = (req, res, next) => {
-  const { page, pageSize } = req.query;
-  const query = {};
-  let currentPage = page;
+  let { pageSize, filtersData } = req.query;
+  if (!filtersData) {
+    filtersData = { page: 1 };
+  }
+
+  let currentPage = filtersData.page;
 
   if (!currentPage) {
     currentPage = 1;
@@ -13,8 +16,17 @@ const prepareSearchedUsers = (req, res, next) => {
   }
 
   const skipPages = (currentPage - 1) * currentPageSize;
+
+  const searchQuery = {};
+
+  if (filtersData.searchedPhrase) {
+    searchQuery['$or'] = [
+      { username: { $regex: new RegExp(filtersData.searchedPhrase, 'i') } },
+      { email: { $regex: new RegExp(filtersData.searchedPhrase, 'i') } },
+    ];
+  }
   req.paginationInfo = { skipPages, currentPageSize };
-  req.searchQuery = query;
+  req.searchQuery = searchQuery;
   next();
 };
 
