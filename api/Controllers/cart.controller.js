@@ -11,9 +11,8 @@ const stripe = require('stripe')(
 const getAllCartItems = async (req, res) => {
   const { userId } = req.query;
 
-  if (!userId) {
-    return res.status(422).json({ message: 'User id is required!' });
-  }
+  const cookie = req.cookies.token || req.cookies.guestToken;
+  let id = userId || cookie;
 
   const preparedData = {
     products: [],
@@ -23,12 +22,12 @@ const getAllCartItems = async (req, res) => {
 
   try {
     const cartData = await Cart.findOne({
-      userId,
+      userId: id,
     }).lean();
 
     if (!cartData) {
       await Cart.create({
-        userId: userId,
+        userId: id,
       });
       return res.status(200).json({
         data: {
@@ -63,7 +62,7 @@ const getAllCartItems = async (req, res) => {
 
       if (!productData) {
         await Cart.updateOne(
-          { userId, 'products._id': product._id },
+          { userId: id, 'products._id': product._id },
           { $pull: { products: { _id: product._id } } },
         );
       }
