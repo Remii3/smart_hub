@@ -8,7 +8,6 @@ import {
   useState,
 } from 'react';
 import { UserContext } from './UserProvider';
-import { getCookie } from '@lib/utils';
 import { CartTypes } from '@customTypes/interfaces';
 import {
   useGetAccessDatabase,
@@ -59,27 +58,25 @@ export default function CartProvider({ children }: { children: ReactNode }) {
   const [cartState, setCart] = useState<CartTypes>(initialState);
 
   const { userData } = useContext(UserContext);
-  const userId = userData.data?._id || getCookie('guestToken');
+  const userId = userData.data?._id;
 
   const fetchCartData = useCallback(async () => {
-    if (userId) {
-      const { data } = await useGetAccessDatabase({
-        url: DATABASE_ENDPOINTS.CART_ALL,
-        params: { userId },
-      });
-      setCart((prevState) => {
-        return {
-          ...prevState,
-          isIncrementing: false,
-          isAdding: false,
-          addingToCartType: null,
-          isDecrementing: false,
-          isDeleting: false,
-          isLoading: false,
-          ...data,
-        };
-      });
-    }
+    const { data } = await useGetAccessDatabase({
+      url: DATABASE_ENDPOINTS.CART_ALL,
+      params: { userId },
+    });
+    setCart((prevState) => {
+      return {
+        ...prevState,
+        isIncrementing: false,
+        isAdding: false,
+        addingToCartType: null,
+        isDecrementing: false,
+        isDeleting: false,
+        isLoading: false,
+        ...data,
+      };
+    });
   }, [userId]);
 
   const addProductToCart = useCallback(

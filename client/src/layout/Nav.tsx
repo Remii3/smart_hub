@@ -76,8 +76,6 @@ export default function Nav({ scrollFlag }: { scrollFlag: boolean }) {
       navigate('/');
     }
     setTimeout(async () => {
-      document.cookie =
-        'token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
       await useGetAccessDatabase({ url: DATABASE_ENDPOINTS.USER_GUEST });
       changeUserData(null);
       navigate('/');

@@ -11,7 +11,6 @@ import {
 } from '@stripe/stripe-js';
 import { useState, useEffect, useContext, FormEvent } from 'react';
 import { UserContext } from '@context/UserProvider';
-import { getCookie } from '@lib/utils';
 import { CartContext } from '@context/CartProvider';
 import { usePostAccessDatabase } from '../../hooks/useAaccessDatabase';
 import { DATABASE_ENDPOINTS } from '../../data/endpoints';
@@ -134,7 +133,7 @@ export default function CheckoutForm({
         setMessage('An unexpected error occurred.');
       }
     } else {
-      const currentUserId = userData.data?._id || getCookie('guestToken');
+      const currentUserId = userData.data?._id;
       const { data, error } = await usePostAccessDatabase({
         url: DATABASE_ENDPOINTS.ORDER_ONE,
         body: {
