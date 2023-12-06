@@ -43,19 +43,7 @@ export default function UserProvider({ children }: { children: ReactNode }) {
   };
 
   useEffect(() => {
-    const token = document.cookie.match('token');
-
-    if (document.cookie.match('token') && document.cookie.match('guestToken')) {
-      document.cookie =
-        'guestToken=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT; Secure; SameSite=None;';
-    }
-    if (!userData.data && token) {
-      fetchUserData();
-    } else {
-      setUserData((prevState) => {
-        return { ...prevState, isLoading: false };
-      });
-    }
+    fetchUserData();
   }, []);
   const userValues = useMemo(
     () => ({ userData, changeUserData, fetchUserData }),

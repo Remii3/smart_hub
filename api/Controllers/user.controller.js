@@ -72,6 +72,12 @@ const login = async (req, res) => {
           sameSite: 'None',
           path: '/',
         })
+        .cookie('guestToken', '', {
+          secure: true,
+          expirces: 'Thu, 01 Jan 1970 00:00:01 GMT',
+          sameSite: 'None',
+          path: '/',
+        })
         .json({ data: userData });
     },
   );
@@ -143,6 +149,12 @@ const register = async (req, res) => {
           .status(201)
           .cookie('token', token, {
             secure: true,
+            sameSite: 'None',
+            path: '/',
+          })
+          .cookie('guestToken', '', {
+            secure: true,
+            expirces: 'Thu, 01 Jan 1970 00:00:01 GMT',
             sameSite: 'None',
             path: '/',
           })
@@ -266,6 +278,9 @@ const getOtherProfile = async (req, res) => {
 };
 
 const getGuestProfile = async (req, res) => {
+  if (req.cookies.guestToken || req.cookies.token)
+    return res.status(200).json({ message: 'Success' });
+
   jwt.sign(
     {
       email: getRandomString(10),

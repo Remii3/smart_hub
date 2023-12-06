@@ -14,13 +14,7 @@ export default function MainLayout() {
 
   useEffect(() => {
     window.scrollTo(0, 0);
-
-    if (
-      !document.cookie.match('token') &&
-      !document.cookie.match('guestToken')
-    ) {
-      useGetAccessDatabase({ url: DATABASE_ENDPOINTS.USER_GUEST });
-    }
+    useGetAccessDatabase({ url: DATABASE_ENDPOINTS.USER_GUEST });
   }, [pathname]);
 
   return (
