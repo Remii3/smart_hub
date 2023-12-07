@@ -81,6 +81,23 @@ export default function AdminTabs({
   });
   const form = useForm({
     resolver: zodResolver<typeof adminSchema>(adminSchema),
+    defaultValues: {
+      admin: [
+        {
+          username: user.username,
+          email: user.email,
+          password: '',
+          firstName: user.userInfo.credentials.firstName,
+          lastName: user.userInfo.credentials.lastName,
+          phone: user.userInfo.phone,
+          pseudonim: user.authorInfo.pseudonim,
+          quote: user.authorInfo.quote,
+          shortDescription: user.authorInfo.shortDescription,
+          role: user.role,
+          profileImg: user.userInfo.profileImg,
+        },
+      ],
+    },
   });
   const resetUserData = useCallback(() => {
     form.reset({
