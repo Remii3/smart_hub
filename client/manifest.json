@@ -1,7 +1,7 @@
 {
   "name": "Smarthub",
   "short_name": "Smarthub",
-  "start_url": ".",
+  "start_url": "https://smarthub.studio",
   "display": "standalone",
   "background_color": "#fff",
   "description": "An ecommerce app for books.",
