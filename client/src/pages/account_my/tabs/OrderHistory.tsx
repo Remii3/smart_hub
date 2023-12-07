@@ -25,6 +25,16 @@ import { MagnifyingGlassIcon } from '@radix-ui/react-icons';
 import DeleteDialog from '@components/UI/dialogs/DeleteDialog';
 import { Button } from '@components/UI/button';
 import Pagination from '@components/paginations/Pagination';
+import { z } from 'zod';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from '@components/UI/form';
 
 interface UserOrdersTypes extends FetchDataTypes {
   data: null | OrderTypes[];
@@ -35,6 +45,14 @@ interface UserOrdersTypes extends FetchDataTypes {
   };
 }
 
+const formSchema = z.object({
+  query: z
+    .string()
+    .refine((value) => value.length === 0 || value.length >= 24, {
+      message: 'Input should be either empty or have a whole id.',
+    }),
+});
+
 export default function OrderHistory() {
   const [orderState, setOrderState] = useState<UserOrdersTypes>({
     hasError: null,
@@ -42,10 +60,10 @@ export default function OrderHistory() {
     data: null,
     rawData: null,
   });
+
   const [page, setPage] = useState(1);
   const limit = 8;
   const [deleteDialog, setDeleteDialog] = useState(false);
-  const [searchbarValue, setSearchbarValue] = useState('');
   const [deleteAllStatus, setDeleteAllStatus] = useState<PostDataTypes>({
     hasError: null,
     isLoading: false,
@@ -53,12 +71,26 @@ export default function OrderHistory() {
   });
   const { userData } = useContext(UserContext);
 
-  const fetchOrders = async ({ newPage }: { newPage: number }) => {
+  const form = useForm({
+    resolver: zodResolver(formSchema),
+    reValidateMode: 'onSubmit',
+    defaultValues: {
+      query: '',
+    },
+  });
+
+  const fetchOrders = async ({
+    newPage,
+    query = '',
+  }: {
+    newPage: number;
+    query?: string;
+  }) => {
     const filtersData = {
       page: newPage,
     } as { [index: string]: unknown };
 
-    filtersData.query = searchbarValue;
+    filtersData.query = query;
 
     if (!userData.data) return;
     const { data, error } = await useGetAccessDatabase({
@@ -85,9 +117,8 @@ export default function OrderHistory() {
     });
   };
 
-  const searchHandler = async (e: React.FormEvent) => {
-    e.preventDefault();
-    await fetchOrders({ newPage: 1 });
+  const searchHandler = async (formResponse: z.infer<typeof formSchema>) => {
+    await fetchOrders({ newPage: 1, query: formResponse.query });
     setPage(1);
   };
 
@@ -130,29 +161,42 @@ export default function OrderHistory() {
 
   return (
     <>
-      <section className="flex justify-between flex-wrap items-center mb-4 gap-4">
+      <section className="flex justify-between flex-wrap items-start mb-4 gap-4">
         <h4 className="order-1">My orders</h4>
         <div className="order-3 sm:order-2 w-full sm:w-auto">
-          <form
-            onSubmit={(e) => searchHandler(e)}
-            className="relative mx-auto me-4 w-full basis-full items-center justify-end text-muted-foreground flex"
-          >
-            <Input
-              className="h-full rounded-lg bg-background py-2 pl-3 pr-12 text-sm transition-[width] duration-200 ease-in-out focus-visible:w-full"
-              type="text"
-              name="search"
-              placeholder="Search"
-              value={searchbarValue}
-              onChange={(e) => setSearchbarValue(e.target.value)}
-            />
-            <button
-              type="submit"
-              className="absolute right-0 top-1/2 h-full w-auto min-w-[40px] -translate-y-1/2 transform rounded-e-xl border-0 bg-transparent px-2 text-gray-600 transition"
+          <Form {...form}>
+            <form
+              onSubmit={form.handleSubmit(searchHandler)}
+              className="relative mx-auto me-4 w-full basis-full items-center justify-end text-muted-foreground flex"
             >
-              <span className="sr-only">Search</span>
-              <MagnifyingGlassIcon className="h-6 w-6 font-bold text-muted-foreground" />
-            </button>
-          </form>
+              <FormField
+                name="query"
+                control={form.control}
+                render={({ field }) => (
+                  <FormItem className="space-y-0 flex-grow">
+                    <FormControl>
+                      <div className="relative flex-grow">
+                        <Input
+                          className="h-full rounded-lg bg-background py-2 pl-3 pr-12 text-sm transition-[width] duration-200 ease-in-out focus-visible:w-full"
+                          type="text"
+                          placeholder="Search"
+                          {...field}
+                        />
+                        <button
+                          type="submit"
+                          className="absolute right-0 top-1/2 h-full w-auto min-w-[40px] -translate-y-1/2 transform rounded-e-xl border-0 bg-transparent px-2 text-gray-600 transition"
+                        >
+                          <span className="sr-only">Search</span>
+                          <MagnifyingGlassIcon className="h-6 w-6 font-bold text-muted-foreground" />
+                        </button>
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </form>
+          </Form>
         </div>
         <div className="order-2 sm:order-3 ">
           <DeleteDialog

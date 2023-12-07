@@ -24,7 +24,7 @@ const prodCol = async (req, res, next) => {
   let specialQuery = null;
 
   if (filtersData.searchedPhrase) {
-    searchQuery['$text'] = { $search: `${filtersData.searchedPhrase}` };
+    searchQuery.title = { $regex: new RegExp(filtersData.searchedPhrase, 'i') };
   }
   if (filtersData.searchedSpecial) {
     specialQuery = filtersData.searchedSpecial;
