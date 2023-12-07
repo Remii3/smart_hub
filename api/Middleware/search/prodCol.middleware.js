@@ -107,7 +107,7 @@ const prodCol = async (req, res, next) => {
 
   if (filtersData.selectedRating) {
     searchQuery['rating.avgRating'] = {
-      $gte: Number(filtersData.selectedRating),
+      $gte: Number(filtersData.selectedRating - 0.5),
     };
   }
 

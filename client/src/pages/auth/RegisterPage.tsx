@@ -23,6 +23,9 @@ import {
 import { Input } from '@components/UI/input';
 import { useToast } from '@components/UI/use-toast';
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
+import { PostDataTypes } from '@customTypes/interfaces';
+import LoadingCircle from '@components/Loaders/LoadingCircle';
+import { set } from 'date-fns';
 
 const formSchema = z
   .object({
@@ -45,6 +48,11 @@ const formSchema = z
 
 export default function RegisterPage() {
   const navigate = useNavigate();
+  const [signUpStatus, setSignUpStatus] = useState<PostDataTypes>({
+    hasError: null,
+    isLoading: false,
+    isSuccess: false,
+  });
   const { changeUserData } = useContext(UserContext);
   const [showPasswords, setShowPasswords] = useState({
     password: false,
@@ -73,6 +81,8 @@ export default function RegisterPage() {
       lastName,
     } = formResponse;
 
+    setSignUpStatus((prevState) => ({ ...prevState, isLoading: true }));
+
     const { error: registerError, name } = await usePostAccessDatabase({
       url: DATABASE_ENDPOINTS.USER_REGISTER,
       body: {
@@ -85,22 +95,34 @@ export default function RegisterPage() {
     });
     if (registerError) {
       form.setError(name, { type: 'value', message: registerError });
-      return toast({
+      toast({
         variant: 'destructive',
         title: 'Uh oh! Something went wrong.',
         description: registerError,
       });
+      return setSignUpStatus((prevState) => ({
+        ...prevState,
+        isLoading: false,
+      }));
     }
     const { data, error: updateProfileDataError } = await useGetAccessDatabase({
       url: DATABASE_ENDPOINTS.USER_PROFILE,
     });
     if (updateProfileDataError) {
-      return toast({
+      toast({
         variant: 'destructive',
         title: 'Uh oh! Something went wrong.',
         description: updateProfileDataError,
       });
+      return setSignUpStatus((prevState) => ({
+        ...prevState,
+        isLoading: false,
+      }));
     }
+    setSignUpStatus((prevState) => ({
+      ...prevState,
+      isLoading: false,
+    }));
     changeUserData(data);
     if (data) {
       navigate('/');
@@ -328,8 +350,18 @@ export default function RegisterPage() {
                 </div>
 
                 <div className="col-span-6 sm:flex sm:items-center sm:gap-4">
-                  <Button variant="default" type="submit" size="default">
-                    Sign up
+                  <Button
+                    variant="default"
+                    type="submit"
+                    disabled={signUpStatus.isLoading}
+                    className="relative"
+                  >
+                    {signUpStatus.isLoading && <LoadingCircle />}
+                    <span
+                      className={`${signUpStatus.isLoading && 'invisible'}`}
+                    >
+                      Sign up
+                    </span>
                   </Button>
                   <p className="mt-4 text-sm text-gray-500 sm:mt-0">
                     Already have an account?{' '}

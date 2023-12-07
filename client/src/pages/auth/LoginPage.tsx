@@ -23,6 +23,8 @@ import {
 import { Input } from '@components/UI/input';
 import { useToast } from '@components/UI/use-toast';
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
+import { PostDataTypes } from '@customTypes/interfaces';
+import LoadingCircle from '@components/Loaders/LoadingCircle';
 
 const formSchema = z.object({
   email: z.string().email().nonempty().min(2),
@@ -31,6 +33,11 @@ const formSchema = z.object({
 
 export default function LoginPage() {
   const navigate = useNavigate();
+  const [signInStatus, setSignInStatus] = useState<PostDataTypes>({
+    hasError: null,
+    isLoading: false,
+    isSuccess: false,
+  });
   const { changeUserData } = useContext(UserContext);
   const [showPassword, setShowPassword] = useState(false);
   const { toast } = useToast();
@@ -45,6 +52,7 @@ export default function LoginPage() {
 
   const signInHandler = async (formResponse: z.infer<typeof formSchema>) => {
     const { email, password } = formResponse;
+    setSignInStatus((prevState) => ({ ...prevState, isLoading: true }));
     const { error: logInError, name } = await usePostAccessDatabase({
       url: DATABASE_ENDPOINTS.USER_LOGIN,
       body: {
@@ -54,22 +62,34 @@ export default function LoginPage() {
     });
     if (logInError) {
       form.setError(name, { type: 'value', message: logInError });
-      return toast({
+      toast({
         variant: 'destructive',
         title: 'Uh oh! Something went wrong.',
         description: logInError,
       });
+      return setSignInStatus((prevState) => ({
+        ...prevState,
+        isLoading: false,
+      }));
     }
     const { data, error: updateProfileDataError } = await useGetAccessDatabase({
       url: DATABASE_ENDPOINTS.USER_PROFILE,
     });
     if (updateProfileDataError) {
-      return toast({
+      toast({
         variant: 'destructive',
         title: 'Uh oh! Something went wrong.',
         description: updateProfileDataError,
       });
+      return setSignInStatus((prevState) => ({
+        ...prevState,
+        isLoading: false,
+      }));
     }
+    setSignInStatus((prevState) => ({
+      ...prevState,
+      isLoading: false,
+    }));
     changeUserData(data);
     if (data) {
       navigate('/');
@@ -190,8 +210,18 @@ export default function LoginPage() {
                 </div>
 
                 <div className="col-span-6 sm:flex sm:items-center sm:gap-4">
-                  <Button variant="default" type="submit" size="default">
-                    Sign in
+                  <Button
+                    variant="default"
+                    type="submit"
+                    disabled={signInStatus.isLoading}
+                    className="relative"
+                  >
+                    {signInStatus.isLoading && <LoadingCircle />}
+                    <span
+                      className={`${signInStatus.isLoading && 'invisible'}`}
+                    >
+                      Sign in
+                    </span>
                   </Button>
 
                   <p className="mt-4 text-sm text-gray-500 sm:mt-0">
