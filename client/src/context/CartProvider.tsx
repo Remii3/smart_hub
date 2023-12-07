@@ -59,9 +59,9 @@ export default function CartProvider({ children }: { children: ReactNode }) {
   const [cartState, setCart] = useState<CartTypes>(initialState);
 
   const { userData } = useContext(UserContext);
-  const userId = userData.data?._id || getCookie('guestToken');
+  const userId = userData.data?._id;
+
   const fetchCartData = useCallback(async () => {
-    if (!userId) return;
     setCart((prevState) => {
       return { ...prevState, isLoading: true };
     });
