@@ -61,6 +61,10 @@ export default function CartProvider({ children }: { children: ReactNode }) {
   const { userData } = useContext(UserContext);
   const userId = userData.data?._id || getCookie('guestToken');
   const fetchCartData = useCallback(async () => {
+    if (!userId) return;
+    setCart((prevState) => {
+      return { ...prevState, isLoading: true };
+    });
     const { data } = await useGetAccessDatabase({
       url: DATABASE_ENDPOINTS.CART_ALL,
       params: { userId },

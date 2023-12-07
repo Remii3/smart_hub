@@ -10,6 +10,7 @@ import {
 import { AuthorTypes } from '@customTypes/interfaces';
 import { useGetAccessDatabase } from '../hooks/useAaccessDatabase';
 import { DATABASE_ENDPOINTS } from '../data/endpoints';
+import { getCookie } from '@lib/utils';
 
 type ContextTypes = {
   userData: { data: null | AuthorTypes; isLoading: boolean };
@@ -28,8 +29,10 @@ export default function UserProvider({ children }: { children: ReactNode }) {
     data: null | AuthorTypes;
     isLoading: boolean;
   }>({ data: null, isLoading: true });
+  const userId = userData.data?._id || getCookie('guestToken');
 
   const fetchUserData = useCallback(async () => {
+    if (!userId) return;
     const { data } = await useGetAccessDatabase({
       url: DATABASE_ENDPOINTS.USER_PROFILE,
     });
