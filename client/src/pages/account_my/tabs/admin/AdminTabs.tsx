@@ -122,6 +122,8 @@ export default function AdminTabs({
       isDeleted: false,
     });
   };
+  console.log('form.control: ', form.control);
+  console.log('form: ', form);
   const { fields } = useFieldArray({ name: 'admin', control: form.control });
 
   const [selectedImgs, setSelectedImgs] = useState<SelectedImgsTypes>({

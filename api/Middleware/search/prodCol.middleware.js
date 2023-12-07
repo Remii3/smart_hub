@@ -29,7 +29,12 @@ const prodCol = async (req, res, next) => {
   if (filtersData.searchedSpecial) {
     specialQuery = filtersData.searchedSpecial;
   }
-
+  if (filtersData.authorCreator) {
+    searchQuery['$or'] = [
+      { 'creatorData._id': filtersData.authorCreator },
+      { authors: filtersData.authorCreator },
+    ];
+  }
   if (filtersData.selectedAuthors && filtersData.selectedAuthors.length > 0) {
     const authors = [];
 

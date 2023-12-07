@@ -88,6 +88,7 @@ export default function MyProducts() {
     } as { [index: string]: unknown };
 
     filtersData.searchedPhrase = searchbarValue;
+    filtersData.authorCreator = userData.data?._id;
 
     const { data, error } = await useGetAccessDatabase({
       url: DATABASE_ENDPOINTS.SEARCH_PRODCOL,
