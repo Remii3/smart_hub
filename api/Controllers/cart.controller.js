@@ -13,6 +13,8 @@ const getAllCartItems = async (req, res) => {
   const cookie = req.cookies.token || req.cookies.guestToken;
   let id = userId || cookie;
 
+  if (!id) return res.status(400).json({ message: 'User id is required' });
+
   const preparedData = {
     products: [],
     cartPrice: 0,
