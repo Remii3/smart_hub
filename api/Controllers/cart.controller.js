@@ -19,27 +19,26 @@ const getAllCartItems = async (req, res) => {
     additionalData: { discount: 0 },
   };
 
-  try {
-    const cartData = await Cart.findOne({
+  const cartData = await Cart.findOne({
+    userId: id,
+  }).lean();
+  if (!cartData) {
+    await Cart.create({
       userId: id,
-    }).lean();
-    if (!cartData) {
-      await Cart.create({
-        userId: id,
-      });
-      return res.status(200).json({
-        data: {
-          products: preparedData.products,
-          cartPrice: `${cashFormatter({ number: preparedData.cartPrice })}`,
-          additionalData: {
-            discount: `${cashFormatter({
-              number: preparedData.additionalData.discount,
-            })}`,
-          },
+    });
+    return res.status(200).json({
+      data: {
+        products: preparedData.products,
+        cartPrice: `${cashFormatter({ number: preparedData.cartPrice })}`,
+        additionalData: {
+          discount: `${cashFormatter({
+            number: preparedData.additionalData.discount,
+          })}`,
         },
-      });
-    }
-
+      },
+    });
+  }
+  try {
     for (let i = 0; i < cartData.products.length; i++) {
       const product = cartData.products[i];
       const productData = await Product.findOne(
