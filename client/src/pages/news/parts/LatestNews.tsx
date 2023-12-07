@@ -8,6 +8,9 @@ import NewsArticle from '../popup/NewsArticle';
 import 'swiper/css';
 import 'swiper/css/pagination';
 import 'swiper/css/navigation';
+import SwiperArrowRight from '@components/swiper/navigation/SwiperArrowRight';
+import SwiperArrowLeft from '@components/swiper/navigation/SwiperArrowLeft';
+import SwiperDots from '@components/swiper/pagination/SwiperDots';
 
 interface PropsTypes {
   updateLatestNews: () => void;
@@ -110,13 +113,9 @@ export default function LatestNews({
             </Dialog>
           </SwiperSlide>
         ))}
-      <div
-        className={`swiper-button-next swiper-latest-news-button-next color-primary right-0 flex items-center justify-center rounded-full bg-white p-6 opacity-90 backdrop-blur-sm lg:p-8`}
-      ></div>
-      <div
-        className={`swiper-button-prev swiper-latest-news-button-prev color-primary left-0 flex items-center justify-center rounded-full bg-white p-6 opacity-90 backdrop-blur-sm lg:p-8`}
-      ></div>
-      <div className="swiper-latest-news-pagination text-center"></div>
+      <SwiperArrowRight elId={`swiper-latest-news-button-next`} />
+      <SwiperArrowLeft elId={`swiper-latest-news-button-prev`} />
+      <SwiperDots elId={`swiper-latest-news-pagination`} />
     </Swiper>
   );
 }

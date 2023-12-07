@@ -1,5 +1,7 @@
 import NewsCard from '@components/cards/NewsCard';
 import SushiSwiper from '@components/swiper/SushiSwiper';
+import SwiperArrowLeft from '@components/swiper/navigation/SwiperArrowLeft';
+import SwiperArrowRight from '@components/swiper/navigation/SwiperArrowRight';
 import { NewsType } from '@customTypes/interfaces';
 import { Navigation, Pagination } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -45,6 +47,8 @@ export default function TopRated({
               />
             </SwiperSlide>
           ))}
+          <SwiperArrowRight elId={`swiper-trendingNews-button-next`} />
+          <SwiperArrowLeft elId={`swiper-trendingNews-button-prev`} />
         </Swiper>
       </div>
       <div className="hidden lg:flex lg:flex-col lg:gap-4">
