@@ -139,8 +139,7 @@ export default function AdminTabs({
       isDeleted: false,
     });
   };
-  console.log('form.control: ', form.control);
-  console.log('form: ', form);
+
   const { fields } = useFieldArray({ name: 'admin', control: form.control });
 
   const [selectedImgs, setSelectedImgs] = useState<SelectedImgsTypes>({
@@ -236,7 +235,7 @@ export default function AdminTabs({
     }
     fetchData({});
   };
-  console.log(fields);
+
   return (
     <AccordionItem value={`${user._id}`}>
       <AccordionTrigger className="mt-3 flex w-full justify-between px-3 py-4 first:mt-0 hover:bg-transparent hover:no-underline">
