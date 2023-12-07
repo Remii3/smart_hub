@@ -28,14 +28,7 @@ export default function UserProvider({ children }: { children: ReactNode }) {
     data: null | AuthorTypes;
     isLoading: boolean;
   }>({ data: null, isLoading: true });
-  const fetchGuestData = async () => {
-    await useGetAccessDatabase({
-      url: DATABASE_ENDPOINTS.USER_GUEST,
-    });
-  };
-  useEffect(() => {
-    fetchGuestData();
-  }, []);
+
   const fetchUserData = useCallback(async () => {
     const { data } = await useGetAccessDatabase({
       url: DATABASE_ENDPOINTS.USER_PROFILE,

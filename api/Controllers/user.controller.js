@@ -177,6 +177,31 @@ const register = async (req, res) => {
 };
 
 const getMyProfile = async (req, res) => {
+  if (!req.cookies.guestToken && !req.cookies.token) {
+    jwt.sign(
+      {
+        email: getRandomString(10),
+        userId: getRandomString(15),
+      },
+      getRandomString(40),
+      {},
+      (err, token) => {
+        if (err)
+          return res
+            .status(500)
+            .json({ message: 'Failed to fetch guest Data' });
+        token = token.slice(token.length - 12, token.length);
+        return res
+          .status(200)
+          .cookie('guestToken', token, {
+            secure: true,
+            sameSite: 'None',
+            path: '/',
+          })
+          .json({ message: 'Success' });
+      },
+    );
+  }
   try {
     const userData = await User.findOne(
       {

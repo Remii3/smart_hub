@@ -15,6 +15,7 @@ import {
 } from '@hooks/useAaccessDatabase';
 import { DATABASE_ENDPOINTS } from '@data/endpoints';
 import { AddingToCartTypes } from '@customTypes/types';
+import { getCookie } from '@lib/utils';
 
 const initialState = {
   products: [],
@@ -58,13 +59,13 @@ export default function CartProvider({ children }: { children: ReactNode }) {
   const [cartState, setCart] = useState<CartTypes>(initialState);
 
   const { userData } = useContext(UserContext);
-  const userId = userData.data?._id;
-
+  const userId = userData.data?._id || getCookie('guestToken');
   const fetchCartData = useCallback(async () => {
     const { data } = await useGetAccessDatabase({
       url: DATABASE_ENDPOINTS.CART_ALL,
       params: { userId },
     });
+
     setCart((prevState) => {
       return {
         ...prevState,
