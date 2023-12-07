@@ -23,16 +23,13 @@ interface AllNewsTypes extends FetchDataTypes {
   rawData: { totalPages: number | null };
 }
 export default function NewsPage() {
-  const [isSticky, setIsSticky] = useState(false);
-  const elementRef = useRef(null);
-
   const { userData } = useContext(UserContext);
   const [searchParams, setSearchParams] = useSearchParams();
   const [page, setPage] = useState(Number(searchParams.get('page')) || 1);
   const [searchQuery, setSearchQuery] = useState(
     searchParams.get('search') || 'all'
   );
-  const currentPageSize = 10;
+  const currentPageSize = 8;
 
   const [topRatedNews, setTopRatedNews] = useState<NewsTypes>({
     data: null,
@@ -91,12 +88,17 @@ export default function NewsPage() {
     setAllNews((prevState) => {
       return { ...prevState, isLoading: true };
     });
+
+    const filtersData = {
+      page: searchParams.get('page'),
+      searchedPhrase: searchParams.get('search') === 'all' ? '' : searchQuery,
+    };
+
     const { data, error } = await useGetAccessDatabase({
       url: DATABASE_ENDPOINTS.NEWS_SEARCH,
       params: {
-        limit: currentPageSize,
-        currentPage: searchParams.get('page'),
-        searchQuery: searchParams.get('search'),
+        pageSize: currentPageSize,
+        filtersData,
       },
     });
     if (error) {
@@ -124,27 +126,6 @@ export default function NewsPage() {
     fetchLatestNews();
     fetchTopRated();
   }, []);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          // Update the state based on whether the bottom of the element is visible
-          setIsSticky(entry.isIntersecting);
-        });
-      },
-      { threshold: 0 } // Fire the callback when any part of the element is visible
-    );
-
-    if (elementRef.current) {
-      observer.observe(elementRef.current);
-    }
-
-    // Cleanup the observer when the component unmounts
-    return () => {
-      observer.disconnect();
-    };
-  }, [elementRef]);
 
   return (
     <section>
@@ -219,7 +200,7 @@ export default function NewsPage() {
               )}
           </div>
         </main>
-        <aside ref={elementRef} className="basis-full lg:basis-1/3 ">
+        <aside className="basis-full lg:basis-1/3 lg:sticky top-16">
           <h3 className="mb-2">Trending</h3>
           {topRatedNews.isLoading && !topRatedNews.data && (
             <div className="space-y-4">

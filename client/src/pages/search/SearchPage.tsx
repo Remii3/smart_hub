@@ -203,27 +203,28 @@ export default function SearchPage() {
   }, [fetchData]);
   useEffect(() => {
     if (!currentSortMethod) {
-      const searchPage = searchParams.get('page');
-      const searchMarketplace = searchParams.get('marketplace');
-      const searchRating = searchParams.get('rating');
       const searchSortMethod = searchParams.get('sortMethod');
-
-      if (!searchMarketplace) {
-        searchParams.append('marketplace', 'shop');
-        searchParams.append('marketplace', 'collection');
-      }
-
-      if (!searchRating) {
-        searchParams.set('rating', '0');
-      }
-      if (!searchPage) {
-        searchParams.set('page', '1');
-      }
       if (!searchSortMethod) {
         searchParams.set('sortMethod', sortOptions.DATE_DESC);
       }
-      setSearchParams(searchParams, { replace: true });
     }
+    const searchPage = searchParams.get('page');
+    const searchMarketplace = searchParams.get('marketplace');
+    const searchRating = searchParams.get('rating');
+
+    if (!searchMarketplace) {
+      searchParams.append('marketplace', 'shop');
+      searchParams.append('marketplace', 'collection');
+    }
+
+    if (!searchRating) {
+      searchParams.set('rating', '0');
+    }
+    if (!searchPage) {
+      searchParams.set('page', '1');
+    }
+
+    setSearchParams(searchParams, { replace: true });
   }, []);
 
   return (

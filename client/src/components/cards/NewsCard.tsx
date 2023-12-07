@@ -46,7 +46,11 @@ export default function NewsCard({
             thumbnail ? 'basis-full ' : 'ml-3 basis-1/2 '
           } space-y-1 p-3`}
         >
-          <strong className={`line-clamp-2 text-xl`}>{item.title}</strong>
+          <strong
+            className={`${thumbnail ? 'line-clamp-1' : 'line-clamp-2'} text-xl`}
+          >
+            {item.title}
+          </strong>
 
           {item.shortDescription && (
             <section

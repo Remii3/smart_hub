@@ -2,6 +2,7 @@ import NewsCard from '@components/cards/NewsCard';
 import SushiSwiper from '@components/swiper/SushiSwiper';
 import SwiperArrowLeft from '@components/swiper/navigation/SwiperArrowLeft';
 import SwiperArrowRight from '@components/swiper/navigation/SwiperArrowRight';
+import SwiperDots from '@components/swiper/pagination/SwiperDots';
 import { NewsType } from '@customTypes/interfaces';
 import { Navigation, Pagination } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -28,6 +29,7 @@ export default function TopRated({
           slidesPerView={1}
           pagination={{
             clickable: true,
+            el: `.swiper-trendingNews-pagination`,
           }}
           breakpoints={{
             640: {
@@ -49,6 +51,7 @@ export default function TopRated({
           ))}
           <SwiperArrowRight elId={`swiper-trendingNews-button-next`} />
           <SwiperArrowLeft elId={`swiper-trendingNews-button-prev`} />
+          <SwiperDots elId={`swiper-trendingNews-pagination`} />
         </Swiper>
       </div>
       <div className="hidden lg:flex lg:flex-col lg:gap-4">

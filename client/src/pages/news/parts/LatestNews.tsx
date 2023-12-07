@@ -26,7 +26,7 @@ export default function LatestNews({
   >(null);
   return (
     <Swiper
-      className="swiper-news pb-24"
+      className="swiper-news"
       navigation={{
         nextEl: `.swiper-latest-news-button-next`,
         prevEl: `.swiper-latest-news-button-prev`,

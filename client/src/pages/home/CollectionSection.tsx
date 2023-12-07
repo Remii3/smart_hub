@@ -80,7 +80,7 @@ export default function CollectionSection() {
         <Link
           to={{
             pathname: '/search',
-            search: `sort=${sortOptions.PRICE_ASC}`,
+            search: `sortMethod=${sortOptions.PRICE_ASC}`,
           }}
           className="block cursor-pointer rounded-xl"
         >

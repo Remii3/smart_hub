@@ -1,63 +1,36 @@
 const prepareNewsSearch = (req, res, next) => {
-  let { limit, searchQuery, currentPage } = req.query;
-  const maxPagination = 200 / limit;
-  const searchPipeline = [];
-  const searchCopyPipeline = [];
-
-  const page = Number(currentPage) || 1;
-  const pageSize = Number(limit) || 10;
-  const skip = (page - 1) * pageSize;
-
-  if (searchQuery === 'all') {
-    searchQuery = '';
-    searchCopyPipeline.push({
-      $sort: { createdAt: -1 },
-    });
+  let { pageSize, filtersData } = req.query;
+  const searchQuery = {};
+  if (!filtersData) {
+    filtersData = { page: 1 };
   }
 
-  if (searchQuery) {
-    searchPipeline.push({
-      $search: {
-        index: 'titleSearchIndex',
-        text: {
-          query: searchQuery,
-          path: {
-            wildcard: '*',
-          },
-        },
-      },
-    });
-    searchCopyPipeline.push({
-      $search: {
-        index: 'titleSearchIndex',
-        text: {
-          query: searchQuery,
-          path: {
-            wildcard: '*',
-          },
-        },
-      },
-    });
+  let currentPage = filtersData.page;
+
+  if (!currentPage) {
+    currentPage = 1;
   }
 
-  searchCopyPipeline.push({
-    $skip: skip,
-  });
+  let currentPageSize = pageSize;
+  if (!currentPageSize) {
+    currentPageSize = 10;
+  }
 
-  searchCopyPipeline.push({
-    $limit: Number(limit),
-  });
+  const skipPages = (currentPage - 1) * currentPageSize;
 
-  searchPipeline.push({
-    $count: 'totalDocuments',
-  });
+  if (filtersData.searchedPhrase) {
+    searchQuery.title = { $regex: new RegExp(filtersData.searchedPhrase, 'i') };
+  }
 
-  searchCopyPipeline.push({
-    $limit: maxPagination,
-  });
+  req.finalSearchData = {
+    searchQuery,
+  };
 
-  req.searchPipeline = searchPipeline;
-  req.searchCopyPipeline = searchCopyPipeline;
+  req.pageData = {
+    skipPages,
+    currentPageSize,
+    currentPage,
+  };
   next();
 };
 module.exports = prepareNewsSearch;

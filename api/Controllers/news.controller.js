@@ -166,18 +166,20 @@ const addOneNews = async (req, res) => {
 };
 
 const findSearchedNews = async (req, res) => {
-  const searchCopyPipeline = req.searchCopyPipeline;
-  const searchPipeline = req.searchPipeline;
+  const { searchQuery } = req.finalSearchData;
+  const { skipPages, currentPageSize } = req.pageData;
 
   try {
-    const [countResult, newsData] = await Promise.all([
-      News.aggregate(searchPipeline),
-      News.aggregate(searchCopyPipeline),
-    ]);
-    const totalPages =
-      countResult.length > 0 ? countResult[0].totalDocuments : 0;
+    const newsData = await News.find(searchQuery)
+      .limit(currentPageSize)
+      .skip(skipPages)
+      .lean();
 
-    return res.json({ data: { data: newsData, rawData: { totalPages } } });
+    const totalPages = await News.find(searchQuery).countDocuments();
+
+    return res.status(200).json({
+      data: { data: newsData, rawData: { totalPages: totalPages || 0 } },
+    });
   } catch (err) {
     return res.status(500).json({
       message: 'Failed searching for news',

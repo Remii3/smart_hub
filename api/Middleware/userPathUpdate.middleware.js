@@ -18,14 +18,14 @@ const userPathUpdate = (req, res, next) => {
     preparedData['$set'] = { role: dirtyData.role };
   }
 
-  if (dirtyData.firstName) {
+  if (dirtyData.firstName !== undefined) {
     preparedData['$set'] = {
       ...preparedData['$set'],
       'userInfo.credentials.firstName': dirtyData.firstName,
     };
   }
 
-  if (dirtyData.lastName) {
+  if (dirtyData.lastName !== undefined) {
     preparedData['$set'] = {
       ...preparedData['$set'],
       'userInfo.credentials.lastName': dirtyData.lastName,
@@ -37,61 +37,61 @@ const userPathUpdate = (req, res, next) => {
     preparedData['$set'] = { password: copyPassword };
   }
 
-  if (dirtyData.phone) {
+  if (dirtyData.phone !== undefined) {
     preparedData['$set'] = { 'userInfo.phone': dirtyData.phone };
   }
 
-  if (dirtyData.quote) {
+  if (dirtyData.quote !== undefined) {
     preparedData['$set'] = { 'authorInfo.quote': dirtyData.quote };
   }
 
-  if (dirtyData.pseudonim) {
+  if (dirtyData.pseudonim !== undefined) {
     preparedData['$set'] = { 'authorInfo.pseudonim': dirtyData.pseudonim };
   }
 
-  if (dirtyData.shortDescription) {
+  if (dirtyData.shortDescription !== undefined) {
     preparedData['$set'] = {
       'authorInfo.shortDescription': dirtyData.shortDescription,
     };
   }
 
-  if (dirtyData.line1) {
+  if (dirtyData.line1 !== undefined) {
     preparedData['$set'] = {
       ...preparedData['$set'],
       'userInfo.address.line1': dirtyData.line1,
     };
   }
-  if (dirtyData.line2) {
+  if (dirtyData.line2 !== undefined) {
     preparedData['$set'] = {
       ...preparedData['$set'],
       'userInfo.address.line2': dirtyData.line2,
     };
   }
-  if (dirtyData.city) {
+  if (dirtyData.city !== undefined) {
     preparedData['$set'] = {
       ...preparedData['$set'],
       'userInfo.address.city': dirtyData.city,
     };
   }
-  if (dirtyData.state) {
+  if (dirtyData.state !== undefined) {
     preparedData['$set'] = {
       ...preparedData['$set'],
       'userInfo.address.state': dirtyData.state,
     };
   }
-  if (dirtyData.postalCode) {
+  if (dirtyData.postalCode !== undefined) {
     preparedData['$set'] = {
       ...preparedData['$set'],
       'userInfo.address.postalCode': dirtyData.postalCode,
     };
   }
-  if (dirtyData.country) {
+  if (dirtyData.country !== undefined) {
     preparedData['$set'] = {
       ...preparedData['$set'],
       'userInfo.address.country': dirtyData.country,
     };
   }
-  if (dirtyData.profileImg) {
+  if (dirtyData.profileImg !== undefined) {
     preparedData['$set'] = {
       ...preparedData['$set'],
       'userInfo.profileImg': dirtyData.profileImg,
