@@ -9,7 +9,10 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@components/UI/popover';
-import { useGetAccessDatabase } from '../hooks/useAaccessDatabase';
+import {
+  useGetAccessDatabase,
+  usePostAccessDatabase,
+} from '../hooks/useAaccessDatabase';
 import { DATABASE_ENDPOINTS } from '../data/endpoints';
 import { Separator } from '@components/UI/separator';
 import { Button } from '@components/UI/button';
@@ -76,6 +79,10 @@ export default function Nav({ scrollFlag }: { scrollFlag: boolean }) {
       navigate('/');
     }
     setTimeout(async () => {
+      await usePostAccessDatabase({
+        url: DATABASE_ENDPOINTS.USER_LOGOUT,
+        body: {},
+      });
       await useGetAccessDatabase({ url: DATABASE_ENDPOINTS.USER_GUEST });
       changeUserData(null);
       navigate('/');

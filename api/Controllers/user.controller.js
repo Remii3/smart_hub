@@ -177,7 +177,6 @@ const register = async (req, res) => {
 };
 
 const getMyProfile = async (req, res) => {
-  // let preparedData = {};
   try {
     const userData = await User.findOne(
       {
@@ -185,57 +184,6 @@ const getMyProfile = async (req, res) => {
       },
       { password: 0 },
     );
-
-    // const cartData = await Cart.findOne({
-    //   userId: userData._id,
-    // });
-    // preparedData = userData;
-    if (userData.role != 'User') {
-      // const userProducts = await Product.find({
-      //   $or: [{ authors: userData._id }, { 'creatorData._id': userData._id }],
-      //   sold: false,
-      //   deleted: false,
-      //   quantity: { $gt: 0 },
-      // }).lean();
-      // const userProductsCopy = userProducts.map(product => ({
-      //   ...product,
-      //   price: {
-      //     ...product.price,
-      //     value: `${cashFormatter({
-      //       number: product.price.value,
-      //     })}`,
-      //   },
-      // }));
-      // const preparedAuthorInfo = {
-      //   avg_products_grade,
-      //   categories,
-      //   followers,
-      //   my_products: userProductsCopy,
-      //   myCollections: [],
-      //   pseudonim,
-      //   quote,
-      //   short_description,
-      //   sold_books_quantity,
-      //   _id,
-      // };
-    } else {
-      // preparedData = {
-      //   _id: userData._id,
-      //   email: userData.email
-      // };
-      // let preparedUserData = {
-      //   _id,
-      //   email,
-      //   username,
-      //   user_info,
-      //   following,
-      //   orders,
-      //   cart: cartData,
-      //   role,
-      //   security_settings,
-      //   news,
-      // };
-    }
 
     res.status(200).json({ data: userData });
   } catch (err) {
@@ -276,6 +224,17 @@ const getOtherProfile = async (req, res) => {
       .json({ message: 'Failed to fetch user data', error: err.message });
   }
 };
+const logout = async (req, res) => {
+  return res
+    .status(200)
+    .cookie('token', '', {
+      secure: true,
+      expirces: 'Thu, 01 Jan 1970 00:00:01 GMT',
+      sameSite: 'None',
+      path: '/',
+    })
+    .json({ message: 'Success' });
+};
 
 const getGuestProfile = async (req, res) => {
   if (req.cookies.guestToken || req.cookies.token)
@@ -289,22 +248,17 @@ const getGuestProfile = async (req, res) => {
     getRandomString(40),
     {},
     (err, token) => {
-      if (err) res.status(500).json({ message: 'Failed to fetch guest Data' });
+      if (err)
+        return res.status(500).json({ message: 'Failed to fetch guest Data' });
       token = token.slice(token.length - 12, token.length);
-      res
+      return res
         .status(200)
         .cookie('guestToken', token, {
           secure: true,
           sameSite: 'None',
           path: '/',
         })
-        .cookie('token', '', {
-          secure: true,
-          expirces: 'Thu, 01 Jan 1970 00:00:01 GMT',
-          sameSite: 'None',
-          path: '/',
-        })
-        .json('Success');
+        .json({ message: 'Success' });
     },
   );
 };
@@ -541,4 +495,5 @@ module.exports = {
   getFollowedUsers,
   deleteOneUser,
   getFollowes,
+  logout,
 };
